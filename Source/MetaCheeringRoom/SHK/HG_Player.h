@@ -26,11 +26,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-// 	UPROPERTY()
-// 	class USpringArmComponent* SpringArmComp;
-// 
-// 	UPROPERTY()
-// 	class UCameraComponent* CameraComp;
+	UPROPERTY(EditDefaultsOnly)
+	class USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UCameraComponent* CameraComp;
 
 	UPROPERTY(EditDefaultsOnly,Category="Input")
 	class UInputMappingContext* IMC_Player;
@@ -41,6 +41,8 @@ public:
 	class UInputAction* IA_Jump;
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Look;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Interaction;
 	
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
@@ -48,6 +50,15 @@ public:
 	void OnMyJump(const FInputActionValue& Value);
 	UFUNCTION()
 	void OnMyLook(const FInputActionValue& Value);
-
+	UFUNCTION()
+	void OnMyInteraction(const FInputActionValue& Value);
+	UFUNCTION()
+	void DetectObject();
 	FVector Direction;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UHG_PlayerGoodsComponent* GoodsComp;
+
+	bool bToggle = false;
+	bool bCanMove = true;
 };
