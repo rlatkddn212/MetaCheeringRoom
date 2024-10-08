@@ -19,7 +19,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -32,18 +32,20 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UCameraComponent* CameraComp;
 
-	UPROPERTY(EditDefaultsOnly,Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputMappingContext* IMC_Player;
-	
-	UPROPERTY(EditDefaultsOnly,Category="Input")
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Move;
-	UPROPERTY(EditDefaultsOnly,Category="Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Jump;
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Look;
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Interaction;
-	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Inventory;
+
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
 	UFUNCTION()
@@ -54,6 +56,8 @@ public:
 	void OnMyInteraction(const FInputActionValue& Value);
 	UFUNCTION()
 	void DetectObject();
+	UFUNCTION()
+	void PopUpInventory(const FInputActionValue& Value);
 	FVector Direction;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -61,4 +65,11 @@ public:
 
 	bool bToggle = false;
 	bool bCanMove = true;
+
+	// ============== Inventory ====================
+	UPROPERTY(EditDefaultsOnly)
+	class UHG_PlayerInventoryComponent* InventoryComp;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInventoryWidget* InventoryWidget;
 };

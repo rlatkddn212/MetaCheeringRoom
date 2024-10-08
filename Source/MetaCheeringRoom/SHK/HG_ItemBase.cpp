@@ -32,42 +32,26 @@ void AHG_ItemBase::Tick(float DeltaTime)
 
 }
 
-void AHG_ItemBase::UseItem()
+void AHG_ItemBase::Use()
 {
 }
 
 void AHG_ItemBase::SetItemName(FString Value)
 {
-	ItemName = Value;
+	ItemData.ItemName = Value;
 }
 
-FString AHG_ItemBase::GetItemName() const
+FString AHG_ItemBase::GetItemName()
 {
-	return ItemName;
+	return ItemData.ItemName;
 }
 
 void AHG_ItemBase::SetItemIcon(UTexture2D* Value)
 {
-	ItemIcon = Value;
+	ItemData.ItemIcon = Value;
 }
 
-UTexture2D* AHG_ItemBase::GetItemIcon() const
+UTexture2D* AHG_ItemBase::GetItemIcon()
 {
-	return ItemIcon;
+	return ItemData.ItemIcon;
 }
-
-void AHG_ItemBase::SetQunatity(int32 Value)
-{
-	Qunatity = Value;
-}
-
-void AHG_ItemBase::AddQunatity(int32 Value)
-{
-	Qunatity += Value;
-}
-
-int32 AHG_ItemBase::GetQuantity() const
-{
-	return Qunatity;
-}
-

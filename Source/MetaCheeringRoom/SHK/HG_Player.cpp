@@ -9,6 +9,9 @@
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "HG_PlayerGoodsComponent.h"
 #include "HG_StoreTriggerBox.h"
+#include "HG_ItemBase.h"
+#include "HG_PlayerInventoryComponent.h"
+#include "InventoryWidget.h"
 
 // Sets default values
 AHG_Player::AHG_Player()
@@ -24,6 +27,8 @@ AHG_Player::AHG_Player()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	GoodsComp = CreateDefaultSubobject<UHG_PlayerGoodsComponent>(TEXT("GoodsComp"));
+
+	InventoryComp = CreateDefaultSubobject<UHG_PlayerInventoryComponent>(TEXT("InventoryComp"));
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
 	if (TempMesh.Succeeded()) {
@@ -146,6 +151,31 @@ void AHG_Player::DetectObject()
 				}
 			}
 		}
+		// 라인트레이스에 맞은게 아이템일 때
+		if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
+		{
+			InventoryComp->AddtoInventory(Item->GetItemName(),1,Item);
+		}
+	}
+}
+
+void AHG_Player::PopUpInventory(const FInputActionValue& Value)
+{	
+	if (InventoryWidget == nullptr)
+	{
+		InventoryWidget = CreateWidget<UInventoryWidget>(this, InventoryWidgetClass);
+	}
+	else
+	{
+		return;
+	}
+	if (!bToggle)
+	{
+		InventoryWidget->AddToViewport();
+	}
+	else
+	{
+		InventoryWidget->RemoveFromParent();
 	}
 }
 

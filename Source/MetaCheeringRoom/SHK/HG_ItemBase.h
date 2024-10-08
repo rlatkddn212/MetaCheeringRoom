@@ -6,6 +6,22 @@
 #include "GameFramework/Actor.h"
 #include "HG_ItemBase.generated.h"
 
+
+USTRUCT(BlueprintType)
+struct FItemData: public FTableRowBase
+{
+    GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ItemName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* ItemIcon;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 ItemPrice;
+};
+
 UCLASS()
 class METACHEERINGROOM_API AHG_ItemBase : public AActor
 {
@@ -20,14 +36,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(Replicated)
-	FString ItemName;
-
-	UPROPERTY(Replicated)
-	UTexture2D* ItemIcon;
-
-	UPROPERTY(Replicate)
-	int32 Qunatity;
+	FItemData ItemData;
 
 public:
 	// Called every frame
@@ -40,15 +49,11 @@ public:
 	class UBoxComponent* BoxComp;
 
 	// 아이템 사용 (자식에서 구현)
-	void UseItem();
+	virtual void Use();
 
 	void SetItemName(FString Value);
-	FString GetItemName() const;
+	FString GetItemName();
 
 	void SetItemIcon(UTexture2D* Value);
-	UTexture2D* GetItemIcon() const;
-
-	void SetQunatity(int32 Value);
-	int32 GetQuantity() const;
-
+	UTexture2D* GetItemIcon();
 };
