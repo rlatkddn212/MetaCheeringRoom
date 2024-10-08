@@ -61,10 +61,10 @@ void AHG_ItemBase::SetQunatity(int32 Value)
 	Qunatity = Value;
 }
 
-void AHG_ItemBase::AddQunatity(int32 Value)
-{
-	Qunatity += Value;
-}
+// void AHG_ItemBase::AddQunatity(int32 Value)
+// {
+// 	Qunatity += Value;
+// }
 
 int32 AHG_ItemBase::GetQuantity() const
 {

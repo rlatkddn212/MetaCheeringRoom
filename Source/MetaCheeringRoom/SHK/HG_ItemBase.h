@@ -20,13 +20,13 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(Replicated)
+/*	UPROPERTY(Replicated)*/
 	FString ItemName;
 
-	UPROPERTY(Replicated)
+/*	UPROPERTY(Replicated)*/
 	UTexture2D* ItemIcon;
 
-	UPROPERTY(Replicate)
+/*	UPROPERTY(Replicate)*/
 	int32 Qunatity;
 
 public:
@@ -39,7 +39,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* BoxComp;
 
-	// ¾ÆÀÌÅÛ »ç¿ë (ÀÚ½Ä¿¡¼­ ±¸Çö)
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (ï¿½Ú½Ä¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
 	void UseItem();
 
 	void SetItemName(FString Value);
