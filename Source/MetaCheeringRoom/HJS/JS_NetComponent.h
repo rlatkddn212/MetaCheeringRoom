@@ -30,15 +30,33 @@ public:
 	void URLSendToAIServer(const FString& VideoURL);
 
 	// 서버 URL
-	const FString ServerURL = "http://127.0.0.1:5000/";
+	const FString ServerURL = "http://127.0.0.1:5000";
 
 	// 생성 Key
-	FString VideoURL = TEXT("convert_stream");
+	FString StreamURL = TEXT("/convert_stream");
 
-	// 스트림 Key
-	FString StreamURL;
+	// 생성된 URL
+	FString StreamResURL;
+
+	// 스트림 Unique ID
+	FString StreamID;
+
+	// Video Key
+	FString VideoURL;
+
+	int32 SegmentNumber;
 
 	FString MakeJson(const TMap<FString, FString> source);
 
 	FString JsonParseURLData(const FString& json);
+
+	void GetVideoTimer();
+
+	void GetVideoURL();
+
+	UFUNCTION()
+	void Play();
+
+	UFUNCTION()
+	void SetVideoURL();
 };

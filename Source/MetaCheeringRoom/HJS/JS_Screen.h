@@ -26,4 +26,38 @@ public:
 	UPROPERTY()
 	class UJS_NetComponent* NetComp;
 
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* ScreenComp;
+
+	UPROPERTY(EditAnywhere)
+	class UMediaPlayer* MediaPlayer;
+
+	UPROPERTY(EditAnywhere)
+	class UMediaPlayer* MediaPlayer2;
+
+	UPROPERTY(EditAnywhere)
+	class UMediaTexture* MediaTexture;
+
+	UPROPERTY(EditAnywhere)
+	class UStreamMediaSource* MediaSource;
+
+	UPROPERTY(EditAnywhere)
+	class UStreamMediaSource* MediaSource2;
+
+	UPROPERTY(EditAnywhere)
+	class UMediaSoundComponent* MediaSound;
+
+	UFUNCTION()
+	void OnMediaEndReached();
+
+	UFUNCTION()
+	void PlayMedia();
+
+	UFUNCTION()
+	void RequestMediaURL(FString URL);
+
+	bool bUsingFirstPlayer = true; // 현재 어느 플레이어가 사용 중인지 체크
+
+	void PrepareNextMediaSource();
+
 };
