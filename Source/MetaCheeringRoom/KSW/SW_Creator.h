@@ -25,5 +25,19 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	UPROPERTY(EditDefaultsOnly,Category="Input")
+	class UInputMappingContext* IMC_Player;
+	
+	UPROPERTY(EditDefaultsOnly,Category="Input")
+	class UInputAction* IA_Move;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Look;
+	
+	UFUNCTION()
+	void OnMyMove(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyLook(const FInputActionValue& Value);
 
+	FVector Direction;
 };
