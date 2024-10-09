@@ -6,6 +6,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "HttpModule.h"
 #include "HttpFwd.h"
+#include "JS_Screen.h"
 
 // Sets default values for this component's properties
 UJS_NetComponent::UJS_NetComponent()
@@ -44,7 +45,7 @@ void UJS_NetComponent::URLSendToAIServer(const FString& URL)
 
 	// HTTP 요청 생성
 	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
-	HttpRequest->SetURL(ServerURL);
+	HttpRequest->SetURL(ServerURL + StreamURL);
 	HttpRequest->SetVerb("POST");
 	HttpRequest->SetHeader(TEXT("content-type"), TEXT("application/json"));
 	HttpRequest->SetContentAsString(MakeJson(Senddata));
@@ -55,7 +56,11 @@ void UJS_NetComponent::URLSendToAIServer(const FString& URL)
 			if (bWasSuccessful && Response->GetResponseCode() == 200)
 			{
 				FString Res = Response->GetContentAsString();
-				StreamURL = JsonParseURLData(Res);
+				StreamResURL = JsonParseURLData(Res);
+				StreamResURL.Split(TEXT("/stream/"), nullptr, &StreamID);
+				StreamID.Split(TEXT(".m3u8"), &StreamID, nullptr);
+				GetVideoTimer();
+				UE_LOG(LogTemp, Error, TEXT("성공"));
 			}
 			else
 			{
@@ -96,5 +101,71 @@ FString UJS_NetComponent::JsonParseURLData(const FString& json)
 		result = response->GetStringField(TEXT("url"));
 	}
 	return result;
+}
+
+void UJS_NetComponent::GetVideoTimer()
+{
+	FTimerHandle GetVedioTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(GetVedioTimerHandle, this, &UJS_NetComponent::GetVideoURL, 5.f, false);
+}
+
+void UJS_NetComponent::GetVideoURL()
+{
+	FString RequestURL = ServerURL + StreamResURL;
+	// M3U8 파일을 다운로드하는 HTTP 요청 생성
+
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = FHttpModule::Get().CreateRequest();
+	HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+	{
+		if (bWasSuccessful && Response->GetResponseCode() == 200)
+		{
+			FString Res = Response->GetContentAsString();
+
+			SegmentNumber = -1;
+
+			FString SegmentPrefix = StreamID;
+
+			int32 Index = Res.Find(SegmentPrefix);
+			if (Index != INDEX_NONE)
+			{
+				// Stream ID 이후의 문자열에서 세그먼트 번호 추출
+				FString Substring = Res.Mid(Index + SegmentPrefix.Len());
+				FString SegmentStr;
+				Substring.Split(TEXT(".ts"), &SegmentStr, nullptr);
+				SegmentNumber = FCString::Atoi(*SegmentStr);
+			}
+
+			if (SegmentNumber == -1)
+			{
+				UE_LOG(LogTemp, Error, TEXT("M3U8 파일에서 세그먼트 번호 추출 실패"));
+				return;
+			}
+
+			VideoURL = FString::Printf(TEXT("%s/videos/%s%d"),*ServerURL,*StreamID,SegmentNumber);
+			UE_LOG(LogTemp, Log, TEXT("재생할 비디오 URL: %s"), *VideoURL);
+
+			FTimerHandle StartMediaHandle;
+			GetWorld()->GetTimerManager().SetTimer(StartMediaHandle,this,&UJS_NetComponent::Play,20.f,false);
+
+		}
+		else
+		{
+			
+		}
+	});
+	HttpRequest->SetURL(RequestURL);
+	HttpRequest->SetVerb("GET");
+	HttpRequest->ProcessRequest();
+}
+
+void UJS_NetComponent::Play()
+{
+	Me->PlayMedia();
+}
+
+void UJS_NetComponent::SetVideoURL()
+{
+	VideoURL = FString::Printf(TEXT("%s/videos/%s%d"), *ServerURL, *StreamID, ++SegmentNumber);
+	UE_LOG(LogTemp, Log, TEXT("재생할 비디오 URL: %s"), *VideoURL);
 }
 
