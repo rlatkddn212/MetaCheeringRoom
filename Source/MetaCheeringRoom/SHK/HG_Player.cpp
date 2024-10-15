@@ -9,6 +9,9 @@
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "HG_PlayerGoodsComponent.h"
 #include "HG_StoreTriggerBox.h"
+#include "HG_ItemBase.h"
+#include "HG_PlayerInventoryComponent.h"
+#include "InventoryWidget.h"
 
 // Sets default values
 AHG_Player::AHG_Player()
@@ -24,6 +27,8 @@ AHG_Player::AHG_Player()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	GoodsComp = CreateDefaultSubobject<UHG_PlayerGoodsComponent>(TEXT("GoodsComp"));
+
+	InventoryComp = CreateDefaultSubobject<UHG_PlayerInventoryComponent>(TEXT("InventoryComp"));
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
 	if (TempMesh.Succeeded()) {
@@ -78,6 +83,9 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	// 상호작용
 	input->BindAction(IA_Interaction, ETriggerEvent::Completed, this, &AHG_Player::OnMyInteraction);
+
+	// 인벤토리
+	input->BindAction(IA_Inventory, ETriggerEvent::Completed, this, &AHG_Player::PopUpInventory);
 
 }
 
@@ -135,17 +143,55 @@ void AHG_Player::DetectObject()
 				if (!bToggle)
 				{
 					pc->SetShowMouseCursor(true);
-					bToggle = true;
+					bToggle = !bToggle;
 					bCanMove = false;
 				}
 				else
 				{
 					pc->SetShowMouseCursor(false);
-					bToggle = false;
+					bToggle = !bToggle;
 					bCanMove = true;
 				}
 			}
 		}
+		// 라인트레이스에 맞은게 아이템일 때
+		if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
+		{
+			InventoryComp->AddtoInventory(Item->GetItemData(), 1);
+			Item->Destroy();
+		}
+	}
+}
+
+void AHG_Player::PopUpInventory(const FInputActionValue& Value)
+{
+	if (InventoryWidget == nullptr)
+	{
+		InventoryWidget = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
+		if (InventoryWidget)
+		{
+			InventoryWidget->SetOwner(this);
+		}
+	}
+	auto* pc = Cast<APlayerController>(Controller);
+	if (pc)
+	{
+		if (!bToggle)
+		{
+			pc->SetShowMouseCursor(true);
+			InventoryWidget->AddToViewport();
+			InventoryWidget->InitInventoryUI();
+			bToggle = !bToggle;
+			bCanMove = false;
+		}
+		else
+		{
+			pc->SetShowMouseCursor(false);
+			InventoryWidget->RemoveFromParent();
+			bToggle = !bToggle;
+			bCanMove = true;
+		}
+
 	}
 }
 
