@@ -29,7 +29,6 @@ void AJS_Screen::BeginPlay()
 	NetComp->Me = this;
 	MediaPlayer->OnEndReached.AddDynamic(this, &AJS_Screen::OnMediaEndReached);
 	MediaPlayer2->OnEndReached.AddDynamic(this, &AJS_Screen::OnMediaEndReached);
-	RequestMediaURL(TEXT("00"));
 
 	if (MediaSound)
 	{
@@ -72,7 +71,7 @@ void AJS_Screen::OnMediaEndReached()
 
 void AJS_Screen::RequestMediaURL(FString URL)
 {
-	URL = TEXT("https://www.youtube.com/watch?v=IB7zflbICFM");
+	URL = TEXT("https://play.sooplive.co.kr/tjrdbs999/277798062");
 	NetComp->URLSendToAIServer(URL);
 }
 

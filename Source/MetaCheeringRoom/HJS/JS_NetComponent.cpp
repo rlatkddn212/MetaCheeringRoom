@@ -25,7 +25,8 @@ void UJS_NetComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	FTimerHandle HeartBeatHandle;
+	GetWorld()->GetTimerManager().SetTimer(HeartBeatHandle,this, &UJS_NetComponent::SendHeartBeat,5,true);
 }
 
 
@@ -61,15 +62,49 @@ void UJS_NetComponent::URLSendToAIServer(const FString& URL)
 				StreamID.Split(TEXT(".m3u8"), &StreamID, nullptr);
 				GetVideoTimer();
 				UE_LOG(LogTemp, Error, TEXT("성공"));
+				SendHeartBeat();
 			}
 			else
 			{
-				
+				UE_LOG(LogTemp, Error, TEXT("실패"));
 			}
 		});
 
 	// 요청 전송
 	HttpRequest->ProcessRequest();
+}
+
+void UJS_NetComponent::SendHeartBeat()
+{
+	UE_LOG(LogTemp, Error, TEXT("전송 전"));
+	if (ClientID == "")
+	{
+		return;
+	}
+
+	// 파일 읽기
+	TMap<FString, FString> Senddata;
+	Senddata.Add(TEXT("client_id"), ClientID);
+
+	// HTTP 요청 생성
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+	HttpRequest->SetURL(ServerURL + HeartBeatURL);
+	HttpRequest->SetVerb("POST");
+	HttpRequest->SetHeader(TEXT("content-type"), TEXT("application/json"));
+	HttpRequest->SetContentAsString(MakeJson(Senddata));
+
+	// HTTP 응답 처리
+	HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+		{
+			if (bWasSuccessful && Response->GetResponseCode() == 200)
+			{
+				UE_LOG(LogTemp, Error, TEXT("응답"));
+			}
+		});
+
+	// 요청 전송
+	HttpRequest->ProcessRequest();
+	UE_LOG(LogTemp, Error, TEXT("전송 후"));
 }
 
 FString UJS_NetComponent::MakeJson(const TMap<FString, FString> source)
@@ -99,6 +134,7 @@ FString UJS_NetComponent::JsonParseURLData(const FString& json)
 	if (FJsonSerializer::Deserialize(reader, response))
 	{
 		result = response->GetStringField(TEXT("url"));
+		ClientID = response->GetStringField(TEXT("client_id"));
 	}
 	return result;
 }
@@ -167,5 +203,10 @@ void UJS_NetComponent::SetVideoURL()
 {
 	VideoURL = FString::Printf(TEXT("%s/videos/%s%d"), *ServerURL, *StreamID, ++SegmentNumber);
 	UE_LOG(LogTemp, Log, TEXT("재생할 비디오 URL: %s"), *VideoURL);
+}
+
+void UJS_NetComponent::SetVodURL()
+{
+	
 }
 

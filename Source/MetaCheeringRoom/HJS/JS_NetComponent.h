@@ -35,11 +35,18 @@ public:
 	// 생성 Key
 	FString StreamURL = TEXT("/convert_stream");
 
+	// 하트비트 Key
+	FString HeartBeatURL = TEXT("/heartbeat");
+
 	// 생성된 URL
 	FString StreamResURL;
 
 	// 스트림 Unique ID
 	FString StreamID;
+
+	FString ClientID = "";
+
+	void SendHeartBeat();
 
 	// Video Key
 	FString VideoURL;
@@ -59,4 +66,8 @@ public:
 
 	UFUNCTION()
 	void SetVideoURL();
+
+	UFUNCTION()
+	void SetVodURL();
+
 };
