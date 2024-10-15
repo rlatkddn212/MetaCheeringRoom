@@ -4,6 +4,7 @@
 #include "HG_ItemBase.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "Engine/DataTable.h"
 
 // Sets default values
 AHG_ItemBase::AHG_ItemBase()
@@ -13,16 +14,26 @@ AHG_ItemBase::AHG_ItemBase()
 
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
 	SetRootComponent(BoxComp);
+	BoxComp->SetGenerateOverlapEvents(true);
+	BoxComp->SetCollisionProfileName(TEXT("Item"));
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);
+	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableObj(TEXT("/Script/Engine.DataTable'/Game/SHK/BP/DT_Item.DT_Item'"));
+	if (DataTableObj.Succeeded())
+	{
+		ItemDataTable = DataTableObj.Object;
+	}
 }
 
 // Called when the game starts or when spawned
 void AHG_ItemBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SetItemName(TEXT("Green"));
+	InitItemData();
 }
 
 // Called every frame
@@ -32,42 +43,55 @@ void AHG_ItemBase::Tick(float DeltaTime)
 
 }
 
-void AHG_ItemBase::UseItem()
+void AHG_ItemBase::Use()
 {
 }
 
 void AHG_ItemBase::SetItemName(FString Value)
 {
-	ItemName = Value;
+	ItemData.ItemName = Value;
 }
 
-FString AHG_ItemBase::GetItemName() const
+FString AHG_ItemBase::GetItemName()
 {
-	return ItemName;
+	return ItemData.ItemName;
 }
 
 void AHG_ItemBase::SetItemIcon(UTexture2D* Value)
 {
-	ItemIcon = Value;
+	ItemData.ItemIcon = Value;
 }
 
-UTexture2D* AHG_ItemBase::GetItemIcon() const
+UTexture2D* AHG_ItemBase::GetItemIcon()
 {
-	return ItemIcon;
+	return ItemData.ItemIcon;
 }
 
-void AHG_ItemBase::SetQunatity(int32 Value)
+FItemData AHG_ItemBase::GetItemData()
 {
-	Qunatity = Value;
+	return ItemData;
 }
 
-// void AHG_ItemBase::AddQunatity(int32 Value)
-// {
-// 	Qunatity += Value;
-// }
-
-int32 AHG_ItemBase::GetQuantity() const
+void AHG_ItemBase::SetItemData(FItemData ItemValue)
 {
-	return Qunatity;
+	ItemData.ItemClass = this->GetClass();
+	ItemData.ItemIcon = ItemValue.ItemIcon;
+	ItemData.ItemName = ItemValue.ItemName;
+	ItemData.ItemPrice = ItemValue.ItemPrice;
 }
 
+void AHG_ItemBase::InitItemData()
+{
+	
+	TArray<FItemData*> AllRows;
+	ItemDataTable->GetAllRows(TEXT(""), AllRows);
+	for (auto Row : AllRows)
+	{
+		if (Row->ItemName == ItemData.ItemName)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Init"));
+			SetItemData(*Row);
+			break;
+		}
+	}
+}

@@ -6,6 +6,25 @@
 #include "GameFramework/Actor.h"
 #include "HG_ItemBase.generated.h"
 
+
+USTRUCT(BlueprintType)
+struct FItemData: public FTableRowBase
+{
+    GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ItemName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* ItemIcon;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 ItemPrice;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AHG_ItemBase> ItemClass;
+};
+
 UCLASS()
 class METACHEERINGROOM_API AHG_ItemBase : public AActor
 {
@@ -20,14 +39,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-/*	UPROPERTY(Replicated)*/
-	FString ItemName;
-
-/*	UPROPERTY(Replicated)*/
-	UTexture2D* ItemIcon;
-
-/*	UPROPERTY(Replicate)*/
-	int32 Qunatity;
+	FItemData ItemData;
 
 public:
 	// Called every frame
@@ -39,16 +51,20 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* BoxComp;
 
-	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (ï¿½Ú½Ä¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
-	void UseItem();
+	// ¾ÆÀÌÅÛ »ç¿ë (ÀÚ½Ä¿¡¼­ ±¸Çö)
+	virtual void Use();
 
 	void SetItemName(FString Value);
-	FString GetItemName() const;
+	FString GetItemName();
 
 	void SetItemIcon(UTexture2D* Value);
-	UTexture2D* GetItemIcon() const;
+	UTexture2D* GetItemIcon();
 
-	void SetQunatity(int32 Value);
-	int32 GetQuantity() const;
+	FItemData GetItemData();
+	void SetItemData(FItemData ItemValue);
+	void InitItemData();
+
+	UPROPERTY(EditDefaultsOnly)
+	class UDataTable* ItemDataTable;
 
 };
