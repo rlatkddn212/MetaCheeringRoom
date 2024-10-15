@@ -22,8 +22,7 @@ struct FSlotStruct
 public:
 
 	UPROPERTY(EditAnywhere)
-	int32 Qunatity;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AHG_ItemBase> ItemClass;
+	int32 Quantity = 0;
+	UPROPERTY(EditDefaultsOnly)
+	FItemData ItemInfo;
 };

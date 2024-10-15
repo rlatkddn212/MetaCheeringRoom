@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "SlotStruct.h"
 #include "HG_SlotWidget.generated.h"
 
 /**
@@ -26,8 +27,14 @@ public:
 	UFUNCTION()
 	void OnButtonClicked();
 
-	void SetItemIcon(UTexture2D* Icon);
+	void SetItemIcon();
+
+	void InitSlot(FSlotStruct p_Slot);
+
+	void SetOwner(class UInventoryWidget* p_Owner);
+
+	FSlotStruct SlotInfo;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class AHG_ItemBase> ItemClass;
+	UInventoryWidget* Owner;
 };

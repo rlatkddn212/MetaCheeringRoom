@@ -29,11 +29,14 @@ public:
 
 	TArray<FSlotStruct> Inventory;
 
-	int32 SlotNum = 0;
+	void AddtoInventory(FItemData Item, int32 Quantity);
 
-	void AddtoInventory(FString ItemName, int32 Quantity, class AHG_ItemBase* Item);
+	int32 FindSlot(FString ItemName);
 
-	int32 FindSlot(AHG_ItemBase* Item);
+	void RemoveFromInventory(FItemData Item, int32 Quantity);
+	
+	UPROPERTY(EditDefaultsOnly)
+	class UDataTable* ItemDataTable;
 
 
 };

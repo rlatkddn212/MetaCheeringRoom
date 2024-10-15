@@ -64,6 +64,7 @@ public:
 	class UHG_PlayerGoodsComponent* GoodsComp;
 
 	bool bToggle = false;
+	bool bToggle2 = false;
 	bool bCanMove = true;
 
 	// ============== Inventory ====================
@@ -72,4 +73,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class UInventoryWidget* InventoryWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UInventoryWidget>InventoryWidgetClass;
 };

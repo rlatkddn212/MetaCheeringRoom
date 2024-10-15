@@ -20,6 +20,9 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 ItemPrice;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AHG_ItemBase> ItemClass;
 };
 
 UCLASS()
@@ -56,4 +59,12 @@ public:
 
 	void SetItemIcon(UTexture2D* Value);
 	UTexture2D* GetItemIcon();
+
+	FItemData GetItemData();
+	void SetItemData(FItemData ItemValue);
+	void InitItemData();
+
+	UPROPERTY(EditDefaultsOnly)
+	class UDataTable* ItemDataTable;
+
 };

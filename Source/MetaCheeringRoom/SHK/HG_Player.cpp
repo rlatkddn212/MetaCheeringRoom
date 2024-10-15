@@ -84,6 +84,9 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	// 상호작용
 	input->BindAction(IA_Interaction, ETriggerEvent::Completed, this, &AHG_Player::OnMyInteraction);
 
+	// 인벤토리
+	input->BindAction(IA_Inventory, ETriggerEvent::Completed, this, &AHG_Player::PopUpInventory);
+
 }
 
 void AHG_Player::OnMyMove(const FInputActionValue& Value)
@@ -140,13 +143,13 @@ void AHG_Player::DetectObject()
 				if (!bToggle)
 				{
 					pc->SetShowMouseCursor(true);
-					bToggle = true;
+					bToggle = !bToggle;
 					bCanMove = false;
 				}
 				else
 				{
 					pc->SetShowMouseCursor(false);
-					bToggle = false;
+					bToggle = !bToggle;
 					bCanMove = true;
 				}
 			}
@@ -154,28 +157,41 @@ void AHG_Player::DetectObject()
 		// 라인트레이스에 맞은게 아이템일 때
 		if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
 		{
-			InventoryComp->AddtoInventory(Item->GetItemName(),1,Item);
+			InventoryComp->AddtoInventory(Item->GetItemData(), 1);
+			Item->Destroy();
 		}
 	}
 }
 
 void AHG_Player::PopUpInventory(const FInputActionValue& Value)
-{	
+{
 	if (InventoryWidget == nullptr)
 	{
-		InventoryWidget = CreateWidget<UInventoryWidget>(this, InventoryWidgetClass);
+		InventoryWidget = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
+		if (InventoryWidget)
+		{
+			InventoryWidget->SetOwner(this);
+		}
 	}
-	else
+	auto* pc = Cast<APlayerController>(Controller);
+	if (pc)
 	{
-		return;
-	}
-	if (!bToggle)
-	{
-		InventoryWidget->AddToViewport();
-	}
-	else
-	{
-		InventoryWidget->RemoveFromParent();
+		if (!bToggle)
+		{
+			pc->SetShowMouseCursor(true);
+			InventoryWidget->AddToViewport();
+			InventoryWidget->InitInventoryUI();
+			bToggle = !bToggle;
+			bCanMove = false;
+		}
+		else
+		{
+			pc->SetShowMouseCursor(false);
+			InventoryWidget->RemoveFromParent();
+			bToggle = !bToggle;
+			bCanMove = true;
+		}
+
 	}
 }
 
