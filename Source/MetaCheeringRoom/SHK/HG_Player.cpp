@@ -191,7 +191,6 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 			bToggle = !bToggle;
 			bCanMove = true;
 		}
-
 	}
 }
 

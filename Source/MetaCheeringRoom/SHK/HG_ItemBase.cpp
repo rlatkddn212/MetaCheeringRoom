@@ -5,6 +5,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "Engine/DataTable.h"
+#include "HG_GameInstance.h"
+#include "GameFramework/GameModeBase.h"
 
 // Sets default values
 AHG_ItemBase::AHG_ItemBase()
@@ -20,19 +22,13 @@ AHG_ItemBase::AHG_ItemBase()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);
 	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
-
-	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableObj(TEXT("/Script/Engine.DataTable'/Game/SHK/BP/DT_Item.DT_Item'"));
-	if (DataTableObj.Succeeded())
-	{
-		ItemDataTable = DataTableObj.Object;
-	}
 }
 
 // Called when the game starts or when spawned
 void AHG_ItemBase::BeginPlay()
 {
 	Super::BeginPlay();
-	SetItemName(TEXT("Green"));
+	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 	InitItemData();
 }
 
@@ -74,24 +70,39 @@ FItemData AHG_ItemBase::GetItemData()
 
 void AHG_ItemBase::SetItemData(FItemData ItemValue)
 {
+	UE_LOG(LogTemp, Warning, TEXT("SetItemData"));
 	ItemData.ItemClass = this->GetClass();
 	ItemData.ItemIcon = ItemValue.ItemIcon;
 	ItemData.ItemName = ItemValue.ItemName;
 	ItemData.ItemPrice = ItemValue.ItemPrice;
+	ItemData.ItemCategory= ItemValue.ItemCategory;
+}
+
+EItemCategory AHG_ItemBase::GetItemCategory()
+{
+	return ItemData.ItemCategory;
+}
+
+void AHG_ItemBase::SetItemCategory(EItemCategory p_Category)
+{
+	ItemData.ItemCategory = p_Category;
 }
 
 void AHG_ItemBase::InitItemData()
 {
-	
 	TArray<FItemData*> AllRows;
-	ItemDataTable->GetAllRows(TEXT(""), AllRows);
-	for (auto Row : AllRows)
+	UE_LOG(LogTemp, Warning, TEXT("InitItemData"));
+	if (GI)
 	{
-		if (Row->ItemName == ItemData.ItemName)
+		UE_LOG(LogTemp, Warning, TEXT("GI"));
+		GI->ItemDataTable->GetAllRows(TEXT(""), AllRows);
+		for (auto Row : AllRows)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Init"));
-			SetItemData(*Row);
-			break;
+			if (Row->ItemName == ItemData.ItemName)
+			{
+				SetItemData(*Row);
+				break;
+			}
 		}
 	}
 }
