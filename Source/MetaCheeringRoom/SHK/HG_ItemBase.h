@@ -66,6 +66,8 @@ public:
 	// 아이템 사용 (자식에서 구현)
 	virtual void Use();
 
+	void SetOwner(APawn* Value);
+
 	void SetItemName(FString Value);
 	FString GetItemName();
 
@@ -81,4 +83,6 @@ public:
 	virtual void InitItemData();
 
 	class UHG_GameInstance* GI;
+
+	class APawn* Owner;
 };
