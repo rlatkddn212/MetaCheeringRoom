@@ -150,6 +150,7 @@ void UInventoryWidget::UseItem()
 			auto* OwningPlayer = Cast<AHG_Player>(this->GetOwningPlayer()->GetPawn());
 
 			auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(SelectedSlot->SlotInfo.ItemInfo.ItemClass, OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
+			SpawnedItem->SetOwner(OwningPlayer);
 			if (SpawnedItem)
 			{
 				SpawnedItem->SetActorHiddenInGame(true);
