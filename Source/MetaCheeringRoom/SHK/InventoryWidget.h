@@ -10,6 +10,13 @@
 /**
  *
  */
+class UHG_SlotWidget;
+class UTextBlock;
+class UButton;
+class UWidgetSwitcher;
+class UImage;
+class UWrapBox;
+
 UCLASS()
 class METACHEERINGROOM_API UInventoryWidget : public UUserWidget
 {
@@ -19,37 +26,61 @@ public:
 
 	virtual void NativeConstruct() override;
 
+	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
+	UWidgetSwitcher* WS_Category;
 
-	UPROPERTY()
-	class UWrapBox* WB_SlotList;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
+	UWrapBox* WB_SlotList_Active;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
+	UWrapBox* WB_SlotList_Costume;
 
 	void InitInventoryUI();
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UHG_SlotWidget> SlotWidgetFactory;
+	TSubclassOf<UHG_SlotWidget> SlotWidgetFactory;
 
 	void SetOwner(APawn* Player);
+	
+	UPROPERTY(EditDefaultsOnly)
+	UWrapBox* SelectedCategory;
 
 	UPROPERTY(EditDefaultsOnly)
 	UHG_SlotWidget* SelectedSlot;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	class UImage* Img_SelectedItem;
+	UImage* Img_SelectedItem;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	class UTextBlock* TB_ItemName;
+	UTextBlock* TB_ItemName;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	class UTextBlock* TB_Price;
+	UTextBlock* TB_Price;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	class UTextBlock* TB_Quantity;
+	UTextBlock* TB_Quantity;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	class UButton* Btn_Use;
+	UButton* Btn_Use;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	class UButton* Btn_ThrowAway;
+	UButton* Btn_ThrowAway;
+
+	
+	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
+	UButton* Btn_ActiveCategory;
+	
+	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
+	UButton* Btn_CostumeCategory;
+	
+	UPROPERTY(EditDefaultsOnly)
+	UMaterial* DefaultImage;
+
+	UFUNCTION()
+	void SelectCategory_Active();
+
+	UFUNCTION()
+	void SelectCategory_Costume();
+
 
 	void DIsplaySelectedItemInfo();
 

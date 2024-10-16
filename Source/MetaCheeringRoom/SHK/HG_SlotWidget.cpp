@@ -26,7 +26,6 @@ void UHG_SlotWidget::SetItemIcon()
 {
 	if (SlotInfo.ItemInfo.ItemIcon != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SetItemIcon"));
 		Img_ItemIcon->SetBrushFromTexture(SlotInfo.ItemInfo.ItemIcon);
 	}
 }

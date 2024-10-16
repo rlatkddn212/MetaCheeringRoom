@@ -7,23 +7,34 @@
 #include "HG_ItemBase.generated.h"
 
 
-USTRUCT(BlueprintType)
-struct FItemData: public FTableRowBase
+UENUM(BlueprintType)
+enum class EItemCategory: uint8
 {
-    GENERATED_USTRUCT_BODY()
+	Category_Costume UMETA(DisplayName = "Costume"),
+	Category_Active UMETA(DisplayName = "Active"),
+};
+
+USTRUCT(BlueprintType)
+struct FItemData : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ItemName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture2D* ItemIcon;
+	UTexture2D* ItemIcon = nullptr;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 ItemPrice;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 ItemPrice;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AHG_ItemBase> ItemClass;
+	
+	UPROPERTY(EditDefaultsOnly)
+	EItemCategory ItemCategory;
 };
+
 
 UCLASS()
 class METACHEERINGROOM_API AHG_ItemBase : public AActor
@@ -38,8 +49,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-private:
 	FItemData ItemData;
+
+private:
 
 public:
 	// Called every frame
@@ -62,9 +74,11 @@ public:
 
 	FItemData GetItemData();
 	void SetItemData(FItemData ItemValue);
-	void InitItemData();
 
-	UPROPERTY(EditDefaultsOnly)
-	class UDataTable* ItemDataTable;
+	EItemCategory GetItemCategory();
+	void SetItemCategory(EItemCategory p_Category);
 
+	virtual void InitItemData();
+
+	class UHG_GameInstance* GI;
 };
