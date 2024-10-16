@@ -7,17 +7,16 @@
 #include "MediaSoundComponent.h"
 #include "MediaTexture.h"
 #include "StreamMediaSource.h"
+#include "VideoWidget.h"
 
 // Sets default values
 AJS_Screen::AJS_Screen()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	NetComp = CreateDefaultSubobject<UJS_NetComponent>(TEXT("NetComp"));
-
 	ScreenComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ScreenComp"));
-
+	SetRootComponent(ScreenComp);
+	NetComp = CreateDefaultSubobject<UJS_NetComponent>(TEXT("NetComp"));
 	MediaSound = CreateDefaultSubobject<UMediaSoundComponent>(TEXT("MediaSound"));
 	MediaSound->SetupAttachment(RootComponent);
 }
@@ -26,6 +25,7 @@ AJS_Screen::AJS_Screen()
 void AJS_Screen::BeginPlay()
 {
 	Super::BeginPlay();
+
 	NetComp->Me = this;
 	MediaPlayer->OnEndReached.AddDynamic(this, &AJS_Screen::OnMediaEndReached);
 	MediaPlayer2->OnEndReached.AddDynamic(this, &AJS_Screen::OnMediaEndReached);
@@ -38,6 +38,31 @@ void AJS_Screen::BeginPlay()
 	MediaPlayer2->PlayOnOpen = false;
 	MediaPlayer->SetLooping(false);
 	MediaPlayer2->SetLooping(false);
+
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if(PC)
+	{
+		SetOwner(PC);
+		if (PC->HasAuthority())
+		{
+			if (VideoWidgetFactory)
+			{
+				VideoWidget = CreateWidget<UVideoWidget>(GetWorld(),VideoWidgetFactory);
+				if (VideoWidget)
+				{
+					VideoWidget->AddToViewport();
+				}
+			}
+			// 치지직 정보 가져오기
+			NetComp->GetInfoFromAIServer();
+			// 유튜브 정보 가져오기
+
+			// VOD 정보 가져오기
+
+			// 다 가져와서 어딘가에 리스트로 저장해야 함. 구조체를 하나 만들기
+		}
+	}
+	
 }
 
 // Called every frame
@@ -47,10 +72,21 @@ void AJS_Screen::Tick(float DeltaTime)
 
 }
 
+
+
+void AJS_Screen::ClearVedioInfo()
+{
+	VedioInfoList.Empty();
+}
+
+void AJS_Screen::AddVedioInfo(FVedioInfo Info)
+{
+	VedioInfoList.Add(Info);
+}
+
 void AJS_Screen::OnMediaEndReached()
 {
 	PrepareNextMediaSource();
-	UE_LOG(LogTemp,Warning,TEXT("===================%d"), bUsingFirstPlayer);
 	MediaPlayer->PlayOnOpen = false;
 	MediaSource->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
 	if (bUsingFirstPlayer)
@@ -154,3 +190,17 @@ void AJS_Screen::PlayMedia()
 
 // 이 URL http://127.0.0.1:5000/videos/26644104-de2a-4ace-acc8-39f0400121171037에 이전에 저장해 두었던 int32로 바꾸었던 숫자를 더하여 문자열 만들기
 // 뒤 문자까지 합해진 URL의 링크를 MediaSource ( UStreamMediaSource ) 에 URL로 설정
+
+FVedioInfo::FVedioInfo()
+{
+	
+}
+
+FVedioInfo::FVedioInfo(bool blive, FString time, FString title, FString owner, FString StreamURL, UTexture2D* thumbnail)
+{
+	bLive = blive;
+	Time = time;
+	Title = title;
+	Owner = owner;
+	Thumbnail = thumbnail;
+}

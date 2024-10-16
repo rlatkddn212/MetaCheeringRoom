@@ -70,4 +70,13 @@ public:
 	UFUNCTION()
 	void SetVodURL();
 
+	UFUNCTION()
+	void GetInfoFromAIServer();
+
+	void ParseChzzkVedioData(const FString& json);
+	void ParseYoutubeVedioData(const FString& json);
+
+	UPROPERTY(EditAnywhere)
+	UTexture2D* AdultOnlyTexture;
+
 };
