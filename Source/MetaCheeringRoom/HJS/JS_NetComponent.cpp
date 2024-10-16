@@ -7,6 +7,8 @@
 #include "HttpModule.h"
 #include "HttpFwd.h"
 #include "JS_Screen.h"
+#include "IImageWrapperModule.h"
+#include "VideoWidget.h"
 
 // Sets default values for this component's properties
 UJS_NetComponent::UJS_NetComponent()
@@ -25,7 +27,8 @@ void UJS_NetComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	FTimerHandle HeartBeatHandle;
+	GetWorld()->GetTimerManager().SetTimer(HeartBeatHandle,this, &UJS_NetComponent::SendHeartBeat,5,true);
 }
 
 
@@ -61,10 +64,41 @@ void UJS_NetComponent::URLSendToAIServer(const FString& URL)
 				StreamID.Split(TEXT(".m3u8"), &StreamID, nullptr);
 				GetVideoTimer();
 				UE_LOG(LogTemp, Error, TEXT("성공"));
+				SendHeartBeat();
 			}
 			else
 			{
-				
+				UE_LOG(LogTemp, Error, TEXT("실패"));
+			}
+		});
+
+	// 요청 전송
+	HttpRequest->ProcessRequest();
+}
+
+void UJS_NetComponent::SendHeartBeat()
+{
+	if (ClientID == "")
+	{
+		return;
+	}
+
+	// 파일 읽기
+	TMap<FString, FString> Senddata;
+	Senddata.Add(TEXT("client_id"), ClientID);
+
+	// HTTP 요청 생성
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+	HttpRequest->SetURL(ServerURL + HeartBeatURL);
+	HttpRequest->SetVerb("POST");
+	HttpRequest->SetHeader(TEXT("content-type"), TEXT("application/json"));
+	HttpRequest->SetContentAsString(MakeJson(Senddata));
+
+	// HTTP 응답 처리
+	HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+		{
+			if (bWasSuccessful && Response->GetResponseCode() == 200)
+			{
 			}
 		});
 
@@ -99,6 +133,7 @@ FString UJS_NetComponent::JsonParseURLData(const FString& json)
 	if (FJsonSerializer::Deserialize(reader, response))
 	{
 		result = response->GetStringField(TEXT("url"));
+		ClientID = response->GetStringField(TEXT("client_id"));
 	}
 	return result;
 }
@@ -169,3 +204,162 @@ void UJS_NetComponent::SetVideoURL()
 	UE_LOG(LogTemp, Log, TEXT("재생할 비디오 URL: %s"), *VideoURL);
 }
 
+void UJS_NetComponent::SetVodURL()
+{
+	
+}
+
+void UJS_NetComponent::GetInfoFromAIServer()
+{	// 파일 읽기
+	// HTTP 요청 생성
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+	HttpRequest->SetURL(ServerURL + TEXT("/chzzk_live_streams"));
+	HttpRequest->SetVerb("GET");
+
+	// HTTP 응답 처리
+	HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+		{
+			if (bWasSuccessful && Response->GetResponseCode() == 200)
+			{
+				FString Res = Response->GetContentAsString();
+				ParseChzzkVedioData(Res);
+				UE_LOG(LogTemp, Warning, TEXT("성공"));
+			}
+			else
+			{
+				UE_LOG(LogTemp,Warning,TEXT("실패"));
+			}
+		});
+
+	// 요청 전송
+	HttpRequest->ProcessRequest();
+
+	HttpRequest = FHttpModule::Get().CreateRequest();
+	HttpRequest->SetURL(ServerURL + TEXT("/youtube_live_streams"));
+	HttpRequest->SetVerb("GET");
+
+	// HTTP 응답 처리
+	HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+		{
+			if (bWasSuccessful && Response->GetResponseCode() == 200)
+			{
+
+			}
+			else
+			{
+
+			}
+		});
+
+	// 요청 전송
+	HttpRequest->ProcessRequest();
+}
+
+void UJS_NetComponent::ParseChzzkVedioData(const FString& json)
+{
+	TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create(json);
+	TSharedPtr<FJsonObject> response = MakeShareable(new FJsonObject());
+	
+	if (FJsonSerializer::Deserialize(reader, response))
+	{
+		TArray<TSharedPtr<FJsonValue>> LiveStreams = response->GetArrayField(TEXT("live_streams"));
+		int count = 0;
+		for (TSharedPtr<FJsonValue> StreamValue : LiveStreams)
+		{
+			if (count >= 10)
+			{
+				break;
+			}
+			count++;
+			TSharedPtr<FJsonObject> StreamObject = StreamValue->AsObject();
+			if (StreamObject.IsValid())
+			{
+				FString title = StreamObject->GetStringField(TEXT("Title"));
+				FString channel = StreamObject->GetStringField(TEXT("channel"));
+				FString thumbnail = StreamObject->GetStringField(TEXT("thumbnail"));
+				FString streamURL = StreamObject->GetStringField(TEXT("stream_url"));
+				FString time = StreamObject->GetStringField(TEXT("viewers"));
+
+				if (thumbnail == "" && AdultOnlyTexture)
+				{
+					Me->VedioInfoList.Add(FVedioInfo(true, time, title, channel, streamURL, AdultOnlyTexture));
+					continue;
+				}
+
+				// 필요한 추가 로직으로 데이터를 처리할 수 있음
+				TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+				HttpRequest->SetURL(thumbnail);
+				HttpRequest->SetVerb("GET");
+				HttpRequest->OnProcessRequestComplete().BindLambda([this, title, channel, streamURL, time](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+				{
+					if (bWasSuccessful && Response.IsValid())
+					{
+						const TArray<uint8>& ImageData = Response->GetContent();
+						// 이미지 포맷이 JPG/PNG인지 파악하고 적절히 디코딩
+						IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+						TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::JPEG);
+						if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num()))
+						{
+							TArray<uint8> RawImageData;
+							if (ImageWrapper->GetRaw(ERGBFormat::RGBA, 8, RawImageData))
+							{
+								UTexture2D* NewTexture = UTexture2D::CreateTransient(
+									ImageWrapper->GetWidth(),
+									ImageWrapper->GetHeight(),
+									PF_R8G8B8A8
+								);
+								FTexture2DMipMap& Mip = NewTexture->GetPlatformData()->Mips[0];
+								Mip.SizeX = ImageWrapper->GetWidth();
+								Mip.SizeY = ImageWrapper->GetHeight();
+								Mip.BulkData.Lock(LOCK_READ_WRITE);
+								// 텍스처에 이미지 데이터 복사
+								void* TextureData = Mip.BulkData.Realloc(RawImageData.Num());
+								FMemory::Memcpy(TextureData, RawImageData.GetData(), RawImageData.Num());
+								Mip.BulkData.Unlock();
+								NewTexture->UpdateResource();
+								
+								Me->VedioInfoList.Add(FVedioInfo(true,time,title,channel,streamURL,NewTexture));
+
+								if (Me->VedioInfoList.Num() == 10 && Me->VideoWidget)
+								{
+									Me->VideoWidget->SettingLiveInfo(Me->VedioInfoList);
+								}
+							}
+						}
+
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("실패"));
+					}
+				});
+				HttpRequest->ProcessRequest();
+			}
+		}
+	}
+}
+
+void UJS_NetComponent::ParseYoutubeVedioData(const FString& json)
+{
+	TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create(json);
+	TSharedPtr<FJsonObject> response = MakeShareable(new FJsonObject());
+
+	if (FJsonSerializer::Deserialize(reader, response))
+	{
+		TArray<TSharedPtr<FJsonValue>> LiveStreams = response->GetArrayField(TEXT("live_streams"));
+
+		for (TSharedPtr<FJsonValue> StreamValue : LiveStreams)
+		{
+			TSharedPtr<FJsonObject> StreamObject = StreamValue->AsObject();
+			if (StreamObject.IsValid())
+			{
+				FString title = StreamObject->GetStringField(TEXT("title"));
+				FString channel = StreamObject->GetStringField(TEXT("channelTitle"));
+				FString thumbnail = StreamObject->GetStringField(TEXT("liveThumbnail"));
+				FString streamURL = StreamObject->GetStringField(TEXT("watchUrl"));
+				FString time = TEXT("Live");
+				// 필요한 추가 로직으로 데이터를 처리할 수 있음
+			}
+		}
+	}
+}
