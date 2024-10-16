@@ -6,6 +6,31 @@
 #include "GameFramework/Actor.h"
 #include "JS_Screen.generated.h"
 
+USTRUCT()
+struct FVedioInfo
+{
+	GENERATED_BODY()
+
+public:
+	
+	FVedioInfo();
+
+	FVedioInfo(bool blive, FString time, FString title, FString owner, FString StreamURL, UTexture2D* thumbnail);
+
+	UPROPERTY()
+	bool bLive;
+	UPROPERTY()
+	FString Time;
+	UPROPERTY()
+	FString Title;
+	UPROPERTY()
+	FString Owner;
+	UPROPERTY()
+	FString StreamURL;
+	UPROPERTY()
+	UTexture2D* Thumbnail;
+};
+
 UCLASS()
 class METACHEERINGROOM_API AJS_Screen : public AActor
 {
@@ -22,42 +47,41 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	class UJS_NetComponent* NetComp;
-
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* ScreenComp;
-
 	UPROPERTY(EditAnywhere)
 	class UMediaPlayer* MediaPlayer;
-
 	UPROPERTY(EditAnywhere)
 	class UMediaPlayer* MediaPlayer2;
-
 	UPROPERTY(EditAnywhere)
 	class UMediaTexture* MediaTexture;
-
 	UPROPERTY(EditAnywhere)
 	class UStreamMediaSource* MediaSource;
-
 	UPROPERTY(EditAnywhere)
 	class UStreamMediaSource* MediaSource2;
-
 	UPROPERTY(EditAnywhere)
 	class UMediaSoundComponent* MediaSound;
 
+	TArray<FVedioInfo> VedioInfoList;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UVideoWidget> VideoWidgetFactory;
+	
+	UPROPERTY()
+	class UVideoWidget* VideoWidget;
+
+	UFUNCTION()
+	void ClearVedioInfo();
+	void AddVedioInfo(FVedioInfo Info);
+	
 	UFUNCTION()
 	void OnMediaEndReached();
-
 	UFUNCTION()
 	void PlayMedia();
-
 	UFUNCTION()
 	void RequestMediaURL(FString URL);
-
 	bool bUsingFirstPlayer = true; // 현재 어느 플레이어가 사용 중인지 체크
-
 	void PrepareNextMediaSource();
-
 };
