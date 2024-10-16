@@ -3,3 +3,7 @@
 
 #include "KSW/UI/SW_CreatorMenuWidget.h"
 
+void USW_CreatorMenuWidget::NativeConstruct()
+{
+
+}

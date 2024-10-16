@@ -26,6 +26,8 @@ void ASW_Creator::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// p = p0 + v * t
+	FTransform t = FTransform(GetControlRotation());
+	Direction = t.TransformVector(Direction);
 
 	FVector p = GetActorLocation();
 	p += Direction * 500 * DeltaTime;
@@ -54,6 +56,21 @@ void ASW_Creator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// 움직임
 	input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyMove);
 	input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyLook);
+
+	input->BindAction(IA_Q, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyQ);
+	input->BindAction(IA_W, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyW);
+	input->BindAction(IA_E, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyE);
+	input->BindAction(IA_R, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyR);
+	input->BindAction(IA_RClick, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyRClick);
+	input->BindAction(IA_LClick, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyLClick);
+	input->BindAction(IA_LClick, ETriggerEvent::Started, this, &ASW_Creator::OnMyLClick);
+	input->BindAction(IA_LClick, ETriggerEvent::Completed, this, &ASW_Creator::OnMyLClick);
+
+	input->BindAction(IA_RClick, ETriggerEvent::Started, this, &ASW_Creator::OnMyRClickStarted);
+	input->BindAction(IA_RClick, ETriggerEvent::Completed, this, &ASW_Creator::OnMyRClickCompleted);
+
+	input->BindAction(IA_RClick, ETriggerEvent::Started, this, &ASW_Creator::OnMyLClickStarted);
+	input->BindAction(IA_RClick, ETriggerEvent::Completed, this, &ASW_Creator::OnMyLClickCompleted);
 }
 
 void ASW_Creator::OnMyMove(const FInputActionValue& Value)
@@ -71,3 +88,53 @@ void ASW_Creator::OnMyLook(const FInputActionValue& Value)
 	AddControllerYawInput(v.X);
 }
 
+void ASW_Creator::OnMyQ(const FInputActionValue& Value)
+{
+	Direction.Z = -1;
+}
+
+void ASW_Creator::OnMyW(const FInputActionValue& Value)
+{
+
+}
+
+void ASW_Creator::OnMyE(const FInputActionValue& Value)
+{
+	// 위로 이동
+	Direction.Z = 1;
+}
+
+void ASW_Creator::OnMyR(const FInputActionValue& Value)
+{
+
+}
+
+void ASW_Creator::OnMyRClick(const FInputActionValue& Value)
+{
+
+}
+
+void ASW_Creator::OnMyLClick(const FInputActionValue& Value)
+{
+
+}
+
+void ASW_Creator::OnMyRClickStarted(const FInputActionValue& Value)
+{
+
+}
+
+void ASW_Creator::OnMyRClickCompleted(const FInputActionValue& Value)
+{
+
+}
+
+void ASW_Creator::OnMyLClickStarted(const FInputActionValue& Value)
+{
+
+}
+
+void ASW_Creator::OnMyLClickCompleted(const FInputActionValue& Value)
+{
+
+}

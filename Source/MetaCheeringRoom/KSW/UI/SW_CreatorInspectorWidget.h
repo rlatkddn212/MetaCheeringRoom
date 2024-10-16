@@ -13,5 +13,6 @@ UCLASS()
 class METACHEERINGROOM_API USW_CreatorInspectorWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+public:
+	virtual void NativeConstruct() override;
 };

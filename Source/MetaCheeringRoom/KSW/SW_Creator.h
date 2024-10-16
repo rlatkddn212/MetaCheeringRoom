@@ -33,11 +33,53 @@ public:
 	class UInputAction* IA_Move;
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Look;
+
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Q;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_W;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_E;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_R;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_RClick;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_LClick;
 	
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
 	UFUNCTION()
 	void OnMyLook(const FInputActionValue& Value);
 
+	UFUNCTION()
+	void OnMyQ(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyW(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyE(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyR(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyRClick(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyLClick(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void OnMyRClickStarted(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyRClickCompleted(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void OnMyLClickStarted(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyLClickCompleted(const FInputActionValue& Value);
+	
 	FVector Direction;
 };

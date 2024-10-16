@@ -3,3 +3,7 @@
 
 #include "KSW/UI/SW_CreatorModelToolbarWidget.h"
 
+void USW_CreatorModelToolbarWidget::NativeConstruct()
+{
+
+}

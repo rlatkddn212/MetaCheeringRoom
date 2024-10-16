@@ -4,15 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "SW_CreatorMenuItemWidget.generated.h"
+#include "SW_CreatorWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class METACHEERINGROOM_API USW_CreatorMenuItemWidget : public UUserWidget
+class METACHEERINGROOM_API USW_CreatorWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
+	
+public:
 	virtual void NativeConstruct() override;
+	class ACreatorPlayerController* ControllerReference;
 };

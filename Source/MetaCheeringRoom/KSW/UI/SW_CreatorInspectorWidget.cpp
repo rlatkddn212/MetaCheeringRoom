@@ -3,3 +3,6 @@
 
 #include "KSW/UI/SW_CreatorInspectorWidget.h"
 
+void USW_CreatorInspectorWidget::NativeConstruct()
+{
+}
