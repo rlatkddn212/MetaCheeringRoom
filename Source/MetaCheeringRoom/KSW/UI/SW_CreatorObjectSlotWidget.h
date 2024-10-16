@@ -17,24 +17,32 @@ public:
 
 	virtual void NativeConstruct() override;
 
+	struct FCreatorObjectData* ObjectData;
+
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* ObjectButton;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UImage* ObjectImage;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* ObjectName;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class USW_ObjectDragOperation> DragOperationFactory;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class USW_DragObjectItemWidget> DragFactory;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UTexture2D* MouseObjectTexture;
 
 	void SetObject(struct FCreatorObjectData* data);
-
 
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry,
 		const FPointerEvent& InPointerEvent,
 		UDragDropOperation*& OutOperation) override;
 
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry,
+	virtual FReply NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry,
 		const FPointerEvent& InMouseEvent) override;
 
-	virtual bool NativeOnDrop(const FGeometry& InGeometry,
-		const FDragDropEvent& InDragDropEvent,
-		UDragDropOperation* InOperation) override;
+	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
 };

@@ -25,3 +25,15 @@ void ASW_CreatorObject::Tick(float DeltaTime)
 
 }
 
+void ASW_CreatorObject::OnSelected(bool isSelected)
+{
+	if (isSelected)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Selected"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Unselected"));
+	}
+}
+

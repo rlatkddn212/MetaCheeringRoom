@@ -4,6 +4,10 @@
 #include "KSW/SW_Creator.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
+#include "GameFramework/Actor.h"
+#include "SW_CreatorPlayerController.h"
 
 // Sets default values
 ASW_Creator::ASW_Creator()
@@ -116,12 +120,12 @@ void ASW_Creator::OnMyRClick(const FInputActionValue& Value)
 
 void ASW_Creator::OnMyLClick(const FInputActionValue& Value)
 {
-
+	
 }
 
 void ASW_Creator::OnMyRClickStarted(const FInputActionValue& Value)
 {
-
+	
 }
 
 void ASW_Creator::OnMyRClickCompleted(const FInputActionValue& Value)
@@ -131,7 +135,11 @@ void ASW_Creator::OnMyRClickCompleted(const FInputActionValue& Value)
 
 void ASW_Creator::OnMyLClickStarted(const FInputActionValue& Value)
 {
-
+	auto* pc = Cast<ASW_CreatorPlayerController>(Controller);
+	if (pc)
+	{
+		pc->OnLeftClick();
+	}
 }
 
 void ASW_Creator::OnMyLClickCompleted(const FInputActionValue& Value)

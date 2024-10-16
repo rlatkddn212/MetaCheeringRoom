@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "SW_CreatorWidget.generated.h"
+#include "SW_DragObjectItemWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class METACHEERINGROOM_API USW_CreatorWidget : public UUserWidget
+class METACHEERINGROOM_API USW_DragObjectItemWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
 public:
-	virtual void NativeConstruct() override;
-	class ASW_CreatorPlayerController* ControllerReference;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UImage* ObjectImage;
 };
