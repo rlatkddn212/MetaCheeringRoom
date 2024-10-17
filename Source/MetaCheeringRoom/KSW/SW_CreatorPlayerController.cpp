@@ -14,6 +14,7 @@
 #include "CreatorMapSubsystem.h"
 #include "UObject/FastReferenceCollector.h"
 #include "Engine/Engine.h"
+#include "UI/SW_CreatorHierarchyWidget.h"
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
 {
@@ -85,6 +86,7 @@ void ASW_CreatorPlayerController::OnLeftClick()
 
 void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData* ObjectData)
 {
+	
 	FActorSpawnParameters SpawnParams;
 	//SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -92,6 +94,7 @@ void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData*
 	CreatingObject = GetWorld()->SpawnActor<ASW_CreatorObject>(ObjectData->ItemClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 	CreatingObject->SetActorLocation(FVector::ZeroVector);
 	CreatingObject->SetActorRotation(FRotator::ZeroRotator);
+	CreatingObject->CreatingObjectData = ObjectData;
 
 	CreatorWidget->OnDragged(true);
 }
@@ -105,6 +108,15 @@ bool ASW_CreatorPlayerController::DeleteDummyObject()
 		{
 			CreatingObject->Destroy();
 			CreatingObject = nullptr;
+		}
+	}
+	else
+	{
+		if (CreatingObject)
+		{
+			UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+			system->AddObject(CreatingObject->CreatingObjectData->ItemName, CreatingObject->GetTransform());
+			CreatorWidget->CreatorHierarchyWidget->ReloadItem();
 		}
 	}
 
@@ -143,9 +155,9 @@ void ASW_CreatorPlayerController::MoveDummyObject(FVector2D MousePosition)
 		else
 		{
 			// 레이가 부딪히지 않았을 때
-			// 레이의 500거리 지점으로 이동
+			// 레이의 1000거리 지점으로 이동
 			FVector p = GetPawn()->GetActorLocation();
-			CreatingObject->SetActorLocation(p + WorldDirection * 500);
+			CreatingObject->SetActorLocation(p + WorldDirection * 1000);
 		}
 	}
 }

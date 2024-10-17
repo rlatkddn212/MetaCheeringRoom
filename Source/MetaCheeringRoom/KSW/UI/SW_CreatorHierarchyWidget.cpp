@@ -2,4 +2,55 @@
 
 
 #include "KSW/UI/SW_CreatorHierarchyWidget.h"
+#include "../CreatorMapSubsystem.h"
+#include "SW_CreatorObjectSlotWidget.h"
+#include "SW_CreatorHierarchyItemWidget.h"
+#include "Components/ScrollBox.h"
 
+
+void USW_CreatorHierarchyWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	//UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+	//TArray<FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects();
+
+	//for (int i = 0; i < CreatorObjects.Num(); i++)
+	//{
+	//	USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
+	//	ChildWidget->SetObject(CreatorObjects[i]);
+	//	ObjectScrollBox->AddChild(ChildWidget);
+	//}
+}
+
+void USW_CreatorHierarchyWidget::ReloadItem()
+{
+	// 모든 아이템 삭제
+	// ObjectScrollBox 자식 모두 제거
+	for (int i = 0; i < SlotWidgets.Num(); i++)
+	{
+		SlotWidgets[i]->RemoveFromParent();
+	}
+
+	SlotWidgets.Empty();
+
+	// 모든 아이템 다시 생성
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	const FCreatorMap& CMap = system->GetCreatorMap();
+
+	ReloadWidget(CMap.Objects, 0);
+}
+
+void USW_CreatorHierarchyWidget::ReloadWidget(const TArray<TSharedPtr<FCreatorObject>>& InCreatorObjects, int32 depth)
+{
+	for (int i = 0; i < InCreatorObjects.Num(); i++)
+	{
+		USW_CreatorHierarchyItemWidget* ChildWidget = CreateWidget<USW_CreatorHierarchyItemWidget>(GetWorld(), SlotFactory);
+		ChildWidget->SetItem(InCreatorObjects[i], depth);
+		ObjectScrollBox->AddChild(ChildWidget);
+
+		SlotWidgets.Add(ChildWidget);
+
+		ReloadWidget(InCreatorObjects[i]->Objects, depth + 1);
+	}
+}

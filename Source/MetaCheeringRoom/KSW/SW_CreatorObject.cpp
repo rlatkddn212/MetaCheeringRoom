@@ -2,6 +2,7 @@
 
 
 #include "KSW/SW_CreatorObject.h"
+#include "CreatorStorageSubsystem.h"
 
 // Sets default values
 ASW_CreatorObject::ASW_CreatorObject()
@@ -15,14 +16,12 @@ ASW_CreatorObject::ASW_CreatorObject()
 void ASW_CreatorObject::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void ASW_CreatorObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ASW_CreatorObject::OnSelected(bool isSelected)

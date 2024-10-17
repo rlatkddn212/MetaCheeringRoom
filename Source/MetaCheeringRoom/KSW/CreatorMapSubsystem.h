@@ -61,7 +61,6 @@ public:
 	FString SerializeCreatorMapToJson(const FCreatorMap& Map);
 	FCreatorMap DeserializeJsonToCreatorMap(const FString& JsonString);
 
-private:
 	/** JSON 직렬화/역직렬화 헬퍼 함수 */
 	TSharedPtr<FJsonObject> SerializeCreatorObject(const TSharedPtr<FCreatorObject>& CreatorObject);
 	TSharedPtr<FCreatorObject> DeserializeCreatorObject(const TSharedPtr<FJsonObject>& JsonObject);

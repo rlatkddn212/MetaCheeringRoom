@@ -34,13 +34,11 @@ public:
 	
 	UPROPERTY()
 	class ASW_CreatorObject* CreatingObject;
-
+	
 	// À§Á¬
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<class USW_CreatorWidget> CreatorWidgetFactory;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	class USW_CreatorWidget* CreatorWidget;
-
-	TArray<ASW_CreatorObject*> PendingDestroyActors;
 };

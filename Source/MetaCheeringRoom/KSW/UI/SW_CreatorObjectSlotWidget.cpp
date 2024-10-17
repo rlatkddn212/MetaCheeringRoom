@@ -72,7 +72,6 @@ void USW_CreatorObjectSlotWidget::NativeOnDragDetected(const FGeometry& InGeomet
 	if (controller)
 	{
 		controller->CreatingDummyObject(ObjectData);
-		
 		// 마우스 모드 변경
 	}
 

@@ -27,4 +27,6 @@ public:
 
 	void DoDestroy();
 	// º¯È¯
+
+	struct FCreatorObjectData* CreatingObjectData;
 };

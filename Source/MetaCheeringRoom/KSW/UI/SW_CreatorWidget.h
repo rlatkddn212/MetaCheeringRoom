@@ -29,4 +29,19 @@ public:
 	bool IsDragOverUI();
 
 	bool IsOverUI = false;
+
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class USW_CreatorHierarchyWidget* CreatorHierarchyWidget;
+
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class USW_CreatorInspectorWidget* CreatorInspectorWidget;
+
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class USW_CreatorMenuWidget* CreatorMenuWidget;
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class USW_CreatorObjectWidget* CreatorObjectWidget;
+
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class USW_CreatorModelToolbarWidget* ModelToolbarWidget;
+
 };
