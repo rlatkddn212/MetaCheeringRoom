@@ -25,6 +25,6 @@ public:
 
 	void OnSelected(bool isSelected);
 
-
+	void DoDestroy();
 	// º¯È¯
 };

@@ -9,7 +9,6 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonWriter.h"
 
-
 void UCreatorMapSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);

@@ -16,5 +16,17 @@ class METACHEERINGROOM_API USW_CreatorWidget : public UUserWidget
 	
 public:
 	virtual void NativeConstruct() override;
+
 	class ASW_CreatorPlayerController* ControllerReference;
+
+	void OnDragged(bool isDrag) { bIsDrag = isDrag; }
+
+	bool bIsDrag;
+
+	virtual void NativeOnDragEnter(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual bool NativeOnDragOver( const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation ) override;
+	bool IsDragOverUI();
+
+	bool IsOverUI = false;
 };

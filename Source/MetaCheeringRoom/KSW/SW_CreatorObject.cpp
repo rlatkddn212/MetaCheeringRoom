@@ -37,3 +37,8 @@ void ASW_CreatorObject::OnSelected(bool isSelected)
 	}
 }
 
+void ASW_CreatorObject::DoDestroy()
+{
+	Destroy();
+}
+

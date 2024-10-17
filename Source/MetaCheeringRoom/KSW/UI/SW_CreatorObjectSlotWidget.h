@@ -17,6 +17,8 @@ public:
 
 	virtual void NativeConstruct() override;
 
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 	struct FCreatorObjectData* ObjectData;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -28,6 +30,8 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class USW_ObjectDragOperation> DragOperationFactory;
+
+	class USW_ObjectDragOperation* DragOp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class USW_DragObjectItemWidget> DragFactory;
@@ -45,4 +49,6 @@ public:
 		const FPointerEvent& InMouseEvent) override;
 
 	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+	
+	bool bIsDragging = false;
 };

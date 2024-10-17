@@ -11,10 +11,13 @@
 #include "UObject/NoExportTypes.h"
 #include "Layout/SlateRotatedRect.h"
 #include "Types/SlateVector2.h"
+#include "CreatorMapSubsystem.h"
+#include "UObject/FastReferenceCollector.h"
+#include "Engine/Engine.h"
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
 {
-   
+    PrimaryActorTick.bCanEverTick = true;
 
 }
 
@@ -37,31 +40,22 @@ void ASW_CreatorPlayerController::BeginPlay()
 void ASW_CreatorPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//for (int32 i = PendingDestroyActors.Num() - 1; i >= 0; --i)
+	//{
+	//	AActor* Actor = PendingDestroyActors[i];
 
-    FVector2D MousePosition;
-    if (GetMousePosition(MousePosition.X, MousePosition.Y))
-    {
-        if (CreatingObject)
-        {
-			MoveDummyObject(MousePosition);
-        }
-
-        //if (CreatorWidget)
-        //{
-        //    FGeometry WidgetGeometry = CreatorWidget->GetCachedGeometry();
-        //    // UI 바깥으로 나갔을 때
-        //    UE::Slate::FDeprecateVector2DParameter MousePosition2(MousePosition);
-        //    /*if (! WidgetGeometry.IsUnderLocation(MousePosition2))
-        //    {
-        //        UE_LOG(LogTemp, Log, TEXT("Mouse is outside of any UI."));
-        //    }
-        //    else
-        //    {
-        //        UE_LOG(LogTemp, Log, TEXT("Mouse is inside of any UI."));
-        //    }*/
-        //}
-        
-    }
+	//	// Actor가 유효하고 파괴 가능 상태인지 확인
+	//	if (IsValid(Actor) && !Actor->IsPendingKillPending())
+	//	{
+	//		UE_LOG(LogTemp, Log, TEXT("Destroying Actor: %s"), *Actor->GetName());
+	//		Actor->Destroy();
+	//		PendingDestroyActors.RemoveAt(i);  // 배열에서 제거
+	//	}
+	//	else
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("Actor not ready for destruction: %s"), *Actor->GetName());
+	//	}
+	//}
 }
 
 void ASW_CreatorPlayerController::OnLeftClick()
@@ -106,62 +100,70 @@ void ASW_CreatorPlayerController::OnLeftClick()
 
 void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData* ObjectData)
 {
-	if (CreatingObject)
-	{
-		CreatingObject->Destroy();
-	}
-
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
+	//SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	CreatingObject = GetWorld()->SpawnActor<ASW_CreatorObject>(ObjectData->ItemClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 	CreatingObject->SetActorLocation(FVector::ZeroVector);
 	CreatingObject->SetActorRotation(FRotator::ZeroRotator);
 
-	// 더미 오브젝트 생성
+	CreatorWidget->OnDragged(true);
 }
 
 bool ASW_CreatorPlayerController::DeleteDummyObject()
 {
-	if (CreatingObject)
+	bool ret = CreatorWidget->IsDragOverUI();
+	if (ret)
 	{
-		CreatingObject->Destroy();
-		CreatingObject = nullptr;
-		return true;
+		if (CreatingObject)
+		{
+			CreatingObject->ConditionalBeginDestroy();
+		}
 	}
-	return false;
 
+	CreatorWidget->OnDragged(false);
+
+	return ret;
 }
 
 void ASW_CreatorPlayerController::MoveDummyObject(FVector2D MousePosition)
 {
-    // 레이를 쏴서 부딪히는 지점으로 이동시킨다.
-	FVector WorldLocation, WorldDirection;
-
-	DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldLocation, WorldDirection);
-
-	FVector TraceStart = WorldLocation;
-	FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0f);  // 트레이스 거리 설정
-
-	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(GetPawn());  // 자신의 캐릭터는 무시
-
-	// 라인 트레이스 실행
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
-
-	if (bHit)
+	bool ret = CreatorWidget->IsDragOverUI();
+	if (CreatingObject)
 	{
-        CreatingObject->SetActorLocation(HitResult.Location);
+		CreatingObject->SetActorHiddenInGame(ret);
 	}
-    else
-    {
-		// 레이가 부딪히지 않았을 때
-		// 레이의 500거리 지점으로 이동
-		FVector p = CreatingObject->GetActorLocation();
-		p += WorldDirection * 500;
-		CreatingObject->SetActorLocation(p);
-    }
+
+	if (CreatingObject)
+	{
+		// 레이를 쏴서 부딪히는 지점으로 이동시킨다.
+		FVector WorldLocation, WorldDirection;
+
+		DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldLocation, WorldDirection);
+
+		FVector TraceStart = WorldLocation;
+		FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0f);  // 트레이스 거리 설정
+
+		FHitResult HitResult;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(GetPawn());  // 자신의 캐릭터는 무시
+
+		Params.AddIgnoredActor(CreatingObject);  // 자신의 캐릭터는 무시
+		// 라인 트레이스 실행
+		bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
+
+		if (bHit)
+		{
+			CreatingObject->SetActorLocation(HitResult.Location);
+		}
+		else
+		{
+			// 레이가 부딪히지 않았을 때
+			// 레이의 500거리 지점으로 이동
+			FVector p = GetPawn()->GetActorLocation();
+			CreatingObject->SetActorLocation(p + WorldDirection * 500);
+		}
+	}
 }
 

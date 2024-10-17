@@ -25,11 +25,14 @@ public:
 
 	void CreatingDummyObject(struct FCreatorObjectData* ObjectData);
 	// 지워지지 않는경우
+	
+	UFUNCTION()
 	bool DeleteDummyObject();
 	void MoveDummyObject(FVector2D MousePosition);
 
 	class ASW_CreatorObject* SelectedObject;
-
+	
+	UPROPERTY()
 	class ASW_CreatorObject* CreatingObject;
 
 	// 위젯
@@ -38,4 +41,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	class USW_CreatorWidget* CreatorWidget;
+
+	TArray<ASW_CreatorObject*> PendingDestroyActors;
 };
