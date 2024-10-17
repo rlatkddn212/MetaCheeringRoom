@@ -17,6 +17,7 @@ void AHG_FireCracker::Use()
 {
 	if (Owner)
 	{
+		UE_LOG(LogTemp,Warning,TEXT("Use"));
 		FVector SpawnLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 200.0f;
 		FRotator SpawnRotation = Owner->GetActorRotation();
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireCrackerEffect, SpawnLocation, SpawnRotation,true);

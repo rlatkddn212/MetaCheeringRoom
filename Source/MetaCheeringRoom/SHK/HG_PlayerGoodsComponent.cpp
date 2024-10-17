@@ -47,7 +47,7 @@ int32 UHG_PlayerGoodsComponent::AddGold(int32 Value)
 	if (Gold + Value > 0 && Gold + Value < MAX_GOLD)
 	{
 		Gold += Value;
-		return -1;
+		return Gold;
 	}
 	else
 	{

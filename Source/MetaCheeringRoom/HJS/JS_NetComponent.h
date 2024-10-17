@@ -53,6 +53,8 @@ public:
 
 	int32 SegmentNumber;
 
+	FTimerHandle GetVedioTimerHandle;
+
 	FString MakeJson(const TMap<FString, FString> source);
 
 	FString JsonParseURLData(const FString& json);
@@ -78,5 +80,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UTexture2D* AdultOnlyTexture;
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastVideoURLWrite(const FString& URL, const FString& streamID,int32 segmentNumber);
+
+	FTimerHandle VideoInfoSettingHaldle;
+
+	void VideoInfoSetting();
 
 };

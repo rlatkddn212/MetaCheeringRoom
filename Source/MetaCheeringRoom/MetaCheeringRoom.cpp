@@ -4,3 +4,4 @@
 #include "Modules/ModuleManager.h"
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, MetaCheeringRoom, "MetaCheeringRoom" );
+DEFINE_LOG_CATEGORY(NetLog);

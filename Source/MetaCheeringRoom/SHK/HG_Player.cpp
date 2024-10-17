@@ -12,6 +12,8 @@
 #include "HG_ItemBase.h"
 #include "HG_PlayerInventoryComponent.h"
 #include "InventoryWidget.h"
+#include "HG_DisplayStandBase.h"
+#include "HG_ItemPurchaseWidget.h"
 
 // Sets default values
 AHG_Player::AHG_Player()
@@ -160,6 +162,14 @@ void AHG_Player::DetectObject()
 			InventoryComp->AddtoInventory(Item->GetItemData(), 1);
 			Item->Destroy();
 		}
+
+		// 라인트레이스에 맞은게 상점 진열대일 때
+		if (auto* Stand = Cast<AHG_DisplayStandBase>(OutHit.GetActor()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Stand"));
+			TempData = Stand->ItemData;
+			PopUpPurchaseWidget();
+		}
 	}
 }
 
@@ -178,19 +188,46 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 	{
 		if (!bToggle)
 		{
-			pc->SetShowMouseCursor(true);
 			InventoryWidget->AddToViewport();
 			InventoryWidget->InitInventoryUI();
+			pc->SetShowMouseCursor(true);
 			bToggle = !bToggle;
 			bCanMove = false;
 		}
 		else
 		{
-			pc->SetShowMouseCursor(false);
 			InventoryWidget->RemoveFromParent();
+			pc->SetShowMouseCursor(false);
 			bToggle = !bToggle;
 			bCanMove = true;
 		}
 	}
 }
 
+void AHG_Player::PopUpPurchaseWidget()
+{
+	if (PurchaseWidget == nullptr)
+	{
+		PurchaseWidget = CreateWidget<UHG_ItemPurchaseWidget>(GetWorld(), PurchaseWidgetClass);
+		PurchaseWidget->SetOwner(this);
+		PurchaseWidget->SetItemInfo(TempData);
+	}
+	auto* pc = Cast<APlayerController>(Controller);
+	if (pc)
+	{
+		if (!bToggle)
+		{
+			PurchaseWidget->AddToViewport();
+			bCanMove = false;
+			pc->SetShowMouseCursor(true);
+			bToggle = !bToggle;
+		}
+		else
+		{
+			PurchaseWidget->RemoveFromParent();
+			bCanMove = true;
+			pc->SetShowMouseCursor(false);
+			bToggle = !bToggle;
+		}
+	}
+}

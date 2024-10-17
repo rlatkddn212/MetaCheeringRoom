@@ -3,6 +3,7 @@
 
 #include "SHK/HG_GameInstance.h"
 #include "Engine/DataTable.h"
+#include "HG_ItemBase.h"
 
 UHG_GameInstance::UHG_GameInstance()
 {
@@ -12,4 +13,20 @@ UHG_GameInstance::UHG_GameInstance()
 	{
 		ItemDataTable = TempDateTable.Object;
 	}
+}
+
+bool UHG_GameInstance::IsValidItem(FString ItemName)
+{
+	TArray<FItemData*> AllRows;
+	UE_LOG(LogTemp, Warning, TEXT("IsValidItem"));
+
+	ItemDataTable->GetAllRows(TEXT(""), AllRows);
+	for (auto Row : AllRows)
+	{
+		if (Row->ItemName == ItemName)
+		{
+			return true;
+		}
+	}
+	return false;
 }
