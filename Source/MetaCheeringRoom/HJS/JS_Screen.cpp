@@ -6,6 +6,7 @@
 #include "MediaPlayer.h"
 #include "MediaSoundComponent.h"
 #include "MediaTexture.h"
+#include "MetaCheeringRoom.h"
 #include "StreamMediaSource.h"
 #include "VideoWidget.h"
 
@@ -19,6 +20,10 @@ AJS_Screen::AJS_Screen()
 	NetComp = CreateDefaultSubobject<UJS_NetComponent>(TEXT("NetComp"));
 	MediaSound = CreateDefaultSubobject<UMediaSoundComponent>(TEXT("MediaSound"));
 	MediaSound->SetupAttachment(RootComponent);
+	MediaSound2 = CreateDefaultSubobject<UMediaSoundComponent>(TEXT("MediaSound2"));
+	MediaSound2->SetupAttachment(RootComponent);
+
+	//bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -29,11 +34,6 @@ void AJS_Screen::BeginPlay()
 	NetComp->Me = this;
 	MediaPlayer->OnEndReached.AddDynamic(this, &AJS_Screen::OnMediaEndReached);
 	MediaPlayer2->OnEndReached.AddDynamic(this, &AJS_Screen::OnMediaEndReached);
-
-	if (MediaSound)
-	{
-		MediaSound->SetMediaPlayer(MediaPlayer);
-	}
 	MediaPlayer->PlayOnOpen = true;
 	MediaPlayer2->PlayOnOpen = false;
 	MediaPlayer->SetLooping(false);
@@ -45,6 +45,14 @@ void AJS_Screen::BeginPlay()
 		SetOwner(PC);
 		if (PC->HasAuthority())
 		{
+			if (MediaSound)
+			{
+				MediaSound->SetMediaPlayer(MediaPlayer);
+			}
+			if (MediaSound2)
+			{
+				MediaSound2->SetMediaPlayer(MediaPlayer2);
+			}
 			if (VideoWidgetFactory)
 			{
 				VideoWidget = CreateWidget<UVideoWidget>(GetWorld(),VideoWidgetFactory);
@@ -56,7 +64,6 @@ void AJS_Screen::BeginPlay()
 			// 치지직 정보 가져오기
 			NetComp->GetInfoFromAIServer();
 			// 유튜브 정보 가져오기
-
 			// VOD 정보 가져오기
 
 			// 다 가져와서 어딘가에 리스트로 저장해야 함. 구조체를 하나 만들기
@@ -86,28 +93,29 @@ void AJS_Screen::AddVedioInfo(FVedioInfo Info)
 
 void AJS_Screen::OnMediaEndReached()
 {
-	PrepareNextMediaSource();
-	MediaPlayer->PlayOnOpen = false;
-	MediaSource->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
-	if (bUsingFirstPlayer)
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC->HasAuthority())
 	{
-		MediaSound->SetMediaPlayer(MediaPlayer2);
-		MediaTexture->SetMediaPlayer(MediaPlayer2);
-		MediaPlayer2->Play();
-		bUsingFirstPlayer = false;
-	}
-	else
-	{
-		MediaSound->SetMediaPlayer(MediaPlayer);
-		MediaTexture->SetMediaPlayer(MediaPlayer);
-		MediaPlayer->Play();
-		bUsingFirstPlayer = true;
+		PrepareNextMediaSource();
+		MediaPlayer->PlayOnOpen = false;
+		MediaSource->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
+		if (bUsingFirstPlayer)
+		{
+			MediaTexture->SetMediaPlayer(MediaPlayer2);
+			MediaPlayer2->Play();
+			bUsingFirstPlayer = false;
+		}
+		else
+		{
+			MediaTexture->SetMediaPlayer(MediaPlayer);
+			MediaPlayer->Play();
+			bUsingFirstPlayer = true;
+		}
 	}
 }
 
 void AJS_Screen::RequestMediaURL(FString URL)
 {
-	URL = TEXT("https://play.sooplive.co.kr/tjrdbs999/277798062");
 	NetComp->URLSendToAIServer(URL);
 }
 
@@ -138,13 +146,20 @@ void AJS_Screen::PrepareNextMediaSource()
 	}
 }
 
-void AJS_Screen::PlayMedia()
+void AJS_Screen::PlayMedia(const FString& VideoURL)
 {
+	//MultiCastPlayMedia(VideoURL);
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (!PC->HasAuthority())
+	{
+		return;
+	}
 	// Media를 재생
 	// MediaSource의 URL 설정
 	MediaTexture->SetMediaPlayer(MediaPlayer);
 	if (MediaSource)
 	{
+		PRINTLOG(TEXT("%s"), *NetComp->VideoURL);
 		MediaSource->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
 		// 미디어 재생 시작
 		if (MediaPlayer)
@@ -161,6 +176,11 @@ void AJS_Screen::PlayMedia()
 			MediaPlayer2->OpenSource(MediaSource2);
 		}
 	}
+}
+
+void AJS_Screen::MultiCastPlayMedia_Implementation(const FString& VideoURL)
+{
+
 }
 
 // m3u8 파일을 읽어오기 ( URL : http://127.0.0.1:5000/stream/26644104-de2a-4ace-acc8-39f040012117.m3u8 ) 
@@ -196,11 +216,12 @@ FVedioInfo::FVedioInfo()
 	
 }
 
-FVedioInfo::FVedioInfo(bool blive, FString time, FString title, FString owner, FString StreamURL, UTexture2D* thumbnail)
+FVedioInfo::FVedioInfo(bool blive, FString time, FString title, FString owner, FString streamURL, UTexture2D* thumbnail)
 {
 	bLive = blive;
 	Time = time;
 	Title = title;
 	Owner = owner;
 	Thumbnail = thumbnail;
+	StreamURL =streamURL;
 }

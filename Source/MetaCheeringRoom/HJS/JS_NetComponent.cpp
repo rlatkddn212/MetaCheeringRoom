@@ -9,6 +9,8 @@
 #include "JS_Screen.h"
 #include "IImageWrapperModule.h"
 #include "VideoWidget.h"
+#include "Net/UnrealNetwork.h"
+#include "MetaCheeringRoom.h"
 
 // Sets default values for this component's properties
 UJS_NetComponent::UJS_NetComponent()
@@ -17,7 +19,8 @@ UJS_NetComponent::UJS_NetComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	// ..
+	
 }
 
 
@@ -62,9 +65,9 @@ void UJS_NetComponent::URLSendToAIServer(const FString& URL)
 				StreamResURL = JsonParseURLData(Res);
 				StreamResURL.Split(TEXT("/stream/"), nullptr, &StreamID);
 				StreamID.Split(TEXT(".m3u8"), &StreamID, nullptr);
-				GetVideoTimer();
+				this->GetVideoTimer();
 				UE_LOG(LogTemp, Error, TEXT("성공"));
-				SendHeartBeat();
+				this->SendHeartBeat();
 			}
 			else
 			{
@@ -140,8 +143,7 @@ FString UJS_NetComponent::JsonParseURLData(const FString& json)
 
 void UJS_NetComponent::GetVideoTimer()
 {
-	FTimerHandle GetVedioTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(GetVedioTimerHandle, this, &UJS_NetComponent::GetVideoURL, 5.f, false);
+	GetWorld()->GetTimerManager().SetTimer(GetVedioTimerHandle, this, &UJS_NetComponent::GetVideoURL, 3.f, true);
 }
 
 void UJS_NetComponent::GetVideoURL()
@@ -175,10 +177,10 @@ void UJS_NetComponent::GetVideoURL()
 				UE_LOG(LogTemp, Error, TEXT("M3U8 파일에서 세그먼트 번호 추출 실패"));
 				return;
 			}
-
 			VideoURL = FString::Printf(TEXT("%s/videos/%s%d"),*ServerURL,*StreamID,SegmentNumber);
+			this->MulticastVideoURLWrite(VideoURL, StreamID, SegmentNumber);
 			UE_LOG(LogTemp, Log, TEXT("재생할 비디오 URL: %s"), *VideoURL);
-
+			GetWorld()->GetTimerManager().ClearTimer(GetVedioTimerHandle);
 			FTimerHandle StartMediaHandle;
 			GetWorld()->GetTimerManager().SetTimer(StartMediaHandle,this,&UJS_NetComponent::Play,20.f,false);
 
@@ -195,7 +197,7 @@ void UJS_NetComponent::GetVideoURL()
 
 void UJS_NetComponent::Play()
 {
-	Me->PlayMedia();
+	Me->PlayMedia(VideoURL);
 }
 
 void UJS_NetComponent::SetVideoURL()
@@ -319,14 +321,10 @@ void UJS_NetComponent::ParseChzzkVedioData(const FString& json)
 								NewTexture->UpdateResource();
 								
 								Me->VedioInfoList.Add(FVedioInfo(true,time,title,channel,streamURL,NewTexture));
-
-								if (Me->VedioInfoList.Num() == 10 && Me->VideoWidget)
-								{
-									Me->VideoWidget->SettingLiveInfo(Me->VedioInfoList);
-								}
+								this->GetWorld()->GetTimerManager().SetTimer(VideoInfoSettingHaldle, this, &UJS_NetComponent::VideoInfoSetting, 1.f, false);
+								
 							}
 						}
-
 					}
 					else
 					{
@@ -360,6 +358,25 @@ void UJS_NetComponent::ParseYoutubeVedioData(const FString& json)
 				FString time = TEXT("Live");
 				// 필요한 추가 로직으로 데이터를 처리할 수 있음
 			}
+		}
+	}
+}
+
+void UJS_NetComponent::MulticastVideoURLWrite_Implementation(const FString& URL, const FString& streamID, int32 segmentNumber)
+{
+	VideoURL = URL;
+	StreamID = streamID;
+	SegmentNumber = segmentNumber;
+	PRINTLOG(TEXT("%s"), *VideoURL);
+}
+
+void UJS_NetComponent::VideoInfoSetting()
+{
+	if (Me)
+	{
+		if (Me->VideoWidget)
+		{
+			Me->VideoWidget->SettingLiveInfo(Me->VedioInfoList);
 		}
 	}
 }

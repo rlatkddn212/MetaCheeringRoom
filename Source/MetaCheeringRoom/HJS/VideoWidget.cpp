@@ -36,6 +36,7 @@ void UVideoWidget::SettingLiveInfo(TArray<FVedioInfo>& LiveInfoList)
 	{
 		UVideoList* VideoList = CreateWidget<UVideoList>(this,VideoListFactory);
 		VideoList->NativeConstruct();
+		VideoList->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		// 인포 리스트에 있는 정보를 받아와서
 		for (int32 j = 0; j < 4; j++)
 		{
@@ -45,7 +46,8 @@ void UVideoWidget::SettingLiveInfo(TArray<FVedioInfo>& LiveInfoList)
 				break;
 			}
 			// Node를 생성해
-			UVideoNode* VideoNode = CreateWidget<UVideoNode>(this, VideoNodeFactory);
+			UVideoNode* VideoNode = CreateWidget<UVideoNode>(VideoList, VideoNodeFactory);
+			VideoNode->SetVisibility(ESlateVisibility::Visible);
 			if (VideoNode)
 			{
 				// Node에 세팅해주기
@@ -61,7 +63,7 @@ void UVideoWidget::SettingLiveInfo(TArray<FVedioInfo>& LiveInfoList)
 				VideoNode->TEXT_Owner->SetText(FText::FromString(LiveInfoList[count].Owner));
 				VideoNode->TEXT_Time->SetText(FText::FromString(LiveInfoList[count].Time));
 				VideoNode->IMG_Thumbnail->SetBrushFromTexture(LiveInfoList[count].Thumbnail);
-				
+				VideoNode->PlayURL = LiveInfoList[count].StreamURL;
 				VideoList->NodeArr[j]->AddChild(VideoNode);
 			}
 			count++;
