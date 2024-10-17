@@ -5,5 +5,6 @@
 
 void USW_CreatorModelToolbarWidget::NativeConstruct()
 {
+	Super::NativeConstruct();
 
 }

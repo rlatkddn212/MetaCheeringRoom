@@ -5,4 +5,5 @@
 
 void USW_CreatorInspectorWidget::NativeConstruct()
 {
+	Super::NativeConstruct();
 }

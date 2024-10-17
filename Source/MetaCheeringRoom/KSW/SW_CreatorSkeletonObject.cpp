@@ -12,8 +12,10 @@ ASW_CreatorSkeletonObject::ASW_CreatorSkeletonObject()
 
 void ASW_CreatorSkeletonObject::BeginPlay()
 {
+	Super::BeginPlay();
 }
 
 void ASW_CreatorSkeletonObject::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
 }

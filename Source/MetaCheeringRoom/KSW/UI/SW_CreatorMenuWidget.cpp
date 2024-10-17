@@ -5,5 +5,5 @@
 
 void USW_CreatorMenuWidget::NativeConstruct()
 {
-
+	Super::NativeConstruct();
 }

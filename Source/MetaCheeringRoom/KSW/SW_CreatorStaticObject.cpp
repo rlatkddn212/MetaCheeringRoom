@@ -10,8 +10,11 @@ ASW_CreatorStaticObject::ASW_CreatorStaticObject()
 
 void ASW_CreatorStaticObject::BeginPlay()
 {
+	Super::BeginPlay();
+
 }
 
 void ASW_CreatorStaticObject::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
 }

@@ -40,22 +40,7 @@ void ASW_CreatorPlayerController::BeginPlay()
 void ASW_CreatorPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//for (int32 i = PendingDestroyActors.Num() - 1; i >= 0; --i)
-	//{
-	//	AActor* Actor = PendingDestroyActors[i];
-
-	//	// Actor가 유효하고 파괴 가능 상태인지 확인
-	//	if (IsValid(Actor) && !Actor->IsPendingKillPending())
-	//	{
-	//		UE_LOG(LogTemp, Log, TEXT("Destroying Actor: %s"), *Actor->GetName());
-	//		Actor->Destroy();
-	//		PendingDestroyActors.RemoveAt(i);  // 배열에서 제거
-	//	}
-	//	else
-	//	{
-	//		UE_LOG(LogTemp, Warning, TEXT("Actor not ready for destruction: %s"), *Actor->GetName());
-	//	}
-	//}
+	
 }
 
 void ASW_CreatorPlayerController::OnLeftClick()
@@ -118,7 +103,8 @@ bool ASW_CreatorPlayerController::DeleteDummyObject()
 	{
 		if (CreatingObject)
 		{
-			CreatingObject->ConditionalBeginDestroy();
+			CreatingObject->Destroy();
+			CreatingObject = nullptr;
 		}
 	}
 
@@ -130,13 +116,10 @@ bool ASW_CreatorPlayerController::DeleteDummyObject()
 void ASW_CreatorPlayerController::MoveDummyObject(FVector2D MousePosition)
 {
 	bool ret = CreatorWidget->IsDragOverUI();
-	if (CreatingObject)
-	{
-		CreatingObject->SetActorHiddenInGame(ret);
-	}
 
 	if (CreatingObject)
 	{
+		CreatingObject->SetActorHiddenInGame(ret);
 		// 레이를 쏴서 부딪히는 지점으로 이동시킨다.
 		FVector WorldLocation, WorldDirection;
 
