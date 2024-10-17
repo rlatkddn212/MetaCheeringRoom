@@ -66,7 +66,7 @@ public:
 	// 아이템 사용 (자식에서 구현)
 	virtual void Use();
 
-	void SetOwner(APawn* Value);
+	virtual void SetOwner(APawn* Value);
 
 	void SetItemName(FString Value);
 	FString GetItemName();

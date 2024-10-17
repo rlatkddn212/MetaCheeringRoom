@@ -19,4 +19,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class UDataTable* ItemDataTable;
+
+	bool IsValidItem(FString ItemName);
 };

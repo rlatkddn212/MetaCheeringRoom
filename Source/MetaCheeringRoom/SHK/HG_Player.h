@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "HG_ItemBase.h"
 #include "HG_Player.generated.h"
 
 UCLASS()
@@ -76,4 +77,14 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UInventoryWidget>InventoryWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UHG_ItemPurchaseWidget> PurchaseWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	UHG_ItemPurchaseWidget* PurchaseWidget;
+
+	void PopUpPurchaseWidget();
+
+	FItemData TempData;
 };

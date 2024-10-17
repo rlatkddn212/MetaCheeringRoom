@@ -28,7 +28,9 @@ AHG_ItemBase::AHG_ItemBase()
 void AHG_ItemBase::BeginPlay()
 {
 	Super::BeginPlay();
+
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
+
 	InitItemData();
 }
 
@@ -75,7 +77,6 @@ FItemData AHG_ItemBase::GetItemData()
 
 void AHG_ItemBase::SetItemData(FItemData ItemValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("SetItemData"));
 	ItemData.ItemClass = this->GetClass();
 	ItemData.ItemIcon = ItemValue.ItemIcon;
 	ItemData.ItemName = ItemValue.ItemName;
