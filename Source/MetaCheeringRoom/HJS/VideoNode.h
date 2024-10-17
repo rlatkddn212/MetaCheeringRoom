@@ -13,8 +13,8 @@ UCLASS()
 class METACHEERINGROOM_API UVideoNode : public UUserWidget
 {
 	GENERATED_BODY()
-	
 public:
+	virtual void NativeConstruct() override;
 	UPROPERTY(meta=(BindWIdget))
 	class UBorder* IMG_Thumbnail;
 
@@ -24,7 +24,12 @@ public:
 	class UTextBlock* TEXT_Title;
 	UPROPERTY(meta=(BindWIdget))
 	class UTextBlock* TEXT_Owner;
+	UPROPERTY(meta=(BindWIdget))
+	class UButton* BTN_Play;
 
+	FString PlayURL;
 
+	UFUNCTION()
+	void PlayStream();
 
 };

@@ -15,7 +15,7 @@ public:
 	
 	FVedioInfo();
 
-	FVedioInfo(bool blive, FString time, FString title, FString owner, FString StreamURL, UTexture2D* thumbnail);
+	FVedioInfo(bool blive, FString time, FString title, FString owner, FString streamURL, UTexture2D* thumbnail);
 
 	UPROPERTY()
 	bool bLive;
@@ -63,6 +63,8 @@ public:
 	class UStreamMediaSource* MediaSource2;
 	UPROPERTY(EditAnywhere)
 	class UMediaSoundComponent* MediaSound;
+	UPROPERTY(EditAnywhere)
+	class UMediaSoundComponent* MediaSound2;
 
 	TArray<FVedioInfo> VedioInfoList;
 
@@ -79,7 +81,10 @@ public:
 	UFUNCTION()
 	void OnMediaEndReached();
 	UFUNCTION()
-	void PlayMedia();
+	void PlayMedia(const FString& VideoURL);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastPlayMedia(const FString& VideoURL);
 	UFUNCTION()
 	void RequestMediaURL(FString URL);
 	bool bUsingFirstPlayer = true; // 현재 어느 플레이어가 사용 중인지 체크
