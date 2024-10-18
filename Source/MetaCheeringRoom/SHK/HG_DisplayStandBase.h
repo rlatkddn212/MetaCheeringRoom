@@ -37,6 +37,15 @@ public:
 
 	void SetItemData(FItemData ItemValue);
 
+	void Detected(bool Value, APawn* p_DetectActor);
+
+	UPROPERTY(EditDefaultsOnly)
+	class UWidgetComponent* InteractionWidget;
 
 	bool bToggle = false;
+
+	bool bOnDetect = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	APawn* DetectActor;
 };

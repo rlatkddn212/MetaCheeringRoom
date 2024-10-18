@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "HG_Player.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -31,7 +30,6 @@ AHG_Player::AHG_Player()
 	GoodsComp = CreateDefaultSubobject<UHG_PlayerGoodsComponent>(TEXT("GoodsComp"));
 
 	InventoryComp = CreateDefaultSubobject<UHG_PlayerInventoryComponent>(TEXT("InventoryComp"));
-
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
 	if (TempMesh.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(TempMesh.Object);
@@ -44,7 +42,7 @@ AHG_Player::AHG_Player()
 void AHG_Player::BeginPlay()
 {
 	Super::BeginPlay();
-
+	DetectedStand = nullptr;
 	auto* pc = Cast<APlayerController>(Controller);
 	if (pc)
 	{
@@ -69,9 +67,44 @@ void AHG_Player::Tick(float DeltaTime)
 	AddMovementInput(Direction);
 	Direction = FVector::ZeroVector;
 
+	FHitResult OutHit;
+	FVector Start = GetActorLocation();
+	FVector End = Start + CameraComp->GetForwardVector() * 1000.0f;
+
+	ECollisionChannel TC = ECC_WorldDynamic;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, TC, Params);
+	if (bHit)
+	{
+		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Green, false, 1.0f);
+
+
+		if (LookAtActor != OutHit.GetActor() && bIsStand)
+		{
+			bIsStand = false;
+			DetectedStand->Detected(false, this);
+			DetectedStand = nullptr;
+		}
+		else
+		{
+			// 라인트레이스에 맞은게 상점 진열대일 때
+			if (!bIsStand)
+			{
+				DetectedStand = Cast<AHG_DisplayStandBase>(OutHit.GetActor());
+				if (DetectedStand != nullptr)
+				{
+					DetectedStand->Detected(true, this);
+					bIsStand = true;
+				}
+			}
+		}
+		LookAtActor = OutHit.GetActor();
+	}
 }
 
-// Called to bind functionality to input
+// Called to bind functionality to inputw
 void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
