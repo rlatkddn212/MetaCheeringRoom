@@ -27,8 +27,9 @@ public:
 	void SetGold(int32 Value);
 	int32 GetGold() const;
 	int32 AddGold(int32 Value);
+	int32 SubGold(int32 Value);
 
 private:
 	int32 Gold;
-	int32 MAX_GOLD = 100000;
+	int32 MAX_GOLD = 4000;
 };

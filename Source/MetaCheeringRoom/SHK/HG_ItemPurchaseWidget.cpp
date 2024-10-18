@@ -24,17 +24,23 @@ void UHG_ItemPurchaseWidget::OnClickPurchaseButton()
 {
 	if (GI->IsValidItem(LookingItemData.ItemName))
 	{
-		if (0 <= Owner->GoodsComp->AddGold(-1 * LookingItemData.ItemPrice))
+
+		if (Owner->GoodsComp->GetGold() <= 0)
 		{
-			Owner->InventoryComp->AddtoInventory(LookingItemData, 1);
+			RemoveFromParent();
 		}
-		RemoveFromParent();
+		else
+		{
+			Owner->GoodsComp->SubGold(LookingItemData.ItemPrice);
+			UE_LOG(LogTemp,Warning,TEXT("%d"), Owner->GoodsComp->GetGold());
+			Owner->InventoryComp->AddtoInventory(LookingItemData, 1);
+			RemoveFromParent();
+		}
 		auto* pc = Cast<APlayerController>(Owner->Controller);
 		if (pc)
 		{
 			pc->SetShowMouseCursor(false);
 			Owner->bCanMove = true;
-			Owner->bToggle = !Owner->bToggle;
 		}
 	}
 }
@@ -53,11 +59,10 @@ void UHG_ItemPurchaseWidget::OnClickExitButton()
 
 void UHG_ItemPurchaseWidget::SetItemInfo(FItemData ItemInfo)
 {
-	UE_LOG(LogTemp,Warning,TEXT("UHG_ItemPurchaseWidget::SetItemInfo"));
 	LookingItemData = ItemInfo;
 	Img_ItemImg->SetBrushFromTexture(ItemInfo.ItemIcon);
 	TB_ItemName->SetText(FText::FromString(ItemInfo.ItemName));
-	TB_ItemPrice->SetText(FText::FromString(FString::Printf(TEXT("%dPoint"), ItemInfo.ItemPrice)));
+	TB_ItemPrice->SetText(FText::FromString(FString::Printf(TEXT("%d Point"), ItemInfo.ItemPrice)));
 }
 
 void UHG_ItemPurchaseWidget::SetOwner(AHG_Player* Value)
