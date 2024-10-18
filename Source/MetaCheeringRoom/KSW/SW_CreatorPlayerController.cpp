@@ -69,8 +69,9 @@ void ASW_CreatorPlayerController::OnLeftClick()
             ASW_CreatorObject* Object = Cast<ASW_CreatorObject>(HitResult.GetActor());
             if (Object)
             {
+				if (SelectedObject)
+					SelectedObject->OnSelected(false);
                 Object->OnSelected(true);
-				SelectedObject->OnSelected(false);
 				SelectedObject = Object;
             }
         }
@@ -80,7 +81,7 @@ void ASW_CreatorPlayerController::OnLeftClick()
         }
 
         // 디버그용 트레이스 라인 표시 (빨간색)
-        DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
+        //DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
     }
 }
 
@@ -95,6 +96,11 @@ void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData*
 	CreatingObject->SetActorLocation(FVector::ZeroVector);
 	CreatingObject->SetActorRotation(FRotator::ZeroRotator);
 	CreatingObject->CreatingObjectData = ObjectData;
+
+	if (SelectedObject)
+		SelectedObject->OnSelected(false);
+	CreatingObject->OnSelected(true);
+	SelectedObject = CreatingObject;
 
 	CreatorWidget->OnDragged(true);
 }

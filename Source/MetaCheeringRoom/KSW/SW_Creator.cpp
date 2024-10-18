@@ -67,14 +67,12 @@ void ASW_Creator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	input->BindAction(IA_R, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyR);
 	input->BindAction(IA_RClick, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyRClick);
 	input->BindAction(IA_LClick, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyLClick);
-	input->BindAction(IA_LClick, ETriggerEvent::Started, this, &ASW_Creator::OnMyLClick);
-	input->BindAction(IA_LClick, ETriggerEvent::Completed, this, &ASW_Creator::OnMyLClick);
 
 	input->BindAction(IA_RClick, ETriggerEvent::Started, this, &ASW_Creator::OnMyRClickStarted);
 	input->BindAction(IA_RClick, ETriggerEvent::Completed, this, &ASW_Creator::OnMyRClickCompleted);
 
-	input->BindAction(IA_RClick, ETriggerEvent::Started, this, &ASW_Creator::OnMyLClickStarted);
-	input->BindAction(IA_RClick, ETriggerEvent::Completed, this, &ASW_Creator::OnMyLClickCompleted);
+	input->BindAction(IA_LClick, ETriggerEvent::Started, this, &ASW_Creator::OnMyLClickStarted);
+	input->BindAction(IA_LClick, ETriggerEvent::Completed, this, &ASW_Creator::OnMyLClickCompleted);
 }
 
 void ASW_Creator::OnMyMove(const FInputActionValue& Value)

@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "SW_CreatorObject.generated.h"
 
+struct FCreatorObjectData;
+
 UCLASS()
 class METACHEERINGROOM_API ASW_CreatorObject : public AActor
 {
@@ -23,10 +25,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void OnSelected(bool isSelected);
+	virtual void OnSelected(bool isSelected);
 
 	void DoDestroy();
 	// º¯È¯
 
 	struct FCreatorObjectData* CreatingObjectData;
+
+	UPROPERTY()
+	class USceneComponent* Root;
+	
+	UPROPERTY()
+	class UMaterialInstanceDynamic* Mat;
 };
