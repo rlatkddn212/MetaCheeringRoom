@@ -12,10 +12,6 @@
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 
-void UInventoryWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
-}
 
 void UInventoryWidget::NativeConstruct()
 {
@@ -28,11 +24,17 @@ void UInventoryWidget::NativeConstruct()
 	SelectedCategory = WB_SlotList_Active;
 }
 
+void UInventoryWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+}
+
 void UInventoryWidget::InitInventoryUI()
 {
 	WB_SlotList_Active->ClearChildren();
 	WB_SlotList_Costume->ClearChildren();
 	SelectedSlot = nullptr;
+	DIsplaySelectedItemInfo();
 	if (this->GetOwningPlayer() != nullptr)
 	{
 		auto* OwningPlayer = Cast<AHG_Player>(this->GetOwningPlayer()->GetPawn());
@@ -48,13 +50,10 @@ void UInventoryWidget::InitInventoryUI()
 					SlotWidget->SetOwner(this);
 					if (slot.ItemInfo.ItemCategory == EItemCategory::Category_Active)
 					{
-						UE_LOG(LogTemp, Warning, TEXT("Category_Active"));
 						WB_SlotList_Active->AddChildToWrapBox(SlotWidget);
 					}
 					else if (slot.ItemInfo.ItemCategory == EItemCategory::Category_Costume)
 					{
-
-						UE_LOG(LogTemp, Warning, TEXT("Category_Costume"));
 						WB_SlotList_Costume->AddChildToWrapBox(SlotWidget);
 					}
 					else
@@ -120,15 +119,16 @@ void UInventoryWidget::ThrowAwaySelectedItem()
 				{
 					Owner->InventoryComp->RemoveFromInventory(SelectedSlot->SlotInfo.ItemInfo, 1);
 				}
-
 				SelectedSlot->SlotInfo.Quantity--;
-				if (SelectedSlot->SlotInfo.Quantity <= 0)
+
+				if (SelectedSlot->SlotInfo.Quantity == 0)
 				{
 					SelectedCategory->RemoveChildAt(i);
 					Img_SelectedItem->SetBrushFromMaterial(DefaultImage);
 					TB_ItemName->SetText(FText::FromString(TEXT("")));
 					TB_Price->SetText(FText::FromString(TEXT("")));
 					TB_Quantity->SetText(FText::FromString(TEXT("")));
+					SelectedSlot = nullptr;
 				}
 				else
 				{

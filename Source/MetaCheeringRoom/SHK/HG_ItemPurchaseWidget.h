@@ -44,7 +44,6 @@ public:
 	UFUNCTION()
 	void OnClickExitButton();
 
-	
 	void SetItemInfo(FItemData ItemInfo);
 	
 	void SetOwner(class AHG_Player* Value);

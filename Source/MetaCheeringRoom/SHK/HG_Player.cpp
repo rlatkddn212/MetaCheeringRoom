@@ -31,7 +31,8 @@ AHG_Player::AHG_Player()
 
 	InventoryComp = CreateDefaultSubobject<UHG_PlayerInventoryComponent>(TEXT("InventoryComp"));
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
-	if (TempMesh.Succeeded()) {
+	if (TempMesh.Succeeded())
+	{
 		GetMesh()->SetSkeletalMesh(TempMesh.Object);
 	}
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -80.0f));
@@ -43,6 +44,7 @@ void AHG_Player::BeginPlay()
 {
 	Super::BeginPlay();
 	DetectedStand = nullptr;
+
 	auto* pc = Cast<APlayerController>(Controller);
 	if (pc)
 	{
@@ -52,7 +54,7 @@ void AHG_Player::BeginPlay()
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
 	}
-	GoodsComp->SetGold(0);
+	GoodsComp->SetGold(4000);
 }
 
 // Called every frame
@@ -69,7 +71,7 @@ void AHG_Player::Tick(float DeltaTime)
 
 	FHitResult OutHit;
 	FVector Start = GetActorLocation();
-	FVector End = Start + CameraComp->GetForwardVector() * 1000.0f;
+	FVector End = Start + CameraComp->GetForwardVector() * 300.0f;
 
 	ECollisionChannel TC = ECC_WorldDynamic;
 	FCollisionQueryParams Params;
@@ -102,9 +104,18 @@ void AHG_Player::Tick(float DeltaTime)
 		}
 		LookAtActor = OutHit.GetActor();
 	}
+	else
+	{
+		if (DetectedStand)
+		{
+			bIsStand = false;
+			DetectedStand->Detected(false, this);
+			DetectedStand = nullptr;
+		}
+	}
 }
 
-// Called to bind functionality to inputw
+// Called to bind functionality to input
 void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -189,17 +200,15 @@ void AHG_Player::DetectObject()
 				}
 			}
 		}
-		// 라인트레이스에 맞은게 아이템일 때
-		if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
+		else if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
 		{
+			// 라인트레이스에 맞은게 아이템일 때
 			InventoryComp->AddtoInventory(Item->GetItemData(), 1);
 			Item->Destroy();
 		}
-
-		// 라인트레이스에 맞은게 상점 진열대일 때
-		if (auto* Stand = Cast<AHG_DisplayStandBase>(OutHit.GetActor()))
+		else if (auto* Stand = Cast<AHG_DisplayStandBase>(OutHit.GetActor()))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Stand"));
+			// 라인트레이스에 맞은게 상점 진열대일 때
 			TempData = Stand->ItemData;
 			PopUpPurchaseWidget();
 		}
@@ -261,6 +270,7 @@ void AHG_Player::PopUpPurchaseWidget()
 			bCanMove = true;
 			pc->SetShowMouseCursor(false);
 			bToggle = !bToggle;
+			PurchaseWidget = nullptr;
 		}
 	}
 }
