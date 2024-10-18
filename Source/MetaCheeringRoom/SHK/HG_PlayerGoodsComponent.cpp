@@ -44,15 +44,13 @@ int32 UHG_PlayerGoodsComponent::GetGold() const
 
 int32 UHG_PlayerGoodsComponent::AddGold(int32 Value)
 {
-	if (Gold + Value > 0 && Gold + Value < MAX_GOLD)
-	{
-		Gold += Value;
-		return Gold;
-	}
-	else
-	{
-		return Gold - Value > 0? Gold - Value : Value - Gold;
-	}
-	
+	SetGold(FMath::Clamp(Gold + Value, 0, MAX_GOLD));
+	return Gold;
+}
+
+int32 UHG_PlayerGoodsComponent::SubGold(int32 Value)
+{
+	SetGold(FMath::Clamp(Gold - Value, 0, MAX_GOLD));
+	return Gold;
 }
 

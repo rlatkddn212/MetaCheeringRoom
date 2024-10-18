@@ -87,4 +87,12 @@ public:
 	void PopUpPurchaseWidget();
 
 	FItemData TempData;
+
+	UPROPERTY(EditDefaultsOnly)
+	AActor* LookAtActor;
+
+	bool bIsStand = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	class AHG_DisplayStandBase* DetectedStand;
 };

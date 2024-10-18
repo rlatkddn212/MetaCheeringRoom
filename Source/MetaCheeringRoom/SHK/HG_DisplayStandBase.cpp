@@ -18,6 +18,10 @@ AHG_DisplayStandBase::AHG_DisplayStandBase()
 
 	BoxComp->SetGenerateOverlapEvents(true);
 	BoxComp->SetCollisionProfileName(TEXT("DisplayStand"));
+
+	InteractionWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
+	InteractionWidget->SetupAttachment(RootComponent);
+	InteractionWidget->SetVisibility(false);
 }
 
 // Called when the game starts or when spawned
@@ -34,6 +38,18 @@ void AHG_DisplayStandBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (DetectActor != nullptr)
+	{
+		// 사용자의 카메라를 찾고
+		FVector target = Cast<APlayerController>(DetectActor->Controller)->PlayerCameraManager->GetCameraLocation();
+		// 그 카메라를 바라보는 방향을 만들어서
+		FVector dir = target - InteractionWidget->GetComponentLocation();
+		dir.Normalize();
+
+		// HPComp를 회전하고싶다.(Billboard 기법)
+		FRotator rot = dir.ToOrientationRotator();
+		InteractionWidget->SetWorldRotation(rot);
+	}
 }
 
 void AHG_DisplayStandBase::InitItemData()
@@ -42,14 +58,11 @@ void AHG_DisplayStandBase::InitItemData()
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 	if (GI)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GI"));
 		GI->ItemDataTable->GetAllRows(TEXT(""), AllRows);
 		for (auto Row : AllRows)
 		{
 			if (Row->ItemName == ItemData.ItemName)
 			{
-
-				UE_LOG(LogTemp, Warning, TEXT("Row->ItemName == ItemData.ItemName"));
 				SetItemData(*Row);
 				break;
 			}
@@ -64,4 +77,10 @@ void AHG_DisplayStandBase::SetItemData(FItemData ItemValue)
 	ItemData.ItemName = ItemValue.ItemName;
 	ItemData.ItemPrice = ItemValue.ItemPrice;
 	ItemData.ItemCategory = ItemValue.ItemCategory;
+}
+
+void AHG_DisplayStandBase::Detected(bool Value, APawn* p_DetectActor)
+{
+	InteractionWidget->SetVisibility(Value);
+	DetectActor = p_DetectActor;
 }
