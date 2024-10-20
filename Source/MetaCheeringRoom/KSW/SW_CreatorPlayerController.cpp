@@ -61,37 +61,107 @@ void ASW_CreatorPlayerController::OnLeftClick()
         FVector WorldLocation, WorldDirection;
         // 화면 좌표를 월드 좌표로 변환
         DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldLocation, WorldDirection);
+		
+		{
+			FVector TraceStart = WorldLocation;
+			FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0f);  // 트레이스 거리 설정
 
-        FVector TraceStart = WorldLocation;
-        FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0f);  // 트레이스 거리 설정
+			FHitResult HitResult;
+			FCollisionQueryParams Params;
+			Params.AddIgnoredActor(GetPawn());  // 자신의 캐릭터는 무시
 
-        FHitResult HitResult;
-        FCollisionQueryParams Params;
-        Params.AddIgnoredActor(GetPawn());  // 자신의 캐릭터는 무시
+			FCollisionObjectQueryParams ObjectParams;
+			ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel3);
+			
+			// 라인 트레이스 실행
+			bool bHit = GetWorld()->LineTraceSingleByObjectType(HitResult, TraceStart, TraceEnd, ObjectParams, Params);
 
-        // 라인 트레이스 실행
-        bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
+			if (bHit)
+			{
+				if (bHit && HitResult.Component.IsValid())
+				{
+					// 아니 컴포넌트 이름 출력
+					UE_LOG(LogTemp, Log, TEXT("Clicked on Component: %s"), *HitResult.Component->GetName());
 
-        if (bHit)
-        {
-            UE_LOG(LogTemp, Log, TEXT("Clicked on Actor: %s"), *HitResult.GetActor()->GetName());
-            ASW_CreatorObject* Object = Cast<ASW_CreatorObject>(HitResult.GetActor());
+					if (HitResult.Component->ComponentTags.Contains(FName("XAxisMesh")))
+					{
+						SelectedObject->SelectAxis(true, false, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("YAxisMesh")))
+					{
+						SelectedObject->SelectAxis(false, true, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("ZAxisMesh")))
+					{
+						SelectedObject->SelectAxis(false, false, true);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("XRingMesh")))
+					{
+						SelectedObject->SelectRotationAxis(true, false, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("YRingMesh")))
+					{
+						SelectedObject->SelectRotationAxis(false, true, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("ZRingMesh")))
+					{
+						SelectedObject->SelectRotationAxis(false, false, true);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("XScaleMesh")))
+					{
+						SelectedObject->SelectScaleAxis(true, false, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("YScaleMesh")))
+					{
+						SelectedObject->SelectScaleAxis(false, true, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("ZScaleMesh")))
+					{
+						SelectedObject->SelectScaleAxis(false, false, true);
+					}
 
-            if (Object)
-            {
-				if (SelectedObject)
-					SelectedObject->OnSelected(false);
-                Object->OnSelected(true);
-				SelectedObject = Object;
+					return;
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("No Actor hit."));
+			}
+		}
 
-				if (SelectedObject)
-					SelectedObject->ChangeToolMode(ToolState);
-            }
-        }
-        else
-        {
-            UE_LOG(LogTemp, Log, TEXT("No Actor hit."));
-        }
+		{
+			FVector TraceStart = WorldLocation;
+			FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0f);  // 트레이스 거리 설정
+
+			FHitResult HitResult;
+			FCollisionQueryParams Params;
+			Params.AddIgnoredActor(GetPawn());  // 자신의 캐릭터는 무시
+
+			// 라인 트레이스 실행
+			bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
+
+			if (bHit)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Clicked on Actor: %s"), *HitResult.GetActor()->GetName());
+				ASW_CreatorObject* Object = Cast<ASW_CreatorObject>(HitResult.GetActor());
+
+				if (Object)
+				{
+					if (SelectedObject)
+						SelectedObject->OnSelected(false);
+					Object->OnSelected(true);
+					SelectedObject = Object;
+
+					if (SelectedObject)
+						SelectedObject->ChangeToolMode(ToolState);
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("No Actor hit."));
+			}
+		}
+        
 
         // 디버그용 트레이스 라인 표시 (빨간색)
         //DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);

@@ -56,3 +56,39 @@ void UCreatorRotationGizmoComponent::SetGizmoVisibility(bool isVisible)
 	Me->ZRingMesh->SetVisibility(isVisible);
 }
 
+void UCreatorRotationGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
+{
+	// 축 선택
+	IsXAxisSelected = isX;
+	IsYAxisSelected = isY;
+	IsZAxisSelected = isZ;
+
+    // 선택한 축을 노란색으로
+	if (isX)
+	{
+		Me->XRingMesh->SetMaterial(0, YellowMat);
+	}
+	else
+	{
+		Me->XRingMesh->SetMaterial(0, RedMat);
+	}
+
+	if (isY)
+	{
+		Me->YRingMesh->SetMaterial(0, YellowMat);
+	}
+	else
+	{
+		Me->YRingMesh->SetMaterial(0, GreenMat);
+	}
+
+	if (isZ)
+	{
+		Me->ZRingMesh->SetMaterial(0, YellowMat);
+	}
+	else
+	{
+		Me->ZRingMesh->SetMaterial(0, BlueMat);
+	}
+}
+

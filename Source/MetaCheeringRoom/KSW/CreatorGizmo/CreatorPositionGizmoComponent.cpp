@@ -58,3 +58,44 @@ void UCreatorPositionGizmoComponent::SetGizmoVisibility(bool isVisible)
 	Me->ZAxisMesh->SetVisibility(isVisible);
 }
 
+void UCreatorPositionGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
+{
+	IsXAxisSelected = isX;
+	IsYAxisSelected = isY;
+	IsZAxisSelected = isZ;
+	
+    // 선택한 축을 노란색으로 바꾼다.
+	if (isX)
+	{
+		Me->XAxisMesh->SetMaterial(0, YellowMat);
+		Me->XAxisMesh->SetMaterial(1, YellowMat);
+	}
+	else
+	{
+		Me->XAxisMesh->SetMaterial(0, RedMat);
+		Me->XAxisMesh->SetMaterial(1, RedMat);
+	}
+
+	if (isY)
+	{
+		Me->YAxisMesh->SetMaterial(0, YellowMat);
+		Me->YAxisMesh->SetMaterial(1, YellowMat);
+	}
+	else
+	{
+		Me->YAxisMesh->SetMaterial(0, GreenMat);
+		Me->YAxisMesh->SetMaterial(1, GreenMat);
+	}
+
+	if (isZ)
+	{
+		Me->ZAxisMesh->SetMaterial(0, YellowMat);
+		Me->ZAxisMesh->SetMaterial(1, YellowMat);
+	}
+	else
+	{
+		Me->ZAxisMesh->SetMaterial(0, BlueMat);
+		Me->ZAxisMesh->SetMaterial(1, BlueMat);
+	}
+}
+

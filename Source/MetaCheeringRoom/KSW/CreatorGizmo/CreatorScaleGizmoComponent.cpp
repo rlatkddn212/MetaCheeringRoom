@@ -81,3 +81,62 @@ void UCreatorScaleGizmoComponent::SetGizmoVisibility(bool isVisible)
 	Me->ZScaleRectMesh->SetVisibility(isVisible);
 }
 
+void UCreatorScaleGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
+{
+	// 축 선택
+	IsXAxisSelected = isX;
+	IsYAxisSelected = isY;
+	IsZAxisSelected = isZ;
+
+	// 선택한 축을 노란색으로
+	if (isX)
+	{
+		Me->XScaleAxisMesh->SetMaterial(0, YellowMat);
+		Me->XScaleAxisMesh->SetMaterial(1, YellowMat);
+
+		Me->XScaleRectMesh->SetMaterial(0, YellowMat);
+		Me->XScaleRectMesh->SetMaterial(1, YellowMat);
+	}
+	else
+	{
+		Me->XScaleAxisMesh->SetMaterial(0, RedMat);
+		Me->XScaleAxisMesh->SetMaterial(1, RedMat);
+
+		Me->XScaleRectMesh->SetMaterial(0, RedMat);
+		Me->XScaleRectMesh->SetMaterial(1, RedMat);
+	}
+
+	if (isY)
+	{
+		Me->YScaleAxisMesh->SetMaterial(0, YellowMat);
+		Me->YScaleAxisMesh->SetMaterial(1, YellowMat);
+
+		Me->YScaleRectMesh->SetMaterial(0, YellowMat);
+		Me->YScaleRectMesh->SetMaterial(1, YellowMat);
+	}
+	else
+	{
+		Me->YScaleAxisMesh->SetMaterial(0, GreenMat);
+		Me->YScaleAxisMesh->SetMaterial(1, GreenMat);
+
+		Me->YScaleRectMesh->SetMaterial(0, GreenMat);
+		Me->YScaleRectMesh->SetMaterial(1, GreenMat);
+	}
+
+	if (isZ)
+	{
+		Me->ZScaleAxisMesh->SetMaterial(0, YellowMat);
+		Me->ZScaleAxisMesh->SetMaterial(1, YellowMat);
+
+		Me->ZScaleRectMesh->SetMaterial(0, YellowMat);
+		Me->ZScaleRectMesh->SetMaterial(1, YellowMat);
+	}
+	else
+	{
+		Me->ZScaleAxisMesh->SetMaterial(0, BlueMat);
+		Me->ZScaleAxisMesh->SetMaterial(1, BlueMat);
+
+		Me->ZScaleRectMesh->SetMaterial(0, BlueMat);
+		Me->ZScaleRectMesh->SetMaterial(1, BlueMat);
+	}
+}

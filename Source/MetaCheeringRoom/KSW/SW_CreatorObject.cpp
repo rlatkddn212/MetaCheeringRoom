@@ -23,6 +23,14 @@ ASW_CreatorObject::ASW_CreatorObject()
 	YAxisMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("YAxisMesh"));
 	ZAxisMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ZAxisMesh"));
 
+	XAxisMesh->ComponentTags.Add(FName("XAxisMesh"));
+	YAxisMesh->ComponentTags.Add(FName("YAxisMesh"));
+	ZAxisMesh->ComponentTags.Add(FName("ZAxisMesh"));
+
+	XAxisMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	YAxisMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	ZAxisMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+
 	// 기본 메시 설정 (옵션)
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderMesh(TEXT("/Script/Engine.StaticMesh'/Game/Ksw/TranslateArrowHandle.TranslateArrowHandle'"));
 	if (CylinderMesh.Succeeded())
@@ -53,6 +61,14 @@ ASW_CreatorObject::ASW_CreatorObject()
 
 	ZRingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ZRingMesh"));
 
+	XRingMesh->ComponentTags.Add(FName("XRingMesh"));
+	YRingMesh->ComponentTags.Add(FName("YRingMesh"));
+	ZRingMesh->ComponentTags.Add(FName("ZRingMesh"));
+
+	XRingMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	YRingMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	ZRingMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+
 	// 링 메쉬 설정 (Torus 사용 예시)
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> RingMesh(TEXT("/Script/Engine.StaticMesh'/Game/Ksw/Ring.Ring'"));
 	if (RingMesh.Succeeded())
@@ -74,6 +90,21 @@ ASW_CreatorObject::ASW_CreatorObject()
 	XScaleRectMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XScaleRectMesh"));
 	YScaleRectMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("YScaleRectMesh"));
 	ZScaleRectMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ZScaleRectMesh"));
+
+	XScaleAxisMesh->ComponentTags.Add(FName("XScaleMesh"));
+	YScaleAxisMesh->ComponentTags.Add(FName("YScaleMesh"));
+	ZScaleAxisMesh->ComponentTags.Add(FName("ZScaleMesh"));
+
+	XScaleRectMesh->ComponentTags.Add(FName("XScaleMesh"));
+	YScaleRectMesh->ComponentTags.Add(FName("YScaleMesh"));
+	ZScaleRectMesh->ComponentTags.Add(FName("ZScaleMesh"));
+
+	XScaleAxisMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	YScaleAxisMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	ZScaleAxisMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	XScaleRectMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	YScaleRectMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	ZScaleRectMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ScaleAxisMesh(TEXT("/Script/Engine.StaticMesh'/Game/Ksw/TranslateHandleLong.TranslateHandleLong'"));
 
@@ -123,6 +154,8 @@ ASW_CreatorObject::ASW_CreatorObject()
 	PositionGizmo->SetupAttachment(Root);
 	RotationGizmo->SetupAttachment(Root);
 	ScaleGizmo->SetupAttachment(Root);
+
+	ChangeToolMode(ECreatorToolState::Selection);
 }
 
 // Called when the game starts or when spawned
@@ -162,45 +195,88 @@ void ASW_CreatorObject::DoDestroy()
 
 void ASW_CreatorObject::ChangeToolMode(ECreatorToolState state)
 {
-	XAxisMesh->SetVisibility(false);
-	YAxisMesh->SetVisibility(false);
-	ZAxisMesh->SetVisibility(false);
+	// hidden in game
+	XAxisMesh->SetHiddenInGame(true);
+	YAxisMesh->SetHiddenInGame(true);
+	ZAxisMesh->SetHiddenInGame(true);
+	XAxisMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	YAxisMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ZAxisMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	XRingMesh->SetVisibility(false);
-	YRingMesh->SetVisibility(false);
-	ZRingMesh->SetVisibility(false);
+	XRingMesh->SetHiddenInGame(true);
+	YRingMesh->SetHiddenInGame(true);
+	ZRingMesh->SetHiddenInGame(true);
+	XRingMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	YRingMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ZRingMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	XScaleAxisMesh->SetVisibility(false);
-	YScaleAxisMesh->SetVisibility(false);
-	ZScaleAxisMesh->SetVisibility(false);
+	XScaleAxisMesh->SetHiddenInGame(true);
+	YScaleAxisMesh->SetHiddenInGame(true);
+	ZScaleAxisMesh->SetHiddenInGame(true);
+	
+	XScaleRectMesh->SetHiddenInGame(true);
+	YScaleRectMesh->SetHiddenInGame(true);
+	ZScaleRectMesh->SetHiddenInGame(true);
 
-	XScaleRectMesh->SetVisibility(false);
-	YScaleRectMesh->SetVisibility(false);
-	ZScaleRectMesh->SetVisibility(false);
+	XScaleAxisMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	YScaleAxisMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ZScaleAxisMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	XScaleRectMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	YScaleRectMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ZScaleRectMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	switch (state)
 	{
 	case ECreatorToolState::Selection:
 		break;
 	case ECreatorToolState::Position:
-		XAxisMesh->SetVisibility(true);
-		YAxisMesh->SetVisibility(true);
-		ZAxisMesh->SetVisibility(true);
+		XAxisMesh->SetHiddenInGame(false);
+		YAxisMesh->SetHiddenInGame(false);
+		ZAxisMesh->SetHiddenInGame(false);
+		XAxisMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		YAxisMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		ZAxisMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	case ECreatorToolState::Rotation:
-		XRingMesh->SetVisibility(true);
-		YRingMesh->SetVisibility(true);
-		ZRingMesh->SetVisibility(true);
+		
+		XRingMesh->SetHiddenInGame(false);
+		YRingMesh->SetHiddenInGame(false);
+		ZRingMesh->SetHiddenInGame(false);
+		XRingMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		YRingMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		ZRingMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	case ECreatorToolState::Scale:
-		XScaleAxisMesh->SetVisibility(true);
-		YScaleAxisMesh->SetVisibility(true);
-		ZScaleAxisMesh->SetVisibility(true);
+		XScaleAxisMesh->SetHiddenInGame(false);
+		YScaleAxisMesh->SetHiddenInGame(false);
+		ZScaleAxisMesh->SetHiddenInGame(false);
+		XScaleAxisMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		YScaleAxisMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		ZScaleAxisMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-		XScaleRectMesh->SetVisibility(true);
-		YScaleRectMesh->SetVisibility(true);
-		ZScaleRectMesh->SetVisibility(true);
+		XScaleRectMesh->SetHiddenInGame(false);
+		YScaleRectMesh->SetHiddenInGame(false);
+		ZScaleRectMesh->SetHiddenInGame(false);
+		XScaleRectMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		YScaleRectMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		ZScaleRectMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	}
+}
+
+void ASW_CreatorObject::SelectAxis(bool isX, bool isY, bool isZ)
+{
+	PositionGizmo->SetAxisSelected(isX, isY, isZ);
+}
+
+void ASW_CreatorObject::SelectRotationAxis(bool isX, bool isY, bool isZ)
+{
+	RotationGizmo->SetAxisSelected(isX, isY, isZ);
+}
+
+void ASW_CreatorObject::SelectScaleAxis(bool isX, bool isY, bool isZ)
+{
+	ScaleGizmo->SetAxisSelected(isX, isY, isZ);
 }
 

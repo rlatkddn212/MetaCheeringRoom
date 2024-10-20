@@ -85,4 +85,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* ZScaleRectMesh;
+
+	void SelectAxis(bool isX, bool isY, bool isZ);
+
+	void SelectRotationAxis(bool isX, bool isY, bool isZ);
+
+	void SelectScaleAxis(bool isX, bool isY, bool isZ);
 };
