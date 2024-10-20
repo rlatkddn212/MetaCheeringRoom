@@ -9,13 +9,25 @@
 #include "Online/CoreOnline.h"
 #include "Containers/StringConv.h"
 #include <string>
-
+#include "MetaCheeringRoom.h"
 //세션 이름
 const static FName SESSION_NAME = TEXT("Cheering");
 
 void UJS_SessionGameInstanceSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
+	if (Subsystem)
+	{
+		SessionInterface = Subsystem->GetSessionInterface();
+	}
+	if (SessionInterface)
+	{
+		SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UJS_SessionGameInstanceSubSystem::OnMyCreateSessionComplete);
+		SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UJS_SessionGameInstanceSubSystem::OnMyFindSessionComplete);
+		SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UJS_SessionGameInstanceSubSystem::OnMyJoinSessionComplete);
+		SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UJS_SessionGameInstanceSubSystem::OnMyDestroySessionComplete);
+	}
 }
 
 void UJS_SessionGameInstanceSubSystem::CreateSession(const FString& RoomName, int32 PlayerCount, const FString& Category)
@@ -105,11 +117,12 @@ void UJS_SessionGameInstanceSubSystem::OnMyCreateSessionComplete(FName SessionNa
 {
 	if (!Success)
 	{
+		PRINTLOG(TEXT("Failed"));
 		return;
 	}
 	// 서버 트래블하기 ( 영상 맵으로 )
-
-	GetWorld()->ServerTravel("/Game/KJH/Maps/KJH_CommunityMap?listen");
+	PRINTLOG(TEXT("Success"));
+	GetWorld()->ServerTravel("/Game/HJS/Maps/HJSTestMap?listen");
 	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Hosting"));
 
 }
@@ -189,21 +202,21 @@ void UJS_SessionGameInstanceSubSystem::OnMyFindSessionComplete(bool Success)
 				else if (categoryString == "Idol")
 					roomInfo.RoomCategory = ERoomCategory::CT_Idol;
 			}
-			roomInfo.index = i;
+			roomInfo.Index = i;
 			//방이름
 			FString roomNameString;
 			results[i].Session.SessionSettings.Get<FString>(FName("Room_Name"), roomNameString);
-			roomInfo.roomName = StringBase64Decode(roomNameString);
+			roomInfo.RoomName = StringBase64Decode(roomNameString);
 			//호스트 이름
 			FString hostNameString;
 			results[i].Session.SessionSettings.Get<FString>(FName("Host_Name"), hostNameString);
-			roomInfo.hostName = hostNameString;
+			roomInfo.HostName = hostNameString;
 			//최대 플레이어 수
 			roomInfo.MaxPlayerCount = results[i].Session.SessionSettings.NumPublicConnections;
 			//입장 가능한 플레이어 최대 - 지금
 			roomInfo.CurrentPlayerCount = roomInfo.MaxPlayerCount - results[i].Session.NumOpenPublicConnections;
 			//핑 정보
-			roomInfo.pingMS = results[i].PingInMs;
+			roomInfo.PingMS = results[i].PingInMs;
 
 
 			//델리게이트 룸 생성
@@ -214,7 +227,7 @@ void UJS_SessionGameInstanceSubSystem::OnMyFindSessionComplete(bool Success)
 	{
 		// 검색 결과가 없을 때 처리
 		FRoomInfo EmptyRoomInfo;
-		EmptyRoomInfo.roomName = TEXT("입장 가능한 방이 없습니다.");
+		EmptyRoomInfo.RoomName = TEXT("입장 가능한 방이 없습니다.");
 		OnSearchSignatureCompleteDelegate.Broadcast(EmptyRoomInfo);
 	}
 }

@@ -24,19 +24,19 @@ struct FRoomInfo {
 	ERoomCategory RoomCategory;
 	//방이름
 	UPROPERTY(BlueprintReadOnly)
-	FString roomName;
+	FString RoomName;
 	UPROPERTY(BlueprintReadOnly)
-	FString hostName;
+	FString HostName;
 	UPROPERTY(BlueprintReadOnly)
 	int32 MaxPlayerCount;
 	UPROPERTY(BlueprintReadOnly)
 	int32 CurrentPlayerCount;
 	UPROPERTY(BlueprintReadOnly)
-	int32 pingMS;
-	int32 index;
+	int32 PingMS;
+	int32 Index;
 	FString ToString()
 	{
-		return FString::Printf(TEXT(" %d) [%s] [%s]( %d / %d)-> %dms"), index, *roomName, *hostName, CurrentPlayerCount, MaxPlayerCount, pingMS);
+		return FString::Printf(TEXT(" %d) [%s] [%s]( %d / %d)-> %dms"), Index, *RoomName, *HostName, CurrentPlayerCount, MaxPlayerCount, PingMS);
 	}
 };
 
