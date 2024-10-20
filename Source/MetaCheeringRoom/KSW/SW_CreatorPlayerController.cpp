@@ -15,6 +15,7 @@
 #include "UObject/FastReferenceCollector.h"
 #include "Engine/Engine.h"
 #include "UI/SW_CreatorHierarchyWidget.h"
+#include "UI/SW_CreatorModelToolbarWidget.h"
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
 {
@@ -36,6 +37,14 @@ void ASW_CreatorPlayerController::BeginPlay()
 
 	// PlayerController 가져오기
 	CreatorWidget->ControllerReference = this;
+	CreatorWidget->ModelToolbarWidget->SetCreatorToolState(ECreatorToolState::Selection);
+
+	CreatorWidget->ModelToolbarWidget->OnCreatorToolStateChanged.BindLambda([this](ECreatorToolState NewState)
+		{
+			SetToolState(NewState);
+		});
+
+	ToolState = ECreatorToolState::Selection;
 }
 
 void ASW_CreatorPlayerController::Tick(float DeltaTime)
@@ -67,12 +76,16 @@ void ASW_CreatorPlayerController::OnLeftClick()
         {
             UE_LOG(LogTemp, Log, TEXT("Clicked on Actor: %s"), *HitResult.GetActor()->GetName());
             ASW_CreatorObject* Object = Cast<ASW_CreatorObject>(HitResult.GetActor());
+
             if (Object)
             {
 				if (SelectedObject)
 					SelectedObject->OnSelected(false);
                 Object->OnSelected(true);
 				SelectedObject = Object;
+
+				if (SelectedObject)
+					SelectedObject->ChangeToolMode(ToolState);
             }
         }
         else
@@ -101,6 +114,9 @@ void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData*
 		SelectedObject->OnSelected(false);
 	CreatingObject->OnSelected(true);
 	SelectedObject = CreatingObject;
+
+	if (SelectedObject)
+		SelectedObject->ChangeToolMode(ToolState);
 
 	CreatorWidget->OnDragged(true);
 }
@@ -166,5 +182,15 @@ void ASW_CreatorPlayerController::MoveDummyObject(FVector2D MousePosition)
 			CreatingObject->SetActorLocation(p + WorldDirection * 1000);
 		}
 	}
+}
+
+void ASW_CreatorPlayerController::SetToolState(ECreatorToolState NewState)
+{
+	ToolState = NewState;
+	if (CreatorWidget)
+		CreatorWidget->ModelToolbarWidget->SetCreatorToolState(NewState);
+	
+	if (SelectedObject)
+		SelectedObject->ChangeToolMode(ToolState);
 }
 

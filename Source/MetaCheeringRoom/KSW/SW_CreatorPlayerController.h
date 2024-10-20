@@ -6,6 +6,16 @@
 #include "GameFramework/PlayerController.h"
 #include "SW_CreatorPlayerController.generated.h"
 
+// 상태
+UENUM(BlueprintType)
+enum class ECreatorToolState : uint8
+{
+	Selection,
+	Position,
+	Rotation,
+	Scale
+};
+
 /**
  * 
  */
@@ -29,6 +39,12 @@ public:
 	UFUNCTION()
 	bool DeleteDummyObject();
 	void MoveDummyObject(FVector2D MousePosition);
+
+	void SetToolState(ECreatorToolState NewState);
+
+	// 상태
+	UPROPERTY()
+	ECreatorToolState ToolState;
 
 	class ASW_CreatorObject* SelectedObject;
 	

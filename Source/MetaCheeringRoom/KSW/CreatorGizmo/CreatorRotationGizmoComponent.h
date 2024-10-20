@@ -22,17 +22,23 @@ protected:
 
 public:	
 		
-    /** X, Y, Z 회전용 링 메쉬 */
-    UPROPERTY(VisibleAnywhere, Category = "Gizmo")
-    UStaticMeshComponent* XRingMesh;
-
-    UPROPERTY(VisibleAnywhere, Category = "Gizmo")
-    UStaticMeshComponent* YRingMesh;
-
-    UPROPERTY(VisibleAnywhere, Category = "Gizmo")
-    UStaticMeshComponent* ZRingMesh;
-
-    /** 기즈모 표시/숨김 설정 */
+	/** 기즈모 활성화 함수 */
     UFUNCTION(BlueprintCallable)
-    void SetGizmoVisibility(bool isVisible);
+	void SetGizmoVisibility(bool isVisible);
+
+	// 머터리얼 정보
+	UPROPERTY()
+	class UMaterialInterface* RedMat;
+
+	UPROPERTY()
+	class UMaterialInterface* GreenMat;
+	
+	UPROPERTY()
+	class UMaterialInterface* BlueMat;
+	
+	UPROPERTY()
+	class UMaterialInterface* YellowMat;
+
+	UPROPERTY()
+	class ASW_CreatorObject* Me;
 };

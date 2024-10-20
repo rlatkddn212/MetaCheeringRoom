@@ -6,6 +6,15 @@
 #include "GameFramework/Pawn.h"
 #include "SW_Creator.generated.h"
 
+// Mode State
+UENUM(BlueprintType)
+enum class ECreatorMouseState : uint8
+{
+	None,
+	Clicked,
+	Drag,
+};
+
 UCLASS()
 class METACHEERINGROOM_API ASW_Creator : public APawn
 {
@@ -52,7 +61,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_LClick;
-	
+
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
 	UFUNCTION()
@@ -82,4 +91,12 @@ public:
 	void OnMyLClickCompleted(const FInputActionValue& Value);
 	
 	FVector Direction;
+
+	ECreatorMouseState MouseState;
+
+	UPROPERTY()
+	class ASW_CreatorPlayerController* PC;
+
+	void SetMouseState(ECreatorMouseState NewState);
+
 };

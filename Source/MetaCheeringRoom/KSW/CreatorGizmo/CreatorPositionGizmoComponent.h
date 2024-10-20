@@ -21,20 +21,24 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void OnComponentCreated() override;
-		
-    /** 축 메시를 위한 StaticMeshComponent들 */
-    UPROPERTY(VisibleAnywhere, Category = "Gizmo")
-    UStaticMeshComponent* XAxisMesh;
-
-    UPROPERTY(VisibleAnywhere, Category = "Gizmo")
-    UStaticMeshComponent* YAxisMesh;
-
-    UPROPERTY(VisibleAnywhere, Category = "Gizmo")
-    UStaticMeshComponent* ZAxisMesh;
-
+   
 	/** 기즈모 활성화 함수 */
     UFUNCTION(BlueprintCallable)
 	void SetGizmoVisibility(bool isVisible);
+
+	// 머터리얼 정보
+	UPROPERTY()
+	class UMaterialInterface* RedMat;
+
+	UPROPERTY()
+	class UMaterialInterface* GreenMat;
+	
+	UPROPERTY()
+	class UMaterialInterface* BlueMat;
+	
+	UPROPERTY()
+	class UMaterialInterface* YellowMat;
+
+	UPROPERTY()
+	class ASW_CreatorObject* Me;
 };
