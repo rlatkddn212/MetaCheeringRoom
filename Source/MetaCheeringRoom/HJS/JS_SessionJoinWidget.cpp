@@ -42,6 +42,7 @@ void UJS_SessionJoinWidget::NativeConstruct()
 	BTN_JoinQuit->OnClicked.AddDynamic(this, &UJS_SessionJoinWidget::OnClickedJoinQuit);
 	BTN_JoinBack->OnClicked.AddDynamic(this, &UJS_SessionJoinWidget::OnClickedJoinQuit);
 	BTN_Quit->OnClicked.AddDynamic(this, &UJS_SessionJoinWidget::OnClickedQuit);
+	BTN_CreateQuit->OnClicked.AddDynamic(this, &UJS_SessionJoinWidget::OnClickedCreateQuit);
 }
 
 void UJS_SessionJoinWidget::MenuSwitching(int32 index)
@@ -165,6 +166,11 @@ void UJS_SessionJoinWidget::OnClickedJoinQuit()
 {
 	BD_JoinRoom->SetVisibility(ESlateVisibility::Hidden);
 	LobbySelectedIndex = -1;
+}
+
+void UJS_SessionJoinWidget::OnClickedCreateQuit()
+{
+	BD_CreateRoom->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UJS_SessionJoinWidget::OnClickedQuit()
