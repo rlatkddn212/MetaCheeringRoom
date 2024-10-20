@@ -12,7 +12,7 @@ enum class ECreatorMouseState : uint8
 {
 	None,
 	Clicked,
-	Drag,
+	GizmoDrag,
 };
 
 UCLASS()
@@ -99,4 +99,6 @@ public:
 
 	void SetMouseState(ECreatorMouseState NewState);
 
+	// 마우스 클릭시 초기 위치
+	FVector2D MouseDownPosition;
 };

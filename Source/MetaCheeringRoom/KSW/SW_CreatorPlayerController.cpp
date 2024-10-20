@@ -53,7 +53,7 @@ void ASW_CreatorPlayerController::Tick(float DeltaTime)
 	
 }
 
-void ASW_CreatorPlayerController::OnLeftClick()
+bool ASW_CreatorPlayerController::OnLeftClick()
 {
     FVector2D MousePosition;
     if (GetMousePosition(MousePosition.X, MousePosition.Y))
@@ -120,7 +120,7 @@ void ASW_CreatorPlayerController::OnLeftClick()
 						SelectedObject->SelectScaleAxis(false, false, true);
 					}
 
-					return;
+					return true;
 				}
 			}
 			else
@@ -166,6 +166,8 @@ void ASW_CreatorPlayerController::OnLeftClick()
         // 디버그용 트레이스 라인 표시 (빨간색)
         //DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
     }
+
+	return false;
 }
 
 void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData* ObjectData)
@@ -262,5 +264,26 @@ void ASW_CreatorPlayerController::SetToolState(ECreatorToolState NewState)
 	
 	if (SelectedObject)
 		SelectedObject->ChangeToolMode(ToolState);
+}
+
+void ASW_CreatorPlayerController::Drag(FVector2D MouseDownPosition)
+{
+	FVector2D MousePosition;
+	if (GetMousePosition(MousePosition.X, MousePosition.Y))
+	{
+		// 초기값
+		if (SelectedObject)
+		{
+			SelectedObject->Drag(MouseDownPosition, MousePosition);
+		}
+	}
+}
+
+void ASW_CreatorPlayerController::DragEnd()
+{
+	if (SelectedObject)
+	{
+		SelectedObject->DragEnd(ToolState);
+	}
 }
 

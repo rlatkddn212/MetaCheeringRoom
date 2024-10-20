@@ -91,4 +91,8 @@ public:
 	void SelectRotationAxis(bool isX, bool isY, bool isZ);
 
 	void SelectScaleAxis(bool isX, bool isY, bool isZ);
+
+	void Drag(FVector2D MouseDownPosition, FVector2D MousePosition);
+
+	void DragEnd(ECreatorToolState ToolState);
 };

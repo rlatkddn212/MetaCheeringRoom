@@ -146,11 +146,11 @@ void ASW_Creator::OnMyR(const FInputActionValue& Value)
 
 void ASW_Creator::OnMyRClick(const FInputActionValue& Value)
 {
-	SetMouseState(ECreatorMouseState::Clicked);	
 }
 
 void ASW_Creator::OnMyLClick(const FInputActionValue& Value)
 {
+	PC->Drag(MouseDownPosition);
 }
 
 void ASW_Creator::OnMyRClickStarted(const FInputActionValue& Value)
@@ -166,16 +166,25 @@ void ASW_Creator::OnMyRClickCompleted(const FInputActionValue& Value)
 void ASW_Creator::OnMyLClickStarted(const FInputActionValue& Value)
 {
 	SetMouseState(ECreatorMouseState::Clicked);
-	auto* pc = Cast<ASW_CreatorPlayerController>(Controller);
-	if (pc)
+	if (PC)
 	{
-		pc->OnLeftClick();
+		if (PC->OnLeftClick())
+		{
+			SetMouseState(ECreatorMouseState::GizmoDrag);
+		}
+
+		PC->GetMousePosition(MouseDownPosition.X, MouseDownPosition.Y);
 	}
 }
 
 void ASW_Creator::OnMyLClickCompleted(const FInputActionValue& Value)
 {
 	SetMouseState(ECreatorMouseState::None);
+
+	if (PC)
+	{
+		PC->DragEnd();
+	}
 }
 
 void ASW_Creator::SetMouseState(ECreatorMouseState NewState)

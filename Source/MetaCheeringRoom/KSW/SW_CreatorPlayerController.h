@@ -31,7 +31,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// 마우스 왼쪽 클릭 처리 함수
-	void OnLeftClick();
+	bool OnLeftClick();
 
 	void CreatingDummyObject(struct FCreatorObjectData* ObjectData);
 	// 지워지지 않는경우
@@ -57,4 +57,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	class USW_CreatorWidget* CreatorWidget;
+
+	void Drag(FVector2D MouseDownPosition);
+	void DragEnd();
 };

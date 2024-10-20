@@ -154,8 +154,6 @@ ASW_CreatorObject::ASW_CreatorObject()
 	PositionGizmo->SetupAttachment(Root);
 	RotationGizmo->SetupAttachment(Root);
 	ScaleGizmo->SetupAttachment(Root);
-
-	ChangeToolMode(ECreatorToolState::Selection);
 }
 
 // Called when the game starts or when spawned
@@ -169,6 +167,7 @@ void ASW_CreatorObject::BeginPlay()
 		EAttachmentRule::SnapToTarget,
 		false);
 
+	ChangeToolMode(ECreatorToolState::Selection);
 	/*XScaleRectMesh->AttachToComponent(XScaleAxisMesh, AttachmentRules);
 	YScaleRectMesh->AttachToComponent(YScaleAxisMesh, AttachmentRules);
 	ZScaleRectMesh->AttachToComponent(ZScaleAxisMesh, AttachmentRules);*/
@@ -195,6 +194,10 @@ void ASW_CreatorObject::DoDestroy()
 
 void ASW_CreatorObject::ChangeToolMode(ECreatorToolState state)
 {
+	PositionGizmo->SetAxisSelected(false, false, false);
+	RotationGizmo->SetAxisSelected(false, false, false);
+	ScaleGizmo->SetAxisSelected(false, false, false);
+
 	// hidden in game
 	XAxisMesh->SetHiddenInGame(true);
 	YAxisMesh->SetHiddenInGame(true);
@@ -278,5 +281,26 @@ void ASW_CreatorObject::SelectRotationAxis(bool isX, bool isY, bool isZ)
 void ASW_CreatorObject::SelectScaleAxis(bool isX, bool isY, bool isZ)
 {
 	ScaleGizmo->SetAxisSelected(isX, isY, isZ);
+}
+
+void ASW_CreatorObject::Drag(FVector2D MouseDownPosition, FVector2D MousePosition)
+{
+	
+}
+
+void ASW_CreatorObject::DragEnd(ECreatorToolState ToolState)
+{
+	switch (ToolState)
+	{
+	case ECreatorToolState::Position:
+		PositionGizmo->SetAxisSelected(false, false, false);
+		break;
+	case ECreatorToolState::Rotation:
+		RotationGizmo->SetAxisSelected(false, false, false);
+		break;
+	case ECreatorToolState::Scale:
+		ScaleGizmo->SetAxisSelected(false, false, false);
+		break;
+	}
 }
 
