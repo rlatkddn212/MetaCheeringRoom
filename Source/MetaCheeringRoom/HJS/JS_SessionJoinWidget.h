@@ -133,6 +133,8 @@ public:
 	UFUNCTION()
 	void OnClickedJoinQuit();
 	UFUNCTION()
+	void OnClickedCreateQuit();
+	UFUNCTION()
 	void OnClickedQuit();
 	UPROPERTY()
 	class UJS_SessionGameInstanceSubSystem* si;

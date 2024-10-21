@@ -59,7 +59,7 @@ void AJS_Screen::BeginPlay()
 				if (VideoWidget)
 				{
 					VideoWidget->AddToViewport();
-					VideoWidget->SetVisibility(ESlateVisibility::Hidden);
+					//VideoWidget->SetVisibility(ESlateVisibility::Hidden);
 				}
 			}
 			// 치지직 정보 가져오기
@@ -95,8 +95,8 @@ void AJS_Screen::AddVedioInfo(FVedioInfo Info)
 void AJS_Screen::OnMediaEndReached()
 {
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	if (PC->HasAuthority())
-	{
+	//if (PC->HasAuthority())
+	//{
 		PrepareNextMediaSource();
 		MediaPlayer->PlayOnOpen = false;
 		MediaSource->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
@@ -112,7 +112,7 @@ void AJS_Screen::OnMediaEndReached()
 			MediaPlayer->Play();
 			bUsingFirstPlayer = true;
 		}
-	}
+	//}
 }
 
 void AJS_Screen::RequestMediaURL(FString URL)
@@ -149,12 +149,12 @@ void AJS_Screen::PrepareNextMediaSource()
 
 void AJS_Screen::PlayMedia(const FString& VideoURL)
 {
-	//MultiCastPlayMedia(VideoURL);
+	MultiCastPlayMedia(VideoURL);
+}
+
+void AJS_Screen::MultiCastPlayMedia_Implementation(const FString& VideoURL)
+{
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	if (!PC->HasAuthority())
-	{
-		return;
-	}
 	// Media를 재생
 	// MediaSource의 URL 설정
 	MediaTexture->SetMediaPlayer(MediaPlayer);
@@ -177,11 +177,6 @@ void AJS_Screen::PlayMedia(const FString& VideoURL)
 			MediaPlayer2->OpenSource(MediaSource2);
 		}
 	}
-}
-
-void AJS_Screen::MultiCastPlayMedia_Implementation(const FString& VideoURL)
-{
-
 }
 
 // m3u8 파일을 읽어오기 ( URL : http://127.0.0.1:5000/stream/26644104-de2a-4ace-acc8-39f040012117.m3u8 ) 
