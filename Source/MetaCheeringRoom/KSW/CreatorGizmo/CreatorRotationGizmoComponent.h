@@ -35,6 +35,7 @@ public:
 	UPROPERTY()
 	bool IsZAxisSelected;
 
+	void Drag(FVector2D MouseDownPosition, FVector2D MousePosition);
 
 	// 머터리얼 정보
 	UPROPERTY()

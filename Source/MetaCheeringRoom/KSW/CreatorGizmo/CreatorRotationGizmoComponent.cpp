@@ -92,3 +92,8 @@ void UCreatorRotationGizmoComponent::SetAxisSelected(bool isX, bool isY, bool is
 	}
 }
 
+void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D MousePosition)
+{
+
+}
+

@@ -41,6 +41,7 @@ public:
 	void MoveDummyObject(FVector2D MousePosition);
 
 	void SetToolState(ECreatorToolState NewState);
+	ECreatorToolState GetToolState() { return ToolState; }
 
 	// ป๓ลย
 	UPROPERTY()

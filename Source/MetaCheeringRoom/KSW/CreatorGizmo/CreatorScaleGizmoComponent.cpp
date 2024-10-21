@@ -140,3 +140,8 @@ void UCreatorScaleGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
 		Me->ZScaleRectMesh->SetMaterial(1, BlueMat);
 	}
 }
+
+void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D MousePosition)
+{
+
+}

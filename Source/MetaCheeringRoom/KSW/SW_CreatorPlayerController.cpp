@@ -27,9 +27,8 @@ void ASW_CreatorPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-    // 기본적으로 마우스가 보임
 	bShowMouseCursor = true;
-    SetInputMode(FInputModeGameAndUI());
+	SetInputMode(FInputModeGameAndUI());
 
     // 위젯 생성
 	CreatorWidget = CreateWidget<USW_CreatorWidget>(GetWorld(), CreatorWidgetFactory);
@@ -275,6 +274,9 @@ void ASW_CreatorPlayerController::Drag(FVector2D MouseDownPosition)
 		if (SelectedObject)
 		{
 			SelectedObject->Drag(MouseDownPosition, MousePosition);
+
+			// 마우스 위치 로그
+			UE_LOG(LogTemp, Log, TEXT("Mouse Position: %s"), *MousePosition.ToString());
 		}
 	}
 }

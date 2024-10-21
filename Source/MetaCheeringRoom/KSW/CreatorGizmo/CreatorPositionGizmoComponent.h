@@ -28,6 +28,12 @@ public:
 
 	// 축 선택
 	void SetAxisSelected(bool isX, bool isY, bool isZ);
+
+	void Drag(FVector2D MouseDownPosition, FVector2D MousePosition);
+	FVector OnMouseClick(const FVector2D& ScreenPosition);
+	void GetClickRay(const APlayerController* PlayerController, const FVector2D& ScreenPosition, FVector& RayOrigin, FVector& RayDirection);
+
+	FVector ClosestPointOnAxisToRay(const FVector& LinePoint, const FVector& LineDirection, const FVector& RayOrigin, const FVector& RayDirection);
 	
 	// 선택한 축 정보 저장
 	UPROPERTY()
@@ -52,4 +58,7 @@ public:
 
 	UPROPERTY()
 	class ASW_CreatorObject* Me;
+
+	UPROPERTY()
+	FVector GizmoStartLocation;
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "KSW/SW_CreatorObject.h"
@@ -7,6 +7,13 @@
 #include "CreatorGizmo/CreatorRotationGizmoComponent.h"
 #include "CreatorGizmo/CreatorPositionGizmoComponent.h"
 #include "SW_CreatorPlayerController.h"
+#include "Components/StaticMeshComponent.h"
+#include "UObject/UObjectGlobals.h"
+#include "MeshDescription.h"
+#include "Engine/StaticMesh.h"
+#include "MeshTypes.h"
+#include "StaticMeshResources.h"
+#include "StaticMeshAttributes.h"
 
 // Sets default values
 ASW_CreatorObject::ASW_CreatorObject()
@@ -17,8 +24,8 @@ ASW_CreatorObject::ASW_CreatorObject()
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Root;
 
-	// ·çÆ® ÄÄÆ÷³ÍÆ® »ı¼º ¹× ¼³Á¤
-	// XÃà ¸Ş½Ã »ı¼º ¹× ÃÊ±âÈ­
+	// ë£¨íŠ¸ ì»´í¬ë„ŒíŠ¸ ìƒì„± ë° ì„¤ì •
+	// Xì¶• ë©”ì‹œ ìƒì„± ë° ì´ˆê¸°í™”
 	XAxisMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XAxisMesh"));
 	YAxisMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("YAxisMesh"));
 	ZAxisMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ZAxisMesh"));
@@ -31,7 +38,7 @@ ASW_CreatorObject::ASW_CreatorObject()
 	YAxisMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
 	ZAxisMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
 
-	// ±âº» ¸Ş½Ã ¼³Á¤ (¿É¼Ç)
+	// ê¸°ë³¸ ë©”ì‹œ ì„¤ì • (ì˜µì…˜)
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderMesh(TEXT("/Script/Engine.StaticMesh'/Game/Ksw/TranslateArrowHandle.TranslateArrowHandle'"));
 	if (CylinderMesh.Succeeded())
 	{
@@ -52,12 +59,12 @@ ASW_CreatorObject::ASW_CreatorObject()
 	YAxisMesh->SetupAttachment(Root);
 	ZAxisMesh->SetupAttachment(Root);
 
-	// È¸Àü ¸µ ÃÊ±âÈ­ ¹× ¼³Á¤
+	// íšŒì „ ë§ ì´ˆê¸°í™” ë° ì„¤ì •
 	XRingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XRingMesh"));
-	XRingMesh->SetRelativeRotation(FRotator(90.f, 0.f, 0.f));  // ZÃà ¸µ È¸Àü
+	XRingMesh->SetRelativeRotation(FRotator(90.f, 0.f, 0.f));  // Zì¶• ë§ íšŒì „
 
 	YRingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("YRingMesh"));
-	YRingMesh->SetRelativeRotation(FRotator(0.f, 0.f, 90.f));  // XÃà ¸µ È¸Àü
+	YRingMesh->SetRelativeRotation(FRotator(0.f, 0.f, 90.f));  // Xì¶• ë§ íšŒì „
 
 	ZRingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ZRingMesh"));
 
@@ -69,7 +76,11 @@ ASW_CreatorObject::ASW_CreatorObject()
 	YRingMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
 	ZRingMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
 
-	// ¸µ ¸Ş½¬ ¼³Á¤ (Torus »ç¿ë ¿¹½Ã)
+	//XRingMesh->SetStaticMesh(CreateCylinderMesh(50.0f, 10.0f, 32));
+	//YRingMesh->SetStaticMesh(CreateCylinderMesh(50.0f, 10.0f, 32));
+	//ZRingMesh->SetStaticMesh(CreateCylinderMesh(50.0f, 10.0f, 32));
+
+	// ë§ ë©”ì‰¬ ì„¤ì • (Torus ì‚¬ìš© ì˜ˆì‹œ)
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> RingMesh(TEXT("/Script/Engine.StaticMesh'/Game/Ksw/Ring.Ring'"));
 	if (RingMesh.Succeeded())
 	{
@@ -78,7 +89,7 @@ ASW_CreatorObject::ASW_CreatorObject()
 		ZRingMesh->SetStaticMesh(RingMesh.Object);
 	}
 
-	// root¿¡ ºÎÂøÇÑ´Ù.
+	// rootì— ë¶€ì°©í•œë‹¤.
 	XRingMesh->SetupAttachment(Root);
 	YRingMesh->SetupAttachment(Root);
 	ZRingMesh->SetupAttachment(Root);
@@ -115,7 +126,7 @@ ASW_CreatorObject::ASW_CreatorObject()
 		ZScaleAxisMesh->SetStaticMesh(ScaleAxisMesh.Object);
 	}
 
-	// ±âº» ¸Ş½Ã ¼³Á¤ (¿É¼Ç)
+	// ê¸°ë³¸ ë©”ì‹œ ì„¤ì • (ì˜µì…˜)
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> RectMesh(TEXT("/Script/Engine.StaticMesh'/Game/Ksw/UniformScaleHandle.UniformScaleHandle'"));
 
 	if (RectMesh.Succeeded())
@@ -161,7 +172,7 @@ void ASW_CreatorObject::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ºÎ¸ğ ½ºÄÉÀÏÀ» »ó¼ÓÇÏÁö ¾Êµµ·Ï ¼³Á¤
+	// ë¶€ëª¨ ìŠ¤ì¼€ì¼ì„ ìƒì†í•˜ì§€ ì•Šë„ë¡ ì„¤ì •
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,
 		EAttachmentRule::SnapToTarget,
 		EAttachmentRule::SnapToTarget,
@@ -268,6 +279,7 @@ void ASW_CreatorObject::ChangeToolMode(ECreatorToolState state)
 	}
 }
 
+
 void ASW_CreatorObject::SelectAxis(bool isX, bool isY, bool isZ)
 {
 	PositionGizmo->SetAxisSelected(isX, isY, isZ);
@@ -285,6 +297,23 @@ void ASW_CreatorObject::SelectScaleAxis(bool isX, bool isY, bool isZ)
 
 void ASW_CreatorObject::Drag(FVector2D MouseDownPosition, FVector2D MousePosition)
 {
+	ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
+	{
+		ECreatorToolState ToolState = PC->GetToolState();
+		switch (ToolState)
+		{
+		case ECreatorToolState::Position:
+			PositionGizmo->Drag(MouseDownPosition, MousePosition);
+			break;
+		case ECreatorToolState::Rotation:
+			RotationGizmo->Drag(MouseDownPosition, MousePosition);
+			break;
+		case ECreatorToolState::Scale:
+			ScaleGizmo->Drag(MouseDownPosition, MousePosition);
+			break;
+		}
+	}
 	
 }
 
