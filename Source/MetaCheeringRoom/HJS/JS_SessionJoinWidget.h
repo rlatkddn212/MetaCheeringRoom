@@ -31,33 +31,18 @@ public:
 	// 방 만들기 start-------------------------
 	UPROPERTY(meta=(BindWidget))
 	class UCanvasPanel* CA_MakeSession;
-
 	UPROPERTY(meta=(BindWidget))
 	class UScrollBox* SB_Maps;
-	
 	UPROPERTY(meta=(BindWidget))
 	class UBorder* BD_CreateRoom;
-
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_Create;
-
-	UPROPERTY(meta=(BindWidget))
-	class USlider* S_PlayerCount;
-
-	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* TEXT_PlayerCount;
-
 	UPROPERTY(meta = (BindWidget))
 	class UEditableText* ED_RoomName;
-
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_CreateQuit;
 	UPROPERTY(meta=(BindWidget))
 	class UComboBoxString* CB_Category;
-
-	UFUNCTION()
-	void OnSliderValueChanged(float value);
-
 	UFUNCTION()
 	void CreateSession();
 

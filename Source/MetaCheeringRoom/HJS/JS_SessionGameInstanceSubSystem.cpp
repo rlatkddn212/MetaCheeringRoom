@@ -202,6 +202,7 @@ void UJS_SessionGameInstanceSubSystem::OnMyFindSessionComplete(bool Success)
 				else if (categoryString == "Idol")
 					roomInfo.RoomCategory = ERoomCategory::CT_Idol;
 			}
+
 			roomInfo.Index = i;
 			//방이름
 			FString roomNameString;
