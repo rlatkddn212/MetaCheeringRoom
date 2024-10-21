@@ -27,7 +27,6 @@ void UJS_SessionJoinWidget::NativeConstruct()
 
 	// 세션 생성 UI 초기 처리
 	//BD_CreateRoom->SetVisibility(ESlateVisibility::Hidden);
-	S_PlayerCount->OnValueChanged.AddDynamic(this,&UJS_SessionJoinWidget::OnSliderValueChanged);
 	BTN_Create->OnClicked.AddDynamic(this,&UJS_SessionJoinWidget::CreateSession);
 	BD_JoinRoom->SetVisibility(ESlateVisibility::Hidden);
 	//BD_CreateRoom->SetVisibility(ESlateVisibility::Hidden);
@@ -50,12 +49,6 @@ void UJS_SessionJoinWidget::MenuSwitching(int32 index)
 	WS_Menu->SetActiveWidgetIndex(index);
 }
 
-void UJS_SessionJoinWidget::OnSliderValueChanged(float value)
-{
-	int intValue = FMath::FloorToInt(value);
-	TEXT_PlayerCount->SetText(FText::AsNumber(intValue));
-}
-
 void UJS_SessionJoinWidget::CreateSession()
 {
 
@@ -66,8 +59,27 @@ void UJS_SessionJoinWidget::CreateSession()
 	{
 		return;
 	}
-	int32 PlayerCount = (int32)S_PlayerCount->GetValue();
+
+	int32 PlayerCount = 30;
 	PRINTLOG(TEXT("%s"), *CB_Category->GetSelectedOption());
+
+	FString category;
+	switch (CB_Category->GetSelectedIndex())
+	{
+	case 0:
+		category = TEXT("ESports");
+		break;
+	case 1:
+		category = TEXT("Soccer");
+		break;
+	case 2:
+		category = TEXT("Idol");
+		break;
+	case 3:
+		category = TEXT("Talk");
+		break;
+	}
+	
 	//일단 4로 진행
 	si->CreateSession(roomName, PlayerCount, CB_Category->GetSelectedOption());
 }
@@ -85,22 +97,30 @@ void UJS_SessionJoinWidget::AddSessionSlotWidget(const FRoomInfo& info)
 	slot->SetupInfo(this);
 	//스크롤박스에 붙이기
 	SB_All->AddChild(slot);
-	
+	auto* cateslot = CreateWidget<UJS_SessionSlotWidget>(this, SessionSlotFactory);
+
+	//슬롯에서 위젯에 뿌리기
+	cateslot->UpdateInfo(info);
+	//부모 기억시키기
+	cateslot->SetupInfo(this);
 	if (info.RoomCategory == ERoomCategory::CT_ESports)
 	{
-		SB_ESports->AddChild(slot);
+		SB_ESports->AddChild(cateslot);
 	}
+
 	if (info.RoomCategory == ERoomCategory::CT_Idol)
 	{
-		SB_Idol->AddChild(slot);
+		SB_Idol->AddChild(cateslot);
 	}
+
 	if (info.RoomCategory == ERoomCategory::CT_Soccer)
 	{
-		SB_Soccer->AddChild(slot);
+		SB_Soccer->AddChild(cateslot);
 	}
+
 	if (info.RoomCategory == ERoomCategory::CT_Talk)
 	{
-		SB_Talk->AddChild(slot);
+		SB_Talk->AddChild(cateslot);
 	}
 }
 
