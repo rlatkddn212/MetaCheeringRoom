@@ -40,6 +40,11 @@ public:
 	bool IsZAxisSelected;
 
 	void Drag(FVector2D MouseDownPosition, FVector2D MousePosition);
+	FVector OnMouseClick(const FVector2D& ScreenPosition);
+	void GetClickRay(const APlayerController* PlayerController, const FVector2D& ScreenPosition, FVector& RayOrigin, FVector& RayDirection);
+
+	FVector ClosestPointOnAxisToRay(const FVector& LinePoint, const FVector& LineDirection, const FVector& RayOrigin, const FVector& RayDirection);
+
 	// 머터리얼 정보
 	UPROPERTY()
 	class UMaterialInterface* RedMat;
@@ -55,4 +60,10 @@ public:
 
 	UPROPERTY()
 	class ASW_CreatorObject* Me;
+	
+	UPROPERTY()
+	FVector GizmoStartScale;
+
+	UPROPERTY()
+	float Factor = 0.025f;
 };

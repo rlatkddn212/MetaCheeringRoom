@@ -58,6 +58,9 @@ ASW_CreatorObject::ASW_CreatorObject()
 	XAxisMesh->SetupAttachment(Root);
 	YAxisMesh->SetupAttachment(Root);
 	ZAxisMesh->SetupAttachment(Root);
+	XAxisMesh->SetAbsolute(false, false, true);
+	YAxisMesh->SetAbsolute(false, false, true);
+	ZAxisMesh->SetAbsolute(false, false, true);
 
 	// 회전 링 초기화 및 설정
 	XRingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XRingMesh"));
@@ -76,6 +79,9 @@ ASW_CreatorObject::ASW_CreatorObject()
 	YRingMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
 	ZRingMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
 
+	XRingMesh->SetAbsolute(false, false, true);
+	YRingMesh->SetAbsolute(false, false, true);
+	ZRingMesh->SetAbsolute(false, false, true);
 	//XRingMesh->SetStaticMesh(CreateCylinderMesh(50.0f, 10.0f, 32));
 	//YRingMesh->SetStaticMesh(CreateCylinderMesh(50.0f, 10.0f, 32));
 	//ZRingMesh->SetStaticMesh(CreateCylinderMesh(50.0f, 10.0f, 32));
@@ -137,7 +143,6 @@ ASW_CreatorObject::ASW_CreatorObject()
 	}
 
 	// (X=0.004000,Y=4.000000,Z=4.000000)
-	
 	XScaleAxisMesh->SetRelativeScale3D(FVector(0.004f, 4.0f, 4.0f));
 
 	YScaleAxisMesh->SetRelativeScale3D(FVector(0.004f, 4.0f, 4.0f));
@@ -158,6 +163,10 @@ ASW_CreatorObject::ASW_CreatorObject()
 	YScaleRectMesh->SetupAttachment(YScaleAxisMesh, "Socket");
 	ZScaleRectMesh->SetupAttachment(ZScaleAxisMesh, "Socket");
 
+	XScaleAxisMesh->SetAbsolute(false, false, true);
+	YScaleAxisMesh->SetAbsolute(false, false, true);
+	ZScaleAxisMesh->SetAbsolute(false, false, true);
+
 	PositionGizmo = CreateDefaultSubobject<UCreatorPositionGizmoComponent>(TEXT("PositionGizmo"));
 	RotationGizmo = CreateDefaultSubobject<UCreatorRotationGizmoComponent>(TEXT("RotationGizmo"));
 	ScaleGizmo = CreateDefaultSubobject<UCreatorScaleGizmoComponent>(TEXT("ScaleGizmo"));
@@ -172,16 +181,7 @@ void ASW_CreatorObject::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 부모 스케일을 상속하지 않도록 설정
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,
-		EAttachmentRule::SnapToTarget,
-		EAttachmentRule::SnapToTarget,
-		false);
-
 	ChangeToolMode(ECreatorToolState::Selection);
-	/*XScaleRectMesh->AttachToComponent(XScaleAxisMesh, AttachmentRules);
-	YScaleRectMesh->AttachToComponent(YScaleAxisMesh, AttachmentRules);
-	ZScaleRectMesh->AttachToComponent(ZScaleAxisMesh, AttachmentRules);*/
 }
 
 // Called every frame

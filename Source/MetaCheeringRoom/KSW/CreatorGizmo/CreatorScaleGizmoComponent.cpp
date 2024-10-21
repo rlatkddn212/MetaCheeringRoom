@@ -96,6 +96,7 @@ void UCreatorScaleGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
 
 		Me->XScaleRectMesh->SetMaterial(0, YellowMat);
 		Me->XScaleRectMesh->SetMaterial(1, YellowMat);
+		GizmoStartScale = Me->GetActorScale();
 	}
 	else
 	{
@@ -113,6 +114,7 @@ void UCreatorScaleGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
 
 		Me->YScaleRectMesh->SetMaterial(0, YellowMat);
 		Me->YScaleRectMesh->SetMaterial(1, YellowMat);
+		GizmoStartScale = Me->GetActorScale();
 	}
 	else
 	{
@@ -130,6 +132,7 @@ void UCreatorScaleGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
 
 		Me->ZScaleRectMesh->SetMaterial(0, YellowMat);
 		Me->ZScaleRectMesh->SetMaterial(1, YellowMat);
+		GizmoStartScale = Me->GetActorScale();
 	}
 	else
 	{
@@ -141,7 +144,117 @@ void UCreatorScaleGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
 	}
 }
 
+
 void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D MousePosition)
 {
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (IsXAxisSelected)
+	{
+		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
+		FVector ClosestPoint = OnMouseClick(MousePosition);
 
+		FVector Delta = (ClosestPoint - CurrentPosition) * Factor;
+		Me->SetActorScale3D(GizmoStartScale + Delta);
+	}
+
+	if (IsYAxisSelected)
+	{
+		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
+		FVector ClosestPoint = OnMouseClick(MousePosition);
+
+		FVector Delta = (ClosestPoint - CurrentPosition) * Factor;
+		Me->SetActorScale3D(GizmoStartScale + Delta);
+	}
+
+	if (IsZAxisSelected)
+	{
+		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
+		FVector ClosestPoint = OnMouseClick(MousePosition);
+
+		FVector Delta = (ClosestPoint - CurrentPosition) * Factor;
+		Me->SetActorScale3D(GizmoStartScale + Delta);
+	}
 }
+
+FVector UCreatorScaleGizmoComponent::OnMouseClick(const FVector2D& ScreenPosition)
+{
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (!PlayerController) return FVector::ZeroVector;
+
+	// 클릭 위치를 기준으로 Ray 생성
+	FVector RayOrigin, RayDirection;
+	GetClickRay(PlayerController, ScreenPosition, RayOrigin, RayDirection);
+
+	// Actor의 위치와 X축 방향으로 직선 정의
+	FVector LinePoint = Me->XAxisMesh->GetComponentLocation();
+
+
+	if (IsXAxisSelected)
+	{
+		FVector LineDirection = Me->XAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
+
+		// 가장 가까운 점 계산
+		return ClosestPointOnAxisToRay(LinePoint, LineDirection, RayOrigin, RayDirection);
+
+	}
+
+	if (IsYAxisSelected)
+	{
+		FVector LineDirection = Me->YAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
+
+		// 가장 가까운 점 계산
+		return ClosestPointOnAxisToRay(LinePoint, LineDirection, RayOrigin, RayDirection);
+	}
+
+	if (IsZAxisSelected)
+	{
+		FVector LineDirection = Me->ZAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
+
+		// 가장 가까운 점 계산
+		return ClosestPointOnAxisToRay(LinePoint, LineDirection, RayOrigin, RayDirection);
+	}
+
+	return FVector::ZeroVector;
+	// Debug 시각화
+	//FVector RayEnd = RayOrigin + RayDirection * 1000.0f;
+
+	//DrawDebugLine(GetWorld(), RayOrigin, RayEnd, FColor::Green, false, 5.0f, 0, 2.0f); // Ray
+	//DrawDebugLine(GetWorld(), LinePoint, LinePoint + LineDirection * 500.0f, FColor::Red, false, 5.0f, 0, 2.0f); // 직선
+	//DrawDebugPoint(GetWorld(), ClosestPoint, 10.0f, FColor::Blue, false, 5.0f); // 최근접 점
+}
+
+void UCreatorScaleGizmoComponent::GetClickRay(const APlayerController* PlayerController, const FVector2D& ScreenPosition, FVector& RayOrigin, FVector& RayDirection)
+{
+	FVector WorldPosition, WorldDirection;
+	PlayerController->DeprojectScreenPositionToWorld(ScreenPosition.X, ScreenPosition.Y, WorldPosition, WorldDirection);
+
+	RayOrigin = WorldPosition;
+	RayDirection = WorldDirection.GetSafeNormal();
+}
+
+FVector UCreatorScaleGizmoComponent::ClosestPointOnAxisToRay(const FVector& LinePoint, const FVector& LineDirection, const FVector& RayOrigin, const FVector& RayDirection)
+{
+	// 직선과 Ray 사이의 가장 가까운 점 계산
+	FVector OA = RayOrigin - LinePoint;
+	float DDotB = FVector::DotProduct(RayDirection, LineDirection);
+	float DDotD = FVector::DotProduct(RayDirection, RayDirection);
+	float BDotB = FVector::DotProduct(LineDirection, LineDirection);
+	float DDotOA = FVector::DotProduct(RayDirection, OA);
+	float BDotOA = FVector::DotProduct(LineDirection, OA);
+
+	float denominator = DDotD * BDotB - DDotB * DDotB;
+	if (FMath::IsNearlyZero(denominator)) // 두 선이 평행한 경우 처리
+	{
+		return LinePoint;
+	}
+
+	float s = (DDotOA * DDotB - BDotOA * DDotD) / denominator;
+	float t = (BDotOA * DDotB - DDotOA * BDotB) / denominator;
+
+	// t가 음수일 경우 Ray의 시작점 사용
+	FVector PointOnLine = LinePoint + s * -LineDirection;
+	FVector PointOnRay = RayOrigin + FMath::Max(t, 0.0f) * RayDirection;
+
+	return PointOnLine;
+}
+

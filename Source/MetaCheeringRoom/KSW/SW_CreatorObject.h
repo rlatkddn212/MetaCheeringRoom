@@ -59,13 +59,13 @@ public:
 
 	
     /** X, Y, Z 회전용 링 메쉬 */
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     UStaticMeshComponent* XRingMesh;
 
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     UStaticMeshComponent* YRingMesh;
 
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     UStaticMeshComponent* ZRingMesh;
 
 	UPROPERTY(EditAnywhere)
