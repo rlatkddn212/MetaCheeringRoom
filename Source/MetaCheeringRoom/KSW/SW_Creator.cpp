@@ -45,10 +45,10 @@ void ASW_Creator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	auto* pc = Cast<APlayerController>(Controller);
-	if (pc)
+	PC  = Cast<ASW_CreatorPlayerController>(Controller);
+	if (PC)
 	{
-		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
 		if (subSys)
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
@@ -77,70 +77,117 @@ void ASW_Creator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void ASW_Creator::OnMyMove(const FInputActionValue& Value)
 {
-	FVector2D v = Value.Get<FVector2D>();
-	Direction.X = v.X;
-	Direction.Y = v.Y;
-	Direction.Normalize();
+	if (MouseState == ECreatorMouseState::Clicked)
+	{
+		FVector2D v = Value.Get<FVector2D>();
+		Direction.X = v.X;
+		Direction.Y = v.Y;
+		Direction.Normalize();
+	}
 }
 
 void ASW_Creator::OnMyLook(const FInputActionValue& Value)
 {
-	FVector2D v = Value.Get<FVector2D>();
-	AddControllerPitchInput(-v.Y);
-	AddControllerYawInput(v.X);
+
+	if (MouseState == ECreatorMouseState::Clicked)
+	{
+		FVector2D v = Value.Get<FVector2D>();
+		AddControllerPitchInput(-v.Y);
+		AddControllerYawInput(v.X);
+	}
 }
 
 void ASW_Creator::OnMyQ(const FInputActionValue& Value)
 {
-	Direction.Z = -1;
+	if (MouseState == ECreatorMouseState::Clicked)
+	{
+		Direction.Z = -1;
+	}
+	else
+	{
+		if (PC)
+			PC->SetToolState(ECreatorToolState::Selection);
+	}
+
 }
 
 void ASW_Creator::OnMyW(const FInputActionValue& Value)
 {
 
+	if (MouseState == ECreatorMouseState::None)
+	{
+		if (PC)
+			PC->SetToolState(ECreatorToolState::Position);
+	}
 }
 
 void ASW_Creator::OnMyE(const FInputActionValue& Value)
 {
 	// 위로 이동
-	Direction.Z = 1;
+	if (MouseState == ECreatorMouseState::Clicked)
+	{
+		Direction.Z = 1;
+	}
+	else
+	{
+		if (PC)
+			PC->SetToolState(ECreatorToolState::Rotation);
+	}
 }
 
 void ASW_Creator::OnMyR(const FInputActionValue& Value)
 {
-
+	if (MouseState == ECreatorMouseState::None)
+	{
+		if (PC)
+			PC->SetToolState(ECreatorToolState::Scale);
+	}
 }
 
 void ASW_Creator::OnMyRClick(const FInputActionValue& Value)
 {
-
 }
 
 void ASW_Creator::OnMyLClick(const FInputActionValue& Value)
 {
-	
+	PC->Drag(MouseDownPosition);
 }
 
 void ASW_Creator::OnMyRClickStarted(const FInputActionValue& Value)
 {
-	
+	SetMouseState(ECreatorMouseState::Clicked);
 }
 
 void ASW_Creator::OnMyRClickCompleted(const FInputActionValue& Value)
 {
-
+	SetMouseState(ECreatorMouseState::None);
 }
 
 void ASW_Creator::OnMyLClickStarted(const FInputActionValue& Value)
 {
-	auto* pc = Cast<ASW_CreatorPlayerController>(Controller);
-	if (pc)
+	SetMouseState(ECreatorMouseState::Clicked);
+	if (PC)
 	{
-		pc->OnLeftClick();
+		if (PC->OnLeftClick())
+		{
+			SetMouseState(ECreatorMouseState::GizmoDrag);
+		}
+
+		PC->GetMousePosition(MouseDownPosition.X, MouseDownPosition.Y);
 	}
 }
 
 void ASW_Creator::OnMyLClickCompleted(const FInputActionValue& Value)
 {
+	SetMouseState(ECreatorMouseState::None);
 
+	if (PC)
+	{
+		PC->DragEnd();
+	}
+}
+
+void ASW_Creator::SetMouseState(ECreatorMouseState NewState)
+{
+	MouseState = NewState;
 }

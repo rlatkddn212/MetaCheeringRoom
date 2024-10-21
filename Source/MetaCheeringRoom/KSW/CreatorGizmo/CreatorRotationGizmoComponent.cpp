@@ -4,6 +4,7 @@
 #include "KSW/CreatorGizmo/CreatorRotationGizmoComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "../SW_CreatorObject.h"
 
 // Sets default values for this component's properties
 UCreatorRotationGizmoComponent::UCreatorRotationGizmoComponent()
@@ -12,29 +13,14 @@ UCreatorRotationGizmoComponent::UCreatorRotationGizmoComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-    // 회전 링 초기화 및 설정
-    XRingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XRingMesh"));
-    XRingMesh->SetupAttachment(this);
-    XRingMesh->SetRelativeRotation(FRotator(90.f, 0.f, 0.f));  // Z축 링 회전
-    XRingMesh->SetVisibility(false);
+	// mat
+	RedMat = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.MaterialInstanceConstant'/Game/Ksw/Mat/GizmoSharingRed.GizmoSharingRed'"));
 
-    YRingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("YRingMesh"));
-    YRingMesh->SetupAttachment(this);
-    YRingMesh->SetRelativeRotation(FRotator(0.f, 0.f, 90.f));  // X축 링 회전
-    YRingMesh->SetVisibility(false);
+	GreenMat = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.MaterialInstanceConstant'/Game/Ksw/Mat/GizmoSharingGreen.GizmoSharingGreen'"));
 
-    ZRingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ZRingMesh"));
-    ZRingMesh->SetupAttachment(this);
-    ZRingMesh->SetVisibility(false);
+	BlueMat = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.MaterialInstanceConstant'/Game/Ksw/Mat/GizmoSharingBlue.GizmoSharingBlue'"));
 
-    // 링 메쉬 설정 (Torus 사용 예시)
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> RingMesh(TEXT("/Script/Engine.StaticMesh'/Game/Ksw/Ring.Ring'"));
-    if (RingMesh.Succeeded())
-    {
-        XRingMesh->SetStaticMesh(RingMesh.Object);
-        YRingMesh->SetStaticMesh(RingMesh.Object);
-        ZRingMesh->SetStaticMesh(RingMesh.Object);
-    }
+	YellowMat = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.MaterialInstanceConstant'/Game/Ksw/Mat/GizmoSharingYellow.GizmoSharingYellow'"));
 }
 
 
@@ -43,14 +29,66 @@ void UCreatorRotationGizmoComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+    // Actor를 가져옴
+    Me = Cast<ASW_CreatorObject>(GetOwner());
+
+    // ...
+    if (RedMat)
+    {
+        Me->XRingMesh->SetMaterial(0, RedMat);
+    }
+
+    if (GreenMat)
+    {
+        Me->YRingMesh->SetMaterial(0, GreenMat);
+    }
+
+    if (BlueMat)
+    {
+        Me->ZRingMesh->SetMaterial(0, BlueMat);
+    }
 }
 
 void UCreatorRotationGizmoComponent::SetGizmoVisibility(bool isVisible)
 {
-    XRingMesh->SetVisibility(isVisible);
-    YRingMesh->SetVisibility(isVisible);
-    ZRingMesh->SetVisibility(isVisible);
+	Me->XRingMesh->SetVisibility(isVisible);
+	Me->YRingMesh->SetVisibility(isVisible);
+	Me->ZRingMesh->SetVisibility(isVisible);
+}
+
+void UCreatorRotationGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
+{
+	// 축 선택
+	IsXAxisSelected = isX;
+	IsYAxisSelected = isY;
+	IsZAxisSelected = isZ;
+
+    // 선택한 축을 노란색으로
+	if (isX)
+	{
+		Me->XRingMesh->SetMaterial(0, YellowMat);
+	}
+	else
+	{
+		Me->XRingMesh->SetMaterial(0, RedMat);
+	}
+
+	if (isY)
+	{
+		Me->YRingMesh->SetMaterial(0, YellowMat);
+	}
+	else
+	{
+		Me->YRingMesh->SetMaterial(0, GreenMat);
+	}
+
+	if (isZ)
+	{
+		Me->ZRingMesh->SetMaterial(0, YellowMat);
+	}
+	else
+	{
+		Me->ZRingMesh->SetMaterial(0, BlueMat);
+	}
 }
 

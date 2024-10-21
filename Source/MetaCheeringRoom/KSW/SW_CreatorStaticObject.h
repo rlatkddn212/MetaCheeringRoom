@@ -27,6 +27,7 @@ public:
 
 	virtual void OnSelected(bool isSelected) override;
 
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* Mesh;
 };

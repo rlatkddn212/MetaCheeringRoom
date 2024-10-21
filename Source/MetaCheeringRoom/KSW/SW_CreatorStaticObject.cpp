@@ -4,13 +4,14 @@
 #include "KSW/SW_CreatorStaticObject.h"
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "CreatorGizmo/CreatorPositionGizmoComponent.h"
+#include "CreatorGizmo/CreatorRotationGizmoComponent.h"
+#include "CreatorGizmo/CreatorScaleGizmoComponent.h"
 
 ASW_CreatorStaticObject::ASW_CreatorStaticObject()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = Root;
+
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(Root);
 }
@@ -18,8 +19,6 @@ ASW_CreatorStaticObject::ASW_CreatorStaticObject()
 void ASW_CreatorStaticObject::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Mat->SetScalarParameterValue(TEXT(""), 0);
 }
 
 void ASW_CreatorStaticObject::Tick(float DeltaTime)
@@ -29,12 +28,13 @@ void ASW_CreatorStaticObject::Tick(float DeltaTime)
 
 void ASW_CreatorStaticObject::OnSelected(bool isSelected)
 {
-	
+	Super::OnSelected(isSelected);
+
 	if (isSelected)
 	{
 		Mesh->SetRenderCustomDepth(true);
 		UE_LOG(LogTemp, Warning, TEXT("Selected"));
-		
+
 	}
 	else
 	{

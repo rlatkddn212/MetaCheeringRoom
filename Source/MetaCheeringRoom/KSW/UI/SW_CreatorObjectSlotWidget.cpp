@@ -71,7 +71,12 @@ void USW_CreatorObjectSlotWidget::NativeOnDragDetected(const FGeometry& InGeomet
 	ASW_CreatorPlayerController* controller = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (controller)
 	{
+		FVector2d LocalPixelMousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
+		LocalPixelMousePos.X = FMath::Clamp(LocalPixelMousePos.X * InGeometry.Scale, (double)TNumericLimits<int32>::Min(), (double)TNumericLimits<int32>::Max());
+		LocalPixelMousePos.Y = FMath::Clamp(LocalPixelMousePos.Y * InGeometry.Scale, (double)TNumericLimits<int32>::Min(), (double)TNumericLimits<int32>::Max());
+
 		controller->CreatingDummyObject(ObjectData);
+		controller->MoveDummyObject(LocalPixelMousePos);
 		// 마우스 모드 변경
 	}
 

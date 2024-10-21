@@ -6,6 +6,16 @@
 #include "GameFramework/PlayerController.h"
 #include "SW_CreatorPlayerController.generated.h"
 
+// 상태
+UENUM(BlueprintType)
+enum class ECreatorToolState : uint8
+{
+	Selection,
+	Position,
+	Rotation,
+	Scale
+};
+
 /**
  * 
  */
@@ -21,7 +31,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// 마우스 왼쪽 클릭 처리 함수
-	void OnLeftClick();
+	bool OnLeftClick();
 
 	void CreatingDummyObject(struct FCreatorObjectData* ObjectData);
 	// 지워지지 않는경우
@@ -29,6 +39,12 @@ public:
 	UFUNCTION()
 	bool DeleteDummyObject();
 	void MoveDummyObject(FVector2D MousePosition);
+
+	void SetToolState(ECreatorToolState NewState);
+
+	// 상태
+	UPROPERTY()
+	ECreatorToolState ToolState;
 
 	class ASW_CreatorObject* SelectedObject;
 	
@@ -41,4 +57,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	class USW_CreatorWidget* CreatorWidget;
+
+	void Drag(FVector2D MouseDownPosition);
+	void DragEnd();
 };

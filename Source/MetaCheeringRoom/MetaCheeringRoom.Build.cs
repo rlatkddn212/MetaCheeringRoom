@@ -10,9 +10,9 @@ public class MetaCheeringRoom : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "Json", "JsonUtilities", "HTTP", "MediaAssets", "OnlineSubsystem", "OnlineSubsystemSteam" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
-		PrivateIncludePaths.Add("MetaCheeringRoom");
+        PrivateIncludePaths.Add("MetaCheeringRoom");
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
