@@ -88,7 +88,6 @@ void ASW_Creator::OnMyMove(const FInputActionValue& Value)
 
 void ASW_Creator::OnMyLook(const FInputActionValue& Value)
 {
-
 	if (MouseState == ECreatorMouseState::Clicked)
 	{
 		FVector2D v = Value.Get<FVector2D>();
@@ -150,7 +149,8 @@ void ASW_Creator::OnMyRClick(const FInputActionValue& Value)
 
 void ASW_Creator::OnMyLClick(const FInputActionValue& Value)
 {
-	PC->Drag(MouseDownPosition);
+	if (MouseState == ECreatorMouseState::GizmoDrag)
+		PC->Drag(MouseDownPosition);
 }
 
 void ASW_Creator::OnMyRClickStarted(const FInputActionValue& Value)
@@ -166,6 +166,7 @@ void ASW_Creator::OnMyRClickCompleted(const FInputActionValue& Value)
 void ASW_Creator::OnMyLClickStarted(const FInputActionValue& Value)
 {
 	SetMouseState(ECreatorMouseState::Clicked);
+
 	if (PC)
 	{
 		if (PC->OnLeftClick())
@@ -189,5 +190,17 @@ void ASW_Creator::OnMyLClickCompleted(const FInputActionValue& Value)
 
 void ASW_Creator::SetMouseState(ECreatorMouseState NewState)
 {
+	
+	if (MouseState == ECreatorMouseState::GizmoDrag && MouseState != NewState)
+	{
+		PC->SetInputMode(FInputModeGameAndUI());
+		PC->SetShowMouseCursor(true);
+	}
+
 	MouseState = NewState;
+	if (MouseState == ECreatorMouseState::GizmoDrag)
+	{
+		PC->SetInputMode(FInputModeGameAndUI());
+		PC->SetShowMouseCursor(true);
+	}
 }

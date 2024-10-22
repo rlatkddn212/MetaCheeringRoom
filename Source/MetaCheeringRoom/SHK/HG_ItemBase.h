@@ -10,7 +10,9 @@
 UENUM(BlueprintType)
 enum class EItemCategory: uint8
 {
-	Category_Costume UMETA(DisplayName = "Costume"),
+	Category_HandGrab UMETA(DisplayName = "HandGrab"),
+	Category_Top UMETA(DisplayName = "Top"),
+	Category_Bottom UMETA(DisplayName = "Bottom"),
 	Category_Active UMETA(DisplayName = "Active"),
 };
 
@@ -63,7 +65,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* BoxComp;
 
-	// ¾ÆÀÌÅÛ »ç¿ë (ÀÚ½Ä¿¡¼­ ±¸Çö)
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (ï¿½Ú½Ä¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
 	virtual void Use();
 
 	virtual void SetOwner(APawn* Value);

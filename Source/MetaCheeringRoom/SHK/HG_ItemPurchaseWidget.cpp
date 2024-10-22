@@ -14,8 +14,14 @@ void UHG_ItemPurchaseWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Btn_Purchase->OnClicked.AddDynamic(this, &UHG_ItemPurchaseWidget::OnClickPurchaseButton);
-	Btn_Exit->OnClicked.AddDynamic(this, &UHG_ItemPurchaseWidget::OnClickExitButton);
+	if (!Btn_Purchase->OnClicked.IsBound())
+	{
+		Btn_Purchase->OnClicked.AddDynamic(this, &UHG_ItemPurchaseWidget::OnClickPurchaseButton);
+	}
+	if (!Btn_Exit->OnClicked.IsBound())
+	{
+		Btn_Exit->OnClicked.AddDynamic(this, &UHG_ItemPurchaseWidget::OnClickExitButton);
+	}
 
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 }
@@ -25,22 +31,25 @@ void UHG_ItemPurchaseWidget::OnClickPurchaseButton()
 	if (GI->IsValidItem(LookingItemData.ItemName))
 	{
 
-		if (Owner->GoodsComp->GetGold() <= 0)
-		{
-			RemoveFromParent();
-		}
-		else
-		{
-			Owner->GoodsComp->SubGold(LookingItemData.ItemPrice);
-			UE_LOG(LogTemp,Warning,TEXT("%d"), Owner->GoodsComp->GetGold());
-			Owner->InventoryComp->AddtoInventory(LookingItemData, 1);
-			RemoveFromParent();
-		}
 		auto* pc = Cast<APlayerController>(Owner->Controller);
 		if (pc)
 		{
 			pc->SetShowMouseCursor(false);
 			Owner->bCanMove = true;
+			Owner->bToggle = !Owner->bToggle;
+		}
+		if (Owner->GoodsComp->GetGold() <= 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Gold = 0"));
+			RemoveFromParent();
+			return;
+		}
+		else
+		{
+			Owner->GoodsComp->SubGold(LookingItemData.ItemPrice);
+			UE_LOG(LogTemp, Warning, TEXT("%d"), Owner->GoodsComp->GetGold());
+			Owner->InventoryComp->AddtoInventory(LookingItemData, 1);
+			RemoveFromParent();
 		}
 	}
 }

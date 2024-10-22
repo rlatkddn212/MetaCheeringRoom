@@ -59,13 +59,13 @@ public:
 
 	
     /** X, Y, Z 회전용 링 메쉬 */
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     UStaticMeshComponent* XRingMesh;
 
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     UStaticMeshComponent* YRingMesh;
 
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     UStaticMeshComponent* ZRingMesh;
 
 	UPROPERTY(EditAnywhere)
@@ -86,13 +86,15 @@ public:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* ZScaleRectMesh;
 
+	UStaticMesh* CreateCylinderMesh(float Radius, float Height, int32 SegmentCount);
+
 	void SelectAxis(bool isX, bool isY, bool isZ);
-
 	void SelectRotationAxis(bool isX, bool isY, bool isZ);
-
 	void SelectScaleAxis(bool isX, bool isY, bool isZ);
 
 	void Drag(FVector2D MouseDownPosition, FVector2D MousePosition);
 
 	void DragEnd(ECreatorToolState ToolState);
+
+	
 };

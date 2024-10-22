@@ -11,15 +11,28 @@
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "HG_EquipItem.h"
+#include "HG_GameInstance.h"
 
 
 void UInventoryWidget::NativeConstruct()
 {
-	//Btn_Use->OnClicked.AddDynamic();
-	Btn_ThrowAway->OnClicked.AddDynamic(this, &UInventoryWidget::ThrowAwaySelectedItem);
-	Btn_Use->OnClicked.AddDynamic(this, &UInventoryWidget::UseItem);
-	Btn_CostumeCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Costume);
-	Btn_ActiveCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Active);
+	if (!Btn_ThrowAway->OnClicked.IsBound())
+	{
+		Btn_ThrowAway->OnClicked.AddDynamic(this, &UInventoryWidget::ThrowAwaySelectedItem);
+	}
+	if (!Btn_Use->OnClicked.IsBound())
+	{
+		Btn_Use->OnClicked.AddDynamic(this, &UInventoryWidget::UseItem);
+	}
+	if (!Btn_CostumeCategory->OnClicked.IsBound())
+	{
+		Btn_CostumeCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Costume);
+	}
+	if (!Btn_ActiveCategory->OnClicked.IsBound())
+	{
+		Btn_ActiveCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Active);
+	}
 
 	SelectedCategory = WB_SlotList_Active;
 }
@@ -31,6 +44,7 @@ void UInventoryWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 void UInventoryWidget::InitInventoryUI()
 {
+	UE_LOG(LogTemp, Warning, TEXT("EquipList : %d"), EquipList.Num());
 	WB_SlotList_Active->ClearChildren();
 	WB_SlotList_Costume->ClearChildren();
 	SelectedSlot = nullptr;
@@ -52,18 +66,24 @@ void UInventoryWidget::InitInventoryUI()
 					{
 						WB_SlotList_Active->AddChildToWrapBox(SlotWidget);
 					}
-					else if (slot.ItemInfo.ItemCategory == EItemCategory::Category_Costume)
-					{
-						WB_SlotList_Costume->AddChildToWrapBox(SlotWidget);
-					}
 					else
 					{
-						UE_LOG(LogTemp, Warning, TEXT("Error"));
+						WB_SlotList_Costume->AddChildToWrapBox(SlotWidget);
+						for (auto EquipSlot : EquipList)
+						{
+							if (EquipSlot->SlotInfo.ItemInfo.ItemName == SlotWidget->SlotInfo.ItemInfo.ItemName)
+							{
+								SlotWidget->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
+								EquipList[EquipList.Find(EquipSlot)] = SlotWidget;
+							}
+						}
 					}
 				}
 			}
 		}
 	}
+	SelectedCategory = WB_SlotList_Active;
+	WS_Category->SetActiveWidgetIndex(0);
 }
 
 void UInventoryWidget::SetOwner(APawn* Player)
@@ -78,12 +98,22 @@ void UInventoryWidget::SelectCategory_Active()
 {
 	SelectedCategory = WB_SlotList_Active;
 	WS_Category->SetActiveWidgetIndex(0);
+	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
 }
 
 void UInventoryWidget::SelectCategory_Costume()
 {
 	SelectedCategory = WB_SlotList_Costume;
 	WS_Category->SetActiveWidgetIndex(1);
+
+	if (SelectedSlot != nullptr && EquipList.Contains(SelectedSlot))
+	{
+		TB_Use->SetText(FText::FromString(TEXT("해제하기")));
+	}
+	else
+	{
+		TB_Use->SetText(FText::FromString(TEXT("장착하기")));
+	}
 }
 
 void UInventoryWidget::DIsplaySelectedItemInfo()
@@ -108,13 +138,20 @@ void UInventoryWidget::ThrowAwaySelectedItem()
 {
 	if (SelectedSlot)
 	{
+		auto* Owner = Cast<AHG_Player>(this->GetOwningPlayer()->GetPawn());
+		if (EquipList.Contains(SelectedSlot))
+		{
+			TB_Use->SetText(FText::FromString(TEXT("장착하기")));
+			SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
+			EquipList.Remove(SelectedSlot);
+			Owner->UnequipItem(SelectedSlot->SlotInfo.ItemInfo.ItemName);
+		}
 		int32 ChildCount = SelectedCategory->GetChildrenCount();
 		for (int32 i = 0; i < ChildCount; i++)
 		{
 			UHG_SlotWidget* Child = Cast<UHG_SlotWidget>(SelectedCategory->GetChildAt(i));
 			if (Child == SelectedSlot)
 			{
-				auto* Owner = Cast<AHG_Player>(this->GetOwningPlayer()->GetPawn());
 				if (Owner)
 				{
 					Owner->InventoryComp->RemoveFromInventory(SelectedSlot->SlotInfo.ItemInfo, 1);
@@ -148,17 +185,43 @@ void UInventoryWidget::UseItem()
 		if (this->GetOwningPlayer() != nullptr)
 		{
 			auto* OwningPlayer = Cast<AHG_Player>(this->GetOwningPlayer()->GetPawn());
-
-			auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(SelectedSlot->SlotInfo.ItemInfo.ItemClass, OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
-			if (nullptr != SpawnedItem && nullptr != OwningPlayer)
+			if (nullptr != OwningPlayer)
 			{
-				SpawnedItem->SetOwner(OwningPlayer);
-			}
-			if (SpawnedItem)
-			{
-				SpawnedItem->SetActorHiddenInGame(true);
-				SpawnedItem->Use();
-				ThrowAwaySelectedItem();
+				if (SelectedCategory == WB_SlotList_Active)
+				{
+					auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(SelectedSlot->SlotInfo.ItemInfo.ItemClass,
+						OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
+					if (SpawnedItem != nullptr)
+					{
+						SpawnedItem->SetOwner(OwningPlayer);
+						SpawnedItem->SetActorHiddenInGame(true);
+						SpawnedItem->Use();
+						ThrowAwaySelectedItem();
+					}
+				}
+				else if (SelectedCategory == WB_SlotList_Costume)
+				{
+					if (EquipList.Contains(SelectedSlot))
+					{
+						TB_Use->SetText(FText::FromString(TEXT("장착하기")));
+						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
+						EquipList.Remove(SelectedSlot);
+						OwningPlayer->UnequipItem(SelectedSlot->SlotInfo.ItemInfo.ItemName);
+					}
+					else
+					{
+						TB_Use->SetText(FText::FromString(TEXT("해제하기")));
+						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
+						EquipList.Add(SelectedSlot);
+						auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(SelectedSlot->SlotInfo.ItemInfo.ItemClass,
+							OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
+						if (EItem != nullptr)
+						{
+							EItem->SetOwner(OwningPlayer);
+							OwningPlayer->EquipItem(EItem);
+						}
+					}
+				}
 			}
 		}
 	}

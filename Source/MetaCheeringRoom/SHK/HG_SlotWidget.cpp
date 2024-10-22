@@ -7,18 +7,30 @@
 #include "Engine/DataTable.h"
 #include "InventoryWidget.h"
 #include "HG_ItemBase.h"
+#include "Components/TextBlock.h"
 
 void UHG_SlotWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Button_InventorySlot->OnClicked.AddDynamic(this, &UHG_SlotWidget::OnButtonClicked);
-
+	if (!(Button_InventorySlot->OnClicked.IsBound()))
+	{
+		Button_InventorySlot->OnClicked.AddDynamic(this, &UHG_SlotWidget::OnButtonClicked);
+	}
+	Img_Equip->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UHG_SlotWidget::OnButtonClicked()
 {
 	Owner->SelectedSlot = this;
+	if (Owner->EquipList.Contains(this))
+	{
+		Owner->TB_Use->SetText(FText::FromString(TEXT("해제하기")));
+	}
+	else
+	{
+		Owner->TB_Use->SetText(FText::FromString(TEXT("장착하기")));
+	}
 	Owner->DIsplaySelectedItemInfo();
 }
 
@@ -30,7 +42,7 @@ void UHG_SlotWidget::SetItemIcon()
 	}
 }
 
-void UHG_SlotWidget::InitSlot(FSlotStruct p_Slot)
+void UHG_SlotWidget::InitSlot (FSlotStruct p_Slot)
 {
 	SlotInfo.ItemInfo.ItemIcon = p_Slot.ItemInfo.ItemIcon;
 	SlotInfo.ItemInfo.ItemName = p_Slot.ItemInfo.ItemName;
