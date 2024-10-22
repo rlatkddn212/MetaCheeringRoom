@@ -58,51 +58,67 @@ void UCreatorRotationGizmoComponent::SetGizmoVisibility(bool isVisible)
 
 void UCreatorRotationGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
 {
-	// 축 선택
-	IsXAxisSelected = isX;
-	IsYAxisSelected = isY;
-	IsZAxisSelected = isZ;
+	if (Me)
+	{
+		// 축 선택
+		IsXAxisSelected = isX;
+		IsYAxisSelected = isY;
+		IsZAxisSelected = isZ;
 
-    // 선택한 축을 노란색으로
-	if (isX)
-	{
-		Me->XRingMesh->SetMaterial(0, YellowMat);
-		GizmoStartRotation = Me->GetActorRotation();
+		// 선택한 축을 노란색으로
+		if (isX)
+		{
+			Me->XRingMesh->SetMaterial(0, YellowMat);
+			CurrentRotation = Me->GetActorQuat();
+			RotationAxis = Me->XRingMesh->GetUpVector();
 
-	}
-	else
-	{
-		Me->XRingMesh->SetMaterial(0, RedMat);
-	}
+		}
+		else
+		{
+			Me->XRingMesh->SetMaterial(0, RedMat);
 
-	if (isY)
-	{
-		Me->YRingMesh->SetMaterial(0, YellowMat);
-		GizmoStartRotation = Me->GetActorRotation();
-	}
-	else
-	{
-		Me->YRingMesh->SetMaterial(0, GreenMat);
-	}
+		}
 
-	if (isZ)
-	{
-		Me->ZRingMesh->SetMaterial(0, YellowMat);
-		GizmoStartRotation = Me->GetActorRotation();
-	}
-	else
-	{
-		Me->ZRingMesh->SetMaterial(0, BlueMat);
+		if (isY)
+		{
+			Me->YRingMesh->SetMaterial(0, YellowMat);
+			CurrentRotation = Me->GetActorQuat();
+			RotationAxis = Me->YRingMesh->GetUpVector();
+		}
+		else
+		{
+			Me->YRingMesh->SetMaterial(0, GreenMat);
+		}
+
+		if (isZ)
+		{
+			Me->ZRingMesh->SetMaterial(0, YellowMat);
+			CurrentRotation = Me->GetActorQuat();
+			RotationAxis = Me->ZRingMesh->GetUpVector();
+		}
+		else
+		{
+			Me->ZRingMesh->SetMaterial(0, BlueMat);
+		}
 	}
 }
 
 void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D MousePosition)
 {
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	// Me의 Screen상의 좌표를 가져옴
+	FVector2D ScreenPosition;
+	PC->ProjectWorldLocationToScreen(Me->GetActorLocation(), ScreenPosition);
+	//ScreenPosition 좌표 기준으로 MouseDownPosition, MousePosition 90도 회전시킴
+	FVector2D MouseDownPosition90 = FVector2D(ScreenPosition.X + (ScreenPosition.Y - MouseDownPosition.Y), ScreenPosition.Y - (ScreenPosition.X - MouseDownPosition.X));
+	FVector2D MousePosition90 = FVector2D(ScreenPosition.X + (ScreenPosition.Y - MousePosition.Y), ScreenPosition.Y - (ScreenPosition.X - MousePosition.X));
+
+
 	if (IsXAxisSelected)
 	{
-		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
-		FVector ClosestPoint = OnMouseClick(MousePosition);
+		FVector CurrentPosition = OnMouseClick(MouseDownPosition90);
+		FVector ClosestPoint = OnMouseClick(MousePosition90);
 
 		FVector Delta = ClosestPoint - CurrentPosition;
 
@@ -110,68 +126,51 @@ void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 		if (Delta.Size() < 0.1f) return;
 
 		//Me->XRingMesh 의 방향 벡터와 Delta의 방향 벡터를 내적하여 회전값 계산
-		FVector Axis = Me->XRingMesh->GetForwardVector();
+		FVector rAxis = Me->XRingMesh->GetUpVector();
 		FVector DeltaDirection = Delta.GetSafeNormal();
 
-		float Dot = FVector::DotProduct(Axis, DeltaDirection);
-		float Angle = (FMath::Acos(Dot) * 180.0f / PI) / 90.0f;
-
-		// 회전값 적용
-		FRotator Rotation = Me->GetActorRotation();
-		Rotation.Yaw = GizmoStartRotation.Yaw + (Angle * Delta.Size() * 0.05f);
-		Me->SetActorRotation(Rotation);
-
-		//GizmoStartRotation
-		UE_LOG(LogTemp, Warning, TEXT("GizmoStartRotation.Yaw : %f Angle : %f Rotation.Yaw : %f "),
-			GizmoStartRotation.Yaw, Angle, Rotation.Yaw);
+		FQuat RotationDelta;
+		RotationDelta = FQuat(DeltaDirection, Delta.Size() * 0.01f);
+		
+		FQuat NewRotation = RotationDelta * CurrentRotation;
+		Me->SetActorRotation(NewRotation);
 	}
 
 	if (IsYAxisSelected)
 	{
-		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
-		FVector ClosestPoint = OnMouseClick(MousePosition);
+		FVector CurrentPosition = OnMouseClick(MouseDownPosition90);
+		FVector ClosestPoint = OnMouseClick(MousePosition90);
 
 		FVector Delta = ClosestPoint - CurrentPosition;
 
 		// Delta를 이용하여 회전값 계산
 		//Me->XRingMesh 의 방향 벡터와 Delta의 방향 벡터를 내적하여 회전값 계산
-		FVector Axis = Me->YRingMesh->GetForwardVector();
+		FVector rAxis = Me->YRingMesh->GetUpVector();
+
 		FVector DeltaDirection = Delta.GetSafeNormal();
-
-		float Dot = FVector::DotProduct(Axis, DeltaDirection);
-		float Angle = FMath::Acos(Dot) * 180.0f / PI;
-
-		// 회전값 적용
-		FRotator Rotation = Me->GetActorRotation();
-		Rotation.Pitch = GizmoStartRotation.Pitch + (Angle * Delta.Size() * 0.05f);
-		Me->SetActorRotation(Rotation);
 		
-		//GizmoStartRotation
-		UE_LOG(LogTemp, Warning, TEXT("GizmoStartRotation.Pitch : %f Angle : %f Rotation.Pitch : %f "), 
-			GizmoStartRotation.Pitch, Angle, Rotation.Pitch);
+		FQuat RotationDelta;
+		RotationDelta = FQuat(DeltaDirection, Delta.Size() * 0.01f);
+		
+		FQuat NewRotation = RotationDelta * CurrentRotation;
+		Me->SetActorRotation(NewRotation);
 	}
 
 	if (IsZAxisSelected)
 	{
-		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
-		FVector ClosestPoint = OnMouseClick(MousePosition);
+		FVector CurrentPosition = OnMouseClick(MouseDownPosition90);
+		FVector ClosestPoint = OnMouseClick(MousePosition90);
 
 		FVector Delta = ClosestPoint - CurrentPosition;
-
+		FVector rAxis = Me->ZRingMesh->GetUpVector();
 		// Delta를 이용하여 회전값 계산
-		FVector Axis = Me->YRingMesh->GetForwardVector();
 		FVector DeltaDirection = Delta.GetSafeNormal();
 
-		float Dot = FVector::DotProduct(Axis, DeltaDirection);
-		float Angle = FMath::Acos(Dot) * 180.0f / PI;
-
-		// 회전값 적용
-		FRotator Rotation = Me->GetActorRotation();
-		Rotation.Roll = GizmoStartRotation.Roll + (Angle * Delta.Size() * 0.05f);
-		Me->SetActorRotation(Rotation);
-		//GizmoStartRotation
-		UE_LOG(LogTemp, Warning, TEXT("GizmoStartRotation.Roll : %f Angle : %f Rotation.Roll : %f "),
-			GizmoStartRotation.Roll, Angle, Rotation.Roll);
+		FQuat RotationDelta;
+		RotationDelta = FQuat(DeltaDirection, Delta.Size() * 0.01f);
+		
+		FQuat NewRotation = RotationDelta * CurrentRotation;
+		Me->SetActorRotation(NewRotation);
 	}
 }
 
@@ -186,12 +185,12 @@ FVector UCreatorRotationGizmoComponent::OnMouseClick(const FVector2D& ScreenPosi
 	GetClickRay(PlayerController, ScreenPosition, RayOrigin, RayDirection);
 
 	// Actor의 위치와 X축 방향으로 직선 정의
-	FVector LinePoint = Me->XAxisMesh->GetComponentLocation();
+	FVector LinePoint = Me->XRingMesh->GetComponentLocation();
 
 
 	if (IsXAxisSelected)
 	{
-		FVector LineDirection = Me->XAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
+		FVector LineDirection = RotationAxis; // Actor의 X축 방향 (로컬 기준)
 
 		// 가장 가까운 점 계산
 		return ClosestPointOnAxisToRay(LinePoint, LineDirection, RayOrigin, RayDirection);
@@ -200,7 +199,7 @@ FVector UCreatorRotationGizmoComponent::OnMouseClick(const FVector2D& ScreenPosi
 
 	if (IsYAxisSelected)
 	{
-		FVector LineDirection = Me->YAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
+		FVector LineDirection = RotationAxis; // Actor의 X축 방향 (로컬 기준)
 
 		// 가장 가까운 점 계산
 		return ClosestPointOnAxisToRay(LinePoint, LineDirection, RayOrigin, RayDirection);
@@ -208,7 +207,7 @@ FVector UCreatorRotationGizmoComponent::OnMouseClick(const FVector2D& ScreenPosi
 
 	if (IsZAxisSelected)
 	{
-		FVector LineDirection = Me->ZAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
+		FVector LineDirection = RotationAxis; // Actor의 X축 방향 (로컬 기준)
 
 		// 가장 가까운 점 계산
 		return ClosestPointOnAxisToRay(LinePoint, LineDirection, RayOrigin, RayDirection);

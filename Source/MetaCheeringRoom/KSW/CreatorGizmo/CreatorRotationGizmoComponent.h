@@ -59,5 +59,9 @@ public:
 
 	// 시작 로테이션 저장
 	UPROPERTY()
-	FRotator GizmoStartRotation;
+	FQuat CurrentRotation;
+
+	// 축저장
+	UPROPERTY()
+	FVector RotationAxis;
 };

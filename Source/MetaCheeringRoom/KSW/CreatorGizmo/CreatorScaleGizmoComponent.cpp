@@ -154,7 +154,19 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 		FVector ClosestPoint = OnMouseClick(MousePosition);
 
 		FVector Delta = (ClosestPoint - CurrentPosition) * Factor;
-		Me->SetActorScale3D(GizmoStartScale + Delta);
+		FVector LineDirection = Me->XScaleAxisMesh->GetForwardVector();
+		float fDir = 1;
+		// Delta 와 LineDirection이 같은 방향인지 역방향인지 검사
+		if (FVector::DotProduct(Delta, LineDirection) < 0)
+		{
+			fDir *= -1;
+		}
+
+		FVector X = FVector(fDir, 0, 0) * Delta.Size();
+		Me->SetActorScale3D(GizmoStartScale + X);
+
+		// Delta Debugline
+		DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
 	}
 
 	if (IsYAxisSelected)
@@ -163,7 +175,19 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 		FVector ClosestPoint = OnMouseClick(MousePosition);
 
 		FVector Delta = (ClosestPoint - CurrentPosition) * Factor;
-		Me->SetActorScale3D(GizmoStartScale + Delta);
+		FVector LineDirection = Me->YScaleAxisMesh->GetForwardVector();
+		float fDir = 1;
+		// Delta 와 LineDirection이 같은 방향인지 역방향인지 검사
+		if (FVector::DotProduct(Delta, LineDirection) < 0)
+		{
+			fDir *= -1;
+		}
+
+		FVector Y = FVector(0, fDir, 0) * Delta.Size();
+
+		Me->SetActorScale3D(GizmoStartScale + Y);
+
+		DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
 	}
 
 	if (IsZAxisSelected)
@@ -172,7 +196,19 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 		FVector ClosestPoint = OnMouseClick(MousePosition);
 
 		FVector Delta = (ClosestPoint - CurrentPosition) * Factor;
-		Me->SetActorScale3D(GizmoStartScale + Delta);
+		FVector LineDirection = Me->ZScaleAxisMesh->GetForwardVector();
+		float fDir = 1;
+		// Delta 와 LineDirection이 같은 방향인지 역방향인지 검사
+		if (FVector::DotProduct(Delta, LineDirection) < 0)
+		{
+			fDir *= -1;
+		}
+		// z 축 스케일을 키운다.
+		// Me->SetActorScale3D(GizmoStartScale + Delta);
+		FVector Z = FVector(0, 0, fDir) * Delta.Size();
+		Me->SetActorScale3D(GizmoStartScale + Z);
+
+		DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
 	}
 }
 
@@ -186,12 +222,10 @@ FVector UCreatorScaleGizmoComponent::OnMouseClick(const FVector2D& ScreenPositio
 	GetClickRay(PlayerController, ScreenPosition, RayOrigin, RayDirection);
 
 	// Actor의 위치와 X축 방향으로 직선 정의
-	FVector LinePoint = Me->XAxisMesh->GetComponentLocation();
-
-
+	FVector LinePoint = Me->XScaleAxisMesh->GetComponentLocation();
 	if (IsXAxisSelected)
 	{
-		FVector LineDirection = Me->XAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
+		FVector LineDirection = Me->XScaleAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
 
 		// 가장 가까운 점 계산
 		return ClosestPointOnAxisToRay(LinePoint, LineDirection, RayOrigin, RayDirection);
@@ -200,7 +234,7 @@ FVector UCreatorScaleGizmoComponent::OnMouseClick(const FVector2D& ScreenPositio
 
 	if (IsYAxisSelected)
 	{
-		FVector LineDirection = Me->YAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
+		FVector LineDirection = Me->YScaleAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
 
 		// 가장 가까운 점 계산
 		return ClosestPointOnAxisToRay(LinePoint, LineDirection, RayOrigin, RayDirection);
@@ -208,7 +242,7 @@ FVector UCreatorScaleGizmoComponent::OnMouseClick(const FVector2D& ScreenPositio
 
 	if (IsZAxisSelected)
 	{
-		FVector LineDirection = Me->ZAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
+		FVector LineDirection = Me->ZScaleAxisMesh->GetForwardVector(); // Actor의 X축 방향 (로컬 기준)
 
 		// 가장 가까운 점 계산
 		return ClosestPointOnAxisToRay(LinePoint, LineDirection, RayOrigin, RayDirection);
