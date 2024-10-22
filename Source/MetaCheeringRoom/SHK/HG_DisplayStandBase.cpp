@@ -40,13 +40,11 @@ void AHG_DisplayStandBase::Tick(float DeltaTime)
 
 	if (DetectActor != nullptr)
 	{
-		// »ç¿ëÀÚÀÇ Ä«¸Þ¶ó¸¦ Ã£°í
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ Ã£ï¿½ï¿½
 		FVector target = Cast<APlayerController>(DetectActor->Controller)->PlayerCameraManager->GetCameraLocation();
-		// ±× Ä«¸Þ¶ó¸¦ ¹Ù¶óº¸´Â ¹æÇâÀ» ¸¸µé¾î¼­
 		FVector dir = target - InteractionWidget->GetComponentLocation();
 		dir.Normalize();
 
-		// HPComp¸¦ È¸ÀüÇÏ°í½Í´Ù.(Billboard ±â¹ý)
 		FRotator rot = dir.ToOrientationRotator();
 		InteractionWidget->SetWorldRotation(rot);
 	}

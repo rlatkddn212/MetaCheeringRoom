@@ -37,4 +37,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UInventoryWidget* Owner;
+
+	UPROPERTY(EditDefaultsOnly)
+	UImage* Img_Equip;
+
+	bool bSelected = false;
 };

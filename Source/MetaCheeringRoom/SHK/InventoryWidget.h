@@ -40,7 +40,7 @@ public:
 	TSubclassOf<UHG_SlotWidget> SlotWidgetFactory;
 
 	void SetOwner(APawn* Player);
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	UWrapBox* SelectedCategory;
 
@@ -57,6 +57,9 @@ public:
 	UTextBlock* TB_Price;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
+	UTextBlock* TB_Use;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
 	UTextBlock* TB_Quantity;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
@@ -65,13 +68,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
 	UButton* Btn_ThrowAway;
 
-	
+
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
 	UButton* Btn_ActiveCategory;
-	
+
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
 	UButton* Btn_CostumeCategory;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	UMaterial* DefaultImage;
 
@@ -89,4 +92,10 @@ public:
 
 	UFUNCTION()
 	void UseItem();
+
+	bool bSlotSelected = false;
+
+	TArray<UHG_SlotWidget*> EquipList;
+
+	class UHG_GameInstance* GI;
 };
