@@ -23,6 +23,14 @@ void UHG_SlotWidget::NativeConstruct()
 void UHG_SlotWidget::OnButtonClicked()
 {
 	Owner->SelectedSlot = this;
+	if (Owner->EquipList.Contains(this))
+	{
+		Owner->TB_Use->SetText(FText::FromString(TEXT("해제하기")));
+	}
+	else
+	{
+		Owner->TB_Use->SetText(FText::FromString(TEXT("장착하기")));
+	}
 	Owner->DIsplaySelectedItemInfo();
 }
 

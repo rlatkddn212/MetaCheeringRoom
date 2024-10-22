@@ -144,7 +144,7 @@ void UInventoryWidget::ThrowAwaySelectedItem()
 			TB_Use->SetText(FText::FromString(TEXT("장착하기")));
 			SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
 			EquipList.Remove(SelectedSlot);
-			Owner->UnequipItem();
+			Owner->UnequipItem(SelectedSlot->SlotInfo.ItemInfo.ItemName);
 		}
 		int32 ChildCount = SelectedCategory->GetChildrenCount();
 		for (int32 i = 0; i < ChildCount; i++)
@@ -206,7 +206,7 @@ void UInventoryWidget::UseItem()
 						TB_Use->SetText(FText::FromString(TEXT("장착하기")));
 						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
 						EquipList.Remove(SelectedSlot);
-						OwningPlayer->UnequipItem();
+						OwningPlayer->UnequipItem(SelectedSlot->SlotInfo.ItemInfo.ItemName);
 					}
 					else
 					{

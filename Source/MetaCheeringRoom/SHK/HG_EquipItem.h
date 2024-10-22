@@ -25,4 +25,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Equiped(APawn* Value);
+
+	UPROPERTY(EditDefaultsOnly)
+	FString Name;
 };

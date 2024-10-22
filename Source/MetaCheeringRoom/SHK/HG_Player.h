@@ -96,7 +96,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class AHG_DisplayStandBase* DetectedStand;
 
-	// ========================¾ÆÀÌÅÛ Àâ±â===============================
+	// ========================ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½===============================
 
 	UPROPERTY(EditDefaultsOnly , Category = Equip)
 	class USceneComponent* HandComp;
@@ -107,7 +107,7 @@ public:
 
 	void EquipItem(class AHG_EquipItem* ItemValue);
 
-	void UnequipItem();
+	void UnequipItem(const FString& NameValue);
 	UPROPERTY()
 	AHG_EquipItem* GrabItem;
 
@@ -115,7 +115,7 @@ public:
 	float GrabDistance = 300;
 
 	void EquipItemToSocket(AHG_EquipItem* ItemValue);
-	void UnequipItemToSocket(); 
+	void UnequipItemToSocket(const FString& NameValue);
 
 	UFUNCTION(Server,Reliable)
 	void ServerRPCEquipItemToSocket(AHG_EquipItem* ItemValue);
@@ -124,10 +124,12 @@ public:
 	void MulticastRPCEquipItemToSocket(AHG_EquipItem* ItemValue);
 	
 	UFUNCTION(Server, Reliable)
-	void ServerRPCUnequipItemToSocket();
+	void ServerRPCUnequipItemToSocket(const FString& NameValue);
 
 	UFUNCTION(NetMulticast,Reliable)
-	void MulticastRPCUnequipItemToSocket();
+	void MulticastRPCUnequipItemToSocket(const FString& NameValue);
 
 	bool bEquipItem = false;
+
+	TArray<AHG_EquipItem*> EquipItemList;
 };

@@ -41,7 +41,13 @@ AHG_Player::AHG_Player()
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 
 	HandComp = CreateDefaultSubobject<USceneComponent>(TEXT("HandComp"));
-	HandComp->SetupAttachment(GetMesh(),TEXT("HandPosition"));
+	HandComp->SetupAttachment(GetMesh(), TEXT("HandPosition"));
+
+	LowerComp = CreateDefaultSubobject<USceneComponent>(TEXT("LowerComp"));
+	LowerComp->SetupAttachment(GetMesh(), TEXT("LowerPosition"));
+
+	UpperComp = CreateDefaultSubobject<USceneComponent>(TEXT("UpperComp"));
+	UpperComp->SetupAttachment(GetMesh(), TEXT("UpperPosition"));
 
 	bReplicates = true;
 	SetReplicateMovement(true);
@@ -283,6 +289,7 @@ void AHG_Player::PopUpPurchaseWidget()
 void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 {
 	GrabItem = ItemValue;
+	EquipItemList.Add(GrabItem);
 	auto* mesh = GrabItem->GetComponentByClass<UStaticMeshComponent>();
 	check(mesh)
 		if (mesh)
@@ -292,7 +299,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 			{
 			case EItemCategory::Category_Bottom:
 				mesh->AttachToComponent(LowerComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-			case EItemCategory::Category_Consultation:
+			case EItemCategory::Category_Top:
 				mesh->AttachToComponent(UpperComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			case EItemCategory::Category_HandGrab:
 				mesh->AttachToComponent(HandComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
@@ -302,17 +309,23 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 		}
 }
 
-void AHG_Player::UnequipItem()
+void AHG_Player::UnequipItem(const FString& NameValue)
 {
-	auto* mesh = GrabItem->GetComponentByClass<UStaticMeshComponent>();
-	check(mesh);
-	if (mesh)
+	for (AHG_EquipItem* item : EquipItemList)
 	{
-		mesh->SetSimulatePhysics(true);
-		mesh->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		if (item->GetItemName() == NameValue)
+		{
+			auto* mesh = item->GetComponentByClass<UStaticMeshComponent>();
+			check(mesh);
+			if (mesh)
+			{
+				mesh->SetSimulatePhysics(true);
+				mesh->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+			}
+			item->Destroy();
+			EquipItemList.Remove(item);
+		}
 	}
-	GrabItem->Destroy();
-	GrabItem = nullptr;
 }
 
 void AHG_Player::EquipItemToSocket(AHG_EquipItem* ItemValue)
@@ -320,9 +333,9 @@ void AHG_Player::EquipItemToSocket(AHG_EquipItem* ItemValue)
 	ServerRPCEquipItemToSocket(ItemValue);
 }
 
-void AHG_Player::UnequipItemToSocket()
+void AHG_Player::UnequipItemToSocket(const FString& NameValue)
 {
-	ServerRPCUnequipItemToSocket();
+	ServerRPCUnequipItemToSocket(NameValue);
 }
 
 void AHG_Player::ServerRPCEquipItemToSocket_Implementation(AHG_EquipItem* ItemValue)
@@ -335,13 +348,13 @@ void AHG_Player::MulticastRPCEquipItemToSocket_Implementation(AHG_EquipItem* Ite
 	EquipItem(ItemValue);
 }
 
-void AHG_Player::ServerRPCUnequipItemToSocket_Implementation()
+void AHG_Player::ServerRPCUnequipItemToSocket_Implementation(const FString& NameValue)
 {
-	MulticastRPCUnequipItemToSocket();
+	MulticastRPCUnequipItemToSocket(NameValue);
 }
 
-void AHG_Player::MulticastRPCUnequipItemToSocket_Implementation()
+void AHG_Player::MulticastRPCUnequipItemToSocket_Implementation(const FString& NameValue)
 {
-	UnequipItem();
+	UnequipItem(NameValue);
 }
 

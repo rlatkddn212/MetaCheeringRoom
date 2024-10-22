@@ -16,7 +16,7 @@ AHG_EquipItem::AHG_EquipItem()
 void AHG_EquipItem::BeginPlay()
 {
 	Super::BeginPlay();
-	this->ItemData.ItemName = "EquipItem";
+	this->ItemData.ItemName = Name;
 	InitItemData();
 }
 
