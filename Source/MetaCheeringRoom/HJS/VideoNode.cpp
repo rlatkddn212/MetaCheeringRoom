@@ -23,5 +23,8 @@ void UVideoNode::PlayStream()
 		Screen->RequestMediaURL(PlayURL);
 		
 		Screen->VideoWidget->SetVisibility(ESlateVisibility::Hidden);
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		PC->SetShowMouseCursor(false);
+		PC->SetInputMode(FInputModeGameOnly());
 	}
 }
