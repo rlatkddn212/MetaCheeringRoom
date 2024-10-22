@@ -14,4 +14,9 @@ class METACHEERINGROOM_API USW_HierarchyDragOperation : public UDragDropOperatio
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(BlueprintReadWrite)
+	FString ItemName;
+
+	TSharedPtr<struct FCreatorObject> CreatorObject;
 };

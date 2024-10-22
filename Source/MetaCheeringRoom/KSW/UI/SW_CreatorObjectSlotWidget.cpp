@@ -32,6 +32,8 @@ void USW_CreatorObjectSlotWidget::NativeConstruct()
 
 void USW_CreatorObjectSlotWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
 	if (bIsDragging)
 	{
 		// 드래그 중일 때 매 프레임 호출되는 코드
@@ -87,6 +89,7 @@ void USW_CreatorObjectSlotWidget::NativeOnDragDetected(const FGeometry& InGeomet
 
 FReply USW_CreatorObjectSlotWidget::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
+	Super::NativeOnPreviewMouseButtonDown(InGeometry, InMouseEvent);
 	FEventReply ret = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
 
 	return ret.NativeReply;
