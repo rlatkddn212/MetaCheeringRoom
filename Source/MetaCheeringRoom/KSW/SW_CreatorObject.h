@@ -96,5 +96,10 @@ public:
 
 	void DragEnd(ECreatorToolState ToolState);
 
-	
+	UFUNCTION()
+	void OnChangePosition(FVector Pos);
+	UFUNCTION()
+	void OnChangeRotation(FRotator Rot);
+	UFUNCTION()
+	void OnChangeScale(FVector Scale);
 };

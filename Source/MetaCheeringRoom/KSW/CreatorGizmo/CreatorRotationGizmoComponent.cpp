@@ -105,7 +105,7 @@ void UCreatorRotationGizmoComponent::SetAxisSelected(bool isX, bool isY, bool is
 
 void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D MousePosition)
 {
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
 
 	// MeÀÇ Screen»óÀÇ ÁÂÇ¥¸¦ °¡Á®¿È
 	FVector2D ScreenPosition;
@@ -134,6 +134,7 @@ void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 		
 		FQuat NewRotation = RotationDelta * CurrentRotation;
 		Me->SetActorRotation(NewRotation);
+		PC->OnObjectChanged();
 	}
 
 	if (IsYAxisSelected)
@@ -154,6 +155,7 @@ void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 		
 		FQuat NewRotation = RotationDelta * CurrentRotation;
 		Me->SetActorRotation(NewRotation);
+		PC->OnObjectChanged();
 	}
 
 	if (IsZAxisSelected)
@@ -171,6 +173,7 @@ void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 		
 		FQuat NewRotation = RotationDelta * CurrentRotation;
 		Me->SetActorRotation(NewRotation);
+		PC->OnObjectChanged();
 	}
 }
 

@@ -14,6 +14,14 @@
 #include "MeshTypes.h"
 #include "StaticMeshResources.h"
 #include "StaticMeshAttributes.h"
+#include "Engine/StaticMeshSourceData.h"
+#include "RawMesh.h"
+#include "Chaos/Array.h"
+#include "Math/Vector.h"
+#include "UObject/NoExportTypes.h"
+#include "MeshDescription.h"
+#include "StaticMeshAttributes.h"
+
 
 // Sets default values
 ASW_CreatorObject::ASW_CreatorObject()
@@ -82,11 +90,15 @@ ASW_CreatorObject::ASW_CreatorObject()
 	XRingMesh->SetAbsolute(false, false, true);
 	YRingMesh->SetAbsolute(false, false, true);
 	ZRingMesh->SetAbsolute(false, false, true);
-	//XRingMesh->SetStaticMesh(CreateCylinderMesh(50.0f, 10.0f, 32));
-	//YRingMesh->SetStaticMesh(CreateCylinderMesh(50.0f, 10.0f, 32));
-	//ZRingMesh->SetStaticMesh(CreateCylinderMesh(50.0f, 10.0f, 32));
 
-	// 링 메쉬 설정 (Torus 사용 예시)
+	//if (UStaticMesh* NewMesh = CreateCylinderMesh(50.0f, 3.0f, 16))
+	//{
+	//	XRingMesh->SetStaticMesh(NewMesh);
+	//	YRingMesh->SetStaticMesh(NewMesh);
+	//	ZRingMesh->SetStaticMesh(NewMesh);
+	//}
+
+	//// 링 메쉬 설정 (Torus 사용 예시)
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> RingMesh(TEXT("/Script/Engine.StaticMesh'/Game/Ksw/Ring.Ring'"));
 	if (RingMesh.Succeeded())
 	{
@@ -280,6 +292,100 @@ void ASW_CreatorObject::ChangeToolMode(ECreatorToolState state)
 }
 
 
+UStaticMesh* ASW_CreatorObject::CreateCylinderMesh(float Radius, float Height, int32 SegmentCount)
+{
+	// 메시 생성을 위한 기본 설정
+	FString MeshName = FString::Printf(TEXT("SM_Cylinder_%d"), FMath::Rand());
+	UStaticMesh* StaticMesh = NewObject<UStaticMesh>(GetTransientPackage(), *MeshName);
+
+	// MeshDescription 생성
+	FMeshDescription MeshDescription;
+
+	FStaticMeshAttributes Attributes(MeshDescription);
+	Attributes.Register();
+	TVertexAttributesRef<FVector3f> VertexPositions = Attributes.GetVertexPositions();
+	TVertexInstanceAttributesRef<FVector2f> VertexInstanceUVs = Attributes.GetVertexInstanceUVs();
+
+	// 정점과 폴리곤 그룹 배열
+	TArray<FVertexID> VertexIDs;
+	FPolygonGroupID PolygonGroup = MeshDescription.CreatePolygonGroup();
+
+	// 원통 측면의 정점들 생성
+	for (int32 i = 0; i < SegmentCount; ++i)
+	{
+		float Angle = (2.0f * PI * i) / SegmentCount;
+		float X = Radius * FMath::Cos(Angle);
+		float Y = Radius * FMath::Sin(Angle);
+
+		// 상단 정점
+		FVertexID TopVertex = MeshDescription.CreateVertex();
+		VertexPositions[TopVertex] = FVector3f(X, Y, Height * 0.5f);
+		VertexIDs.Add(TopVertex);
+
+		// 하단 정점
+		FVertexID BottomVertex = MeshDescription.CreateVertex();
+		VertexPositions[BottomVertex] = FVector3f(X, Y, -Height * 0.5f);
+		VertexIDs.Add(BottomVertex);
+	}
+
+	// 삼각형 생성 함수
+	auto CreateTriangle = [&](FVertexID V0, FVertexID V1, FVertexID V2, bool bReverse = true)
+		{
+			TArray<FVertexInstanceID> VertexInstances;
+			TArray<FVertexID> TriVertices;
+			if (!bReverse)
+			{
+				TriVertices = {V0, V1, V2};
+			}
+			else
+			{
+				TriVertices = {V0, V2, V1};
+			}
+
+			for (FVertexID VertexID : TriVertices)
+			{
+				FVertexInstanceID InstanceID = MeshDescription.CreateVertexInstance(VertexID);
+				VertexInstances.Add(InstanceID);
+
+				// UV 좌표 계산
+				FVector3f Position = VertexPositions[VertexID];
+				float U = FMath::Atan2(Position.Y, Position.X) / (2.0f * PI) + 0.5f;
+				float V = (Position.Z + Height * 0.5f) / Height;
+				VertexInstanceUVs.Set(InstanceID, 0, FVector2f(U, V));
+			}
+
+			MeshDescription.CreateTriangle(PolygonGroup, VertexInstances);
+		};
+
+	// 측면 삼각형 생성
+	for (int32 i = 0; i < SegmentCount; ++i)
+	{
+		int32 Current = i * 2;
+		int32 Next = ((i + 1) % SegmentCount) * 2;
+		CreateTriangle(VertexIDs[Current], VertexIDs[Current + 1], VertexIDs[Next]);
+		CreateTriangle(VertexIDs[Next], VertexIDs[Current + 1], VertexIDs[Next + 1]);
+	}
+
+	UStaticMesh::FBuildMeshDescriptionsParams Params;
+	Params.bBuildSimpleCollision = true;
+	StaticMesh->NaniteSettings.bEnabled = true;
+	StaticMesh->BuildFromMeshDescriptions({&MeshDescription}, Params);
+
+	// StaticMesh 생성 완료
+	StaticMesh->CommitMeshDescription(0);
+	StaticMesh->SetLightingGuid();
+
+	// 메시 설정
+	StaticMesh->CreateBodySetup();
+
+	// 빌드 설정
+	UStaticMesh::FBuildParameters BuildParams;
+	StaticMesh->Build(BuildParams);
+	StaticMesh->PostEditChange();
+
+	return StaticMesh;
+}
+
 void ASW_CreatorObject::SelectAxis(bool isX, bool isY, bool isZ)
 {
 	PositionGizmo->SetAxisSelected(isX, isY, isZ);
@@ -331,5 +437,20 @@ void ASW_CreatorObject::DragEnd(ECreatorToolState ToolState)
 		ScaleGizmo->SetAxisSelected(false, false, false);
 		break;
 	}
+}
+
+void ASW_CreatorObject::OnChangePosition(FVector Pos)
+{
+	SetActorLocation(Pos);
+}
+
+void ASW_CreatorObject::OnChangeRotation(FRotator Rot)
+{
+	SetActorRotation(Rot);
+}
+
+void ASW_CreatorObject::OnChangeScale(FVector Scale)
+{
+	SetActorScale3D(Scale);
 }
 

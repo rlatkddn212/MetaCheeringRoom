@@ -16,6 +16,7 @@
 #include "Engine/Engine.h"
 #include "UI/SW_CreatorHierarchyWidget.h"
 #include "UI/SW_CreatorModelToolbarWidget.h"
+#include "UI/SW_CreatorInspectorWidget.h"
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
 {
@@ -149,7 +150,9 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 					if (SelectedObject)
 						SelectedObject->OnSelected(false);
 					Object->OnSelected(true);
+
 					SelectedObject = Object;
+					CreatorWidget->CreatorInspectorWidget->SetObject(SelectedObject);
 
 					if (SelectedObject)
 						SelectedObject->ChangeToolMode(ToolState);
@@ -185,10 +188,11 @@ void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData*
 		SelectedObject->OnSelected(false);
 	CreatingObject->OnSelected(true);
 	SelectedObject = CreatingObject;
-
+	
+	CreatorWidget->CreatorInspectorWidget->SetObject(SelectedObject);
 	if (SelectedObject)
 		SelectedObject->ChangeToolMode(ToolState);
-
+	
 	CreatorWidget->OnDragged(true);
 }
 
@@ -210,6 +214,7 @@ bool ASW_CreatorPlayerController::DeleteDummyObject()
 			UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 			system->AddObject(CreatingObject->CreatingObjectData->ItemName, CreatingObject->GetTransform());
 			CreatorWidget->CreatorHierarchyWidget->ReloadItem();
+			OnObjectChanged();
 		}
 	}
 
@@ -286,6 +291,14 @@ void ASW_CreatorPlayerController::DragEnd()
 	if (SelectedObject)
 	{
 		SelectedObject->DragEnd(ToolState);
+	}
+}
+
+void ASW_CreatorPlayerController::OnObjectChanged()
+{
+	if (SelectedObject)
+	{
+		CreatorWidget->CreatorInspectorWidget->OnChanged();
 	}
 }
 

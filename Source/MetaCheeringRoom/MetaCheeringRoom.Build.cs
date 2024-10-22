@@ -8,9 +8,9 @@ public class MetaCheeringRoom : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "Json", "JsonUtilities", "HTTP", "MediaAssets", "OnlineSubsystem", "OnlineSubsystemSteam", "ProceduralMeshComponent","MeshDescription", "StaticMeshDescription" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "Json", "JsonUtilities", "HTTP", "MediaAssets", "OnlineSubsystem", "OnlineSubsystemSteam", "RenderCore", "RHI","MeshDescription", "StaticMeshDescription", "GeometryCore"});
 
-        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore"});
 
         PrivateIncludePaths.Add("MetaCheeringRoom");
 		// Uncomment if you are using Slate UI

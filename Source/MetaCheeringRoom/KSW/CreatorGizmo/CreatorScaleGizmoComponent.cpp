@@ -147,7 +147,8 @@ void UCreatorScaleGizmoComponent::SetAxisSelected(bool isX, bool isY, bool isZ)
 
 void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D MousePosition)
 {
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+
 	if (IsXAxisSelected)
 	{
 		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
@@ -164,9 +165,9 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 
 		FVector X = FVector(fDir, 0, 0) * Delta.Size();
 		Me->SetActorScale3D(GizmoStartScale + X);
-
+		PC->OnObjectChanged();
 		// Delta Debugline
-		DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
+		//DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
 	}
 
 	if (IsYAxisSelected)
@@ -186,8 +187,8 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 		FVector Y = FVector(0, fDir, 0) * Delta.Size();
 
 		Me->SetActorScale3D(GizmoStartScale + Y);
-
-		DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
+		PC->OnObjectChanged();
+		//DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
 	}
 
 	if (IsZAxisSelected)
@@ -207,8 +208,8 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 		// Me->SetActorScale3D(GizmoStartScale + Delta);
 		FVector Z = FVector(0, 0, fDir) * Delta.Size();
 		Me->SetActorScale3D(GizmoStartScale + Z);
-
-		DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
+		PC->OnObjectChanged();
+		//DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
 	}
 }
 

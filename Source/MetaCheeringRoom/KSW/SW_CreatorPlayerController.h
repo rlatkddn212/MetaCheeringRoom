@@ -61,4 +61,6 @@ public:
 
 	void Drag(FVector2D MouseDownPosition);
 	void DragEnd();
+
+	void OnObjectChanged();
 };
