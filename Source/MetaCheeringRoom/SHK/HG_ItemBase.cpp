@@ -97,10 +97,8 @@ void AHG_ItemBase::SetItemCategory(EItemCategory p_Category)
 void AHG_ItemBase::InitItemData()
 {
 	TArray<FItemData*> AllRows;
-	UE_LOG(LogTemp, Warning, TEXT("InitItemData"));
 	if (GI)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GI"));
 		GI->ItemDataTable->GetAllRows(TEXT(""), AllRows);
 		for (auto Row : AllRows)
 		{

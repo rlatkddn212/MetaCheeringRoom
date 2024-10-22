@@ -16,10 +16,23 @@
 void UInventoryWidget::NativeConstruct()
 {
 	//Btn_Use->OnClicked.AddDynamic();
-	Btn_ThrowAway->OnClicked.AddDynamic(this, &UInventoryWidget::ThrowAwaySelectedItem);
-	Btn_Use->OnClicked.AddDynamic(this, &UInventoryWidget::UseItem);
-	Btn_CostumeCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Costume);
-	Btn_ActiveCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Active);
+	if (!Btn_ThrowAway->OnClicked.IsBound())
+	{
+		Btn_ThrowAway->OnClicked.AddDynamic(this, &UInventoryWidget::ThrowAwaySelectedItem);
+
+	}
+	if (!Btn_Use->OnClicked.IsBound())
+	{
+		Btn_Use->OnClicked.AddDynamic(this, &UInventoryWidget::UseItem);
+	}
+	if (!Btn_CostumeCategory->OnClicked.IsBound())
+	{
+		Btn_CostumeCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Costume);
+	}
+	if (!Btn_ActiveCategory->OnClicked.IsBound())
+	{
+		Btn_ActiveCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Active);
+	}
 
 	SelectedCategory = WB_SlotList_Active;
 }
@@ -42,6 +55,7 @@ void UInventoryWidget::InitInventoryUI()
 		{
 			for (auto slot : OwningPlayer->InventoryComp->Inventory)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("1"));
 				UHG_SlotWidget* SlotWidget = CreateWidget<UHG_SlotWidget>(this, SlotWidgetFactory);
 				if (SlotWidget)
 				{

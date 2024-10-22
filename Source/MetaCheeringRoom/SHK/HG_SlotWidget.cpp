@@ -12,7 +12,10 @@ void UHG_SlotWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Button_InventorySlot->OnClicked.AddDynamic(this, &UHG_SlotWidget::OnButtonClicked);
+	if (!(Button_InventorySlot->OnClicked.IsBound()))
+	{
+		Button_InventorySlot->OnClicked.AddDynamic(this, &UHG_SlotWidget::OnButtonClicked);
+	}
 
 }
 
@@ -30,7 +33,7 @@ void UHG_SlotWidget::SetItemIcon()
 	}
 }
 
-void UHG_SlotWidget::InitSlot(FSlotStruct p_Slot)
+void UHG_SlotWidget::InitSlot (FSlotStruct p_Slot)
 {
 	SlotInfo.ItemInfo.ItemIcon = p_Slot.ItemInfo.ItemIcon;
 	SlotInfo.ItemInfo.ItemName = p_Slot.ItemInfo.ItemName;
