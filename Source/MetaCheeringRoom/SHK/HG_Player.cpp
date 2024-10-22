@@ -13,6 +13,8 @@
 #include "InventoryWidget.h"
 #include "HG_DisplayStandBase.h"
 #include "HG_ItemPurchaseWidget.h"
+#include "HG_EquipItem.h"
+#include "GameFramework/PlayerController.h"
 
 // Sets default values
 AHG_Player::AHG_Player()
@@ -37,6 +39,12 @@ AHG_Player::AHG_Player()
 	}
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -80.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
+
+	HandComp = CreateDefaultSubobject<USceneComponent>(TEXT("HandComp"));
+	HandComp->SetupAttachment(GetMesh(),TEXT("HandPosition"));
+
+	bReplicates = true;
+	SetReplicateMovement(true);
 }
 
 // Called when the game starts or when spawned
@@ -200,9 +208,9 @@ void AHG_Player::DetectObject()
 				}
 			}
 		}
+		// 라인트레이스에 맞은게 아이템일 때
 		else if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
 		{
-			// 라인트레이스에 맞은게 아이템일 때
 			InventoryComp->AddtoInventory(Item->GetItemData(), 1);
 			Item->Destroy();
 		}
@@ -274,3 +282,67 @@ void AHG_Player::PopUpPurchaseWidget()
 		}
 	}
 }
+
+void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
+{
+	GrabItem = ItemValue;
+	auto* mesh = GrabItem->GetComponentByClass<UStaticMeshComponent>();
+	check(mesh)
+		if (mesh)
+		{
+			mesh->SetSimulatePhysics(false);
+			switch (GrabItem->GetItemCategory())
+			{
+			case EItemCategory::Category_Bottom:
+				mesh->AttachToComponent(LowerComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			case EItemCategory::Category_Consultation:
+				mesh->AttachToComponent(UpperComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			case EItemCategory::Category_HandGrab:
+				mesh->AttachToComponent(HandComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			default:
+				break;
+			}
+		}
+}
+
+void AHG_Player::UnequipItem()
+{
+	auto* mesh = GrabItem->GetComponentByClass<UStaticMeshComponent>();
+	check(mesh);
+	if (mesh)
+	{
+		mesh->SetSimulatePhysics(true);
+		mesh->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	}
+}
+
+void AHG_Player::EquipItemToSocket(AHG_EquipItem* ItemValue)
+{
+	ServerRPCEquipItemToSocket(ItemValue);
+}
+
+void AHG_Player::UnequipItemToSocket()
+{
+	ServerRPCUnequipItemToSocket();
+}
+
+void AHG_Player::ServerRPCEquipItemToSocket_Implementation(AHG_EquipItem* ItemValue)
+{
+	MulticastRPCEquipItemToSocket(ItemValue);
+}
+
+void AHG_Player::MulticastRPCEquipItemToSocket_Implementation(AHG_EquipItem* ItemValue)
+{
+	EquipItem(ItemValue);
+}
+
+void AHG_Player::ServerRPCUnequipItemToSocket_Implementation()
+{
+	MulticastRPCUnequipItemToSocket();
+}
+
+void AHG_Player::MulticastRPCUnequipItemToSocket_Implementation()
+{
+	UnequipItem();
+}
+

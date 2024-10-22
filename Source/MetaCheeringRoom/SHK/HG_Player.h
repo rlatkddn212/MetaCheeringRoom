@@ -95,4 +95,39 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class AHG_DisplayStandBase* DetectedStand;
+
+	// ========================아이템 잡기===============================
+
+	UPROPERTY(EditDefaultsOnly , Category = Equip)
+	class USceneComponent* HandComp;
+	UPROPERTY(EditDefaultsOnly , Category = Equip)
+	class USceneComponent* LowerComp;
+	UPROPERTY(EditDefaultsOnly, Category = Equip)
+	class USceneComponent* UpperComp;
+
+	void EquipItem(class AHG_EquipItem* ItemValue);
+
+	void UnequipItem();
+	UPROPERTY()
+	AHG_EquipItem* GrabItem;
+
+	UPROPERTY(EditDefaultsOnly , Category = Equip)
+	float GrabDistance = 300;
+
+	void EquipItemToSocket(AHG_EquipItem* ItemValue);
+	void UnequipItemToSocket(); 
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPCEquipItemToSocket(AHG_EquipItem* ItemValue);
+	
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastRPCEquipItemToSocket(AHG_EquipItem* ItemValue);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPCUnequipItemToSocket();
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastRPCUnequipItemToSocket();
+
+	bool bEquipItem = false;
 };

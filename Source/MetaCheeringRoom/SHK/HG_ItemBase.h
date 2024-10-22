@@ -10,7 +10,9 @@
 UENUM(BlueprintType)
 enum class EItemCategory: uint8
 {
-	Category_Costume UMETA(DisplayName = "Costume"),
+	Category_HandGrab UMETA(DisplayName = "HandGrab"),
+	Category_Consultation UMETA(DisplayName = "Consultation"),
+	Category_Bottom UMETA(DisplayName = "Bottom"),
 	Category_Active UMETA(DisplayName = "Active"),
 };
 

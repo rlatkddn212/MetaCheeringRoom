@@ -11,6 +11,7 @@
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "HG_EquipItem.h"
 
 
 void UInventoryWidget::NativeConstruct()
@@ -66,13 +67,9 @@ void UInventoryWidget::InitInventoryUI()
 					{
 						WB_SlotList_Active->AddChildToWrapBox(SlotWidget);
 					}
-					else if (slot.ItemInfo.ItemCategory == EItemCategory::Category_Costume)
-					{
-						WB_SlotList_Costume->AddChildToWrapBox(SlotWidget);
-					}
 					else
 					{
-						UE_LOG(LogTemp, Warning, TEXT("Error"));
+						WB_SlotList_Costume->AddChildToWrapBox(SlotWidget);
 					}
 				}
 			}
@@ -162,17 +159,30 @@ void UInventoryWidget::UseItem()
 		if (this->GetOwningPlayer() != nullptr)
 		{
 			auto* OwningPlayer = Cast<AHG_Player>(this->GetOwningPlayer()->GetPawn());
-
-			auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(SelectedSlot->SlotInfo.ItemInfo.ItemClass, OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
-			if (nullptr != SpawnedItem && nullptr != OwningPlayer)
+			if (nullptr != OwningPlayer)
 			{
-				SpawnedItem->SetOwner(OwningPlayer);
-			}
-			if (SpawnedItem)
-			{
-				SpawnedItem->SetActorHiddenInGame(true);
-				SpawnedItem->Use();
-				ThrowAwaySelectedItem();
+				if (SelectedCategory == WB_SlotList_Active)
+				{
+					auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(SelectedSlot->SlotInfo.ItemInfo.ItemClass, 
+					OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
+					if (SpawnedItem != nullptr)
+					{
+						SpawnedItem->SetOwner(OwningPlayer);
+						SpawnedItem->SetActorHiddenInGame(true);
+						SpawnedItem->Use();
+						ThrowAwaySelectedItem();
+					}
+				}
+				else if (SelectedCategory == WB_SlotList_Costume)
+				{
+					auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(SelectedSlot->SlotInfo.ItemInfo.ItemClass,
+					OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
+					if (EItem != nullptr)
+					{
+						EItem->SetOwner(OwningPlayer);
+						OwningPlayer->EquipItem(EItem);
+					}
+				}
 			}
 		}
 	}
