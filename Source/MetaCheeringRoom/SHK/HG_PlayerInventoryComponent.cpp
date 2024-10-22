@@ -25,17 +25,6 @@ UHG_PlayerInventoryComponent::UHG_PlayerInventoryComponent()
 void UHG_PlayerInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-// 
-// 	TArray<FName> RowNames = ItemDataTable->GetRowNames();
-// 
-// 	for (FName RowName : RowNames)
-// 	{
-// 		FItemData* ItemData = ItemDataTable->FindRow<FItemData>(RowName, TEXT(""));
-// 		if (ItemData)
-// 		{
-// 			AddtoInventory(*ItemData,1);
-// 		}
-// 	}
 }
 
 
@@ -63,6 +52,10 @@ void UHG_PlayerInventoryComponent::AddtoInventory(FItemData Item, int32 Quantity
 			Inventory.Add(Temp);
 		}
 	}
+	for (int i = 0; i < Inventory.Num(); i++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Inventory[%d] = %s,%d"), i,*Inventory[i].ItemInfo.ItemName,Inventory[i].Quantity);
+	}
 }
 
 int32 UHG_PlayerInventoryComponent::FindSlot(FString ItemName)
@@ -83,9 +76,13 @@ void UHG_PlayerInventoryComponent::RemoveFromInventory(FItemData Item, int32 Qua
 	{
 		Inventory[FindSlot(Item.ItemName)].Quantity = FMath::Clamp(Inventory[FindSlot(Item.ItemName)].Quantity - Quantity, 0, InventorySize);
 		if (Inventory[FindSlot(Item.ItemName)].Quantity <= 0)
-		{
+		{ 
 			Inventory.RemoveAt(FindSlot(Item.ItemName));
 		}
+	}
+	for (int i = 0; i < Inventory.Num(); i++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Inventory[%d] = %s,%d"), i, *Inventory[i].ItemInfo.ItemName, Inventory[i].Quantity);
 	}
 }
 
