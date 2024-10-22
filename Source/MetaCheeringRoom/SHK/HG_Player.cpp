@@ -99,7 +99,7 @@ void AHG_Player::Tick(float DeltaTime)
 		}
 		else
 		{
-			// ¶óÀÎÆ®·¹ÀÌ½º¿¡ ¸ÂÀº°Ô »óÁ¡ Áø¿­´ëÀÏ ¶§
+			// ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 			if (!bIsStand)
 			{
 				DetectedStand = Cast<AHG_DisplayStandBase>(OutHit.GetActor());
@@ -130,15 +130,15 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 
-	// ¿òÁ÷ÀÓ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AHG_Player::OnMyMove);
 	input->BindAction(IA_Jump, ETriggerEvent::Started, this, &AHG_Player::OnMyJump);
 	input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AHG_Player::OnMyLook);
 
-	// »óÈ£ÀÛ¿ë
+	// ï¿½ï¿½È£ï¿½Û¿ï¿½
 	input->BindAction(IA_Interaction, ETriggerEvent::Completed, this, &AHG_Player::OnMyInteraction);
 
-	// ÀÎº¥Åä¸®
+	// ï¿½Îºï¿½ï¿½ä¸®
 	input->BindAction(IA_Inventory, ETriggerEvent::Completed, this, &AHG_Player::PopUpInventory);
 
 }
@@ -187,7 +187,7 @@ void AHG_Player::DetectObject()
 	if (bHit)
 	{
 		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Yellow, false, 1.0f);
-		// ¶óÀÎÆ®·¹ÀÌ½º¿¡ ¸ÂÀº°Ô »óÁ¡ Æ®¸®°Å ¹Ú½ºÀÏ ¶§
+		// ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½
 		if (auto* STB = Cast<AHG_StoreTriggerBox>(OutHit.GetActor()))
 		{
 			STB->ByInteraction();
@@ -208,7 +208,6 @@ void AHG_Player::DetectObject()
 				}
 			}
 		}
-		// ¶óÀÎÆ®·¹ÀÌ½º¿¡ ¸ÂÀº°Ô ¾ÆÀÌÅÛÀÏ ¶§
 		else if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
 		{
 			InventoryComp->AddtoInventory(Item->GetItemData(), 1);
@@ -216,7 +215,6 @@ void AHG_Player::DetectObject()
 		}
 		else if (auto* Stand = Cast<AHG_DisplayStandBase>(OutHit.GetActor()))
 		{
-			// ¶óÀÎÆ®·¹ÀÌ½º¿¡ ¸ÂÀº°Ô »óÁ¡ Áø¿­´ëÀÏ ¶§
 			TempData = Stand->ItemData;
 			PopUpPurchaseWidget();
 		}
@@ -278,7 +276,6 @@ void AHG_Player::PopUpPurchaseWidget()
 			bCanMove = true;
 			pc->SetShowMouseCursor(false);
 			bToggle = !bToggle;
-			PurchaseWidget = nullptr;
 		}
 	}
 }
@@ -314,6 +311,8 @@ void AHG_Player::UnequipItem()
 		mesh->SetSimulatePhysics(true);
 		mesh->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 	}
+	GrabItem->Destroy();
+	GrabItem = nullptr;
 }
 
 void AHG_Player::EquipItemToSocket(AHG_EquipItem* ItemValue)

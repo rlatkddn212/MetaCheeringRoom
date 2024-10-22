@@ -12,15 +12,14 @@
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 #include "HG_EquipItem.h"
+#include "HG_GameInstance.h"
 
 
 void UInventoryWidget::NativeConstruct()
 {
-	//Btn_Use->OnClicked.AddDynamic();
 	if (!Btn_ThrowAway->OnClicked.IsBound())
 	{
 		Btn_ThrowAway->OnClicked.AddDynamic(this, &UInventoryWidget::ThrowAwaySelectedItem);
-
 	}
 	if (!Btn_Use->OnClicked.IsBound())
 	{
@@ -45,6 +44,7 @@ void UInventoryWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 void UInventoryWidget::InitInventoryUI()
 {
+	UE_LOG(LogTemp, Warning, TEXT("EquipList : %d"), EquipList.Num());
 	WB_SlotList_Active->ClearChildren();
 	WB_SlotList_Costume->ClearChildren();
 	SelectedSlot = nullptr;
@@ -56,7 +56,6 @@ void UInventoryWidget::InitInventoryUI()
 		{
 			for (auto slot : OwningPlayer->InventoryComp->Inventory)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("1"));
 				UHG_SlotWidget* SlotWidget = CreateWidget<UHG_SlotWidget>(this, SlotWidgetFactory);
 				if (SlotWidget)
 				{
@@ -70,11 +69,21 @@ void UInventoryWidget::InitInventoryUI()
 					else
 					{
 						WB_SlotList_Costume->AddChildToWrapBox(SlotWidget);
+						for (auto EquipSlot : EquipList)
+						{
+							if (EquipSlot->SlotInfo.ItemInfo.ItemName == SlotWidget->SlotInfo.ItemInfo.ItemName)
+							{
+								SlotWidget->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
+								EquipList[EquipList.Find(EquipSlot)] = SlotWidget;
+							}
+						}
 					}
 				}
 			}
 		}
 	}
+	SelectedCategory = WB_SlotList_Active;
+	WS_Category->SetActiveWidgetIndex(0);
 }
 
 void UInventoryWidget::SetOwner(APawn* Player)
@@ -89,12 +98,22 @@ void UInventoryWidget::SelectCategory_Active()
 {
 	SelectedCategory = WB_SlotList_Active;
 	WS_Category->SetActiveWidgetIndex(0);
+	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
 }
 
 void UInventoryWidget::SelectCategory_Costume()
 {
 	SelectedCategory = WB_SlotList_Costume;
 	WS_Category->SetActiveWidgetIndex(1);
+
+	if (SelectedSlot != nullptr && EquipList.Contains(SelectedSlot))
+	{
+		TB_Use->SetText(FText::FromString(TEXT("해제하기")));
+	}
+	else
+	{
+		TB_Use->SetText(FText::FromString(TEXT("장착하기")));
+	}
 }
 
 void UInventoryWidget::DIsplaySelectedItemInfo()
@@ -119,13 +138,20 @@ void UInventoryWidget::ThrowAwaySelectedItem()
 {
 	if (SelectedSlot)
 	{
+		auto* Owner = Cast<AHG_Player>(this->GetOwningPlayer()->GetPawn());
+		if (EquipList.Contains(SelectedSlot))
+		{
+			TB_Use->SetText(FText::FromString(TEXT("장착하기")));
+			SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
+			EquipList.Remove(SelectedSlot);
+			Owner->UnequipItem();
+		}
 		int32 ChildCount = SelectedCategory->GetChildrenCount();
 		for (int32 i = 0; i < ChildCount; i++)
 		{
 			UHG_SlotWidget* Child = Cast<UHG_SlotWidget>(SelectedCategory->GetChildAt(i));
 			if (Child == SelectedSlot)
 			{
-				auto* Owner = Cast<AHG_Player>(this->GetOwningPlayer()->GetPawn());
 				if (Owner)
 				{
 					Owner->InventoryComp->RemoveFromInventory(SelectedSlot->SlotInfo.ItemInfo, 1);
@@ -163,8 +189,8 @@ void UInventoryWidget::UseItem()
 			{
 				if (SelectedCategory == WB_SlotList_Active)
 				{
-					auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(SelectedSlot->SlotInfo.ItemInfo.ItemClass, 
-					OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
+					auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(SelectedSlot->SlotInfo.ItemInfo.ItemClass,
+						OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
 					if (SpawnedItem != nullptr)
 					{
 						SpawnedItem->SetOwner(OwningPlayer);
@@ -175,12 +201,25 @@ void UInventoryWidget::UseItem()
 				}
 				else if (SelectedCategory == WB_SlotList_Costume)
 				{
-					auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(SelectedSlot->SlotInfo.ItemInfo.ItemClass,
-					OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
-					if (EItem != nullptr)
+					if (EquipList.Contains(SelectedSlot))
 					{
-						EItem->SetOwner(OwningPlayer);
-						OwningPlayer->EquipItem(EItem);
+						TB_Use->SetText(FText::FromString(TEXT("장착하기")));
+						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
+						EquipList.Remove(SelectedSlot);
+						OwningPlayer->UnequipItem();
+					}
+					else
+					{
+						TB_Use->SetText(FText::FromString(TEXT("해제하기")));
+						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
+						EquipList.Add(SelectedSlot);
+						auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(SelectedSlot->SlotInfo.ItemInfo.ItemClass,
+							OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
+						if (EItem != nullptr)
+						{
+							EItem->SetOwner(OwningPlayer);
+							OwningPlayer->EquipItem(EItem);
+						}
 					}
 				}
 			}

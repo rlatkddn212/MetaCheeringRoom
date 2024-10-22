@@ -65,7 +65,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* BoxComp;
 
-	// ¾ÆÀÌÅÛ »ç¿ë (ÀÚ½Ä¿¡¼­ ±¸Çö)
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (ï¿½Ú½Ä¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
 	virtual void Use();
 
 	virtual void SetOwner(APawn* Value);

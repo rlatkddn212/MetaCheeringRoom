@@ -7,6 +7,7 @@
 #include "Engine/DataTable.h"
 #include "InventoryWidget.h"
 #include "HG_ItemBase.h"
+#include "Components/TextBlock.h"
 
 void UHG_SlotWidget::NativeConstruct()
 {
@@ -16,7 +17,7 @@ void UHG_SlotWidget::NativeConstruct()
 	{
 		Button_InventorySlot->OnClicked.AddDynamic(this, &UHG_SlotWidget::OnButtonClicked);
 	}
-
+	Img_Equip->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UHG_SlotWidget::OnButtonClicked()
