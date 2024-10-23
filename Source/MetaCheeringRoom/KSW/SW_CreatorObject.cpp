@@ -208,7 +208,10 @@ void ASW_CreatorObject::OnSelected(bool isSelected)
 	{
 		ChangeToolMode(ECreatorToolState::Selection);
 	}
+
+	OnChangeSelected.ExecuteIfBound(isSelected);
 }
+
 
 void ASW_CreatorObject::DoDestroy()
 {

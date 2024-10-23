@@ -7,6 +7,8 @@
 #include "SW_CreatorPlayerController.h"
 #include "SW_CreatorObject.generated.h"
 
+DECLARE_DYNAMIC_DELEGATE_OneParam(FChangeSelected, bool, isSelected);
+
 struct FCreatorObjectData;
 
 UCLASS()
@@ -36,6 +38,8 @@ public:
 	struct FCreatorObjectData* CreatingObjectData;
 
 	int32 CreatorItemId;
+
+	FChangeSelected OnChangeSelected;
 
 	UPROPERTY()
 	class USceneComponent* Root;

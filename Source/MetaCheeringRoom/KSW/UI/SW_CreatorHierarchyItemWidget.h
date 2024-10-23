@@ -7,6 +7,8 @@
 #include "Templates/SharedPointer.h"
 #include "SW_CreatorHierarchyItemWidget.generated.h"
 
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnHierarchyItemClicked, class ASW_CreatorObject*, CreatorObject);
+
 /**
  * 
  */
@@ -33,6 +35,11 @@ public:
 
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+
+	UFUNCTION()
+	void OnSelected(bool isSelected);
+
+	FOnHierarchyItemClicked OnHierarchyItemClicked;
 
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	class UButton* HierarchyItemButton;

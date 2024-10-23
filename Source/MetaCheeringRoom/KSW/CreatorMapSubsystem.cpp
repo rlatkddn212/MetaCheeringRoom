@@ -241,7 +241,7 @@ void UCreatorMapSubsystem::RenameObject(ASW_CreatorObject* Object, const FString
 
 void UCreatorMapSubsystem::AddChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
 {
-    
+    ChildObject->AttachToActor(ParentObject, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 void UCreatorMapSubsystem::RemoveChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)

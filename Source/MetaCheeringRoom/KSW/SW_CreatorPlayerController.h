@@ -36,6 +36,7 @@ public:
 	void CreatingDummyObject(struct FCreatorObjectData* ObjectData);
 	// 지워지지 않는경우
 
+	UFUNCTION()
 	void DoSelectObject(class ASW_CreatorObject* NewSelectObject);
 	
 	UFUNCTION()

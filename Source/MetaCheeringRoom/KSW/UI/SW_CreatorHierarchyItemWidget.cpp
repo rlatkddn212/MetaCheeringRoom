@@ -13,6 +13,7 @@
 #include "../SW_CreatorPlayerController.h"
 #include "Components/Button.h"
 #include "../SW_CreatorObject.h"
+#include "Delegates/Delegate.h"
 
 void USW_CreatorHierarchyItemWidget::NativeConstruct()
 {
@@ -28,6 +29,15 @@ void USW_CreatorHierarchyItemWidget::SetItem(ASW_CreatorObject* CreatorObject, i
 	// Set the item
 	HierarchyCreatorObject = CreatorObject;
 
+	if (PC == nullptr)
+	{
+		PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+	}
+
+	OnHierarchyItemClicked.BindDynamic(PC, &ASW_CreatorPlayerController::DoSelectObject);
+
+	HierarchyCreatorObject->OnChangeSelected.BindDynamic(this, &USW_CreatorHierarchyItemWidget::OnSelected);
+	
 	// InCreatorObject->ObjectName;
 	NameText->SetText(FText::FromString(HierarchyCreatorObject->GetName()));
 }
@@ -42,6 +52,7 @@ void USW_CreatorHierarchyItemWidget::NativeOnDragDetected(const FGeometry& InGeo
 	widget->HierarchyItemImage->SetBrush(IconImage->Brush);
 	dragOperation->DefaultDragVisual = widget;
 	dragOperation->ItemName = HierarchyCreatorObject->GetName();
+	dragOperation->CreatorObject = HierarchyCreatorObject;
 	
 	OutOperation = dragOperation;
 }
@@ -53,6 +64,8 @@ FReply USW_CreatorHierarchyItemWidget::NativeOnPreviewMouseButtonDown(const FGeo
 	HierarchyItemButton->SetStyle(ClickedButtonStyle);
 	// 아이템 셀렉트를 바꾼다.
 	//PC->DoSelectObject(CreatorObject);
+	if (OnHierarchyItemClicked.IsBound())
+		OnHierarchyItemClicked.Execute(HierarchyCreatorObject);
 
 	return ret.NativeReply;
 }
@@ -87,9 +100,6 @@ bool USW_CreatorHierarchyItemWidget::NativeOnDrop(const FGeometry& InGeometry, c
 	HierarchyItemButton->SetStyle(DefaultButtonStyle);
 	if (dragOperation)
 	{
-		// dragOperation->ItemName;
-		// dragOperation->ItemIcon;
-		// dragOperation->ItemData;
 		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 		const FCreatorMap& CMap = system->GetCreatorMap();
 
@@ -97,11 +107,26 @@ bool USW_CreatorHierarchyItemWidget::NativeOnDrop(const FGeometry& InGeometry, c
 		if (PrevParent)
 		{
 			system->RemoveChildObject(PrevParent, dragOperation->CreatorObject);
-			system->AddChildObject(HierarchyCreatorObject, dragOperation->CreatorObject);
+		}
+		else
+		{
+			system->RemoveObject(dragOperation->CreatorObject);
 		}
 
-		// PC에서 화면을 리플레쉬시킨다.
+		system->AddChildObject(HierarchyCreatorObject, dragOperation->CreatorObject);
 	}
 
 	return true;
+}
+
+void USW_CreatorHierarchyItemWidget::OnSelected(bool isSelected)
+{
+	if (isSelected)
+	{
+		HierarchyItemButton->SetStyle(ClickedButtonStyle);
+	}
+	else
+	{
+		HierarchyItemButton->SetStyle(DefaultButtonStyle);
+	}
 }

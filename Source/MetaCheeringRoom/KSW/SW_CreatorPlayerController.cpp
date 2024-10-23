@@ -306,8 +306,10 @@ void ASW_CreatorPlayerController::DeleteSelectedObject()
 		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 		system->RemoveObject(SelectedObject);
 
-		CreatingObject->Destroy();
-		CreatingObject = nullptr;
+		SelectedObject->Destroy();
+		SelectedObject = nullptr;
+
+		CreatorWidget->CreatorHierarchyWidget->ReloadItem();
 	}
 }
 
