@@ -16,10 +16,8 @@
 #include "HG_EquipItem.h"
 #include "GameFramework/PlayerController.h"
 
-// Sets default values
 AHG_Player::AHG_Player()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -53,7 +51,6 @@ AHG_Player::AHG_Player()
 	SetReplicateMovement(true);
 }
 
-// Called when the game starts or when spawned
 void AHG_Player::BeginPlay()
 {
 	Super::BeginPlay();
@@ -71,11 +68,9 @@ void AHG_Player::BeginPlay()
 	GoodsComp->SetGold(4000);
 }
 
-// Called every frame
 void AHG_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 
 	FTransform t = FTransform(GetControlRotation());
 	Direction = t.TransformVector(Direction);
@@ -105,7 +100,6 @@ void AHG_Player::Tick(float DeltaTime)
 		}
 		else
 		{
-			// ����Ʈ���̽��� ������ ���� �������� ��
 			if (!bIsStand)
 			{
 				DetectedStand = Cast<AHG_DisplayStandBase>(OutHit.GetActor());
@@ -126,25 +120,30 @@ void AHG_Player::Tick(float DeltaTime)
 			DetectedStand->Detected(false, this);
 			DetectedStand = nullptr;
 		}
+	} 
+
+	if (bDetectStand)
+	{
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 5.0f);
+	}
+	else                 
+	{
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 5.0f);
 	}
 }
 
-// Called to bind functionality to input
 void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 
-	// ������
 	input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AHG_Player::OnMyMove);
 	input->BindAction(IA_Jump, ETriggerEvent::Started, this, &AHG_Player::OnMyJump);
 	input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AHG_Player::OnMyLook);
 
-	// ��ȣ�ۿ�
 	input->BindAction(IA_Interaction, ETriggerEvent::Completed, this, &AHG_Player::OnMyInteraction);
 
-	// �κ��丮
 	input->BindAction(IA_Inventory, ETriggerEvent::Completed, this, &AHG_Player::PopUpInventory);
 
 }
@@ -193,7 +192,6 @@ void AHG_Player::DetectObject()
 	if (bHit)
 	{
 		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Yellow, false, 1.0f);
-		// ����Ʈ���̽��� ������ ���� Ʈ���� �ڽ��� ��
 		if (auto* STB = Cast<AHG_StoreTriggerBox>(OutHit.GetActor()))
 		{
 			STB->ByInteraction();

@@ -132,4 +132,13 @@ public:
 	bool bEquipItem = false;
 
 	TArray<AHG_EquipItem*> EquipItemList;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UTimelineComponent* Timeline;
+
+	bool bDetectStand = false;
+
+	float TargetValue1 = 200.0f;
+	float TargetValue2 = -50.0f;
+
 };

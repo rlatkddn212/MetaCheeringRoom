@@ -6,6 +6,9 @@
 #include "HG_ItemPurchaseWidget.h"
 #include "Components/WidgetComponent.h"
 #include "Components/BoxComponent.h"
+#include "HG_Player.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 AHG_DisplayStandBase::AHG_DisplayStandBase()
@@ -40,7 +43,6 @@ void AHG_DisplayStandBase::Tick(float DeltaTime)
 
 	if (DetectActor != nullptr)
 	{
-		// ������� ī�޶� ã��
 		FVector target = Cast<APlayerController>(DetectActor->Controller)->PlayerCameraManager->GetCameraLocation();
 		FVector dir = target - InteractionWidget->GetComponentLocation();
 		dir.Normalize();
@@ -48,6 +50,8 @@ void AHG_DisplayStandBase::Tick(float DeltaTime)
 		FRotator rot = dir.ToOrientationRotator();
 		InteractionWidget->SetWorldRotation(rot);
 	}
+
+
 }
 
 void AHG_DisplayStandBase::InitItemData()
@@ -81,4 +85,21 @@ void AHG_DisplayStandBase::Detected(bool Value, APawn* p_DetectActor)
 {
 	InteractionWidget->SetVisibility(Value);
 	DetectActor = p_DetectActor;
+	auto* Player = Cast<AHG_Player>(DetectActor);
+	if (Player)
+	{
+		if (Value)
+		{
+			Player->bDetectStand = true;
+			Player->CameraComp->SetRelativeRotation(FRotator(0.f,0.f,0.f));
+			Player->CameraComp->SetRelativeLocation(FVector(0.f,0.f,-20.0f));
+		}
+		else
+		{
+			Player->bDetectStand = false; 
+			Player->SpringArmComp->SetRelativeLocation(FVector(0.f,0.f,20.0f));
+			Player->CameraComp->SetRelativeRotation(FRotator(0.f, -20.f, 0.f));
+			Player->CameraComp->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+		}
+	}
 }
