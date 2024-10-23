@@ -141,4 +141,5 @@ public:
 	float TargetValue1 = 200.0f;
 	float TargetValue2 = -50.0f;
 
+	FVector LookingPoint;
 };

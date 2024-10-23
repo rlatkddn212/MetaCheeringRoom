@@ -90,7 +90,7 @@ void AHG_Player::Tick(float DeltaTime)
 	if (bHit)
 	{
 		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Green, false, 1.0f);
-
+		LookingPoint = OutHit.ImpactPoint;
 
 		if (LookAtActor != OutHit.GetActor() && bIsStand)
 		{
