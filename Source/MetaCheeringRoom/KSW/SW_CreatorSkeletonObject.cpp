@@ -13,7 +13,7 @@ ASW_CreatorSkeletonObject::ASW_CreatorSkeletonObject()
 	Mesh->SetupAttachment(Root);
 }
 
-void ASW_CreatorSkeletonObject::BeginPlay()
+void ASW_CreatorSkeletonObject::BeginPlay() 
 {
 	Super::BeginPlay();
 

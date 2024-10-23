@@ -73,6 +73,8 @@ void ASW_Creator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	input->BindAction(IA_LClick, ETriggerEvent::Started, this, &ASW_Creator::OnMyLClickStarted);
 	input->BindAction(IA_LClick, ETriggerEvent::Completed, this, &ASW_Creator::OnMyLClickCompleted);
+
+	input->BindAction(IA_Del, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyDelete);
 }
 
 void ASW_Creator::OnMyMove(const FInputActionValue& Value)
@@ -185,6 +187,14 @@ void ASW_Creator::OnMyLClickCompleted(const FInputActionValue& Value)
 	if (PC)
 	{
 		PC->DragEnd();
+	}
+}
+
+void ASW_Creator::OnMyDelete(const FInputActionValue& Value)
+{
+	if (PC)
+	{
+		PC->DeleteSelectedObject();
 	}
 }
 

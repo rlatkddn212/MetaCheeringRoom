@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "SW_CreatorHierarchyWidget.generated.h"
 
+// 전방선언
+class ASW_CreatorObject;
+
 /**
  * 
  */
@@ -17,7 +20,7 @@ public:
 	
 	virtual void NativeConstruct() override;
 	
-	void ReloadWidget(const TArray<TSharedPtr<struct FCreatorObject>>& InCreatorObjects, int32 depth);
+	void ReloadWidget(const TArray<ASW_CreatorObject*>& InCreatorObjects, int32 depth);
 	void ReloadItem();
 
 	UPROPERTY(EditDefaultsOnly)

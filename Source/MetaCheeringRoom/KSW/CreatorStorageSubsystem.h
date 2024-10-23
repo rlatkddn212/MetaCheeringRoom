@@ -17,7 +17,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* ItemIcon = nullptr;
-
+	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class ASW_CreatorObject> ItemClass;
 };

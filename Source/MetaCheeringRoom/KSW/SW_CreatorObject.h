@@ -35,6 +35,8 @@ public:
 
 	struct FCreatorObjectData* CreatingObjectData;
 
+	int32 CreatorItemId;
+
 	UPROPERTY()
 	class USceneComponent* Root;
 	

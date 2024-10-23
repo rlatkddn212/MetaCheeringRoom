@@ -144,18 +144,9 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 			{
 				UE_LOG(LogTemp, Log, TEXT("Clicked on Actor: %s"), *HitResult.GetActor()->GetName());
 				ASW_CreatorObject* Object = Cast<ASW_CreatorObject>(HitResult.GetActor());
-
 				if (Object)
 				{
-					if (SelectedObject)
-						SelectedObject->OnSelected(false);
-					Object->OnSelected(true);
-
-					SelectedObject = Object;
-					CreatorWidget->CreatorInspectorWidget->SetObject(SelectedObject);
-
-					if (SelectedObject)
-						SelectedObject->ChangeToolMode(ToolState);
+					DoSelectObject(Object);
 				}
 			}
 			else
@@ -184,16 +175,21 @@ void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData*
 	CreatingObject->SetActorRotation(FRotator::ZeroRotator);
 	CreatingObject->CreatingObjectData = ObjectData;
 
+	DoSelectObject(CreatingObject);
+	
+	CreatorWidget->OnDragged(true);
+}
+
+void ASW_CreatorPlayerController::DoSelectObject(class ASW_CreatorObject* NewSelectObject)
+{
 	if (SelectedObject)
 		SelectedObject->OnSelected(false);
-	CreatingObject->OnSelected(true);
-	SelectedObject = CreatingObject;
-	
+	NewSelectObject->OnSelected(true);
+	SelectedObject = NewSelectObject;
+
 	CreatorWidget->CreatorInspectorWidget->SetObject(SelectedObject);
 	if (SelectedObject)
 		SelectedObject->ChangeToolMode(ToolState);
-	
-	CreatorWidget->OnDragged(true);
 }
 
 bool ASW_CreatorPlayerController::DeleteDummyObject()
@@ -212,7 +208,7 @@ bool ASW_CreatorPlayerController::DeleteDummyObject()
 		if (CreatingObject)
 		{
 			UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-			system->AddObject(CreatingObject->CreatingObjectData->ItemName, CreatingObject->GetTransform());
+			system->AddObject(CreatingObject);
 			CreatorWidget->CreatorHierarchyWidget->ReloadItem();
 			OnObjectChanged();
 		}
@@ -299,6 +295,19 @@ void ASW_CreatorPlayerController::OnObjectChanged()
 	if (SelectedObject)
 	{
 		CreatorWidget->CreatorInspectorWidget->OnChanged();
+	}
+}
+
+void ASW_CreatorPlayerController::DeleteSelectedObject()
+{
+	if (SelectedObject)
+	{
+		CreatorWidget->CreatorInspectorWidget->SetObject(nullptr);
+		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+		system->RemoveObject(SelectedObject);
+
+		CreatingObject->Destroy();
+		CreatingObject = nullptr;
 	}
 }
 

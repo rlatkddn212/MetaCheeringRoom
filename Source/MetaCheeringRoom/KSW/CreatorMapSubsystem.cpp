@@ -8,11 +8,15 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonWriter.h"
+#include "SW_CreatorObject.h"
+#include "CreatorStorageSubsystem.h"
+#include "Engine/EngineTypes.h"
 
 void UCreatorMapSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	UE_LOG(LogTemp, Log, TEXT("CreatorMapSubSystem initialized"));
+    UniqueCreatorItemId = 1;
 }
 
 void UCreatorMapSubsystem::Deinitialize()
@@ -50,7 +54,7 @@ bool UCreatorMapSubsystem::LoadCreatorMapFromJson(const FString& FilePath)
 FString UCreatorMapSubsystem::SerializeCreatorMapToJson(const FCreatorMap& Map)
 {
     TArray<TSharedPtr<FJsonValue>> JsonRootArray;
-    for (const TSharedPtr<FCreatorObject> RootObject : Map.Objects)
+    for (const ASW_CreatorObject* RootObject : Map.Objects)
     {
         JsonRootArray.Add(MakeShareable(new FJsonValueObject(SerializeCreatorObject(RootObject))));
     }
@@ -93,45 +97,47 @@ FCreatorMap UCreatorMapSubsystem::DeserializeJsonToCreatorMap(const FString& Jso
     return RetCreatorMap;
 }
 
-TSharedPtr<FJsonObject> UCreatorMapSubsystem::SerializeCreatorObject(const TSharedPtr<FCreatorObject>& CreatorObject)
+TSharedPtr<FJsonObject> UCreatorMapSubsystem::SerializeCreatorObject(const ASW_CreatorObject* CreatorObject)
 {
     TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 
-    if (!CreatorObject.IsValid())
+    if (CreatorObject == nullptr)
     {
         UE_LOG(LogTemp, Warning, TEXT("Invalid CreatorObject provided."));
         return JsonObject;  // 빈 객체 반환
     }
-    // CreatorObject의 이름과 변환 정보를 JSON에 직렬화
-    JsonObject->SetStringField(TEXT("ObjectName"), CreatorObject->ObjectName);
 
+    // CreatorObject의 이름과 변환 정보를 JSON에 직렬화
+    JsonObject->SetStringField(TEXT("ObjectName"), CreatorObject->GetName());
+
+    FTransform transform = CreatorObject->GetTransform();
     // 변환 정보를 JSON 객체로 직렬화
-    JsonObject->SetNumberField(TEXT("TranslationX"), CreatorObject->ObjectTransform.GetLocation().X);
-    JsonObject->SetNumberField(TEXT("TranslationY"), CreatorObject->ObjectTransform.GetLocation().Y);
-    JsonObject->SetNumberField(TEXT("TranslationZ"), CreatorObject->ObjectTransform.GetLocation().Z);
+    JsonObject->SetNumberField(TEXT("TranslationX"), transform.GetLocation().X);
+    JsonObject->SetNumberField(TEXT("TranslationY"), transform.GetLocation().Y);
+    JsonObject->SetNumberField(TEXT("TranslationZ"), transform.GetLocation().Z);
 
     // Rotation (Quaternion)
-    JsonObject->SetNumberField(TEXT("RotationX"), CreatorObject->ObjectTransform.GetRotation().X);
-    JsonObject->SetNumberField(TEXT("RotationY"), CreatorObject->ObjectTransform.GetRotation().Y);
-    JsonObject->SetNumberField(TEXT("RotationZ"), CreatorObject->ObjectTransform.GetRotation().Z);
-    JsonObject->SetNumberField(TEXT("RotationW"), CreatorObject->ObjectTransform.GetRotation().W);
+    JsonObject->SetNumberField(TEXT("RotationX"), transform.GetRotation().X);
+    JsonObject->SetNumberField(TEXT("RotationY"), transform.GetRotation().Y);
+    JsonObject->SetNumberField(TEXT("RotationZ"), transform.GetRotation().Z);
+    JsonObject->SetNumberField(TEXT("RotationW"), transform.GetRotation().W);
 
     // Scale
-    JsonObject->SetNumberField(TEXT("ScaleX"), CreatorObject->ObjectTransform.GetScale3D().X);
-    JsonObject->SetNumberField(TEXT("ScaleY"), CreatorObject->ObjectTransform.GetScale3D().Y);
-    JsonObject->SetNumberField(TEXT("ScaleZ"), CreatorObject->ObjectTransform.GetScale3D().Z);
+    JsonObject->SetNumberField(TEXT("ScaleX"), transform.GetScale3D().X);
+    JsonObject->SetNumberField(TEXT("ScaleY"), transform.GetScale3D().Y);
+    JsonObject->SetNumberField(TEXT("ScaleZ"), transform.GetScale3D().Z);
     // 자식 객체 배열 직렬화
-    TArray<TSharedPtr<FJsonValue>> JsonChildren;
-    for (const TSharedPtr<FCreatorObject>& Child : CreatorObject->Objects)
+   /* TArray<TSharedPtr<FJsonValue>> JsonChildren;
+    for (const ASW_CreatorObject* Child : CreatorObject->GetAllChildActors())
     {
         JsonChildren.Add(MakeShareable(new FJsonValueObject(SerializeCreatorObject(Child))));
     }
-    JsonObject->SetArrayField(TEXT("Objects"), JsonChildren);
+    JsonObject->SetArrayField(TEXT("Objects"), JsonChildren);*/
 
     return JsonObject;
 }
 
-TSharedPtr<FCreatorObject> UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedPtr<FJsonObject>& JsonObject)
+ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedPtr<FJsonObject>& JsonObject)
 {
     if (!JsonObject.IsValid())
     {
@@ -140,10 +146,10 @@ TSharedPtr<FCreatorObject> UCreatorMapSubsystem::DeserializeCreatorObject(const 
     }
 
     // CreatorObject를 생성
-    TSharedPtr<FCreatorObject> CreatorObject = MakeShareable(new FCreatorObject);
+    //ASW_CreatorObject* CreatorObject;
 
     // JSON에서 이름과 변환 정보를 가져오기
-    CreatorObject->ObjectName = JsonObject->GetStringField(TEXT("ObjectName"));
+    // CreatorObject->SetName = JsonObject->GetStringField(TEXT("ObjectName"));
 
     // 변환 정보 역직렬화
     FVector Translation(
@@ -165,7 +171,7 @@ TSharedPtr<FCreatorObject> UCreatorMapSubsystem::DeserializeCreatorObject(const 
         JsonObject->GetNumberField(TEXT("ScaleZ"))
     );
 
-    CreatorObject->ObjectTransform = FTransform(Rotation, Translation, Scale);
+    FTransform transform = FTransform(Rotation, Translation, Scale);
 
     // 자식 객체 배열 역직렬화
     const TArray<TSharedPtr<FJsonValue>>* JsonChildren;
@@ -173,38 +179,38 @@ TSharedPtr<FCreatorObject> UCreatorMapSubsystem::DeserializeCreatorObject(const 
     {
         for (const TSharedPtr<FJsonValue>& JsonValue : *JsonChildren)
         {
-            CreatorObject->Objects.Add(DeserializeCreatorObject(JsonValue->AsObject()));
+            //CreatorObject->Objects.Add(DeserializeCreatorObject(JsonValue->AsObject()));
         }
     }
 
-    return CreatorObject;
+    return nullptr;
 }
 
-TSharedPtr<FCreatorObject> UCreatorMapSubsystem::AddObject(const FString& ObjectName, const FTransform& ObjectTransform, TSharedPtr<FCreatorObject> ParentObject /*= nullptr*/)
+void UCreatorMapSubsystem::AddObject(ASW_CreatorObject* CreatingObject, ASW_CreatorObject* ParentObject /*= nullptr*/)
 {
-	TSharedPtr<FCreatorObject> NewObject = MakeShareable(new FCreatorObject);
-	NewObject->ObjectName = ObjectName;
-	NewObject->ObjectTransform = ObjectTransform;
+    int32 CreatorItemId = UniqueCreatorItemId++;
+    CreatingObject->CreatorItemId = CreatorItemId;
+    CreatorItemMap.Add(CreatorItemId, CreatingObject);
 
-	if (ParentObject.IsValid())
+	if (ParentObject != nullptr)
 	{
-		ParentObject->Objects.Add(NewObject);
+        // 부모 액터에 추가
+        CreatingObject->AttachToActor(ParentObject, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 	else
 	{
-		CreatorMap.Objects.Add(NewObject);
+		CreatorMap.Objects.Add(CreatingObject);
 	}
-
-	return NewObject;
 }
 
-void UCreatorMapSubsystem::RemoveObject(TSharedPtr<FCreatorObject> Object)
+void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object)
 {
-	if (Object.IsValid())
+	if (Object != nullptr)
 	{
 		if (CreatorMap.Objects.Contains(Object))
 		{
 			CreatorMap.Objects.Remove(Object);
+            CreatorItemMap.Remove(Object->CreatorItemId);
 		}
 		else
 		{
@@ -213,38 +219,38 @@ void UCreatorMapSubsystem::RemoveObject(TSharedPtr<FCreatorObject> Object)
 	}
 }
 
-void UCreatorMapSubsystem::MoveObject(TSharedPtr<FCreatorObject> Object, const FVector& NewLocation)
+void UCreatorMapSubsystem::MoveObject(ASW_CreatorObject* Object, const FVector& NewLocation)
 {
 
 }
 
-void UCreatorMapSubsystem::RotateObject(TSharedPtr<FCreatorObject> Object, const FRotator& NewRotation)
+void UCreatorMapSubsystem::RotateObject(ASW_CreatorObject* Object, const FRotator& NewRotation)
 {
 
 }
 
-void UCreatorMapSubsystem::ScaleObject(TSharedPtr<FCreatorObject> Object, const FVector& NewScale)
+void UCreatorMapSubsystem::ScaleObject(ASW_CreatorObject* Object, const FVector& NewScale)
 {
 
 }
 
-void UCreatorMapSubsystem::RenameObject(TSharedPtr<FCreatorObject> Object, const FString& NewName)
+void UCreatorMapSubsystem::RenameObject(ASW_CreatorObject* Object, const FString& NewName)
 {
 
 }
 
-void UCreatorMapSubsystem::AddChildObject(TSharedPtr<FCreatorObject> ParentObject, TSharedPtr<FCreatorObject> ChildObject)
+void UCreatorMapSubsystem::AddChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
 {
     
 }
 
-void UCreatorMapSubsystem::RemoveChildObject(TSharedPtr<FCreatorObject> ParentObject, TSharedPtr<FCreatorObject> ChildObject)
+void UCreatorMapSubsystem::RemoveChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
 {
 
 
 }
 
-TSharedPtr<FCreatorObject> UCreatorMapSubsystem::FindObject(const FString& ObjectName)
+ASW_CreatorObject* UCreatorMapSubsystem::FindObject(const FString& ObjectName)
 {
 	// 재귀적으로 돌면서 찾는다.
     
@@ -252,21 +258,9 @@ TSharedPtr<FCreatorObject> UCreatorMapSubsystem::FindObject(const FString& Objec
 }
 
 
-TSharedPtr<FCreatorObject> UCreatorMapSubsystem::FindParentObject(TSharedPtr<FCreatorObject> ChildObject)
+ASW_CreatorObject* UCreatorMapSubsystem::FindParentObject(ASW_CreatorObject* ChildObject)
 {
     // 재귀적으로 돌면서 부모를 찾는다.
 
 	return nullptr;
-}
-
-
-// 구조체 함수
-void FCreatorObject::RemoveObject(TSharedPtr<FCreatorObject> Object)
-{
-    
-}
-
-void FCreatorMap::RemoveObject(TSharedPtr<FCreatorObject> Object)
-{
-
 }

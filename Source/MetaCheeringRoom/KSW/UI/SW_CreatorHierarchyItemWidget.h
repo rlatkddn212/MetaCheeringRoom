@@ -16,21 +16,7 @@ class METACHEERINGROOM_API USW_CreatorHierarchyItemWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 
-	void SetItem(const TSharedPtr<struct FCreatorObject>& InCreatorObject, int32 depth);
-
-	TSharedPtr<struct FCreatorObject> CreatorObject;
-
-	// spacer
-	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
-	class USpacer* HierarchySpacer;
-
-	// 이미지
-	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
-	class UImage* IconImage;
-
-	// 텍스트
-	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* NameText;
+	void SetItem(class ASW_CreatorObject* CreatorObject, int32 depth);
 
 	virtual void NativeConstruct() override;
 
@@ -48,7 +34,28 @@ public:
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
 
-	
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class UButton* HierarchyItemButton;
+
+	// spacer
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class USpacer* HierarchySpacer;
+
+	// 이미지
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class UImage* IconImage;
+
+	// 텍스트
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class UTextBlock* NameText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ButtonStyle")
+	FButtonStyle DefaultButtonStyle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ButtonStyle")
+	FButtonStyle ClickedButtonStyle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ButtonStyle")
+	FButtonStyle HoveredButtonStyle;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class USW_HierarchyDragOperation> DragOperationFactory;
 
@@ -57,4 +64,5 @@ public:
 
 	bool bIsDragging = false;
 	class ASW_CreatorPlayerController* PC;
+	class ASW_CreatorObject* HierarchyCreatorObject;
 };

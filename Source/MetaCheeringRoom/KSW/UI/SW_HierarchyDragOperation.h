@@ -18,5 +18,5 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FString ItemName;
 
-	TSharedPtr<struct FCreatorObject> CreatorObject;
+	class ASW_CreatorObject* CreatorObject;
 };

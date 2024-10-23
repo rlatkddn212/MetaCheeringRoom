@@ -62,6 +62,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_LClick;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Del;
+
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
 	UFUNCTION()
@@ -90,6 +93,9 @@ public:
 	UFUNCTION()
 	void OnMyLClickCompleted(const FInputActionValue& Value);
 	
+	UFUNCTION()
+	void OnMyDelete(const FInputActionValue& Value);
+
 	FVector Direction;
 
 	ECreatorMouseState MouseState;

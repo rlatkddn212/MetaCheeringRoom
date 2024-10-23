@@ -6,6 +6,7 @@
 #include "SW_CreatorObjectSlotWidget.h"
 #include "SW_CreatorHierarchyItemWidget.h"
 #include "Components/ScrollBox.h"
+#include "../SW_CreatorObject.h"
 
 
 void USW_CreatorHierarchyWidget::NativeConstruct()
@@ -41,7 +42,7 @@ void USW_CreatorHierarchyWidget::ReloadItem()
 	ReloadWidget(CMap.Objects, 0);
 }
 
-void USW_CreatorHierarchyWidget::ReloadWidget(const TArray<TSharedPtr<FCreatorObject>>& InCreatorObjects, int32 depth)
+void USW_CreatorHierarchyWidget::ReloadWidget(const TArray<ASW_CreatorObject*>& InCreatorObjects, int32 depth)
 {
 	for (int i = 0; i < InCreatorObjects.Num(); i++)
 	{
@@ -50,7 +51,19 @@ void USW_CreatorHierarchyWidget::ReloadWidget(const TArray<TSharedPtr<FCreatorOb
 		ObjectScrollBox->AddChild(ChildWidget);
 
 		SlotWidgets.Add(ChildWidget);
+		TArray<AActor*> ChildActors;
+		InCreatorObjects[i]->GetAllChildActors(ChildActors);
+		TArray<ASW_CreatorObject*> ChildCreatorObject;
 
-		ReloadWidget(InCreatorObjects[i]->Objects, depth + 1);
+		for (int j = 0; j < ChildActors.Num(); j++)
+		{
+			ASW_CreatorObject* CreatorObject = Cast<ASW_CreatorObject>(ChildActors[j]);
+			if (CreatorObject)
+			{
+				ChildCreatorObject.Add(CreatorObject);
+			}
+		}
+
+		ReloadWidget(ChildCreatorObject, depth + 1);
 	}
 }

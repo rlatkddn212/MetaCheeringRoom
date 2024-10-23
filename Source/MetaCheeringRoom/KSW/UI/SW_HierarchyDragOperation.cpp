@@ -3,3 +3,4 @@
 
 #include "KSW/UI/SW_HierarchyDragOperation.h"
 
+#include "../SW_CreatorObject.h"

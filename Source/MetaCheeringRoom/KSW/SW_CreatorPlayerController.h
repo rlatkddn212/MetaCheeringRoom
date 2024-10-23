@@ -35,6 +35,8 @@ public:
 
 	void CreatingDummyObject(struct FCreatorObjectData* ObjectData);
 	// 지워지지 않는경우
+
+	void DoSelectObject(class ASW_CreatorObject* NewSelectObject);
 	
 	UFUNCTION()
 	bool DeleteDummyObject();
@@ -63,4 +65,5 @@ public:
 	void DragEnd();
 
 	void OnObjectChanged();
+	void DeleteSelectedObject();
 };

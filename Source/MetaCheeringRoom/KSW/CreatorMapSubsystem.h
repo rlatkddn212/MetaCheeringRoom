@@ -7,20 +7,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "CreatorMapSubsystem.generated.h"
 
-USTRUCT(BlueprintType)
-struct FCreatorObject
-{
-	GENERATED_BODY() 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Creator")
-	FString ObjectName; 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Creator")
-	FTransform ObjectTransform;
-	
-    TArray<TSharedPtr<FCreatorObject>> Objects;
-
-	// delete
-	void RemoveObject(TSharedPtr<FCreatorObject> Object);
-};
+class ASW_CreatorObject;
 
 //struct
 USTRUCT(BlueprintType)
@@ -28,16 +15,16 @@ struct FCreatorMap
 {
 	GENERATED_BODY()
 
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString MapName;
-
-	TArray<TSharedPtr<FCreatorObject>> Objects;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<ASW_CreatorObject*> Objects;
 
 	FCreatorMap() : MapName(TEXT("New Map")) {}
 
 	// delete
-	void RemoveObject(TSharedPtr<FCreatorObject> Object);
+	// void RemoveObject(ASW_CreatorObject* Object);
 };
 
 /**
@@ -62,42 +49,43 @@ public:
 	FCreatorMap DeserializeJsonToCreatorMap(const FString& JsonString);
 
 	/** JSON 직렬화/역직렬화 헬퍼 함수 */
-	TSharedPtr<FJsonObject> SerializeCreatorObject(const TSharedPtr<FCreatorObject>& CreatorObject);
-	TSharedPtr<FCreatorObject> DeserializeCreatorObject(const TSharedPtr<FJsonObject>& JsonObject);
+	TSharedPtr<FJsonObject> SerializeCreatorObject(const ASW_CreatorObject* CreatorObject);
+	ASW_CreatorObject* DeserializeCreatorObject(const TSharedPtr<FJsonObject>& JsonObject);
 
 	FCreatorMap CreatorMap;
 
-	// 크리에이터 툴 기능
-
 	// 새로운 오브젝트 추가
-	TSharedPtr<FCreatorObject> AddObject(const FString& ObjectName, const FTransform& ObjectTransform, TSharedPtr<FCreatorObject> ParentObject = nullptr);
+	void AddObject(ASW_CreatorObject* CreatingObject, ASW_CreatorObject* ParentObject = nullptr);
 
 	// 오브젝트 삭제
-	void RemoveObject(TSharedPtr<FCreatorObject> Object);
+	void RemoveObject(ASW_CreatorObject* Object);
 
 	// 오브젝트 이동
-	void MoveObject(TSharedPtr<FCreatorObject> Object, const FVector& NewLocation);
+	void MoveObject(ASW_CreatorObject* Object, const FVector& NewLocation);
 	
 	// 회전
-	void RotateObject(TSharedPtr<FCreatorObject> Object, const FRotator& NewRotation);
+	void RotateObject(ASW_CreatorObject* Object, const FRotator& NewRotation);
 
 	// 스케일
-	void ScaleObject(TSharedPtr<FCreatorObject> Object, const FVector& NewScale);
+	void ScaleObject(ASW_CreatorObject* Object, const FVector& NewScale);
 
 	// 오브젝트 이름 변경
-	void RenameObject(TSharedPtr<FCreatorObject> Object, const FString& NewName);
+	void RenameObject(ASW_CreatorObject* Object, const FString& NewName);
 
 	// 오브젝트 추가
-	void AddChildObject(TSharedPtr<FCreatorObject> ParentObject, TSharedPtr<FCreatorObject> ChildObject);
+	void AddChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
 
 	// 오브젝트 제거
-	void RemoveChildObject(TSharedPtr<FCreatorObject> ParentObject, TSharedPtr<FCreatorObject> ChildObject);
+	void RemoveChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
 
 	// 오브젝트 찾기
-	TSharedPtr<FCreatorObject> FindObject(const FString& ObjectName);
+	ASW_CreatorObject* FindObject(const FString& ObjectName);
 
 	// 부모찾기
-	TSharedPtr<FCreatorObject> FindParentObject(TSharedPtr<FCreatorObject> ChildObject);
+	ASW_CreatorObject* FindParentObject(ASW_CreatorObject* ChildObject);
 
-
+	UPROPERTY()
+	TMap<int32, ASW_CreatorObject*> CreatorItemMap;
+	
+	int32 UniqueCreatorItemId;
 };
