@@ -14,4 +14,9 @@ class METACHEERINGROOM_API USW_DragHierarchyItemWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UImage* HierarchyItemImage;
+
+
 };

@@ -104,7 +104,7 @@ void UCreatorPositionGizmoComponent::SetAxisSelected(bool isX, bool isY, bool is
 
 void UCreatorPositionGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D MousePosition)
 {
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (IsXAxisSelected)
 	{
 		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
@@ -112,6 +112,7 @@ void UCreatorPositionGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 
 		FVector Delta = ClosestPoint - CurrentPosition;
 		Me->SetActorLocation(GizmoStartLocation + Delta);
+		PC->OnObjectChanged();
 	}
 
 	if (IsYAxisSelected)
@@ -121,6 +122,7 @@ void UCreatorPositionGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 
 		FVector Delta = ClosestPoint - CurrentPosition;
 		Me->SetActorLocation(GizmoStartLocation + Delta);
+		PC->OnObjectChanged();
 	}
 
 	if (IsZAxisSelected)
@@ -130,6 +132,7 @@ void UCreatorPositionGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 
 		FVector Delta = ClosestPoint - CurrentPosition;
 		Me->SetActorLocation(GizmoStartLocation + Delta);
+		PC->OnObjectChanged();
 	}
 }
 
