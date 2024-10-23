@@ -165,15 +165,8 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 
 void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData* ObjectData)
 {
-	
-	FActorSpawnParameters SpawnParams;
-	//SpawnParams.Owner = this;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	CreatingObject = GetWorld()->SpawnActor<ASW_CreatorObject>(ObjectData->ItemClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-	CreatingObject->SetActorLocation(FVector::ZeroVector);
-	CreatingObject->SetActorRotation(FRotator::ZeroRotator);
-	CreatingObject->CreatingObjectData = ObjectData;
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	CreatingObject = system->CreateObject(ObjectData);
 
 	DoSelectObject(CreatingObject);
 	
@@ -209,8 +202,9 @@ bool ASW_CreatorPlayerController::DeleteDummyObject()
 		{
 			UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 			system->AddObject(CreatingObject);
-			CreatorWidget->CreatorHierarchyWidget->ReloadItem();
+			ReloadHierarchy();
 			OnObjectChanged();
+			DoSelectObject(CreatingObject);
 		}
 	}
 
@@ -304,12 +298,15 @@ void ASW_CreatorPlayerController::DeleteSelectedObject()
 	{
 		CreatorWidget->CreatorInspectorWidget->SetObject(nullptr);
 		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-		system->RemoveObject(SelectedObject);
-
-		SelectedObject->Destroy();
+		system->RemoveObject(SelectedObject, true);
 		SelectedObject = nullptr;
 
-		CreatorWidget->CreatorHierarchyWidget->ReloadItem();
+		ReloadHierarchy();
 	}
+}
+
+void ASW_CreatorPlayerController::ReloadHierarchy()
+{
+	CreatorWidget->CreatorHierarchyWidget->ReloadItem();
 }
 

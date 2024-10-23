@@ -67,4 +67,6 @@ public:
 
 	void OnObjectChanged();
 	void DeleteSelectedObject();
+
+	void ReloadHierarchy();
 };

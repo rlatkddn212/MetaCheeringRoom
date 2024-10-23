@@ -35,13 +35,20 @@ void USW_CreatorHierarchyItemWidget::SetItem(ASW_CreatorObject* CreatorObject, i
 	}
 
 	OnHierarchyItemClicked.BindDynamic(PC, &ASW_CreatorPlayerController::DoSelectObject);
-
 	HierarchyCreatorObject->OnChangeSelected.BindDynamic(this, &USW_CreatorHierarchyItemWidget::OnSelected);
 	
+	if (PC->SelectedObject == HierarchyCreatorObject)
+	{
+		HierarchyItemButton->SetStyle(ClickedButtonStyle);
+	}
+	else
+	{
+		HierarchyItemButton->SetStyle(DefaultButtonStyle);
+	}
+
 	// InCreatorObject->ObjectName;
 	NameText->SetText(FText::FromString(HierarchyCreatorObject->GetName()));
 }
-
 
 void USW_CreatorHierarchyItemWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent, UDragDropOperation*& OutOperation)
 {
@@ -67,13 +74,17 @@ FReply USW_CreatorHierarchyItemWidget::NativeOnPreviewMouseButtonDown(const FGeo
 	if (OnHierarchyItemClicked.IsBound())
 		OnHierarchyItemClicked.Execute(HierarchyCreatorObject);
 
+	bIsDragging = true;
 	return ret.NativeReply;
 }
 
 void USW_CreatorHierarchyItemWidget::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
-	HierarchyItemButton->SetStyle(DefaultButtonStyle);
+
+	if (!bIsDragging)
+		HierarchyItemButton->SetStyle(DefaultButtonStyle);
+	bIsDragging = false;
 }
 
 void USW_CreatorHierarchyItemWidget::NativeOnDragEnter(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -81,15 +92,35 @@ void USW_CreatorHierarchyItemWidget::NativeOnDragEnter(const FGeometry& InGeomet
 	Super::NativeOnDragEnter(InGeometry, InDragDropEvent, InOperation);
 
 	// 호버스타일로 변경한다.
-	HierarchyItemButton->SetStyle(HoveredButtonStyle);
+	if (!bIsDragging)
+		HierarchyItemButton->SetStyle(HoveredButtonStyle);
 
+	// 자기 자신인지 검사
+	USW_HierarchyDragOperation* dragOperation = Cast<USW_HierarchyDragOperation>(InOperation);
+	if (dragOperation)
+	{
+		if (dragOperation->CreatorObject == HierarchyCreatorObject)
+		{
+			dragOperation->bSameObject = true;
+		}	
+	}
 }
 
 void USW_CreatorHierarchyItemWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
+	if (!bIsDragging)
+		HierarchyItemButton->SetStyle(DefaultButtonStyle);
 
-	HierarchyItemButton->SetStyle(DefaultButtonStyle);
+	// 자기 자신인지 검사
+	USW_HierarchyDragOperation* dragOperation = Cast<USW_HierarchyDragOperation>(InOperation);
+	if (dragOperation)
+	{
+		if (dragOperation->CreatorObject == HierarchyCreatorObject)
+		{
+			dragOperation->bSameObject = false;
+		}
+	}
 }
 
 bool USW_CreatorHierarchyItemWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -97,23 +128,24 @@ bool USW_CreatorHierarchyItemWidget::NativeOnDrop(const FGeometry& InGeometry, c
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
 	USW_HierarchyDragOperation* dragOperation = Cast<USW_HierarchyDragOperation>(InOperation);
-	HierarchyItemButton->SetStyle(DefaultButtonStyle);
+	if (!bIsDragging)
+		HierarchyItemButton->SetStyle(DefaultButtonStyle);
+
+	bIsDragging = false;
 	if (dragOperation)
 	{
 		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 		const FCreatorMap& CMap = system->GetCreatorMap();
+		if (system->IsChildObject(dragOperation->CreatorObject, HierarchyCreatorObject))
+		{
+			return false;
+		}
 
 		ASW_CreatorObject* PrevParent = system->FindParentObject(dragOperation->CreatorObject);
-		if (PrevParent)
-		{
-			system->RemoveChildObject(PrevParent, dragOperation->CreatorObject);
-		}
-		else
-		{
-			system->RemoveObject(dragOperation->CreatorObject);
-		}
+		system->DetechObject(PrevParent, dragOperation->CreatorObject);
 
-		system->AddChildObject(HierarchyCreatorObject, dragOperation->CreatorObject);
+		system->AttachObject(HierarchyCreatorObject, dragOperation->CreatorObject);
+		PC->ReloadHierarchy();
 	}
 
 	return true;

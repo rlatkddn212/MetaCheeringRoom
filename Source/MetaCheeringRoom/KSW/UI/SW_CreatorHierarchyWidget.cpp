@@ -7,6 +7,8 @@
 #include "SW_CreatorHierarchyItemWidget.h"
 #include "Components/ScrollBox.h"
 #include "../SW_CreatorObject.h"
+#include "Components/Widget.h"
+#include "SW_HierarchyDragOperation.h"
 
 
 void USW_CreatorHierarchyWidget::NativeConstruct()
@@ -42,6 +44,29 @@ void USW_CreatorHierarchyWidget::ReloadItem()
 	ReloadWidget(CMap.Objects, 0);
 }
 
+bool USW_CreatorHierarchyWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+
+	USW_HierarchyDragOperation* dragOperation = Cast<USW_HierarchyDragOperation>(InOperation);
+	if (dragOperation)
+	{
+		if (dragOperation->bSameObject)
+			return true;
+		
+		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+		ASW_CreatorObject* PrevParent = system->FindParentObject(dragOperation->CreatorObject);
+		system->DetechObject(PrevParent, dragOperation->CreatorObject);
+		system->AttachObject(nullptr, dragOperation->CreatorObject);
+
+		ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PC) 
+			PC->ReloadHierarchy();
+	}
+
+	return true;
+}
+
 void USW_CreatorHierarchyWidget::ReloadWidget(const TArray<ASW_CreatorObject*>& InCreatorObjects, int32 depth)
 {
 	for (int i = 0; i < InCreatorObjects.Num(); i++)
@@ -52,7 +77,7 @@ void USW_CreatorHierarchyWidget::ReloadWidget(const TArray<ASW_CreatorObject*>& 
 
 		SlotWidgets.Add(ChildWidget);
 		TArray<AActor*> ChildActors;
-		InCreatorObjects[i]->GetAllChildActors(ChildActors);
+		InCreatorObjects[i]->GetAttachedActors(ChildActors);
 		TArray<ASW_CreatorObject*> ChildCreatorObject;
 
 		for (int j = 0; j < ChildActors.Num(); j++)

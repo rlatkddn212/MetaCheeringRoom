@@ -34,7 +34,10 @@ UCLASS()
 class METACHEERINGROOM_API UCreatorMapSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
-	
+
+private:
+	void RemoveObjectRecursive(ASW_CreatorObject* Object);
+
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
@@ -54,35 +57,24 @@ public:
 
 	FCreatorMap CreatorMap;
 
-	// 새로운 오브젝트 추가
+	// 새로운 오브젝트 생성
+	ASW_CreatorObject* CreateObject(struct FCreatorObjectData* ObjectData);
+
+	// 실제 월드에 추가한다. (UI에서 끌어서 임시로 생성하는 경우가 있어서 World에 추가하는 함수를 따로 만듦)
 	void AddObject(ASW_CreatorObject* CreatingObject, ASW_CreatorObject* ParentObject = nullptr);
 
-	// 오브젝트 삭제
-	void RemoveObject(ASW_CreatorObject* Object);
-
-	// 오브젝트 이동
-	void MoveObject(ASW_CreatorObject* Object, const FVector& NewLocation);
-	
-	// 회전
-	void RotateObject(ASW_CreatorObject* Object, const FRotator& NewRotation);
-
-	// 스케일
-	void ScaleObject(ASW_CreatorObject* Object, const FVector& NewScale);
-
-	// 오브젝트 이름 변경
-	void RenameObject(ASW_CreatorObject* Object, const FString& NewName);
+	// 오브젝트 삭제 재귀적으로
+	void RemoveObject(ASW_CreatorObject* Object, bool isRecursive = false);
 
 	// 오브젝트 추가
-	void AddChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
+	void AttachObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
 
-	// 오브젝트 제거
-	void RemoveChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
-
-	// 오브젝트 찾기
-	ASW_CreatorObject* FindObject(const FString& ObjectName);
+	void DetechObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
 
 	// 부모찾기
 	ASW_CreatorObject* FindParentObject(ASW_CreatorObject* ChildObject);
+
+	bool IsChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
 
 	UPROPERTY()
 	TMap<int32, ASW_CreatorObject*> CreatorItemMap;

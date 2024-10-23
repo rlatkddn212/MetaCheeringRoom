@@ -186,6 +186,21 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
     return nullptr;
 }
 
+ASW_CreatorObject* UCreatorMapSubsystem::CreateObject(FCreatorObjectData* ObjectData)
+{
+    FActorSpawnParameters SpawnParams;
+    //SpawnParams.Owner = this;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+    ASW_CreatorObject* CreatingObject = GetWorld()->SpawnActor<ASW_CreatorObject>(ObjectData->ItemClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+    CreatingObject->SetActorLocation(FVector::ZeroVector);
+    CreatingObject->SetActorRotation(FRotator::ZeroRotator);
+    CreatingObject->CreatingObjectData = ObjectData;
+
+	return CreatingObject;
+
+}
+
 void UCreatorMapSubsystem::AddObject(ASW_CreatorObject* CreatingObject, ASW_CreatorObject* ParentObject /*= nullptr*/)
 {
     int32 CreatorItemId = UniqueCreatorItemId++;
@@ -203,64 +218,106 @@ void UCreatorMapSubsystem::AddObject(ASW_CreatorObject* CreatingObject, ASW_Crea
 	}
 }
 
-void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object)
+void UCreatorMapSubsystem::RemoveObjectRecursive(ASW_CreatorObject* Object)
 {
 	if (Object != nullptr)
 	{
-		if (CreatorMap.Objects.Contains(Object))
+		TArray<AActor*> AttachedActors;
+		Object->GetAttachedActors(AttachedActors);
+		for (AActor* AttachedActor : AttachedActors)
 		{
-			CreatorMap.Objects.Remove(Object);
-            CreatorItemMap.Remove(Object->CreatorItemId);
+			ASW_CreatorObject* AttachedCreatorObject = Cast<ASW_CreatorObject>(AttachedActor);
+			if (AttachedCreatorObject != nullptr)
+			{
+				RemoveObjectRecursive(AttachedCreatorObject);
+			}
 		}
-		else
-		{
-			// 재귀적으로 돌면서 부모를 찾아서 삭제한다.
-		}
+
+		CreatorItemMap.Remove(Object->CreatorItemId);
+		Object->Destroy();
 	}
 }
 
-void UCreatorMapSubsystem::MoveObject(ASW_CreatorObject* Object, const FVector& NewLocation)
+void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecursive /*= false*/)
 {
+	if (Object != nullptr)
+	{
+        if (CreatorMap.Objects.Contains(Object))
+        {
+            CreatorMap.Objects.Remove(Object);
+        }
 
+		if (isRecursive)
+		{
+			TArray<AActor*> AttachedActors;
+			Object->GetAttachedActors(AttachedActors);
+			for (AActor* AttachedActor : AttachedActors)
+			{
+				ASW_CreatorObject* AttachedCreatorObject = Cast<ASW_CreatorObject>(AttachedActor);
+				if (AttachedCreatorObject != nullptr)
+				{
+                    RemoveObjectRecursive(AttachedCreatorObject);
+				}
+			}
+		}
+
+		CreatorItemMap.Remove(Object->CreatorItemId);
+		Object->Destroy();
+	}
 }
 
-void UCreatorMapSubsystem::RotateObject(ASW_CreatorObject* Object, const FRotator& NewRotation)
+void UCreatorMapSubsystem::AttachObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
 {
-
+	if (ParentObject == nullptr)
+	{
+		CreatorMap.Objects.Add(ChildObject);
+	}
+	else
+	{
+		ChildObject->AttachToActor(ParentObject, FAttachmentTransformRules::KeepWorldTransform);
+	}
 }
 
-void UCreatorMapSubsystem::ScaleObject(ASW_CreatorObject* Object, const FVector& NewScale)
+void UCreatorMapSubsystem::DetechObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
 {
-
+	if (ParentObject == nullptr)
+	{
+        if (CreatorMap.Objects.Contains(ChildObject))
+        {
+            CreatorMap.Objects.Remove(ChildObject);
+        }
+	}
+    else
+    {
+	    ChildObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+    }
 }
-
-void UCreatorMapSubsystem::RenameObject(ASW_CreatorObject* Object, const FString& NewName)
-{
-
-}
-
-void UCreatorMapSubsystem::AddChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
-{
-    ChildObject->AttachToActor(ParentObject, FAttachmentTransformRules::KeepRelativeTransform);
-}
-
-void UCreatorMapSubsystem::RemoveChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
-{
-
-
-}
-
-ASW_CreatorObject* UCreatorMapSubsystem::FindObject(const FString& ObjectName)
-{
-	// 재귀적으로 돌면서 찾는다.
-    
-	return nullptr;
-}
-
 
 ASW_CreatorObject* UCreatorMapSubsystem::FindParentObject(ASW_CreatorObject* ChildObject)
 {
-    // 재귀적으로 돌면서 부모를 찾는다.
+	return Cast<ASW_CreatorObject>(ChildObject->GetAttachParentActor());
+}
 
-	return nullptr;
+bool UCreatorMapSubsystem::IsChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
+{
+	if (ParentObject == ChildObject)
+	{
+		return true;
+	}
+
+    TArray<AActor*> AttachedActors;
+    ParentObject->GetAttachedActors(AttachedActors);
+    for (AActor* AttachedActor : AttachedActors)
+	{
+		ASW_CreatorObject* AttachedCreatorObject = Cast<ASW_CreatorObject>(AttachedActor);
+		if (AttachedCreatorObject != nullptr)
+		{
+			if (IsChildObject(AttachedCreatorObject, ChildObject))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }

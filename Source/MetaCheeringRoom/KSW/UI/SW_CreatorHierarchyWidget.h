@@ -23,6 +23,8 @@ public:
 	void ReloadWidget(const TArray<ASW_CreatorObject*>& InCreatorObjects, int32 depth);
 	void ReloadItem();
 
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class USW_CreatorHierarchyItemWidget> SlotFactory;
 
