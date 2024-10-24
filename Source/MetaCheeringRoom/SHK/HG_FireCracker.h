@@ -22,7 +22,10 @@ public:
 	virtual void Use() override;
 
 	UFUNCTION(Server,Reliable)
-	void ServerRPCUse();
+	void ServerRPCUse();	 
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPCUse(APawn* pawn);
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
