@@ -16,6 +16,7 @@
 #include "HG_EquipItem.h"
 #include "GameFramework/PlayerController.h"
 #include "Net/UnrealNetwork.h"
+#include "HG_GameInstance.h"
 
 AHG_Player::AHG_Player()
 {
@@ -59,6 +60,8 @@ void AHG_Player::BeginPlay()
 {
 	Super::BeginPlay();
 	DetectedStand = nullptr;
+	
+	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 
 	auto* pc = Cast<APlayerController>(Controller);
 	if (pc)
@@ -67,13 +70,18 @@ void AHG_Player::BeginPlay()
 		if (subSys)
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
-		}
+		}	
+		pc->SetShowMouseCursor(false);
+		pc->SetInputMode(FInputModeGameOnly());
 	}
-	
-	pc->SetShowMouseCursor(false);
-	pc->SetInputMode(FInputModeGameOnly());
+	InitEquipItemList = GI->EquipItemInfoList;
+	for (auto ID : InitEquipItemList)
+	{
+		EquipItemToSocket(ID);
+	}
 
-	GoodsComp->SetGold(4000);
+	InventoryComp->Inventory = GI->CurrentInventory;
+	GoodsComp->SetGold(GI->CurrentGold);
 }
 
 void AHG_Player::Tick(float DeltaTime)
@@ -296,6 +304,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 {
 	if (ItemValue == nullptr) return;
 	EquipItemList.Add(ItemValue);
+	GI->EquipItemInfoList.Add(ItemValue->GetItemData());
 	auto* mesh = ItemValue->GetComponentByClass<UStaticMeshComponent>();
 	check(mesh);
 	if (mesh)
@@ -343,8 +352,9 @@ void AHG_Player::UnequipItem(const FString& NameValue)
 				mesh->SetSimulatePhysics(true);
 				mesh->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 			}
-			item->Destroy();
+			GI->EquipItemInfoList.Remove(item->GetItemData());
 			EquipItemList.Remove(item);
+			item->Destroy();
 		}
 	}
 }

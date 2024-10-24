@@ -107,4 +107,7 @@ public:
 
 	class UHG_GameInstance* GI;
 
+	int32 GetSlotIndexInWB(UWidget* SlotWidget);
+
+	void CheckEquipitem();
 };

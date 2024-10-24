@@ -2,6 +2,8 @@
 
 
 #include "HG_PlayerGoodsComponent.h"
+#include "HG_Player.h"
+#include "HG_GameInstance.h"
 
 // Sets default values for this component's properties
 UHG_PlayerGoodsComponent::UHG_PlayerGoodsComponent()
@@ -18,9 +20,8 @@ UHG_PlayerGoodsComponent::UHG_PlayerGoodsComponent()
 void UHG_PlayerGoodsComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 	
+	CompOwner = Cast<AHG_Player>(GetOwner());
 }
 
 
@@ -35,6 +36,7 @@ void UHG_PlayerGoodsComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 void UHG_PlayerGoodsComponent::SetGold(int32 Value)
 {
 	Gold = Value;
+	CompOwner->GI->CurrentGold = Gold;
 }
 
 int32 UHG_PlayerGoodsComponent::GetGold() const
@@ -45,12 +47,14 @@ int32 UHG_PlayerGoodsComponent::GetGold() const
 int32 UHG_PlayerGoodsComponent::AddGold(int32 Value)
 {
 	SetGold(FMath::Clamp(Gold + Value, 0, MAX_GOLD));
+	CompOwner->GI->CurrentGold = Gold;
 	return Gold;
 }
 
 int32 UHG_PlayerGoodsComponent::SubGold(int32 Value)
 {
-	SetGold(FMath::Clamp(Gold - Value, 0, MAX_GOLD));
+	SetGold(FMath::Clamp(Gold - Value, 0, MAX_GOLD));	
+	CompOwner->GI->CurrentGold = Gold;
 	return Gold;
 }
 

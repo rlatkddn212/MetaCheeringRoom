@@ -35,6 +35,11 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	EItemCategory ItemCategory;
+
+	bool operator==(const FItemData& Other) const
+	{
+		return ItemName == Other.ItemName;
+	}
 };
 
 

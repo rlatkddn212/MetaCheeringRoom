@@ -42,4 +42,6 @@ public:
 	UImage* Img_Equip;
 
 	bool bSelected = false;
+
+	int32 MyIndex;
 };

@@ -31,5 +31,11 @@ public:
 
 private:
 	int32 Gold;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MAX_GOLD = 4000;
+
+	UPROPERTY()
+	class AHG_Player* CompOwner;
 };

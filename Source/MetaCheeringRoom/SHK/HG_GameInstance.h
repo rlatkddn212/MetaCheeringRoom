@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "SlotStruct.h"
+#include "HG_ItemBase.h"
 #include "HG_GameInstance.generated.h"
 
 /**
@@ -21,4 +23,12 @@ public:
 	class UDataTable* ItemDataTable;
 
 	bool IsValidItem(FString ItemName);
+
+	int32 CurrentGold = 4000;
+
+	TArray<FSlotStruct> CurrentInventory;
+
+	TArray<FItemData> EquipItemInfoList;
+
+	TArray<int32> EquipSlotIndexList;
 };
