@@ -69,6 +69,10 @@ void AHG_Player::BeginPlay()
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
 	}
+	
+	pc->SetShowMouseCursor(false);
+	pc->SetInputMode(FInputModeGameOnly());
+
 	GoodsComp->SetGold(4000);
 }
 
