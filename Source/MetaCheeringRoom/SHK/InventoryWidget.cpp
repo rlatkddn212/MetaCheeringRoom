@@ -13,6 +13,7 @@
 #include "Components/WidgetSwitcher.h"
 #include "HG_EquipItem.h"
 #include "HG_GameInstance.h"
+#include "Net/UnrealNetwork.h"
 
 
 void UInventoryWidget::NativeConstruct()
@@ -144,7 +145,7 @@ void UInventoryWidget::ThrowAwaySelectedItem()
 			TB_Use->SetText(FText::FromString(TEXT("장착하기")));
 			SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
 			EquipList.Remove(SelectedSlot);
-			Owner->UnequipItem(SelectedSlot->SlotInfo.ItemInfo.ItemName);
+			Owner->UnequipItemToSocket(SelectedSlot->SlotInfo.ItemInfo.ItemName);
 		}
 		int32 ChildCount = SelectedCategory->GetChildrenCount();
 		for (int32 i = 0; i < ChildCount; i++)
@@ -206,20 +207,21 @@ void UInventoryWidget::UseItem()
 						TB_Use->SetText(FText::FromString(TEXT("장착하기")));
 						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
 						EquipList.Remove(SelectedSlot);
-						OwningPlayer->UnequipItem(SelectedSlot->SlotInfo.ItemInfo.ItemName);
+						OwningPlayer->UnequipItemToSocket(SelectedSlot->SlotInfo.ItemInfo.ItemName);
 					}
 					else
 					{
 						TB_Use->SetText(FText::FromString(TEXT("해제하기")));
 						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
 						EquipList.Add(SelectedSlot);
-						auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(SelectedSlot->SlotInfo.ItemInfo.ItemClass,
-							OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
-						if (EItem != nullptr)
-						{
-							EItem->SetOwner(OwningPlayer);
-							OwningPlayer->EquipItem(EItem);
-						}
+						OwningPlayer->EquipItemToSocket(SelectedSlot->SlotInfo.ItemInfo);
+//						auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(SelectedSlot->SlotInfo.ItemInfo.ItemClass, OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
+// 						if (EItem != nullptr)
+// 						{
+// 							UE_LOG(LogTemp,Warning,TEXT("!"));
+// 							EItem->SetOwner(OwningPlayer);
+// 							OwningPlayer->EquipItemToSocket(EItem);
+// 						}
 					}
 				}
 			}

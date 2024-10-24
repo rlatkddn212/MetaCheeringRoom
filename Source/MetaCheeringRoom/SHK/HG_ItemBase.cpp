@@ -7,6 +7,7 @@
 #include "Engine/DataTable.h"
 #include "HG_GameInstance.h"
 #include "GameFramework/GameModeBase.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AHG_ItemBase::AHG_ItemBase()
@@ -22,6 +23,8 @@ AHG_ItemBase::AHG_ItemBase()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);
 	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -38,7 +41,6 @@ void AHG_ItemBase::BeginPlay()
 void AHG_ItemBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AHG_ItemBase::Use()
@@ -110,3 +112,4 @@ void AHG_ItemBase::InitItemData()
 		}
 	}
 }
+

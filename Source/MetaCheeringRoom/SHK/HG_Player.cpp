@@ -15,6 +15,7 @@
 #include "HG_ItemPurchaseWidget.h"
 #include "HG_EquipItem.h"
 #include "GameFramework/PlayerController.h"
+#include "Net/UnrealNetwork.h"
 
 AHG_Player::AHG_Player()
 {
@@ -40,12 +41,15 @@ AHG_Player::AHG_Player()
 
 	HandComp = CreateDefaultSubobject<USceneComponent>(TEXT("HandComp"));
 	HandComp->SetupAttachment(GetMesh(), TEXT("HandPosition"));
+	HandComp->SetIsReplicated(true);
 
 	LowerComp = CreateDefaultSubobject<USceneComponent>(TEXT("LowerComp"));
 	LowerComp->SetupAttachment(GetMesh(), TEXT("LowerPosition"));
+	LowerComp->SetIsReplicated(true);
 
 	UpperComp = CreateDefaultSubobject<USceneComponent>(TEXT("UpperComp"));
 	UpperComp->SetupAttachment(GetMesh(), TEXT("UpperPosition"));
+	UpperComp->SetIsReplicated(true);
 
 	bReplicates = true;
 	SetReplicateMovement(true);
@@ -120,13 +124,13 @@ void AHG_Player::Tick(float DeltaTime)
 			DetectedStand->Detected(false, this);
 			DetectedStand = nullptr;
 		}
-	} 
+	}
 
 	if (bDetectStand)
 	{
 		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 5.0f);
 	}
-	else                 
+	else
 	{
 		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 5.0f);
 	}
@@ -215,7 +219,7 @@ void AHG_Player::DetectObject()
 		else if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
 		{
 			InventoryComp->AddtoInventory(Item->GetItemData(), 1);
-			Item->Destroy();
+			DestroyItem(Item);
 		}
 		else if (auto* Stand = Cast<AHG_DisplayStandBase>(OutHit.GetActor()))
 		{
@@ -286,34 +290,49 @@ void AHG_Player::PopUpPurchaseWidget()
 
 void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 {
-	GrabItem = ItemValue;
-	EquipItemList.Add(GrabItem);
-	auto* mesh = GrabItem->GetComponentByClass<UStaticMeshComponent>();
-	check(mesh)
-		if (mesh)
+	if (ItemValue == nullptr) return;
+	EquipItemList.Add(ItemValue);
+	auto* mesh = ItemValue->GetComponentByClass<UStaticMeshComponent>();
+	check(mesh);
+	if (mesh)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attach"));
+		mesh->SetSimulatePhysics(false);
+		mesh->AttachToComponent(HandComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		switch (ItemValue->GetItemCategory())
 		{
-			mesh->SetSimulatePhysics(false);
-			switch (GrabItem->GetItemCategory())
-			{
-			case EItemCategory::Category_Bottom:
-				mesh->AttachToComponent(LowerComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-			case EItemCategory::Category_Top:
-				mesh->AttachToComponent(UpperComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-			case EItemCategory::Category_HandGrab:
-				mesh->AttachToComponent(HandComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-			default:
-				break;
-			}
+		case EItemCategory::Category_Bottom:
+			mesh->AttachToComponent(LowerComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			break;
+		case EItemCategory::Category_Top:
+			mesh->AttachToComponent(UpperComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			break;
+		case EItemCategory::Category_HandGrab:
+			mesh->AttachToComponent(HandComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			break;
+		default:
+			break;
 		}
+	}
 }
+
 
 void AHG_Player::UnequipItem(const FString& NameValue)
 {
+	TArray<AHG_EquipItem*> ItemsToRemove;
+
 	for (AHG_EquipItem* item : EquipItemList)
 	{
 		if (item->GetItemName() == NameValue)
 		{
-			auto* mesh = item->GetComponentByClass<UStaticMeshComponent>();
+			ItemsToRemove.Add(item);
+		}
+	}
+	for (auto* item : ItemsToRemove)
+	{
+		if (item != nullptr && item->GetItemName() == NameValue)
+		{
+			UStaticMeshComponent* mesh = item->GetComponentByClass<UStaticMeshComponent>();
 			check(mesh);
 			if (mesh)
 			{
@@ -326,9 +345,9 @@ void AHG_Player::UnequipItem(const FString& NameValue)
 	}
 }
 
-void AHG_Player::EquipItemToSocket(AHG_EquipItem* ItemValue)
+void AHG_Player::EquipItemToSocket(FItemData p_ItemInfo)
 {
-	ServerRPCEquipItemToSocket(ItemValue);
+	ServerRPCEquipItemToSocket(p_ItemInfo);
 }
 
 void AHG_Player::UnequipItemToSocket(const FString& NameValue)
@@ -336,9 +355,29 @@ void AHG_Player::UnequipItemToSocket(const FString& NameValue)
 	ServerRPCUnequipItemToSocket(NameValue);
 }
 
-void AHG_Player::ServerRPCEquipItemToSocket_Implementation(AHG_EquipItem* ItemValue)
+
+void AHG_Player::DestroyItem(AHG_ItemBase* ItemValue)
 {
-	MulticastRPCEquipItemToSocket(ItemValue);
+	ServerRPCDestroyItem(ItemValue);
+}
+
+void AHG_Player::ServerRPCDestroyItem_Implementation(AHG_ItemBase* ItemValue)
+{
+	ItemValue->Destroy();
+}
+
+
+void AHG_Player::ServerRPCEquipItemToSocket_Implementation(FItemData p_ItemInfo)
+{
+	auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(p_ItemInfo.ItemClass, GetActorLocation(), GetActorRotation());
+	if (EItem)
+	{
+		EItem->SetOwner(this);
+
+		UE_LOG(LogTemp, Warning, TEXT("1"));
+		MulticastRPCEquipItemToSocket(EItem);
+
+	}
 }
 
 void AHG_Player::MulticastRPCEquipItemToSocket_Implementation(AHG_EquipItem* ItemValue)
@@ -355,4 +394,12 @@ void AHG_Player::MulticastRPCUnequipItemToSocket_Implementation(const FString& N
 {
 	UnequipItem(NameValue);
 }
+
+void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AHG_Player, EquipItemList);
+}
+
 
