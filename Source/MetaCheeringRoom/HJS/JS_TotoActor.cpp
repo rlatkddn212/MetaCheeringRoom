@@ -9,6 +9,8 @@
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "OnlineSubsystemUtils.h"
 #include "../MetaCheeringRoom.h"
+#include "JS_GameState.h"
+#include "JS_PlayerController.h"
 
 // Sets default values
 AJS_TotoActor::AJS_TotoActor()
@@ -21,12 +23,10 @@ void AJS_TotoActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-
-	SetOwner(PC);
-
 	if (HasAuthority())
 	{
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		SetOwner(PC->GetPawn());
 		if (TotoMakeWidgetFactory)
 		{
 			TotoMakeWidget = CreateWidget<UToToMakeWidget>(GetWorld(), TotoMakeWidgetFactory);
@@ -110,7 +110,16 @@ void AJS_TotoActor::BettingToto(int32 point, int32 select)
 {
 	MyPoint += point;
 	MySelect = select;
-	ServerBettingToto(point, select, MyUserID);
+	AJS_PlayerController* PC = Cast<AJS_PlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC && PC->HasAuthority())
+	{
+		ServerBettingToto(point, select, MyUserID);
+	}
+	else
+	{
+		PC->ServerHandleBettingToTo(point,select,MyUserID);
+	}
+
 }
 
 void AJS_TotoActor::ServerBettingToto_Implementation(int32 point, int32 select, const FString& BettorID)

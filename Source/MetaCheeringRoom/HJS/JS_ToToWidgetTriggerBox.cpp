@@ -7,6 +7,7 @@
 #include "JS_ToToWidget.h"
 #include "Components/BoxComponent.h"
 #include "../MetaCheeringRoom.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 AJS_ToToWidgetTriggerBox::AJS_ToToWidgetTriggerBox()
@@ -28,8 +29,14 @@ void AJS_ToToWidgetTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overla
 {
 	if (ToToActor)
 	{
-		UJS_ToToWidget* ToToWidget = ToToActor->ToToWidget;
-		ToToWidget->ToToInitSetting();
+		ACharacter* Character = Cast<ACharacter>(OtherActor);
+		if (Character && Character->IsLocallyControlled())
+		{
+			UJS_ToToWidget* ToToWidget = ToToActor->ToToWidget;
+			if (ToToWidget)
+			{
+				ToToWidget->ToToInitSetting();
+			}
+		}
 	}
 }
-

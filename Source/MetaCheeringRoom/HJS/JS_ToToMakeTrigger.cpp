@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "JS_TotoActor.h"
 #include "ToToMakeWidget.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 AJS_ToToMakeTrigger::AJS_ToToMakeTrigger()
@@ -26,8 +27,15 @@ void AJS_ToToMakeTrigger::ComponentBeginOverlap(UPrimitiveComponent* OverlappedC
 {
 	if (ToToActor)
 	{
-		UToToMakeWidget* TotoMakeWidget = ToToActor->TotoMakeWidget;
-		TotoMakeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		ACharacter* Character = Cast<ACharacter>(OtherActor);
+		if (Character && Character->IsLocallyControlled() &&  Character->HasAuthority())
+		{
+			UToToMakeWidget* TotoMakeWidget = ToToActor->TotoMakeWidget;
+			if (TotoMakeWidget)
+			{
+				TotoMakeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			}			
+		}
 	}
 }
 
