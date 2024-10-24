@@ -16,7 +16,14 @@ class METACHEERINGROOM_API AHG_FireCracker : public AHG_ItemBase
 protected:
 public:
 	virtual void BeginPlay() override;
+
+
+	UFUNCTION()
 	virtual void Use() override;
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPCUse();
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
 	class UParticleSystem* FireCrackerEffect;
