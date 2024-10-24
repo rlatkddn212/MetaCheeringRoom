@@ -8,6 +8,7 @@
 #include "InventoryWidget.h"
 #include "HG_ItemBase.h"
 #include "Components/TextBlock.h"
+#include "HG_GameInstance.h"
 
 void UHG_SlotWidget::NativeConstruct()
 {
@@ -18,18 +19,28 @@ void UHG_SlotWidget::NativeConstruct()
 		Button_InventorySlot->OnClicked.AddDynamic(this, &UHG_SlotWidget::OnButtonClicked);
 	}
 	Img_Equip->SetVisibility(ESlateVisibility::Hidden);
+
+	MyIndex = Owner->GetSlotIndexInWB(this);
 }
 
 void UHG_SlotWidget::OnButtonClicked()
 {
 	Owner->SelectedSlot = this;
-	if (Owner->EquipList.Contains(this))
+	if (Owner->SelectedCategory == Owner->WB_SlotList_Active)
 	{
-		Owner->TB_Use->SetText(FText::FromString(TEXT("해제하기")));
+		Owner->TB_Use->SetText(FText::FromString(TEXT("사용하기")));
 	}
 	else
 	{
-		Owner->TB_Use->SetText(FText::FromString(TEXT("장착하기")));
+		UE_LOG(LogTemp,Warning,TEXT("%d"),MyIndex);
+		if (Owner->GI->EquipSlotIndexList.Contains(MyIndex))
+		{
+			Owner->TB_Use->SetText(FText::FromString(TEXT("해제하기")));
+		}
+		else
+		{
+			Owner->TB_Use->SetText(FText::FromString(TEXT("장착하기")));
+		}
 	}
 	Owner->DIsplaySelectedItemInfo();
 }
@@ -42,7 +53,7 @@ void UHG_SlotWidget::SetItemIcon()
 	}
 }
 
-void UHG_SlotWidget::InitSlot (FSlotStruct p_Slot)
+void UHG_SlotWidget::InitSlot(FSlotStruct p_Slot)
 {
 	SlotInfo.ItemInfo.ItemIcon = p_Slot.ItemInfo.ItemIcon;
 	SlotInfo.ItemInfo.ItemName = p_Slot.ItemInfo.ItemName;

@@ -3,6 +3,8 @@
 
 #include "HG_PlayerInventoryComponent.h"
 #include "HG_ItemBase.h"
+#include "HG_GameInstance.h"
+#include "HG_Player.h"
 
 // Sets default values for this component's properties
 UHG_PlayerInventoryComponent::UHG_PlayerInventoryComponent()
@@ -24,10 +26,11 @@ UHG_PlayerInventoryComponent::UHG_PlayerInventoryComponent()
 void UHG_PlayerInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	CompOwner = Cast<AHG_Player>(GetOwner());
 }
 
-
+ 
 // Called every frame
 void UHG_PlayerInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -52,10 +55,7 @@ void UHG_PlayerInventoryComponent::AddtoInventory(FItemData Item, int32 Quantity
 			Inventory.Add(Temp);
 		}
 	}
-	for (int i = 0; i < Inventory.Num(); i++)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Inventory[%d] = %s,%d"), i,*Inventory[i].ItemInfo.ItemName,Inventory[i].Quantity);
-	}
+	CompOwner->GI->CurrentInventory = Inventory;
 }
 
 int32 UHG_PlayerInventoryComponent::FindSlot(FString ItemName)
@@ -80,10 +80,7 @@ void UHG_PlayerInventoryComponent::RemoveFromInventory(FItemData Item, int32 Qua
 			Inventory.RemoveAt(FindSlot(Item.ItemName));
 		}
 	}
-	for (int i = 0; i < Inventory.Num(); i++)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Inventory[%d] = %s,%d"), i, *Inventory[i].ItemInfo.ItemName, Inventory[i].Quantity);
-	}
+	CompOwner->GI->CurrentInventory = Inventory;
 }
 
 

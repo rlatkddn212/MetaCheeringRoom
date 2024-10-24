@@ -35,6 +35,7 @@ void UInventoryWidget::NativeConstruct()
 		Btn_ActiveCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Active);
 	}
 
+	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 	SelectedCategory = WB_SlotList_Active;
 }
 
@@ -70,14 +71,15 @@ void UInventoryWidget::InitInventoryUI()
 					else
 					{
 						WB_SlotList_Costume->AddChildToWrapBox(SlotWidget);
-						for (auto EquipSlot : EquipList)
-						{
-							if (EquipSlot->SlotInfo.ItemInfo.ItemName == SlotWidget->SlotInfo.ItemInfo.ItemName)
-							{
-								SlotWidget->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
-								EquipList[EquipList.Find(EquipSlot)] = SlotWidget;
-							}
-						}
+						CheckEquipitem();
+ 						for (auto EquipSlot : EquipList)
+ 						{
+ 							if (EquipSlot->SlotInfo.ItemInfo.ItemName == SlotWidget->SlotInfo.ItemInfo.ItemName)
+ 							{
+ 								SlotWidget->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
+ 								EquipList[EquipList.Find(EquipSlot)] = SlotWidget;
+ 							}
+ 						}
 					}
 				}
 			}
@@ -196,22 +198,51 @@ void UInventoryWidget::UseItem()
 				}
 				else if (SelectedCategory == WB_SlotList_Costume)
 				{
-					if (EquipList.Contains(SelectedSlot))
+					if (GI->EquipSlotIndexList.Contains(SelectedSlot->MyIndex))
 					{
+						UE_LOG(LogTemp,Warning,TEXT("uneq"));
 						TB_Use->SetText(FText::FromString(TEXT("장착하기")));
 						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
 						EquipList.Remove(SelectedSlot);
+						GI->EquipSlotIndexList.Remove(GetSlotIndexInWB(SelectedSlot));
 						OwningPlayer->UnequipItemToSocket(SelectedSlot->SlotInfo.ItemInfo.ItemName);
 					}
 					else
 					{
+						UE_LOG(LogTemp, Warning, TEXT("eq"));
 						TB_Use->SetText(FText::FromString(TEXT("해제하기")));
 						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
 						EquipList.Add(SelectedSlot);
+						GI->EquipSlotIndexList.Add(GetSlotIndexInWB(SelectedSlot));
 						OwningPlayer->EquipItemToSocket(SelectedSlot->SlotInfo.ItemInfo);
 					}
 				}
 			}
+		}
+	}
+}
+
+int32 UInventoryWidget::GetSlotIndexInWB(UWidget* SlotWidget)
+{
+	if (!WB_SlotList_Costume || !SlotWidget) return -1;
+
+	const TArray<UWidget*>& Slots = WB_SlotList_Costume->GetAllChildren();
+
+	int32 Index = Slots.IndexOfByKey(SlotWidget);
+
+	return Index;
+}
+
+void UInventoryWidget::CheckEquipitem()
+{
+	if (GI->EquipSlotIndexList.Num() <= 0) return;
+
+	for (auto n : GI->EquipSlotIndexList)
+	{
+		UHG_SlotWidget* EquipSlot = Cast<UHG_SlotWidget>(WB_SlotList_Costume->GetChildAt(n));
+		if (EquipSlot)
+		{
+			EquipSlot->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
 		}
 	}
 }

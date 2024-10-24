@@ -38,5 +38,5 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UDataTable* ItemDataTable;
 
-
+	class AHG_Player* CompOwner;
 };

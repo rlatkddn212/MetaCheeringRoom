@@ -108,6 +108,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Equip)
 	class USceneComponent* UpperComp;
 
+	class UHG_GameInstance* GI;
+
 	void EquipItem(AHG_EquipItem* ItemValue);
 
 	void UnequipItem(const FString& NameValue);
@@ -116,6 +118,7 @@ public:
 	float GrabDistance = 300;
 
 	void EquipItemToSocket(FItemData p_ItemInfo);
+
 	void UnequipItemToSocket(const FString& NameValue);
 
 	UFUNCTION(Server, Reliable)
@@ -148,11 +151,11 @@ public:
 	UPROPERTY(Replicated)
 	TArray<AHG_EquipItem*> EquipItemList;
 
+	TArray<FItemData> InitEquipItemList;
 	bool bDetectStand = false;
 
 	float TargetValue1 = 200.0f;
 	float TargetValue2 = -50.0f;
 
 	FVector LookingPoint;
-
 };
