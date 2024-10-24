@@ -21,19 +21,19 @@ struct FRoomInfo {
 	GENERATED_BODY()
 
     UPROPERTY(BlueprintReadOnly)
-	ERoomCategory RoomCategory;
+	ERoomCategory RoomCategory = ERoomCategory::CT_Soccer;
 	//방이름
 	UPROPERTY(BlueprintReadOnly)
-	FString RoomName;
+	FString RoomName = TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	FString HostName;
+	FString HostName = TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	int32 MaxPlayerCount;
+	int32 MaxPlayerCount = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 CurrentPlayerCount;
+	int32 CurrentPlayerCount = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 PingMS;
-	int32 Index;
+	int32 PingMS = 0;
+	int32 Index = 0;
 	FString ToString()
 	{
 		return FString::Printf(TEXT(" %d) [%s] [%s]( %d / %d)-> %dms"), Index, *RoomName, *HostName, CurrentPlayerCount, MaxPlayerCount, PingMS);

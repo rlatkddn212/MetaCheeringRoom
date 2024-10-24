@@ -59,7 +59,7 @@ void AJS_Screen::BeginPlay()
 				if (VideoWidget)
 				{
 					VideoWidget->AddToViewport();
-					//VideoWidget->SetVisibility(ESlateVisibility::Hidden);
+					VideoWidget->SetVisibility(ESlateVisibility::Hidden);
 				}
 			}
 			// 치지직 정보 가져오기
