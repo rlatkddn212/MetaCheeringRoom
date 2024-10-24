@@ -41,7 +41,7 @@ void UJS_SessionGameInstanceSubSystem::CreateSession(const FString& RoomName, in
 
 		//1.데디케이트 서버인가?
 		SessionSettings.bIsDedicated = false;
-
+		PRINTLOG(TEXT("%s"), *IOnlineSubsystem::Get()->GetSubsystemName().ToString());
 		//2.Lan으로 매치하는가? , 서브시스템이 널이라면 랜매치겠죠? 아니면 스팀이라 뜰꺼니까
 		SessionSettings.bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL";
 

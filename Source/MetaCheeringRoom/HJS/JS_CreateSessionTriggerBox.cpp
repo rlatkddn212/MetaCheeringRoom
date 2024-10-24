@@ -27,7 +27,6 @@ void AJS_CreateSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Ove
 	if (GM)
 	{
 		UJS_SessionJoinWidget* UI = GM->SessionWidget;
-
 		UI->SetVisibility(ESlateVisibility::Visible);
 		UI->MenuSwitching(0);
 

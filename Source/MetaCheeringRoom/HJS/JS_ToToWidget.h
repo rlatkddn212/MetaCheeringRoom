@@ -15,8 +15,18 @@ class METACHEERINGROOM_API UJS_ToToWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+
+	virtual void NativeConstruct() override;
+
 	UPROPERTY(meta=(BindWidget))
 	class UBorder* BD_Tost;
+
+	UPROPERTY(meta=(BindWidget))
+	class UBorder* BD_ToToMain;
+
+	UPROPERTY(meta=(BindWidget))
+	class UBackgroundBlur* BB_ToToMain;
+
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* TEXT_ToToTost;
 	UPROPERTY(meta=(BindWidget))
@@ -74,8 +84,28 @@ public:
 	class UButton* BTN_WeightBetting1;
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_WeightBetting2;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BTN_ToToQuit;
+	UFUNCTION()
+	void OnClickQuitBtn();
+
+	UPROPERTY(meta=(BindWidgetAnim),Transient)
+	class UWidgetAnimation* TostAnim;
 
 	UFUNCTION()
 	void SetTotoInfo(const FString& totoName, const FString& select1, const FString& select2,
-		int32 totalSelect1 = 0, int32 totalSelect2 = 0, int32 totalBettor1 = 0, int32 totalBettor2 = 0, float totalOdds1 = 1.f, float totalOdds2 = 1.f);
+		int32 totalSelect1, int32 totalSelect2, int32 totalBettor1, int32 totalBettor2, float totalOdds1, float totalOdds2);
+
+	UFUNCTION()
+	void AlarmToto(FString TostMsg);
+
+	UFUNCTION()
+	void SetTimerText(FString TimerText);
+
+	UFUNCTION()
+	void SetBettingStopUI();
+
+	UFUNCTION()
+	void ToToInitSetting();
+
 };

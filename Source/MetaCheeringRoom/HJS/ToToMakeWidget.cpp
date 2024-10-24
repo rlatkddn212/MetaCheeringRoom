@@ -5,6 +5,9 @@
 #include "Components/EditableTextBox.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
+#include "JS_TotoActor.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/SpinBox.h"
 void UToToMakeWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -30,7 +33,7 @@ void UToToMakeWidget::OnSelect1Changed(const FText& Text)
 	}
 	else
 	{
-		FString LimitText = FString::Printf(TEXT("%d/%d"), NewTextLength, MAX_TEXT_LEN);
+		FString LimitText = FString::Printf(TEXT("%d/%d"), NewTextLength, MAX_SELECT_LEN);
 		// 변하는 동안에는 그냥 UI에서만 처리하기
 		TEXT_SelectLimit1->SetText(FText::FromString(LimitText));
 	}
@@ -49,7 +52,7 @@ void UToToMakeWidget::OnSelect2Changed(const FText& Text)
 	}
 	else
 	{
-		FString LimitText = FString::Printf(TEXT("%d/%d"), NewTextLength, MAX_TEXT_LEN);
+		FString LimitText = FString::Printf(TEXT("%d/%d"), NewTextLength, MAX_SELECT_LEN);
 		// 변하는 동안에는 그냥 UI에서만 처리하기
 		TEXT_SelectLimit2->SetText(FText::FromString(LimitText));
 	}
@@ -111,7 +114,9 @@ void UToToMakeWidget::OnClickCancelBtn()
 void UToToMakeWidget::OnClickStartBtn()
 {
 	// 1. 저장되어있던 정보를 UI액터에 전송하기
-	
+	AJS_TotoActor* TotoActor = Cast<AJS_TotoActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AJS_TotoActor::StaticClass()));
+	int32 Second = SPB_TimeLimit->GetValue()*60;
+	TotoActor->MakeToto(ET_BettingName->GetText().ToString(),ET_Select1->GetText().ToString(),ET_Select2->GetText().ToString(), Second);
 	// 2. 창 닫기
 	SetVisibility(ESlateVisibility::Hidden);
 }

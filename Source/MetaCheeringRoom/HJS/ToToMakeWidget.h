@@ -22,7 +22,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int32 MAX_TEXT_LEN = 15;
-
+	UPROPERTY(EditAnywhere)
+	int32 MAX_SELECT_LEN = 10;
 	UPROPERTY(meta=(BindWidget))
 	class UWidgetSwitcher* WS_MakeToTo;
 
