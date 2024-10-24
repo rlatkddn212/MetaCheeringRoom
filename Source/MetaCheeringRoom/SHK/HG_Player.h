@@ -1,4 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "HG_ItemBase.h"
 #include "HG_Player.generated.h"
+
+class AHG_EquipItem;
 
 UCLASS()
 class METACHEERINGROOM_API AHG_Player : public ACharacter
@@ -26,6 +29,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UPROPERTY(EditDefaultsOnly)
 	class USpringArmComponent* SpringArmComp;
@@ -96,8 +101,6 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class AHG_DisplayStandBase* DetectedStand;
 
-	// ========================������ ���===============================
-
 	UPROPERTY(EditDefaultsOnly , Category = Equip)
 	class USceneComponent* HandComp;
 	UPROPERTY(EditDefaultsOnly , Category = Equip)
@@ -105,20 +108,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Equip)
 	class USceneComponent* UpperComp;
 
-	void EquipItem(class AHG_EquipItem* ItemValue);
+	void EquipItem(AHG_EquipItem* ItemValue);
 
 	void UnequipItem(const FString& NameValue);
-	UPROPERTY()
-	AHG_EquipItem* GrabItem;
 
 	UPROPERTY(EditDefaultsOnly , Category = Equip)
 	float GrabDistance = 300;
 
-	void EquipItemToSocket(AHG_EquipItem* ItemValue);
+	void EquipItemToSocket(FItemData p_ItemInfo);
 	void UnequipItemToSocket(const FString& NameValue);
 
 	UFUNCTION(Server,Reliable)
-	void ServerRPCEquipItemToSocket(AHG_EquipItem* ItemValue);
+	void ServerRPCEquipItemToSocket(FItemData p_ItemInfo);
 	
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastRPCEquipItemToSocket(AHG_EquipItem* ItemValue);
@@ -129,7 +130,20 @@ public:
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastRPCUnequipItemToSocket(const FString& NameValue);
 
+	void DestroyItem(AHG_ItemBase* ItemValue);
+	
+	UFUNCTION(Server,Reliable)
+	void ServerRPCDestroyItem(AHG_ItemBase* ItemValue);
+
 	bool bEquipItem = false;
 
+	UPROPERTY(Replicated)
 	TArray<AHG_EquipItem*> EquipItemList;
+
+	bool bDetectStand = false;
+
+	float TargetValue1 = 200.0f;
+	float TargetValue2 = -50.0f;
+
+	FVector LookingPoint;
 };

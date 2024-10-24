@@ -15,11 +15,10 @@
 #include "HG_ItemPurchaseWidget.h"
 #include "HG_EquipItem.h"
 #include "GameFramework/PlayerController.h"
+#include "Net/UnrealNetwork.h"
 
-// Sets default values
 AHG_Player::AHG_Player()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -42,18 +41,20 @@ AHG_Player::AHG_Player()
 
 	HandComp = CreateDefaultSubobject<USceneComponent>(TEXT("HandComp"));
 	HandComp->SetupAttachment(GetMesh(), TEXT("HandPosition"));
+	HandComp->SetIsReplicated(true);
 
 	LowerComp = CreateDefaultSubobject<USceneComponent>(TEXT("LowerComp"));
 	LowerComp->SetupAttachment(GetMesh(), TEXT("LowerPosition"));
+	LowerComp->SetIsReplicated(true);
 
 	UpperComp = CreateDefaultSubobject<USceneComponent>(TEXT("UpperComp"));
 	UpperComp->SetupAttachment(GetMesh(), TEXT("UpperPosition"));
+	UpperComp->SetIsReplicated(true);
 
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
 
-// Called when the game starts or when spawned
 void AHG_Player::BeginPlay()
 {
 	Super::BeginPlay();
@@ -71,11 +72,9 @@ void AHG_Player::BeginPlay()
 	GoodsComp->SetGold(4000);
 }
 
-// Called every frame
 void AHG_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 
 	FTransform t = FTransform(GetControlRotation());
 	Direction = t.TransformVector(Direction);
@@ -95,7 +94,7 @@ void AHG_Player::Tick(float DeltaTime)
 	if (bHit)
 	{
 		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Green, false, 1.0f);
-
+		LookingPoint = OutHit.ImpactPoint;
 
 		if (LookAtActor != OutHit.GetActor() && bIsStand)
 		{
@@ -105,7 +104,6 @@ void AHG_Player::Tick(float DeltaTime)
 		}
 		else
 		{
-			// ����Ʈ���̽��� ������ ���� �������� ��
 			if (!bIsStand)
 			{
 				DetectedStand = Cast<AHG_DisplayStandBase>(OutHit.GetActor());
@@ -127,24 +125,29 @@ void AHG_Player::Tick(float DeltaTime)
 			DetectedStand = nullptr;
 		}
 	}
+
+	if (bDetectStand)
+	{
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 5.0f);
+	}
+	else
+	{
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 5.0f);
+	}
 }
 
-// Called to bind functionality to input
 void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 
-	// ������
 	input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AHG_Player::OnMyMove);
 	input->BindAction(IA_Jump, ETriggerEvent::Started, this, &AHG_Player::OnMyJump);
 	input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AHG_Player::OnMyLook);
 
-	// ��ȣ�ۿ�
 	input->BindAction(IA_Interaction, ETriggerEvent::Completed, this, &AHG_Player::OnMyInteraction);
 
-	// �κ��丮
 	input->BindAction(IA_Inventory, ETriggerEvent::Completed, this, &AHG_Player::PopUpInventory);
 
 }
@@ -193,7 +196,6 @@ void AHG_Player::DetectObject()
 	if (bHit)
 	{
 		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Yellow, false, 1.0f);
-		// ����Ʈ���̽��� ������ ���� Ʈ���� �ڽ��� ��
 		if (auto* STB = Cast<AHG_StoreTriggerBox>(OutHit.GetActor()))
 		{
 			STB->ByInteraction();
@@ -217,7 +219,7 @@ void AHG_Player::DetectObject()
 		else if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
 		{
 			InventoryComp->AddtoInventory(Item->GetItemData(), 1);
-			Item->Destroy();
+			DestroyItem(Item);
 		}
 		else if (auto* Stand = Cast<AHG_DisplayStandBase>(OutHit.GetActor()))
 		{
@@ -288,34 +290,49 @@ void AHG_Player::PopUpPurchaseWidget()
 
 void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 {
-	GrabItem = ItemValue;
-	EquipItemList.Add(GrabItem);
-	auto* mesh = GrabItem->GetComponentByClass<UStaticMeshComponent>();
-	check(mesh)
-		if (mesh)
+	if (ItemValue == nullptr) return;
+	EquipItemList.Add(ItemValue);
+	auto* mesh = ItemValue->GetComponentByClass<UStaticMeshComponent>();
+	check(mesh);
+	if (mesh)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attach"));
+		mesh->SetSimulatePhysics(false);
+		mesh->AttachToComponent(HandComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		switch (ItemValue->GetItemCategory())
 		{
-			mesh->SetSimulatePhysics(false);
-			switch (GrabItem->GetItemCategory())
-			{
-			case EItemCategory::Category_Bottom:
-				mesh->AttachToComponent(LowerComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-			case EItemCategory::Category_Top:
-				mesh->AttachToComponent(UpperComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-			case EItemCategory::Category_HandGrab:
-				mesh->AttachToComponent(HandComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-			default:
-				break;
-			}
+		case EItemCategory::Category_Bottom:
+			mesh->AttachToComponent(LowerComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			break;
+		case EItemCategory::Category_Top:
+			mesh->AttachToComponent(UpperComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			break;
+		case EItemCategory::Category_HandGrab:
+			mesh->AttachToComponent(HandComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			break;
+		default:
+			break;
 		}
+	}
 }
+
 
 void AHG_Player::UnequipItem(const FString& NameValue)
 {
+	TArray<AHG_EquipItem*> ItemsToRemove;
+
 	for (AHG_EquipItem* item : EquipItemList)
 	{
 		if (item->GetItemName() == NameValue)
 		{
-			auto* mesh = item->GetComponentByClass<UStaticMeshComponent>();
+			ItemsToRemove.Add(item);
+		}
+	}
+	for (auto* item : ItemsToRemove)
+	{
+		if (item != nullptr && item->GetItemName() == NameValue)
+		{
+			UStaticMeshComponent* mesh = item->GetComponentByClass<UStaticMeshComponent>();
 			check(mesh);
 			if (mesh)
 			{
@@ -328,9 +345,9 @@ void AHG_Player::UnequipItem(const FString& NameValue)
 	}
 }
 
-void AHG_Player::EquipItemToSocket(AHG_EquipItem* ItemValue)
+void AHG_Player::EquipItemToSocket(FItemData p_ItemInfo)
 {
-	ServerRPCEquipItemToSocket(ItemValue);
+	ServerRPCEquipItemToSocket(p_ItemInfo);
 }
 
 void AHG_Player::UnequipItemToSocket(const FString& NameValue)
@@ -338,9 +355,29 @@ void AHG_Player::UnequipItemToSocket(const FString& NameValue)
 	ServerRPCUnequipItemToSocket(NameValue);
 }
 
-void AHG_Player::ServerRPCEquipItemToSocket_Implementation(AHG_EquipItem* ItemValue)
+
+void AHG_Player::DestroyItem(AHG_ItemBase* ItemValue)
 {
-	MulticastRPCEquipItemToSocket(ItemValue);
+	ServerRPCDestroyItem(ItemValue);
+}
+
+void AHG_Player::ServerRPCDestroyItem_Implementation(AHG_ItemBase* ItemValue)
+{
+	ItemValue->Destroy();
+}
+
+
+void AHG_Player::ServerRPCEquipItemToSocket_Implementation(FItemData p_ItemInfo)
+{
+	auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(p_ItemInfo.ItemClass, GetActorLocation(), GetActorRotation());
+	if (EItem)
+	{
+		EItem->SetOwner(this);
+
+		UE_LOG(LogTemp, Warning, TEXT("1"));
+		MulticastRPCEquipItemToSocket(EItem);
+
+	}
 }
 
 void AHG_Player::MulticastRPCEquipItemToSocket_Implementation(AHG_EquipItem* ItemValue)
@@ -357,4 +394,12 @@ void AHG_Player::MulticastRPCUnequipItemToSocket_Implementation(const FString& N
 {
 	UnequipItem(NameValue);
 }
+
+void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AHG_Player, EquipItemList);
+}
+
 

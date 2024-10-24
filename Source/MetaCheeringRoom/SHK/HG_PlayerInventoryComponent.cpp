@@ -20,11 +20,11 @@ UHG_PlayerInventoryComponent::UHG_PlayerInventoryComponent()
 	InventorySize = 30;
 }
 
-
 // Called when the game starts
 void UHG_PlayerInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
 
 

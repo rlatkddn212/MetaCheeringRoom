@@ -176,60 +176,63 @@ FString UJS_SessionGameInstanceSubSystem::StringBase64Decode(const FString& str)
 
 void UJS_SessionGameInstanceSubSystem::OnMyFindSessionComplete(bool Success)
 {
-	if (Success && SessionSearch->SearchResults.Num() > 0)
+	if (SessionSearch)
 	{
-		//방 만든 결과들 배열에 담아서
-		TArray<FOnlineSessionSearchResult> results = SessionSearch->SearchResults;
-		for (int32 i = 0; i < results.Num(); i++)
+		if (Success && SessionSearch->SearchResults.Num() > 0)
 		{
-			if (false == results[i].IsValid())
+			//방 만든 결과들 배열에 담아서
+			TArray<FOnlineSessionSearchResult> results = SessionSearch->SearchResults;
+			for (int32 i = 0; i < results.Num(); i++)
 			{
-				continue;
+				if (false == results[i].IsValid())
+				{
+					continue;
+				}
+				//방 정보
+				FRoomInfo roomInfo;
+				//카테고리
+				//카테고리 NN인 것만 나눠서 Find창에 띄우기
+				FString categoryString;
+				if (results[i].Session.SessionSettings.Get<FString>(FName("Category"), categoryString))
+				{
+					if (categoryString == "ESports")
+						roomInfo.RoomCategory = ERoomCategory::CT_ESports;
+					else if (categoryString == "Soccer")
+						roomInfo.RoomCategory = ERoomCategory::CT_Soccer;
+					else if (categoryString == "Talk")
+						roomInfo.RoomCategory = ERoomCategory::CT_Talk;
+					else if (categoryString == "Idol")
+						roomInfo.RoomCategory = ERoomCategory::CT_Idol;
+				}
+
+				roomInfo.Index = i;
+				//방이름
+				FString roomNameString;
+				results[i].Session.SessionSettings.Get<FString>(FName("Room_Name"), roomNameString);
+				roomInfo.RoomName = StringBase64Decode(roomNameString);
+				//호스트 이름
+				FString hostNameString;
+				results[i].Session.SessionSettings.Get<FString>(FName("Host_Name"), hostNameString);
+				roomInfo.HostName = hostNameString;
+				//최대 플레이어 수
+				roomInfo.MaxPlayerCount = results[i].Session.SessionSettings.NumPublicConnections;
+				//입장 가능한 플레이어 최대 - 지금
+				roomInfo.CurrentPlayerCount = roomInfo.MaxPlayerCount - results[i].Session.NumOpenPublicConnections;
+				//핑 정보
+				roomInfo.PingMS = results[i].PingInMs;
+
+
+				//델리게이트 룸 생성
+				if (OnSearchSignatureCompleteDelegate.IsBound()) OnSearchSignatureCompleteDelegate.Broadcast(roomInfo);
 			}
-			//방 정보
-			FRoomInfo roomInfo;
-			//카테고리
-			//카테고리 NN인 것만 나눠서 Find창에 띄우기
-			FString categoryString;
-			if (results[i].Session.SessionSettings.Get<FString>(FName("Category"), categoryString))
-			{
-				if (categoryString == "ESports")
-					roomInfo.RoomCategory = ERoomCategory::CT_ESports;
-				else if (categoryString == "Soccer")
-					roomInfo.RoomCategory = ERoomCategory::CT_Soccer;
-				else if (categoryString == "Talk")
-					roomInfo.RoomCategory = ERoomCategory::CT_Talk;
-				else if (categoryString == "Idol")
-					roomInfo.RoomCategory = ERoomCategory::CT_Idol;
-			}
-
-			roomInfo.Index = i;
-			//방이름
-			FString roomNameString;
-			results[i].Session.SessionSettings.Get<FString>(FName("Room_Name"), roomNameString);
-			roomInfo.RoomName = StringBase64Decode(roomNameString);
-			//호스트 이름
-			FString hostNameString;
-			results[i].Session.SessionSettings.Get<FString>(FName("Host_Name"), hostNameString);
-			roomInfo.HostName = hostNameString;
-			//최대 플레이어 수
-			roomInfo.MaxPlayerCount = results[i].Session.SessionSettings.NumPublicConnections;
-			//입장 가능한 플레이어 최대 - 지금
-			roomInfo.CurrentPlayerCount = roomInfo.MaxPlayerCount - results[i].Session.NumOpenPublicConnections;
-			//핑 정보
-			roomInfo.PingMS = results[i].PingInMs;
-
-
-			//델리게이트 룸 생성
-			if (OnSearchSignatureCompleteDelegate.IsBound()) OnSearchSignatureCompleteDelegate.Broadcast(roomInfo);
 		}
-	}
-	else
-	{
-		// 검색 결과가 없을 때 처리
-		FRoomInfo EmptyRoomInfo;
-		EmptyRoomInfo.RoomName = TEXT("입장 가능한 방이 없습니다.");
-		OnSearchSignatureCompleteDelegate.Broadcast(EmptyRoomInfo);
+		else
+		{
+			// 검색 결과가 없을 때 처리
+			FRoomInfo EmptyRoomInfo;
+			EmptyRoomInfo.RoomName = TEXT("입장 가능한 방이 없습니다.");
+			OnSearchSignatureCompleteDelegate.Broadcast(EmptyRoomInfo);
+		}
 	}
 }
 

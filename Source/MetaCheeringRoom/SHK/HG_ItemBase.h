@@ -59,13 +59,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+
 	UPROPERTY(EditDefaultsOnly)
 	class UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* BoxComp;
 
-	// ������ ��� (�ڽĿ��� ����)
 	virtual void Use();
 
 	virtual void SetOwner(APawn* Value);

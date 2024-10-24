@@ -48,4 +48,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	APawn* DetectActor;
+
+	bool bDetected = false;
 };

@@ -16,6 +16,8 @@ class UButton;
 class UWidgetSwitcher;
 class UImage;
 class UWrapBox;
+class AHG_EquipItem;
+class AHG_Player;
 
 UCLASS()
 class METACHEERINGROOM_API UInventoryWidget : public UUserWidget
@@ -93,9 +95,16 @@ public:
 	UFUNCTION()
 	void UseItem();
 
+// 	UFUNCTION(Server,Reliable)
+// 	void ServerRPCUseItem();
+// 
+// 	
+// 	UFUNCTION(NetMulticast,Reliable)
+// 	void MultiCastRPCUseItem(AHG_Player* p_Owner,AHG_EquipItem* ItemValue);
 	bool bSlotSelected = false;
 
 	TArray<UHG_SlotWidget*> EquipList;
 
 	class UHG_GameInstance* GI;
+
 };
