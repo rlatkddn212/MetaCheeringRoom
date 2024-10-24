@@ -190,15 +190,9 @@ void UInventoryWidget::UseItem()
 			{
 				if (SelectedCategory == WB_SlotList_Active)
 				{
-					auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(SelectedSlot->SlotInfo.ItemInfo.ItemClass,
-						OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
-					if (SpawnedItem != nullptr)
-					{
-						SpawnedItem->SetOwner(OwningPlayer);
-						SpawnedItem->SetActorHiddenInGame(true);
-						SpawnedItem->Use();
-						ThrowAwaySelectedItem();
-					}
+					UE_LOG(LogTemp, Warning, TEXT("Spawn Item"));
+					OwningPlayer->SpawnItem(SelectedSlot->SlotInfo.ItemInfo);
+					ThrowAwaySelectedItem();
 				}
 				else if (SelectedCategory == WB_SlotList_Costume)
 				{
@@ -215,13 +209,6 @@ void UInventoryWidget::UseItem()
 						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
 						EquipList.Add(SelectedSlot);
 						OwningPlayer->EquipItemToSocket(SelectedSlot->SlotInfo.ItemInfo);
-//						auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(SelectedSlot->SlotInfo.ItemInfo.ItemClass, OwningPlayer->GetActorLocation(), OwningPlayer->GetActorRotation());
-// 						if (EItem != nullptr)
-// 						{
-// 							UE_LOG(LogTemp,Warning,TEXT("!"));
-// 							EItem->SetOwner(OwningPlayer);
-// 							OwningPlayer->EquipItemToSocket(EItem);
-// 						}
 					}
 				}
 			}

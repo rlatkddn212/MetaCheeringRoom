@@ -5,6 +5,7 @@
 #include "SHK/HG_FireCracker.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Net/UnrealNetwork.h"
 
 void AHG_FireCracker::BeginPlay()
 {
@@ -15,11 +16,14 @@ void AHG_FireCracker::BeginPlay()
 
 void AHG_FireCracker::Use()
 {
-	if (Owner)
-	{
-		FVector SpawnLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 200.0f;
-		FRotator SpawnRotation = Owner->GetActorRotation();
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireCrackerEffect, SpawnLocation, SpawnRotation,true);
-		Destroy();
-	}
+	ServerRPCUse();
 }
+
+void AHG_FireCracker::ServerRPCUse_Implementation()
+{
+	FVector SpawnLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 200.0f;
+	FRotator SpawnRotation = Owner->GetActorRotation();
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireCrackerEffect, SpawnLocation, SpawnRotation, true);
+	Destroy();
+}
+

@@ -101,9 +101,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class AHG_DisplayStandBase* DetectedStand;
 
-	UPROPERTY(EditDefaultsOnly , Category = Equip)
+	UPROPERTY(EditDefaultsOnly, Category = Equip)
 	class USceneComponent* HandComp;
-	UPROPERTY(EditDefaultsOnly , Category = Equip)
+	UPROPERTY(EditDefaultsOnly, Category = Equip)
 	class USceneComponent* LowerComp;
 	UPROPERTY(EditDefaultsOnly, Category = Equip)
 	class USceneComponent* UpperComp;
@@ -112,28 +112,36 @@ public:
 
 	void UnequipItem(const FString& NameValue);
 
-	UPROPERTY(EditDefaultsOnly , Category = Equip)
+	UPROPERTY(EditDefaultsOnly, Category = Equip)
 	float GrabDistance = 300;
 
 	void EquipItemToSocket(FItemData p_ItemInfo);
 	void UnequipItemToSocket(const FString& NameValue);
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server, Reliable)
 	void ServerRPCEquipItemToSocket(FItemData p_ItemInfo);
-	
-	UFUNCTION(NetMulticast,Reliable)
+
+	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPCEquipItemToSocket(AHG_EquipItem* ItemValue);
-	
+
 	UFUNCTION(Server, Reliable)
 	void ServerRPCUnequipItemToSocket(const FString& NameValue);
 
-	UFUNCTION(NetMulticast,Reliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPCUnequipItemToSocket(const FString& NameValue);
 
 	void DestroyItem(AHG_ItemBase* ItemValue);
-	
-	UFUNCTION(Server,Reliable)
+
+	UFUNCTION(Server, Reliable)
 	void ServerRPCDestroyItem(AHG_ItemBase* ItemValue);
+
+	void SpawnItem(FItemData p_ItemInfo);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCSpawnItem(FItemData p_ItemInfo);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPCSpawnItem(AHG_ItemBase* ItemValue);
 
 	bool bEquipItem = false;
 
@@ -146,4 +154,5 @@ public:
 	float TargetValue2 = -50.0f;
 
 	FVector LookingPoint;
+
 };

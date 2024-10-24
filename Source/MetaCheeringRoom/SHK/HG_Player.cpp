@@ -361,6 +361,37 @@ void AHG_Player::DestroyItem(AHG_ItemBase* ItemValue)
 	ServerRPCDestroyItem(ItemValue);
 }
 
+
+void AHG_Player::SpawnItem(FItemData p_ItemInfo)
+{
+	ServerRPCSpawnItem(p_ItemInfo);
+
+}
+
+void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
+{
+	auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(p_ItemInfo.ItemClass, GetActorLocation(), GetActorRotation());
+	if (SpawnedItem != nullptr)
+	{
+		//MulticastRPCSpawnItem(SpawnedItem);
+		SpawnedItem->SetReplicates(true);
+		SpawnedItem->SetOwner(this);
+		SpawnedItem->SetActorHiddenInGame(true);
+		SpawnedItem->Use();
+	}
+}
+
+void AHG_Player::MulticastRPCSpawnItem_Implementation(AHG_ItemBase* ItemValue)
+{
+	if (ItemValue)
+	{
+		ItemValue->SetReplicates(true);
+		ItemValue->SetOwner(this);
+		ItemValue->SetActorHiddenInGame(true);
+		ItemValue->Use();
+	}
+}
+
 void AHG_Player::ServerRPCDestroyItem_Implementation(AHG_ItemBase* ItemValue)
 {
 	ItemValue->Destroy();
@@ -374,7 +405,6 @@ void AHG_Player::ServerRPCEquipItemToSocket_Implementation(FItemData p_ItemInfo)
 	{
 		EItem->SetOwner(this);
 
-		UE_LOG(LogTemp, Warning, TEXT("1"));
 		MulticastRPCEquipItemToSocket(EItem);
 
 	}
