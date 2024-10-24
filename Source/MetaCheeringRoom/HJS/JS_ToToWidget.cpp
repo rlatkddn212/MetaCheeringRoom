@@ -10,13 +10,39 @@
 #include "Components/Button.h"
 #include "../MetaCheeringRoom.h"
 #include "Components/BackgroundBlur.h"
-
+#include "Kismet/GameplayStatics.h"
+#include "HJS/JS_TotoActor.h"
 
 
 void UJS_ToToWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	BTN_ToToQuit->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickQuitBtn);
+
+	BTN_Betting1->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickBetting1Btn);
+	BTN_Betting2->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickBetting2Btn);
+}
+
+void UJS_ToToWidget::OnClickBetting1Btn()
+{
+	// 플레이어가 이만한 포인트가 있는 지 체크하는 부분
+
+	int32 BettingPoint = FCString::Atoi(*TEXT_Betting1->GetText().ToString());
+	// 베팅하기
+	AJS_TotoActor* TotoActor = Cast<AJS_TotoActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AJS_TotoActor::StaticClass()));
+	
+	TotoActor->BettingToto(BettingPoint,1);
+}
+
+void UJS_ToToWidget::OnClickBetting2Btn()
+{
+	// 플레이어가 이만한 포인트가 있는 지 체크하는 부분
+
+	int32 BettingPoint = FCString::Atoi(*TEXT_Betting2->GetText().ToString());
+	// 베팅하기
+	AJS_TotoActor* TotoActor = Cast<AJS_TotoActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AJS_TotoActor::StaticClass()));
+
+	TotoActor->BettingToto(BettingPoint, 2);
 }
 
 void UJS_ToToWidget::OnClickQuitBtn()
@@ -55,8 +81,8 @@ void UJS_ToToWidget::SetTotoInfo(const FString& totoName, const FString& select1
 	FString Percent2Text = FString::Printf(TEXT("%d%%"), Percent2Int);
 	TEXT_Percent2->SetText(FText::FromString(Percent2Text));
 
-	PB_Percent1->SetPercent(Percent1);
-	PB_Percent2->SetPercent(Percent2);
+	PB_Percent1->SetPercent(Percent1/100.f);
+	PB_Percent2->SetPercent(Percent2/100.f);
 
 	FString Odd1Text = FString::Printf(TEXT("%.2f"), totalOdds1);	
 	TEXT_OddsSelect1->SetText(FText::FromString(Odd1Text));

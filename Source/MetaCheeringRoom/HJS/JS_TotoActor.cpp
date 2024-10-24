@@ -120,17 +120,40 @@ void AJS_TotoActor::ServerBettingToto_Implementation(int32 point, int32 select, 
 	if (select == 1)
 	{
 		TotalSelect1+=point;
-		Betting1[BettorID] += point;
+		if (Betting1.Contains(BettorID))
+		{
+			Betting1[BettorID] += point;
+		}
+		else
+		{
+			Betting1.Add(BettorID,point);
+		}
 	}
 	else
 	{
 		TotalSelect2+=point;
-		Betting2[BettorID] += point;
+		if (Betting2.Contains(BettorID))
+		{
+			Betting2[BettorID] += point;
+		}
+		else
+		{
+			Betting2.Add(BettorID, point);
+		}
 	}
-
+	int32 Div1 = TotalSelect1;
+	int32 Div2 = TotalSelect2;
+	if (TotalSelect1 == 0)
+	{
+		Div1 = 1;
+	}
+	if (TotalSelect2 == 0)
+	{
+		Div2 = 1;
+	}
 	//MulticastSetToToUI 배당률을 계산해서 넣어주고
-	TotalOdds1 = (TotalSelect1 + TotalSelect2) / TotalSelect1;
-	TotalOdds2 = (TotalSelect1 + TotalSelect2) / TotalSelect2;
+	TotalOdds1 = ((float)TotalSelect1 + TotalSelect2) / Div1;
+	TotalOdds2 = ((float)TotalSelect1 + TotalSelect2) / Div2;
 
 	TotalBettor1 = Betting1.Num();
 	TotalBettor2 = Betting2.Num();
