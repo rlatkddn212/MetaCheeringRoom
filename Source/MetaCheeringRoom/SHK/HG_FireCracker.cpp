@@ -23,7 +23,18 @@ void AHG_FireCracker::ServerRPCUse_Implementation()
 {
 	FVector SpawnLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 200.0f;
 	FRotator SpawnRotation = Owner->GetActorRotation();
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireCrackerEffect, SpawnLocation, SpawnRotation, true);
+	UParticleSystemComponent* comp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireCrackerEffect, SpawnLocation, SpawnRotation, true);
+
+	MulticastRPCUse(Owner);
+
 	Destroy();
+}
+
+void AHG_FireCracker::MulticastRPCUse_Implementation(APawn* pawn)
+{
+	FVector SpawnLocation = pawn->GetActorLocation() + pawn->GetActorForwardVector() * 200.0f;
+	FRotator SpawnRotation = pawn->GetActorRotation();
+	UParticleSystemComponent* comp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireCrackerEffect, SpawnLocation, SpawnRotation, true);
+	//Destroy();
 }
 
