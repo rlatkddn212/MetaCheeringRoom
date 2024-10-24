@@ -44,6 +44,8 @@ void ASW_CreatorPlayerController::BeginPlay()
 			SetToolState(NewState);
 		});
 
+
+	ReloadHierarchy();
 	ToolState = ECreatorToolState::Selection;
 }
 

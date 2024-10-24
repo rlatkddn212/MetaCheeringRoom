@@ -109,7 +109,6 @@ void ASW_Creator::OnMyQ(const FInputActionValue& Value)
 		if (PC)
 			PC->SetToolState(ECreatorToolState::Selection);
 	}
-
 }
 
 void ASW_Creator::OnMyW(const FInputActionValue& Value)
@@ -200,7 +199,6 @@ void ASW_Creator::OnMyDelete(const FInputActionValue& Value)
 
 void ASW_Creator::SetMouseState(ECreatorMouseState NewState)
 {
-	
 	if (MouseState == ECreatorMouseState::GizmoDrag && MouseState != NewState)
 	{
 		PC->SetInputMode(FInputModeGameAndUI());

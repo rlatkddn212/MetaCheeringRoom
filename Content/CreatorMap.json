@@ -1,0 +1,190 @@
+{
+	"rootObjects": [
+		{
+			"ObjectName": "BP_Cube_C_0",
+			"TranslationX": 142.0259717582004,
+			"TranslationY": -38.699899005280479,
+			"TranslationZ": 321.93751181978985,
+			"RotationX": 1.8417371550412554e-16,
+			"RotationY": 0.88895167660635888,
+			"RotationZ": 2.7986398807391844e-16,
+			"RotationW": -0.45800100071805844,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 2.2250271979723428,
+			"Objects": [
+				{
+					"ObjectName": "BP_Cube_C_2",
+					"TranslationX": -131.82074698827211,
+					"TranslationY": 326.87198168996537,
+					"TranslationZ": -0.49999327371062918,
+					"RotationX": 0,
+					"RotationY": -5.154359051937586e-32,
+					"RotationZ": 0,
+					"RotationW": 0.99999999999999989,
+					"ScaleX": 1,
+					"ScaleY": 1,
+					"ScaleZ": 1,
+					"Objects": [
+						{
+							"ObjectName": "BP_Cube_C_3",
+							"TranslationX": -101.08252081704117,
+							"TranslationY": -80.951840870536785,
+							"TranslationZ": 316.33900338359558,
+							"RotationX": -0.033891401581327932,
+							"RotationY": -0.38670855409481014,
+							"RotationZ": -0.014223041031428491,
+							"RotationW": 0.92146924647140138,
+							"ScaleX": 1,
+							"ScaleY": 1,
+							"ScaleZ": 2.2250271979723428,
+							"Objects": [
+								{
+									"ObjectName": "BP_Cube_C_4",
+									"TranslationX": -176.97140019467633,
+									"TranslationY": -33.243603821973707,
+									"TranslationZ": 234.01045127183093,
+									"RotationX": -0.033891401581327925,
+									"RotationY": -0.38670855409481014,
+									"RotationZ": -0.014223041031428487,
+									"RotationW": 0.92146924647140138,
+									"ScaleX": 1,
+									"ScaleY": 1,
+									"ScaleZ": 2.2250271979723428,
+									"Objects": [
+										{
+											"ObjectName": "BP_Cube_C_5",
+											"TranslationX": 91.760243965932091,
+											"TranslationY": -301.05009263683485,
+											"TranslationZ": 535.94144638842238,
+											"RotationX": -0.033891401581327925,
+											"RotationY": -0.38670855409481014,
+											"RotationZ": -0.014223041031428487,
+											"RotationW": 0.92146924647140138,
+											"ScaleX": 1,
+											"ScaleY": 1,
+											"ScaleZ": 2.2250271979723428,
+											"Objects": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"ObjectName": "BP_Cube_C_1",
+					"TranslationX": 47.188476502660279,
+					"TranslationY": 120.27994049893061,
+					"TranslationZ": 454.97524113528902,
+					"RotationX": 1.8417371550412552e-16,
+					"RotationY": 0.88895167660635888,
+					"RotationZ": 2.7986398807391844e-16,
+					"RotationW": -0.45800100071805844,
+					"ScaleX": 1,
+					"ScaleY": 1,
+					"ScaleZ": 2.2250271979723428,
+					"Objects": []
+				}
+			]
+		},
+		{
+			"ObjectName": "BP_Cube_C_6",
+			"TranslationX": 58.269771769705926,
+			"TranslationY": 665.26206368651731,
+			"TranslationZ": -0.49999788333673223,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		},
+		{
+			"ObjectName": "BP_Cube_C_7",
+			"TranslationX": 246.93641272672903,
+			"TranslationY": 527.57223099336784,
+			"TranslationZ": -0.50002125710796008,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		},
+		{
+			"ObjectName": "BP_Cube_C_8",
+			"TranslationX": 408.90824742532948,
+			"TranslationY": 652.63483250977174,
+			"TranslationZ": -0.49999193527764874,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		},
+		{
+			"ObjectName": "BP_Cube_C_9",
+			"TranslationX": 83.912582745063332,
+			"TranslationY": 11.502481534828803,
+			"TranslationZ": -0.49999586883438951,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		},
+		{
+			"ObjectName": "BP_Cube_C_10",
+			"TranslationX": 118.37001765578975,
+			"TranslationY": 156.94066509445727,
+			"TranslationZ": -0.49999741252290164,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		},
+		{
+			"ObjectName": "BP_Cube_C_11",
+			"TranslationX": 123.16083702258084,
+			"TranslationY": -208.83332120476354,
+			"TranslationZ": -0.50000133626076604,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		},
+		{
+			"ObjectName": "BP_Cube_C_12",
+			"TranslationX": -99.490523857324774,
+			"TranslationY": 87.143970933567374,
+			"TranslationZ": -0.49999519292094874,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		}
+	]
+}
