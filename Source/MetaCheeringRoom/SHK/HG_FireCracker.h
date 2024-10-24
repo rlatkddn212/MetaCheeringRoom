@@ -27,6 +27,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPCUse(APawn* pawn);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPCUse(APawn* pawn);
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
 	class UParticleSystem* FireCrackerEffect;

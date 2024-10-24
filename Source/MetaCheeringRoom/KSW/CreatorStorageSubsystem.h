@@ -45,11 +45,12 @@ public:
 
 	FCreatorObjectData* GetCreatorObjectData(int idx);
 	TArray<FCreatorObjectData*> GetCreatorObjects() { return CreatorObjects; }
-private:
-	// Json형태로 저장
-	FString LoadCreatorMap();
-	void SaveCreatorMap(FString str);
 
+	// Json형태로 저장
+	FString LoadCreatorMap(FString FilePath);
+	bool SaveCreatorMap(FString FilePath, FString JsonStr);
+
+private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	class UDataTable* ItemDataTable;

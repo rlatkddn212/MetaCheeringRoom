@@ -15,4 +15,16 @@ class METACHEERINGROOM_API USW_CreatorMenuWidget : public UUserWidget
 	GENERATED_BODY()
 
 	virtual void NativeConstruct() override;
+
+public:
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UButton* SaveButton;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UButton* QuitButton;
+
+	UFUNCTION()
+	void SaveCreatorMap();
+	UFUNCTION()
+	void Quit();
 };

@@ -25,29 +25,16 @@ void UCreatorMapSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-bool UCreatorMapSubsystem::SaveCreatorMapToJson(const FString& FilePath)
+FString UCreatorMapSubsystem::SaveCreatorMapToJson()
 {
     FString JsonString = SerializeCreatorMapToJson(CreatorMap);
 
-    if (FFileHelper::SaveStringToFile(JsonString, *FilePath))
-    {
-        UE_LOG(LogTemp, Log, TEXT("CreatorMap saved to %s"), *FilePath);
-        return true;
-    }
-    UE_LOG(LogTemp, Error, TEXT("Failed to save CreatorMap to %s"), *FilePath);
-    return false;
+    return JsonString;
 }
 
-bool UCreatorMapSubsystem::LoadCreatorMapFromJson(const FString& FilePath)
+bool UCreatorMapSubsystem::LoadCreatorMapFromJson(FString JsonString)
 {
-    FString JsonString;
-    if (FFileHelper::LoadFileToString(JsonString, *FilePath))
-    {
-        CreatorMap = DeserializeJsonToCreatorMap(JsonString);
-        UE_LOG(LogTemp, Log, TEXT("CreatorMap loaded from %s"), *FilePath);
-        return true;
-    }
-    UE_LOG(LogTemp, Error, TEXT("Failed to load CreatorMap from %s"), *FilePath);
+    FCreatorMap LoadedMap = DeserializeJsonToCreatorMap(JsonString);
     return false;
 }
 
@@ -85,7 +72,8 @@ FCreatorMap UCreatorMapSubsystem::DeserializeJsonToCreatorMap(const FString& Jso
         {
             for (const TSharedPtr<FJsonValue>& JsonValue : *JsonRootArray)
             {
-                RetCreatorMap.Objects.Add(DeserializeCreatorObject(JsonValue->AsObject()));
+                ASW_CreatorObject* ChildObject = DeserializeCreatorObject(JsonValue->AsObject());
+                AddObject(ChildObject);
             }
         }
     }
@@ -127,12 +115,17 @@ TSharedPtr<FJsonObject> UCreatorMapSubsystem::SerializeCreatorObject(const ASW_C
     JsonObject->SetNumberField(TEXT("ScaleY"), transform.GetScale3D().Y);
     JsonObject->SetNumberField(TEXT("ScaleZ"), transform.GetScale3D().Z);
     // 자식 객체 배열 직렬화
-   /* TArray<TSharedPtr<FJsonValue>> JsonChildren;
-    for (const ASW_CreatorObject* Child : CreatorObject->GetAllChildActors())
+
+    TArray<AActor*> AttachedActors;
+    CreatorObject->GetAttachedActors(AttachedActors);
+   TArray<TSharedPtr<FJsonValue>> JsonChildren;
+    for (const AActor* Child : AttachedActors)
     {
-        JsonChildren.Add(MakeShareable(new FJsonValueObject(SerializeCreatorObject(Child))));
+        const ASW_CreatorObject* CreatorObject = Cast<ASW_CreatorObject>(Child); 
+        JsonChildren.Add(MakeShareable(new FJsonValueObject(SerializeCreatorObject(CreatorObject))));
     }
-    JsonObject->SetArrayField(TEXT("Objects"), JsonChildren);*/
+
+    JsonObject->SetArrayField(TEXT("Objects"), JsonChildren);
 
     return JsonObject;
 }
@@ -145,11 +138,13 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
         return nullptr;  // null 반환
     }
 
+    UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+    TArray<FCreatorObjectData*> CreatorObjectsStruct = system->GetCreatorObjects();
     // CreatorObject를 생성
-    //ASW_CreatorObject* CreatorObject;
+    ASW_CreatorObject* CreatorObject = CreateObject(CreatorObjectsStruct[0]);
 
-    // JSON에서 이름과 변환 정보를 가져오기
-    // CreatorObject->SetName = JsonObject->GetStringField(TEXT("ObjectName"));
+     // JSON에서 이름과 변환 정보를 가져오기
+    CreatorObject->SetActorLabel(JsonObject->GetStringField(TEXT("ObjectName")));
 
     // 변환 정보 역직렬화
     FVector Translation(
@@ -172,6 +167,7 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
     );
 
     FTransform transform = FTransform(Rotation, Translation, Scale);
+    CreatorObject->SetActorTransform(transform);
 
     // 자식 객체 배열 역직렬화
     const TArray<TSharedPtr<FJsonValue>>* JsonChildren;
@@ -179,11 +175,13 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
     {
         for (const TSharedPtr<FJsonValue>& JsonValue : *JsonChildren)
         {
-            //CreatorObject->Objects.Add(DeserializeCreatorObject(JsonValue->AsObject()));
+            ASW_CreatorObject* ChildObject =  DeserializeCreatorObject(JsonValue->AsObject());
+            //AttachObject(CreatorObject, ChildObject);
+            AddObject(ChildObject, CreatorObject);
         }
     }
 
-    return nullptr;
+    return CreatorObject;
 }
 
 ASW_CreatorObject* UCreatorMapSubsystem::CreateObject(FCreatorObjectData* ObjectData)
@@ -193,6 +191,9 @@ ASW_CreatorObject* UCreatorMapSubsystem::CreateObject(FCreatorObjectData* Object
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
     ASW_CreatorObject* CreatingObject = GetWorld()->SpawnActor<ASW_CreatorObject>(ObjectData->ItemClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+    CreatingObject->SetReplicates(true);
+    CreatingObject->SetReplicateMovement(true);
+
     CreatingObject->SetActorLocation(FVector::ZeroVector);
     CreatingObject->SetActorRotation(FRotator::ZeroRotator);
     CreatingObject->CreatingObjectData = ObjectData;
@@ -210,7 +211,8 @@ void UCreatorMapSubsystem::AddObject(ASW_CreatorObject* CreatingObject, ASW_Crea
 	if (ParentObject != nullptr)
 	{
         // 부모 액터에 추가
-        CreatingObject->AttachToActor(ParentObject, FAttachmentTransformRules::KeepRelativeTransform);
+        AttachObject(ParentObject, CreatingObject);
+        //CreatingObject->AttachToActor(ParentObject, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 	else
 	{

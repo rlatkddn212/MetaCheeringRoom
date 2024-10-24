@@ -44,9 +44,9 @@ public:
 
 	const FCreatorMap& GetCreatorMap() const { return CreatorMap; }
 	void SetCreatorMap(const FCreatorMap& NewMap) { CreatorMap = NewMap; }
-
-	bool SaveCreatorMapToJson(const FString& FilePath);
-	bool LoadCreatorMapFromJson(const FString& FilePath);
+	
+	FString SaveCreatorMapToJson();
+	bool LoadCreatorMapFromJson(FString JsonString);
 
 	FString SerializeCreatorMapToJson(const FCreatorMap& Map);
 	FCreatorMap DeserializeJsonToCreatorMap(const FString& JsonString);

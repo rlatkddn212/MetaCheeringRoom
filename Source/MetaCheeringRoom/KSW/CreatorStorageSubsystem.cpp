@@ -43,12 +43,28 @@ FCreatorObjectData* UCreatorStorageSubsystem::GetCreatorObjectData(int idx)
 	return CreatorObjects[idx];
 }
 
-FString UCreatorStorageSubsystem::LoadCreatorMap()
+FString UCreatorStorageSubsystem::LoadCreatorMap(FString FilePath)
 {
+	FString JsonStr;
+	if (FFileHelper::LoadFileToString(JsonStr, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("CreatorMap loaded from %s"), *FilePath);
+		return JsonStr;
+	}
+	UE_LOG(LogTemp, Error, TEXT("Failed to load CreatorMap from %s"), *FilePath);
+
 	return "";
+
 }
 
-void UCreatorStorageSubsystem::SaveCreatorMap(FString str)
+bool UCreatorStorageSubsystem::SaveCreatorMap(FString FilePath, FString JsonStr)
 {
+	 if (FFileHelper::SaveStringToFile(JsonStr, *FilePath))
+	 {
+		 UE_LOG(LogTemp, Log, TEXT("CreatorMap saved to %s"), *FilePath);
+		 return true;
+	 }
+	 UE_LOG(LogTemp, Error, TEXT("Failed to save CreatorMap to %s"), *FilePath);
 
+	 return false;
 }
