@@ -31,9 +31,12 @@ void AJS_ToToMakeTrigger::ComponentBeginOverlap(UPrimitiveComponent* OverlappedC
 		if (Character && Character->IsLocallyControlled() &&  Character->HasAuthority())
 		{
 			UToToMakeWidget* TotoMakeWidget = ToToActor->TotoMakeWidget;
-			if (TotoMakeWidget)
+			if (TotoMakeWidget && TotoMakeWidget->bOpen)
 			{
 				TotoMakeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+				APlayerController* PC = GetWorld()->GetFirstPlayerController();
+				PC->SetShowMouseCursor(true);
+				PC->SetInputMode(FInputModeUIOnly());
 			}			
 		}
 	}

@@ -80,6 +80,12 @@ public:
 	// 4-1. 맞춘 유저는 자신이 걸었던 돈을 배당에 맞게 획득함
 	// 4-2. 틀린 유저는 돈을 잃음
 
+	UFUNCTION()
+	void AdjustPoint(int32 ResultNum);
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastAdjustPoint(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd);
+
 	// 끗
 	int32 TotoLimitTIme;
 

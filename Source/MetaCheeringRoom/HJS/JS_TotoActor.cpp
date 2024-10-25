@@ -11,6 +11,8 @@
 #include "../MetaCheeringRoom.h"
 #include "JS_GameState.h"
 #include "JS_PlayerController.h"
+#include "../SHK/HG_Player.h"
+#include "../SHK/HG_PlayerGoodsComponent.h"
 
 // Sets default values
 AJS_TotoActor::AJS_TotoActor()
@@ -170,17 +172,53 @@ void AJS_TotoActor::ServerBettingToto_Implementation(int32 point, int32 select, 
 	MulticastSetToToUI(TotoName,Select1,Select2,-1,TotalSelect1,TotalSelect2,TotalBettor1,TotalBettor2,TotalOdds1,TotalOdds2);
 }
 
+void AJS_TotoActor::AdjustPoint(int32 ResultNum)
+{
+	// 멀티캐스트로 예측 결과 안내
+
+	// 각 플레이어의 게임 인스턴스에 포인트를 지급하기 ( 멀티캐스트, 인자값으로 넘겨주기? )
+	TArray<FString> Keys;
+	TArray<int32> Values;
+	if (ResultNum == 1)
+	{
+		for (auto& Elem : Betting1)
+		{
+			Keys.Add(Elem.Key);
+			Values.Add(Elem.Value);
+		}
+	}
+	else
+	{
+		for (auto& Elem : Betting2)
+		{
+			Keys.Add(Elem.Key);
+			Values.Add(Elem.Value);
+		}
+	}
+}
+
+void AJS_TotoActor::MulticastAdjustPoint_Implementation(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd)
+{
+	int32 BettingPoint = 0;
+	for (int32 i=0;i<Keys.Num();i++)
+	{
+		if (Keys[i] == MyUserID)
+		{
+			BettingPoint = Values[i];
+			break;
+		}
+	}
+	AHG_Player* Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+
+	Player->GoodsComp->AddGold(BettingPoint * Odd);
+}
+
 void AJS_TotoActor::ServerSetTimerLimit()
 {
 	if (TotoLimitTIme <= 0)
 	{
 		FString timeLimitText = FString::Printf(TEXT("제출이 마감되었습니다."));
 		MulticastSetTimeUI(timeLimitText);
-		// 더이상 예측 못하게 UI 바뀌기
-		if (ToToWidget)
-		{
-			ToToWidget->SetBettingStopUI();
-		}
 	}
 	else
 	{
@@ -197,6 +235,13 @@ void AJS_TotoActor::MulticastSetTimeUI_Implementation(const FString& TimeText)
 {
 	if (ToToWidget)
 	{
+		// 더이상 예측 못하게 UI 바뀌기
 		ToToWidget->SetTimerText(TimeText);
+		ToToWidget->SetBettingStopUI();
+	}
+	if (TotoMakeWidget)
+	{
+		TotoMakeWidget->SetWidgetSwitcher(1);
+		TotoMakeWidget->bOpen = true;
 	}
 }

@@ -36,6 +36,9 @@ void AJS_ToToWidgetTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overla
 			if (ToToWidget)
 			{
 				ToToWidget->ToToInitSetting();
+				APlayerController* PC = GetWorld()->GetFirstPlayerController();
+				PC->SetShowMouseCursor(true);
+				PC->SetInputMode(FInputModeUIOnly());
 			}
 		}
 	}

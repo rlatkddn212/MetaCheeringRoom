@@ -18,6 +18,8 @@ public:
 	
 	virtual void NativeConstruct() override;
 
+	void SetWidgetSwitcher(int32 value);
+
 	// ToToMake -------------------------
 
 	UPROPERTY(EditAnywhere)
@@ -77,10 +79,22 @@ public:
 	class UButton* BTN_CancelResult;
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_Adjust;
+	UFUNCTION()
+	void OnClickAdjustBtn();
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_ResultSelect1;
+	UFUNCTION()
+	void OnClickResult1Btn();
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_ResultSelect2;
+	UFUNCTION()
+	void OnClickResult2Btn();
+	int32 SelectResult = -1;
 
 	// ---------------------------- 
+
+	bool bOpen = true;
+
+	void InitMakeWidget();
+
 };
