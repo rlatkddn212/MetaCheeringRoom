@@ -5,6 +5,7 @@
 #include "Components/Button.h"
 #include "../CreatorMapSubsystem.h"
 #include "../CreatorStorageSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 void USW_CreatorMenuWidget::NativeConstruct()
 {
@@ -18,15 +19,14 @@ void USW_CreatorMenuWidget::SaveCreatorMap()
 {
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 	FString str = system->SaveCreatorMapToJson();
+	FString MapName = system->GetMapName();
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *str);
 
 	UCreatorStorageSubsystem * storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
-	
-	FString path = FPaths::ProjectContentDir() + TEXT("CreatorMap.json");
-	storage->SaveCreatorMap(path, str);
+	storage->SaveCreatorMap(str, MapName);
 }
 
 void USW_CreatorMenuWidget::Quit()
 {
-
+	UGameplayStatics::OpenLevel(GetWorld(), "HG_LobbyLevel", true);
 }

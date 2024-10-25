@@ -22,6 +22,28 @@ public:
 	TSubclassOf<class ASW_CreatorObject> ItemClass;
 };
 
+USTRUCT(BlueprintType)
+struct FCreatorMapMetaData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString CreatorName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString CreatorMapName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString FileName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ThumbnailFileName;
+
+	// 시간
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FDateTime CreatedTime;
+};
+
 /**
  * 
  */
@@ -45,10 +67,15 @@ public:
 
 	FCreatorObjectData* GetCreatorObjectData(int idx);
 	TArray<FCreatorObjectData*> GetCreatorObjects() { return CreatorObjects; }
+	TArray<FCreatorMapMetaData*> GetCreatorMapMetaDatas() { return CreatorMapMetaDatas; }
 
-	// Json형태로 저장
 	FString LoadCreatorMap(FString FilePath);
-	bool SaveCreatorMap(FString FilePath, FString JsonStr);
+	bool SaveCreatorMap(FString JsonStr, FString MapName);
+
+	void LoadMetaData();
+	void SaveMetaData();
+	void AddMetaData(FCreatorMapMetaData* MetaData);
+	void RemoveMetaData(int32 idx);
 
 private:
 	
@@ -56,4 +83,7 @@ private:
 	class UDataTable* ItemDataTable;
 	// 크리에이터 툴에 사용할 수 있는 오브젝트
 	TArray<FCreatorObjectData*> CreatorObjects;
+	
+	TArray<FCreatorMapMetaData*> CreatorMapMetaDatas;
+	FString MetaDataFile = "CreatorMapMetaDataList.json";
 };

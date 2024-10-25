@@ -17,10 +17,16 @@ class METACHEERINGROOM_API AHG_GameModeBase : public AGameModeBase
 public:
 	
 	virtual void BeginPlay() override;
-
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UJS_SessionJoinWidget> SessionWidgetFactory;
 	UPROPERTY()
 	class UJS_SessionJoinWidget* SessionWidget;
+
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class USW_CreateCreatorWidget> CreateCreatorWidgetFactory;
+	UPROPERTY()
+	class USW_CreateCreatorWidget* CreateCreatorWidget;
 
 };

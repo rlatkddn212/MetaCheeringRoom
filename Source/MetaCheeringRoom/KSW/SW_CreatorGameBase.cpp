@@ -14,12 +14,6 @@ void ASW_CreatorGameBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UCreatorStorageSubsystem* storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
-
-	FString path = FPaths::ProjectContentDir() + TEXT("CreatorMap.json");
-	FString str = storage->LoadCreatorMap(path);
-
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-	system->LoadCreatorMapFromJson(str);
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *str);
+	system->LoadMap();
 }

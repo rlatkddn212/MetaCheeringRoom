@@ -17,14 +17,11 @@ struct FCreatorMap
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString MapName;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<ASW_CreatorObject*> Objects;
 
 	FCreatorMap() : MapName(TEXT("New Map")) {}
-
-	// delete
-	// void RemoveObject(ASW_CreatorObject* Object);
 };
 
 /**
@@ -45,7 +42,14 @@ public:
 	const FCreatorMap& GetCreatorMap() const { return CreatorMap; }
 	void SetCreatorMap(const FCreatorMap& NewMap) { CreatorMap = NewMap; }
 	
+	void InitMap();
+	void SetMapName(const FString& Name);
+	FString GetMapName();
+
 	FString SaveCreatorMapToJson();
+	void SetupJson(FString JsonString);
+	bool LoadMap();
+
 	bool LoadCreatorMapFromJson(FString JsonString);
 
 	FString SerializeCreatorMapToJson(const FCreatorMap& Map);
@@ -75,6 +79,8 @@ public:
 	ASW_CreatorObject* FindParentObject(ASW_CreatorObject* ChildObject);
 
 	bool IsChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
+
+	FString LoadJsonStr;
 
 	UPROPERTY()
 	TMap<int32, ASW_CreatorObject*> CreatorItemMap;

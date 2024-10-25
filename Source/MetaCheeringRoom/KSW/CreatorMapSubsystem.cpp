@@ -11,6 +11,7 @@
 #include "SW_CreatorObject.h"
 #include "CreatorStorageSubsystem.h"
 #include "Engine/EngineTypes.h"
+#include "EngineUtils.h"
 
 void UCreatorMapSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -25,11 +26,46 @@ void UCreatorMapSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
+void UCreatorMapSubsystem::InitMap()
+{
+    CreatorMap.Objects.Empty();
+	UniqueCreatorItemId = 1;
+
+    // 월드에 있는 ASW_CreatorObject 모두 제거
+    for (TActorIterator<ASW_CreatorObject> It(GetWorld()); It; ++It)
+	{
+		ASW_CreatorObject* CreatorObject = *It;
+		CreatorObject->Destroy();
+	}
+}
+
+void UCreatorMapSubsystem::SetMapName(const FString& Name)
+{
+    CreatorMap.MapName = Name;
+}
+
+FString UCreatorMapSubsystem::GetMapName()
+{
+    return CreatorMap.MapName;
+}
+
 FString UCreatorMapSubsystem::SaveCreatorMapToJson()
 {
     FString JsonString = SerializeCreatorMapToJson(CreatorMap);
 
     return JsonString;
+}
+
+void UCreatorMapSubsystem::SetupJson(FString JsonString)
+{
+    LoadJsonStr = JsonString;
+}
+
+bool UCreatorMapSubsystem::LoadMap()
+{
+    InitMap();
+    FCreatorMap LoadedMap = DeserializeJsonToCreatorMap(LoadJsonStr);
+    return true;
 }
 
 bool UCreatorMapSubsystem::LoadCreatorMapFromJson(FString JsonString)
