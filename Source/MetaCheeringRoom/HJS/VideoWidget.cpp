@@ -8,13 +8,23 @@
 #include "VideoNode.h"
 #include "Components/Border.h"
 #include "Components/TextBlock.h"
+#include "GameFramework/PlayerController.h"
 
 void UVideoWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	BTN_CategoryLive->OnClicked.AddDynamic(this, &UVideoWidget::SettingLive);
 	BTN_CategoryVOD->OnClicked.AddDynamic(this, &UVideoWidget::SettingVOD);
+	BTN_Quit->OnClicked.AddDynamic(this, &UVideoWidget::OnClickQuitBtn);
 
+}
+
+void UVideoWidget::OnClickQuitBtn()
+{
+	SetVisibility(ESlateVisibility::Hidden);
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	PC->SetShowMouseCursor(false);
+	PC->SetInputMode(FInputModeGameOnly());
 }
 
 void UVideoWidget::SettingLive()

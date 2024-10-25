@@ -27,6 +27,11 @@ public:
 	class UScrollBox* SB_Live;
 	UPROPERTY(meta=(BindWidget))
 	class UScrollBox* SB_VOD;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BTN_Quit;
+
+	UFUNCTION()
+	void OnClickQuitBtn();
 
 	UFUNCTION()
 	void SettingLive();

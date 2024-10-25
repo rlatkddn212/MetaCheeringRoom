@@ -65,7 +65,10 @@ public:
 	class UTextBlock* TEXT_BettorCount2;
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* TEXT_SoSad;
-
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock* TEXT_Betting1;
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock* TEXT_Betting2;
 	UPROPERTY(meta=(BindWidget))
 	class UWidgetSwitcher* WS_Betting;
 
@@ -73,9 +76,12 @@ public:
 	class UButton* BTN_BettingWeight;
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_Betting1;
+	UFUNCTION()
+	void OnClickBetting1Btn();
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_Betting2;
-
+	UFUNCTION()
+	void OnClickBetting2Btn();
 	UPROPERTY(meta=(BindWidget))
 	class UEditableTextBox* ET_BettingWeight1;
 	UPROPERTY(meta=(BindWidget))
