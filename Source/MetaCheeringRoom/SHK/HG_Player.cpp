@@ -17,6 +17,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Net/UnrealNetwork.h"
 #include "HG_GameInstance.h"
+#include "HG_PlayerAnimInstance.h"
 
 AHG_Player::AHG_Player()
 {
@@ -59,6 +60,9 @@ AHG_Player::AHG_Player()
 void AHG_Player::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Anim = Cast<UHG_PlayerAnimInstance>(GetMesh()->GetAnimInstance());
+
 	DetectedStand = nullptr;
 	
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
@@ -163,6 +167,7 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	input->BindAction(IA_Inventory, ETriggerEvent::Completed, this, &AHG_Player::PopUpInventory);
 
+	input->BindAction(IA_Emotion, ETriggerEvent::Completed, this, &AHG_Player::Emotion);
 }
 
 void AHG_Player::OnMyMove(const FInputActionValue& Value)
@@ -271,6 +276,14 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 			bToggle = !bToggle;
 			bCanMove = true;
 		}
+	}
+}
+
+void AHG_Player::Emotion()
+{
+	if (Anim)
+	{
+		Anim->PlayTwerkEmotionMontage();
 	}
 }
 

@@ -14,6 +14,7 @@ enum class EItemCategory: uint8
 	Category_Top UMETA(DisplayName = "Top"),
 	Category_Bottom UMETA(DisplayName = "Bottom"),
 	Category_Active UMETA(DisplayName = "Active"),
+	Category_Emotion UMETA(DisplayName = "Emotion"),
 };
 
 USTRUCT(BlueprintType)
@@ -35,6 +36,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	EItemCategory ItemCategory;
+
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* Montage;
 
 	bool operator==(const FItemData& Other) const
 	{

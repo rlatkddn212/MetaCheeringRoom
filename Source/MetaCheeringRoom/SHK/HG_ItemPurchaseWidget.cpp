@@ -30,7 +30,6 @@ void UHG_ItemPurchaseWidget::OnClickPurchaseButton()
 {
 	if (GI->IsValidItem(LookingItemData.ItemName))
 	{
-
 		auto* pc = Cast<APlayerController>(Owner->Controller);
 		if (pc)
 		{

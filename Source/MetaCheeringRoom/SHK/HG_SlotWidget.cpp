@@ -59,6 +59,7 @@ void UHG_SlotWidget::InitSlot(FSlotStruct p_Slot)
 	SlotInfo.ItemInfo.ItemName = p_Slot.ItemInfo.ItemName;
 	SlotInfo.ItemInfo.ItemPrice = p_Slot.ItemInfo.ItemPrice;
 	SlotInfo.ItemInfo.ItemClass = p_Slot.ItemInfo.ItemClass;
+	SlotInfo.ItemInfo.Montage = p_Slot.ItemInfo.Montage;
 	SlotInfo.Quantity = p_Slot.Quantity;
 }
 

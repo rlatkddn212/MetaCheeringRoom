@@ -51,6 +51,8 @@ public:
 	class UInputAction* IA_Interaction;
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Inventory;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Emotion;
 
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
@@ -64,6 +66,10 @@ public:
 	void DetectObject();
 	UFUNCTION()
 	void PopUpInventory(const FInputActionValue& Value);
+	UFUNCTION()
+	void Emotion();
+
+
 	FVector Direction;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -158,4 +164,6 @@ public:
 	float TargetValue2 = -50.0f;
 
 	FVector LookingPoint;
+
+	class UHG_PlayerAnimInstance* Anim;
 };
