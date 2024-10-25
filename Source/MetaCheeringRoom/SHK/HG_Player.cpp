@@ -95,7 +95,8 @@ void AHG_Player::Tick(float DeltaTime)
 	Direction = FVector::ZeroVector;
 
 	FHitResult OutHit;
-	FVector Start = GetActorLocation();
+	int32 BoneIndex = GetMesh()->GetBoneIndex(TEXT("head"));
+	FVector Start = this->GetMesh()->GetBoneTransform(BoneIndex).GetLocation();
 	FVector End = Start + CameraComp->GetForwardVector() * 300.0f;
 
 	ECollisionChannel TC = ECC_WorldDynamic;
@@ -140,11 +141,11 @@ void AHG_Player::Tick(float DeltaTime)
 
 	if (bDetectStand)
 	{
-		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 5.0f);
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 3.5f);
 	}
 	else
 	{
-		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 5.0f);
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
 	}
 }
 
@@ -197,7 +198,8 @@ void AHG_Player::OnMyInteraction(const FInputActionValue& Value)
 void AHG_Player::DetectObject()
 {
 	FHitResult OutHit;
-	FVector Start = GetActorLocation();
+	int32 BoneIndex = GetMesh()->GetBoneIndex(TEXT("head"));
+	FVector Start = this->GetMesh()->GetBoneTransform(BoneIndex).GetLocation();
 	FVector End = Start + CameraComp->GetForwardVector() * 1000.0f;
 
 	ECollisionChannel TC = ECC_WorldDynamic;
@@ -278,11 +280,11 @@ void AHG_Player::PopUpPurchaseWidget()
 	{
 		PurchaseWidget = CreateWidget<UHG_ItemPurchaseWidget>(GetWorld(), PurchaseWidgetClass);
 		PurchaseWidget->SetOwner(this);
-		PurchaseWidget->SetItemInfo(TempData);
 	}
 	auto* pc = Cast<APlayerController>(Controller);
 	if (pc)
 	{
+		PurchaseWidget->SetItemInfo(TempData);
 		if (!bToggle)
 		{
 			PurchaseWidget->AddToViewport();

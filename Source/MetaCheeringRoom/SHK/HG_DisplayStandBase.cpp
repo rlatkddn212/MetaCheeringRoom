@@ -32,7 +32,7 @@ void AHG_DisplayStandBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ItemData.ItemName = "FireCracker";
+	ItemData.ItemName = DisplayItemName;
 	InitItemData();
 }
 
