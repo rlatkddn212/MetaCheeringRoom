@@ -181,16 +181,10 @@ void UInventoryWidget::ThrowAwaySelectedItem()
 				if (SelectedSlot->SlotInfo.Quantity == 0)
 				{
 					SelectedCategory->RemoveChildAt(i);
-					Img_SelectedItem->SetBrushFromMaterial(DefaultImage);
-					TB_ItemName->SetText(FText::FromString(TEXT("")));
-					TB_Price->SetText(FText::FromString(TEXT("")));
-					TB_Quantity->SetText(FText::FromString(TEXT("")));
 					SelectedSlot = nullptr;
 				}
-				else
-				{
 					DIsplaySelectedItemInfo();
-				}
+				
 				break;
 			}
 

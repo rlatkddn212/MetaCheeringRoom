@@ -10,11 +10,13 @@
 UENUM(BlueprintType)
 enum class EItemCategory: uint8
 {
-	Category_HandGrab UMETA(DisplayName = "HandGrab"),
+	Category_OneHandGrab UMETA(DisplayName = "OneHandGrab"),
+	Category_TwoHandGrab UMETA(DisplayName = "TwoHandGrab"),
 	Category_Top UMETA(DisplayName = "Top"),
 	Category_Bottom UMETA(DisplayName = "Bottom"),
 	Category_Active UMETA(DisplayName = "Active"),
 	Category_Emotion UMETA(DisplayName = "Emotion"),
+	Category_Emoji UMETA(DisplayName = "Emoji"),
 };
 
 USTRUCT(BlueprintType)
@@ -96,4 +98,6 @@ public:
 	class UHG_GameInstance* GI;
 
 	class APawn* Owner;
+
+	bool bEquiped = false;
 };

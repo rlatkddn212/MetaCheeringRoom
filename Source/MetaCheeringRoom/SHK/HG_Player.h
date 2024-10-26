@@ -108,7 +108,9 @@ public:
 	class AHG_DisplayStandBase* DetectedStand;
 
 	UPROPERTY(EditDefaultsOnly, Category = Equip)
-	class USceneComponent* HandComp;
+	class USceneComponent* HandLComp;
+	UPROPERTY(EditDefaultsOnly, Category = Equip)
+	class USceneComponent* HandRComp;
 	UPROPERTY(EditDefaultsOnly, Category = Equip)
 	class USceneComponent* LowerComp;
 	UPROPERTY(EditDefaultsOnly, Category = Equip)
@@ -166,4 +168,6 @@ public:
 	FVector LookingPoint;
 
 	class UHG_PlayerAnimInstance* Anim;
+
+	bool bPassed = false;
 };
