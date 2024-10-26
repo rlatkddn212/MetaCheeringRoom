@@ -14,6 +14,7 @@
 #include "HG_EquipItem.h"
 #include "HG_GameInstance.h"
 #include "Net/UnrealNetwork.h"
+#include "HG_PlayerAnimInstance.h"
 
 
 void UInventoryWidget::NativeConstruct()
@@ -34,6 +35,10 @@ void UInventoryWidget::NativeConstruct()
 	{
 		Btn_ActiveCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Active);
 	}
+	if (!Btn_EmotionCategory->OnClicked.IsBound())
+	{
+		Btn_EmotionCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Emotion);
+	}
 
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 	SelectedCategory = WB_SlotList_Active;
@@ -49,6 +54,7 @@ void UInventoryWidget::InitInventoryUI()
 	UE_LOG(LogTemp, Warning, TEXT("EquipList : %d"), EquipList.Num());
 	WB_SlotList_Active->ClearChildren();
 	WB_SlotList_Costume->ClearChildren();
+	WB_SlotList_Emotion->ClearChildren();
 	SelectedSlot = nullptr;
 	DIsplaySelectedItemInfo();
 	if (this->GetOwningPlayer() != nullptr)
@@ -67,6 +73,10 @@ void UInventoryWidget::InitInventoryUI()
 					if (slot.ItemInfo.ItemCategory == EItemCategory::Category_Active)
 					{
 						WB_SlotList_Active->AddChildToWrapBox(SlotWidget);
+					}
+					else if (slot.ItemInfo.ItemCategory == EItemCategory::Category_Emotion)
+					{
+						WB_SlotList_Emotion->AddChildToWrapBox(SlotWidget);
 					}
 					else
 					{
@@ -119,6 +129,13 @@ void UInventoryWidget::SelectCategory_Costume()
 	}
 }
 
+void UInventoryWidget::SelectCategory_Emotion()
+{
+	SelectedCategory = WB_SlotList_Emotion;
+	WS_Category->SetActiveWidgetIndex(2);
+	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
+}
+
 void UInventoryWidget::DIsplaySelectedItemInfo()
 {
 	if (SelectedSlot)
@@ -126,7 +143,7 @@ void UInventoryWidget::DIsplaySelectedItemInfo()
 		Img_SelectedItem->SetBrushFromTexture(SelectedSlot->SlotInfo.ItemInfo.ItemIcon);
 		TB_ItemName->SetText(FText::FromString(SelectedSlot->SlotInfo.ItemInfo.ItemName));
 		TB_Price->SetText(FText::AsNumber((SelectedSlot->SlotInfo.ItemInfo.ItemPrice)));
-		TB_Quantity->SetText(FText::AsNumber(SelectedSlot->SlotInfo.Quantity));
+		TB_Quantity->SetText(FText::AsNumber(SelectedSlot->SlotInfo.Quantity));   
 	}
 	else
 	{
@@ -164,16 +181,10 @@ void UInventoryWidget::ThrowAwaySelectedItem()
 				if (SelectedSlot->SlotInfo.Quantity == 0)
 				{
 					SelectedCategory->RemoveChildAt(i);
-					Img_SelectedItem->SetBrushFromMaterial(DefaultImage);
-					TB_ItemName->SetText(FText::FromString(TEXT("")));
-					TB_Price->SetText(FText::FromString(TEXT("")));
-					TB_Quantity->SetText(FText::FromString(TEXT("")));
 					SelectedSlot = nullptr;
 				}
-				else
-				{
 					DIsplaySelectedItemInfo();
-				}
+				
 				break;
 			}
 
@@ -192,7 +203,6 @@ void UInventoryWidget::UseItem()
 			{
 				if (SelectedCategory == WB_SlotList_Active)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Spawn Item"));
 					OwningPlayer->SpawnItem(SelectedSlot->SlotInfo.ItemInfo);
 					ThrowAwaySelectedItem();
 				}
@@ -216,6 +226,11 @@ void UInventoryWidget::UseItem()
 						GI->EquipSlotIndexList.Add(GetSlotIndexInWB(SelectedSlot));
 						OwningPlayer->EquipItemToSocket(SelectedSlot->SlotInfo.ItemInfo);
 					}
+				}
+				else if(SelectedCategory == WB_SlotList_Emotion)
+				{
+					OwningPlayer->Anim->PlaySelectedMontage(SelectedSlot->SlotInfo.ItemInfo.Montage);
+					RemoveFromParent();
 				}
 			}
 		}

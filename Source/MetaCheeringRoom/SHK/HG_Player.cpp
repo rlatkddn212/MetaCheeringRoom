@@ -17,6 +17,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Net/UnrealNetwork.h"
 #include "HG_GameInstance.h"
+#include "HG_PlayerAnimInstance.h"
 
 AHG_Player::AHG_Player()
 {
@@ -40,9 +41,13 @@ AHG_Player::AHG_Player()
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -80.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 
-	HandComp = CreateDefaultSubobject<USceneComponent>(TEXT("HandComp"));
-	HandComp->SetupAttachment(GetMesh(), TEXT("HandPosition"));
-	HandComp->SetIsReplicated(true);
+	HandLComp = CreateDefaultSubobject<USceneComponent>(TEXT("HandLComp"));
+	HandLComp->SetupAttachment(GetMesh(), TEXT("HandLPosition"));
+	HandLComp->SetIsReplicated(true);
+
+	HandRComp = CreateDefaultSubobject<USceneComponent>(TEXT("HandRComp"));
+	HandRComp->SetupAttachment(GetMesh(), TEXT("HandRPosition"));
+	HandRComp->SetIsReplicated(true);
 
 	LowerComp = CreateDefaultSubobject<USceneComponent>(TEXT("LowerComp"));
 	LowerComp->SetupAttachment(GetMesh(), TEXT("LowerPosition"));
@@ -59,6 +64,9 @@ AHG_Player::AHG_Player()
 void AHG_Player::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Anim = Cast<UHG_PlayerAnimInstance>(GetMesh()->GetAnimInstance());
+
 	DetectedStand = nullptr;
 	
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
@@ -95,7 +103,8 @@ void AHG_Player::Tick(float DeltaTime)
 	Direction = FVector::ZeroVector;
 
 	FHitResult OutHit;
-	FVector Start = GetActorLocation();
+	int32 BoneIndex = GetMesh()->GetBoneIndex(TEXT("head"));
+	FVector Start = this->GetMesh()->GetBoneTransform(BoneIndex).GetLocation();
 	FVector End = Start + CameraComp->GetForwardVector() * 300.0f;
 
 	ECollisionChannel TC = ECC_WorldDynamic;
@@ -140,11 +149,11 @@ void AHG_Player::Tick(float DeltaTime)
 
 	if (bDetectStand)
 	{
-		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 5.0f);
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 3.5f);
 	}
 	else
 	{
-		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 5.0f);
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
 	}
 }
 
@@ -162,7 +171,8 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	input->BindAction(IA_Inventory, ETriggerEvent::Completed, this, &AHG_Player::PopUpInventory);
 
-}
+	input->BindAction(IA_Emotion, ETriggerEvent::Completed, this, &AHG_Player::Emotion);
+}                                       
 
 void AHG_Player::OnMyMove(const FInputActionValue& Value)
 {
@@ -197,7 +207,8 @@ void AHG_Player::OnMyInteraction(const FInputActionValue& Value)
 void AHG_Player::DetectObject()
 {
 	FHitResult OutHit;
-	FVector Start = GetActorLocation();
+	int32 BoneIndex = GetMesh()->GetBoneIndex(TEXT("head"));
+	FVector Start = this->GetMesh()->GetBoneTransform(BoneIndex).GetLocation();
 	FVector End = Start + CameraComp->GetForwardVector() * 1000.0f;
 
 	ECollisionChannel TC = ECC_WorldDynamic;
@@ -230,8 +241,11 @@ void AHG_Player::DetectObject()
 		}
 		else if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
 		{
-			InventoryComp->AddtoInventory(Item->GetItemData(), 1);
-			DestroyItem(Item);
+			if (!Item->bEquiped)
+			{
+				InventoryComp->AddtoInventory(Item->GetItemData(), 1);
+				DestroyItem(Item);
+			}
 		}
 		else if (auto* Stand = Cast<AHG_DisplayStandBase>(OutHit.GetActor()))
 		{
@@ -272,17 +286,25 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 	}
 }
 
+void AHG_Player::Emotion()
+{
+	if (Anim)
+	{
+		Anim->PlayTwerkEmotionMontage();
+	}
+}
+
 void AHG_Player::PopUpPurchaseWidget()
 {
 	if (PurchaseWidget == nullptr)
 	{
 		PurchaseWidget = CreateWidget<UHG_ItemPurchaseWidget>(GetWorld(), PurchaseWidgetClass);
 		PurchaseWidget->SetOwner(this);
-		PurchaseWidget->SetItemInfo(TempData);
 	}
 	auto* pc = Cast<APlayerController>(Controller);
 	if (pc)
 	{
+		PurchaseWidget->SetItemInfo(TempData);
 		if (!bToggle)
 		{
 			PurchaseWidget->AddToViewport();
@@ -304,6 +326,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 {
 	if (ItemValue == nullptr) return;
 	EquipItemList.Add(ItemValue);
+	ItemValue->bEquiped = true;
 	GI->EquipItemInfoList.Add(ItemValue->GetItemData());
 	auto* mesh = ItemValue->GetComponentByClass<UStaticMeshComponent>();
 	check(mesh);
@@ -311,7 +334,6 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Attach"));
 		mesh->SetSimulatePhysics(false);
-		mesh->AttachToComponent(HandComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 		switch (ItemValue->GetItemCategory())
 		{
 		case EItemCategory::Category_Bottom:
@@ -320,8 +342,24 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 		case EItemCategory::Category_Top:
 			mesh->AttachToComponent(UpperComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			break;
-		case EItemCategory::Category_HandGrab:
-			mesh->AttachToComponent(HandComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		case EItemCategory::Category_OneHandGrab:
+			UE_LOG(LogTemp, Warning, TEXT("3"));
+			mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			break;
+		case EItemCategory::Category_TwoHandGrab:
+			if (!bPassed)
+			{
+				UE_LOG(LogTemp,Warning,TEXT("1"));
+				mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+				bPassed = true;
+				EquipItemToSocket(ItemValue->GetItemData());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("2"));
+				mesh->AttachToComponent(HandLComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+				bPassed = false;
+			}
 			break;
 		default:
 			break;
@@ -379,7 +417,6 @@ void AHG_Player::DestroyItem(AHG_ItemBase* ItemValue)
 void AHG_Player::SpawnItem(FItemData p_ItemInfo)
 {
 	ServerRPCSpawnItem(p_ItemInfo);
-
 }
 
 void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
@@ -387,7 +424,6 @@ void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
 	auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(p_ItemInfo.ItemClass, GetActorLocation(), GetActorRotation());
 	if (SpawnedItem != nullptr)
 	{
-		//MulticastRPCSpawnItem(SpawnedItem);
 		SpawnedItem->SetReplicates(true);
 		SpawnedItem->SetOwner(this);
 		SpawnedItem->SetActorHiddenInGame(true);

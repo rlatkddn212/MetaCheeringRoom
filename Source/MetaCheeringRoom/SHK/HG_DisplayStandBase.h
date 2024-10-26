@@ -50,4 +50,7 @@ public:
 	APawn* DetectActor;
 
 	bool bDetected = false;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	FString DisplayItemName;
 };
