@@ -37,6 +37,8 @@ public:
 	UWrapBox* WB_SlotList_Costume;
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
 	UWrapBox* WB_SlotList_Emotion;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
+	UWrapBox* WB_SlotList_Emoji;
 
 	void InitInventoryUI();
 
@@ -80,7 +82,10 @@ public:
 	UButton* Btn_CostumeCategory;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	UButton* Btn_EmotionCategory;
+	UButton* Btn_EmotionCategory;	
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
+	UButton* Btn_EmojiCategory;
 
 	UPROPERTY(EditDefaultsOnly)
 	UMaterial* DefaultImage;
@@ -91,7 +96,9 @@ public:
 	UFUNCTION()
 	void SelectCategory_Costume(); 
 	UFUNCTION()
-	void SelectCategory_Emotion();
+	void SelectCategory_Emotion(); 
+	UFUNCTION()
+	void SelectCategory_Emoji();
 
 
 	void DIsplaySelectedItemInfo();

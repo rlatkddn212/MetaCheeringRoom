@@ -38,6 +38,10 @@ void UInventoryWidget::NativeConstruct()
 	if (!Btn_EmotionCategory->OnClicked.IsBound())
 	{
 		Btn_EmotionCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Emotion);
+	}	
+	if (!Btn_EmojiCategory->OnClicked.IsBound())
+	{
+		Btn_EmojiCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Emoji);
 	}
 
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
@@ -55,6 +59,7 @@ void UInventoryWidget::InitInventoryUI()
 	WB_SlotList_Active->ClearChildren();
 	WB_SlotList_Costume->ClearChildren();
 	WB_SlotList_Emotion->ClearChildren();
+	WB_SlotList_Emoji->ClearChildren();
 	SelectedSlot = nullptr;
 	DIsplaySelectedItemInfo();
 	if (this->GetOwningPlayer() != nullptr)
@@ -77,6 +82,10 @@ void UInventoryWidget::InitInventoryUI()
 					else if (slot.ItemInfo.ItemCategory == EItemCategory::Category_Emotion)
 					{
 						WB_SlotList_Emotion->AddChildToWrapBox(SlotWidget);
+					}
+					else if (slot.ItemInfo.ItemCategory == EItemCategory::Category_Emoji)
+					{
+						WB_SlotList_Emoji->AddChildToWrapBox(SlotWidget);
 					}
 					else
 					{
@@ -133,6 +142,13 @@ void UInventoryWidget::SelectCategory_Emotion()
 {
 	SelectedCategory = WB_SlotList_Emotion;
 	WS_Category->SetActiveWidgetIndex(2);
+	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
+}
+
+void UInventoryWidget::SelectCategory_Emoji()
+{
+	SelectedCategory = WB_SlotList_Emoji;
+	WS_Category->SetActiveWidgetIndex(3);
 	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
 }
 
@@ -206,11 +222,14 @@ void UInventoryWidget::UseItem()
 					OwningPlayer->SpawnItem(SelectedSlot->SlotInfo.ItemInfo);
 					ThrowAwaySelectedItem();
 				}
+				else if (SelectedCategory == WB_SlotList_Emoji)
+				{
+					OwningPlayer->SpawnItem(SelectedSlot->SlotInfo.ItemInfo);
+				}
 				else if (SelectedCategory == WB_SlotList_Costume)
 				{
 					if (GI->EquipSlotIndexList.Contains(SelectedSlot->MyIndex))
 					{
-						UE_LOG(LogTemp,Warning,TEXT("uneq"));
 						TB_Use->SetText(FText::FromString(TEXT("장착하기")));
 						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
 						EquipList.Remove(SelectedSlot);
@@ -219,7 +238,6 @@ void UInventoryWidget::UseItem()
 					}
 					else
 					{
-						UE_LOG(LogTemp, Warning, TEXT("eq"));
 						TB_Use->SetText(FText::FromString(TEXT("해제하기")));
 						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
 						EquipList.Add(SelectedSlot);

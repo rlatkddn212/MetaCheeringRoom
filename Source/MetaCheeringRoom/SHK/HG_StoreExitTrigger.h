@@ -3,29 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "HG_StoreTriggerBox.generated.h"
+#include "HG_StoreExitTrigger.generated.h"
 
+/**
+ *
+ */
 UCLASS()
-class METACHEERINGROOM_API AHG_StoreTriggerBox : public AActor
+class METACHEERINGROOM_API AHG_StoreExitTrigger : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+public:
 	// Sets default values for this actor's properties
-	AHG_StoreTriggerBox();
-
+	AHG_StoreExitTrigger();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION()
-	void OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* BoxCollisionComp;
+
+	UFUNCTION()
+	void OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

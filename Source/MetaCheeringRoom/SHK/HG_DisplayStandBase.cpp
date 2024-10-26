@@ -41,9 +41,10 @@ void AHG_DisplayStandBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (DetectActor != nullptr)
+	if (DetectActor != nullptr && DetectActor->Controller != nullptr)
 	{
-		FVector target = Cast<APlayerController>(DetectActor->Controller)->PlayerCameraManager->GetCameraLocation();
+		FVector target;
+		target = Cast<APlayerController>(DetectActor->Controller)->PlayerCameraManager->GetCameraLocation();
 		FVector dir = target - InteractionWidget->GetComponentLocation();
 		dir.Normalize();
 		float Temp = dir.Z;
@@ -97,12 +98,12 @@ void AHG_DisplayStandBase::Detected(bool Value, APawn* p_DetectActor)
 		Player->bDetectStand = Value;
 		if (Value)
 		{
-			Player->CameraComp->SetRelativeRotation(FRotator(0.f,0.f,0.f));
-			Player->CameraComp->SetRelativeLocation(FVector(0.f,0.f,-20.0f));
+			Player->CameraComp->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+			Player->CameraComp->SetRelativeLocation(FVector(0.f, 0.f, -20.0f));
 		}
 		else
 		{
-			Player->SpringArmComp->SetRelativeLocation(FVector(0.f,0.f,20.0f));
+			Player->SpringArmComp->SetRelativeLocation(FVector(0.f, 0.f, 20.0f));
 			Player->CameraComp->SetRelativeRotation(FRotator(0.f, -20.f, 0.f));
 			Player->CameraComp->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 			InteractionWidget->SetRelativeLocation(FVector(0.f, 0.f, 0.f));

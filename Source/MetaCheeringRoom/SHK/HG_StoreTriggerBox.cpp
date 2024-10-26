@@ -4,6 +4,7 @@
 #include "HG_StoreTriggerBox.h"
 #include "HG_StoreWidget.h"
 #include "Components/BoxComponent.h"
+#include "HG_Player.h"
 
 // Sets default values
 AHG_StoreTriggerBox::AHG_StoreTriggerBox()
@@ -21,6 +22,8 @@ void AHG_StoreTriggerBox::BeginPlay()
 {
 	Super::BeginPlay();
 
+	BoxCollisionComp->OnComponentBeginOverlap.AddDynamic(this,&AHG_StoreTriggerBox::OnMyBeginOverlap);
+
 }
 
 // Called every frame
@@ -30,39 +33,10 @@ void AHG_StoreTriggerBox::Tick(float DeltaTime)
 
 }
 
-void AHG_StoreTriggerBox::CreateStoreWidget()
+void AHG_StoreTriggerBox::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (StoreWidgetFactory)
+	if (auto* Player = Cast<AHG_Player>(OtherActor))
 	{
-		StoreWidget = CreateWidget<UHG_StoreWidget>(GetWorld(), StoreWidgetFactory);
-		if (StoreWidget)
-		{
-			StoreWidget->AddToViewport();
-			bToggle = true;
-		}
+		Player->EnterTheStore();
 	}
 }
-
-void AHG_StoreTriggerBox::ByInteraction()
-{
-	if (nullptr == StoreWidget)
-	{
-		CreateStoreWidget();
-	}
-	else
-	{
-		if (!bToggle)
-		{
-			StoreWidget->SetVisibility(ESlateVisibility::Visible);
-			bToggle = true;
-		}
-		else
-		{
-			StoreWidget->SetVisibility(ESlateVisibility::Hidden);
-
-			bToggle = false;
-		}
-	}
-}
-
-

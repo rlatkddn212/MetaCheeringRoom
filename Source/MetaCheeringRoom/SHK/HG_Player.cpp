@@ -18,6 +18,7 @@
 #include "Net/UnrealNetwork.h"
 #include "HG_GameInstance.h"
 #include "HG_PlayerAnimInstance.h"
+#include "HG_StoreWidget.h"
 
 AHG_Player::AHG_Player()
 {
@@ -68,7 +69,7 @@ void AHG_Player::BeginPlay()
 	Anim = Cast<UHG_PlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
 	DetectedStand = nullptr;
-	
+
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 
 	auto* pc = Cast<APlayerController>(Controller);
@@ -78,7 +79,7 @@ void AHG_Player::BeginPlay()
 		if (subSys)
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
-		}	
+		}
 		pc->SetShowMouseCursor(false);
 		pc->SetInputMode(FInputModeGameOnly());
 	}
@@ -155,6 +156,12 @@ void AHG_Player::Tick(float DeltaTime)
 	{
 		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
 	}
+
+	// 상점 UI 업데이트
+	if (StoreWidget)
+	{
+		StoreWidget->SetPointText(this->GoodsComp->GetGold());
+	}
 }
 
 void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -172,7 +179,7 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	input->BindAction(IA_Inventory, ETriggerEvent::Completed, this, &AHG_Player::PopUpInventory);
 
 	input->BindAction(IA_Emotion, ETriggerEvent::Completed, this, &AHG_Player::Emotion);
-}                                       
+}
 
 void AHG_Player::OnMyMove(const FInputActionValue& Value)
 {
@@ -219,27 +226,7 @@ void AHG_Player::DetectObject()
 	if (bHit)
 	{
 		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Yellow, false, 1.0f);
-		if (auto* STB = Cast<AHG_StoreTriggerBox>(OutHit.GetActor()))
-		{
-			STB->ByInteraction();
-			auto* pc = Cast<APlayerController>(Controller);
-			if (pc)
-			{
-				if (!bToggle)
-				{
-					pc->SetShowMouseCursor(true);
-					bToggle = !bToggle;
-					bCanMove = false;
-				}
-				else
-				{
-					pc->SetShowMouseCursor(false);
-					bToggle = !bToggle;
-					bCanMove = true;
-				}
-			}
-		}
-		else if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
+		if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
 		{
 			if (!Item->bEquiped)
 			{
@@ -349,7 +336,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 		case EItemCategory::Category_TwoHandGrab:
 			if (!bPassed)
 			{
-				UE_LOG(LogTemp,Warning,TEXT("1"));
+				UE_LOG(LogTemp, Warning, TEXT("1"));
 				mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 				bPassed = true;
 				EquipItemToSocket(ItemValue->GetItemData());
@@ -419,6 +406,48 @@ void AHG_Player::SpawnItem(FItemData p_ItemInfo)
 	ServerRPCSpawnItem(p_ItemInfo);
 }
 
+void AHG_Player::CreateStoreWidget()
+{
+	if (StoreWidgetFactory)
+	{
+		StoreWidget = CreateWidget<UHG_StoreWidget>(GetWorld(), StoreWidgetFactory);
+		if (StoreWidget)
+		{
+			StoreWidget->AddToViewport();
+			bStoreWidget = true;
+		}
+	}
+}
+
+void AHG_Player::EnterTheStore()
+{
+	if (StoreWidget == nullptr)
+	{
+		CreateStoreWidget();
+	}
+	else
+	{
+		if (!bStoreWidget)
+		{
+			StoreWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			StoreWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+	bStoreWidget = !bStoreWidget;
+}
+
+void AHG_Player::ExitTheStore()
+{
+	if (StoreWidget != nullptr)
+	{
+		StoreWidget->RemoveFromParent();
+		StoreWidget = nullptr;
+	}
+}
+
 void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
 {
 	auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(p_ItemInfo.ItemClass, GetActorLocation(), GetActorRotation());
@@ -426,7 +455,10 @@ void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
 	{
 		SpawnedItem->SetReplicates(true);
 		SpawnedItem->SetOwner(this);
-		SpawnedItem->SetActorHiddenInGame(true);
+		if (SpawnedItem->GetItemData().ItemCategory != EItemCategory::Category_Emoji)
+		{
+			SpawnedItem->SetActorHiddenInGame(true);
+		}
 		SpawnedItem->Use();
 	}
 }

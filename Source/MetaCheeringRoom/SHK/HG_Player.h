@@ -77,6 +77,7 @@ public:
 
 	bool bToggle = false;
 	bool bToggle2 = false;
+	bool bStoreWidget = false;
 	bool bCanMove = true;
 
 	// ============== Inventory ====================
@@ -170,4 +171,20 @@ public:
 	class UHG_PlayerAnimInstance* Anim;
 
 	bool bPassed = false;
+
+	// 상점 안 UI
+	UPROPERTY()
+	class UHG_StoreWidget* StoreWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UHG_StoreWidget> StoreWidgetFactory;
+
+	UFUNCTION()
+	void CreateStoreWidget();
+
+	UFUNCTION()
+	void EnterTheStore();
+	UFUNCTION()
+	void ExitTheStore();
+
 };

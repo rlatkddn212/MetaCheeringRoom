@@ -15,4 +15,8 @@ class METACHEERINGROOM_API UHG_StoreWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 
+	UPROPERTY(EditDefaultsOnly)
+	class UTextBlock* TB_Point;
+
+	void SetPointText(int32 Value);
 };
