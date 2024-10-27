@@ -133,7 +133,7 @@ void UJS_SessionGameInstanceSubSystem::OnMyDestroySessionComplete(FName SessionN
 	{
 		//로비로 여행을 가고 싶다.
 		auto* pc = GetWorld()->GetFirstPlayerController();
-		pc->ClientTravel(TEXT("/Game/JJH/MAP_Reallobby_SHN"), ETravelType::TRAVEL_Absolute);
+		pc->ClientTravel(TEXT("/Game/SHK/HG_LobbyLevel"), ETravelType::TRAVEL_Absolute);
 	}
 }
 

@@ -95,5 +95,5 @@ public:
 	void ServerSetTimerLimit();
 
 	UFUNCTION(NetMulticast,Reliable)
-	void MulticastSetTimeUI(const FString& TimeText);
+	void MulticastSetTimeUI(const FString& TimeText, const int32& Time);
 };

@@ -95,24 +95,21 @@ void AJS_Screen::AddVedioInfo(FVedioInfo Info)
 void AJS_Screen::OnMediaEndReached()
 {
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	//if (PC->HasAuthority())
-	//{
-		PrepareNextMediaSource();
-		MediaPlayer->PlayOnOpen = false;
-		MediaSource->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
-		if (bUsingFirstPlayer)
-		{
-			MediaTexture->SetMediaPlayer(MediaPlayer2);
-			MediaPlayer2->Play();
-			bUsingFirstPlayer = false;
-		}
-		else
-		{
-			MediaTexture->SetMediaPlayer(MediaPlayer);
-			MediaPlayer->Play();
-			bUsingFirstPlayer = true;
-		}
-	//}
+	PrepareNextMediaSource();
+	MediaPlayer->PlayOnOpen = false;
+	MediaSource->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
+	if (bUsingFirstPlayer)
+	{
+		MediaTexture->SetMediaPlayer(MediaPlayer2);
+		MediaPlayer2->Play();
+		bUsingFirstPlayer = false;
+	}
+	else
+	{
+		MediaTexture->SetMediaPlayer(MediaPlayer);
+		MediaPlayer->Play();
+		bUsingFirstPlayer = true;
+	}
 }
 
 void AJS_Screen::RequestMediaURL(FString URL)
@@ -155,6 +152,9 @@ void AJS_Screen::PlayMedia(const FString& VideoURL)
 void AJS_Screen::MultiCastPlayMedia_Implementation(const FString& VideoURL)
 {
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	// 만약 재생 중인 미디어 플레이어가 있다면 전부 멈추기
+	MediaPlayer->PlayOnOpen = true;
 	// Media를 재생
 	// MediaSource의 URL 설정
 	MediaTexture->SetMediaPlayer(MediaPlayer);
@@ -166,6 +166,8 @@ void AJS_Screen::MultiCastPlayMedia_Implementation(const FString& VideoURL)
 		if (MediaPlayer)
 		{
 			MediaPlayer->OpenSource(MediaSource);
+			MediaPlayer->Play();
+			bUsingFirstPlayer = true;
 		}
 	}
 	if (MediaSource2)
@@ -212,7 +214,7 @@ FVedioInfo::FVedioInfo()
 	
 }
 
-FVedioInfo::FVedioInfo(bool blive, FString time, FString title, FString owner, FString streamURL, UTexture2D* thumbnail)
+FVedioInfo::FVedioInfo(bool blive, FString time, FString title, FString owner, FString streamURL, UTexture2D* thumbnail, FString category)
 {
 	bLive = blive;
 	Time = time;
@@ -220,4 +222,5 @@ FVedioInfo::FVedioInfo(bool blive, FString time, FString title, FString owner, F
 	Owner = owner;
 	Thumbnail = thumbnail;
 	StreamURL =streamURL;
+	Category = category;
 }

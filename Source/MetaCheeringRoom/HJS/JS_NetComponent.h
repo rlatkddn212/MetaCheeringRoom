@@ -88,4 +88,6 @@ public:
 
 	void VideoInfoSetting();
 
+	void GetThumbnail(FString URL, FString title, FString channel, FString streamURL, FString time, FString category);
+
 };

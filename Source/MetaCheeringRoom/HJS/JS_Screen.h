@@ -15,7 +15,7 @@ public:
 	
 	FVedioInfo();
 
-	FVedioInfo(bool blive, FString time, FString title, FString owner, FString streamURL, UTexture2D* thumbnail);
+	FVedioInfo(bool blive, FString time, FString title, FString owner, FString streamURL, UTexture2D* thumbnail, FString category);
 
 	UPROPERTY()
 	bool bLive;
@@ -29,6 +29,9 @@ public:
 	FString StreamURL;
 	UPROPERTY()
 	UTexture2D* Thumbnail;
+
+	UPROPERTY()
+	FString Category;
 };
 
 UCLASS()

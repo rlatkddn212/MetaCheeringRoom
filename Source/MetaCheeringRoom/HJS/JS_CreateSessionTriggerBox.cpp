@@ -6,6 +6,7 @@
 #include "../SHK/HG_GameModeBase.h"
 #include "JS_SessionJoinWidget.h"
 #include "MetaCheeringRoom.h"
+#include "../SHK/HG_Player.h"
 // Sets default values
 AJS_CreateSessionTriggerBox::AJS_CreateSessionTriggerBox()
 {
@@ -29,6 +30,7 @@ void AJS_CreateSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Ove
 		UJS_SessionJoinWidget* UI = GM->SessionWidget;
 		UI->SetVisibility(ESlateVisibility::Visible);
 		UI->MenuSwitching(0);
+		UI->SetupMapData();
 
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 
@@ -36,7 +38,14 @@ void AJS_CreateSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Ove
 		{
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeUIOnly());
+			AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+			if (Player)
+			{
+				Player->Direction = FVector::ZeroVector;
+				Player->bCanMove = false;
+			}
 		}
+
 	}
 }
 

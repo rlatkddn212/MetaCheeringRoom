@@ -7,6 +7,7 @@
 #include "JS_Screen.h"
 #include "GameFramework/Character.h"
 #include "VideoWidget.h"
+#include "../SHK/HG_Player.h"
 // Sets default values
 AJS_VideoWidgetTriggerBox::AJS_VideoWidgetTriggerBox()
 {
@@ -34,8 +35,17 @@ void AJS_VideoWidgetTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overl
 			{
 				VideoWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 				APlayerController* PC = GetWorld()->GetFirstPlayerController();
-				PC->SetShowMouseCursor(true);
-				PC->SetInputMode(FInputModeUIOnly());
+				if (PC)
+				{
+					PC->SetShowMouseCursor(true);
+					PC->SetInputMode(FInputModeUIOnly());
+					AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+					if (Player)
+					{
+						Player->Direction = FVector::ZeroVector;
+						Player->bCanMove = false;
+					}
+				}
 			}
 		}
 	}
