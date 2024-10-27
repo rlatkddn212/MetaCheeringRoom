@@ -9,6 +9,7 @@
 #include "Components/Border.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerController.h"
+#include "../SHK/HG_Player.h"
 
 void UVideoWidget::NativeConstruct()
 {
@@ -25,6 +26,12 @@ void UVideoWidget::OnClickQuitBtn()
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	PC->SetShowMouseCursor(false);
 	PC->SetInputMode(FInputModeGameOnly());
+	AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+	if (Player)
+	{
+		Player->Direction = FVector::ZeroVector;
+		Player->bCanMove = true;
+	}
 }
 
 void UVideoWidget::SettingLive()
@@ -41,6 +48,7 @@ void UVideoWidget::SettingVOD()
 
 void UVideoWidget::SettingLiveInfo(TArray<FVedioInfo>& LiveInfoList)
 {
+	SB_Live->ClearChildren();
 	int32 count = 0;
 	for (int32 i = 0; i < LiveInfoList.Num()/4+1; i++)
 	{
@@ -62,7 +70,10 @@ void UVideoWidget::SettingLiveInfo(TArray<FVedioInfo>& LiveInfoList)
 			{
 				// Node에 세팅해주기
 				FString Title = RemoveEmojis(LiveInfoList[count].Title);
-				Title = Title.LeftChop(10);
+				if (LiveInfoList[count].Category == TEXT("Chzzk"))
+				{
+					Title = Title.LeftChop(10);
+				}
 				if (LiveInfoList[count].Title.Len() > 26)
 				{
 					Title = Title.Left(26);

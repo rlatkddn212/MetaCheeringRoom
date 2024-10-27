@@ -8,6 +8,7 @@
 #include "Components/BoxComponent.h"
 #include "../MetaCheeringRoom.h"
 #include "GameFramework/Character.h"
+#include "../SHK/HG_Player.h"
 
 // Sets default values
 AJS_ToToWidgetTriggerBox::AJS_ToToWidgetTriggerBox()
@@ -37,8 +38,17 @@ void AJS_ToToWidgetTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overla
 			{
 				ToToWidget->ToToInitSetting();
 				APlayerController* PC = GetWorld()->GetFirstPlayerController();
-				PC->SetShowMouseCursor(true);
-				PC->SetInputMode(FInputModeUIOnly());
+				if(PC)
+				{
+					PC->SetShowMouseCursor(true);
+					PC->SetInputMode(FInputModeUIOnly());
+					AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+					if (Player)
+					{
+						Player->Direction = FVector::ZeroVector;
+						Player->bCanMove = false;
+					}
+				}
 			}
 		}
 	}

@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/SpinBox.h"
 #include "Components/WidgetSwitcher.h"
+#include "../SHK/HG_Player.h"
 void UToToMakeWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -122,6 +123,12 @@ void UToToMakeWidget::OnClickCancelBtn()
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	PC->SetShowMouseCursor(false);
 	PC->SetInputMode(FInputModeGameOnly());
+	AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+	if (Player)
+	{
+		Player->Direction = FVector::ZeroVector;
+		Player->bCanMove = true;
+	}
 }
 
 void UToToMakeWidget::OnClickStartBtn()
@@ -139,6 +146,12 @@ void UToToMakeWidget::OnClickStartBtn()
 	PC->SetShowMouseCursor(false);
 	PC->SetInputMode(FInputModeGameOnly());
 	bOpen = false;
+	AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+	if (Player)
+	{
+		Player->Direction = FVector::ZeroVector;
+		Player->bCanMove = true;
+	}
 }
 
 void UToToMakeWidget::OnClickAdjustBtn()
@@ -183,4 +196,10 @@ void UToToMakeWidget::InitMakeWidget()
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	PC->SetShowMouseCursor(false);
 	PC->SetInputMode(FInputModeGameOnly());
+	AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+	if (Player)
+	{
+		Player->Direction = FVector::ZeroVector;
+		Player->bCanMove = true;
+	}
 }

@@ -6,6 +6,7 @@
 #include "JS_Screen.h"
 #include "VideoWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "../SHK/HG_Player.h"
 
 void UVideoNode::NativeConstruct()
 {
@@ -26,5 +27,11 @@ void UVideoNode::PlayStream()
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		PC->SetShowMouseCursor(false);
 		PC->SetInputMode(FInputModeGameOnly());
+		AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+		if (Player)
+		{
+			Player->Direction = FVector::ZeroVector;
+			Player->bCanMove = true;
+		}
 	}
 }

@@ -12,6 +12,7 @@
 #include "Components/BackgroundBlur.h"
 #include "Kismet/GameplayStatics.h"
 #include "HJS/JS_TotoActor.h"
+#include "../SHK/HG_Player.h"
 
 
 void UJS_ToToWidget::NativeConstruct()
@@ -26,7 +27,6 @@ void UJS_ToToWidget::NativeConstruct()
 void UJS_ToToWidget::OnClickBetting1Btn()
 {
 	// 플레이어가 이만한 포인트가 있는 지 체크하는 부분
-
 	int32 BettingPoint = FCString::Atoi(*TEXT_Betting1->GetText().ToString());
 	// 베팅하기
 	AJS_TotoActor* TotoActor = Cast<AJS_TotoActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AJS_TotoActor::StaticClass()));
@@ -52,6 +52,12 @@ void UJS_ToToWidget::OnClickQuitBtn()
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	PC->SetShowMouseCursor(false);
 	PC->SetInputMode(FInputModeGameOnly());
+	AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+	if (Player)
+	{
+		Player->Direction = FVector::ZeroVector;
+		Player->bCanMove = true;
+	}
 }
 
 void UJS_ToToWidget::SetTotoInfo(const FString& totoName, const FString& select1, const FString& select2, int32 totalSelect1 /*= 0*/, int32 totalSelect2 /*= 0*/, int32 totalBettor1 /*= 0*/, int32 totalBettor2 /*= 0*/, float totalOdds1 /*= 1.f*/, float totalOdds2 /*= 1.f*/)

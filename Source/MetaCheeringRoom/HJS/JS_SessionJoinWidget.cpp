@@ -14,6 +14,10 @@
 #include "MetaCheeringRoom.h"
 #include "JS_SessionSlotWidget.h"
 #include "Components/WidgetSwitcher.h"
+#include "../SHK/HG_Player.h"
+#include "../KSW/CreatorStorageSubsystem.h"
+#include "../KSW/CreatorMapSubsystem.h"
+#include "JS_HostSlotWidget.h"
 void UJS_SessionJoinWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -42,6 +46,8 @@ void UJS_SessionJoinWidget::NativeConstruct()
 	BTN_JoinBack->OnClicked.AddDynamic(this, &UJS_SessionJoinWidget::OnClickedJoinQuit);
 	BTN_Quit->OnClicked.AddDynamic(this, &UJS_SessionJoinWidget::OnClickedQuit);
 	BTN_CreateQuit->OnClicked.AddDynamic(this, &UJS_SessionJoinWidget::OnClickedCreateQuit);
+
+	SetupMapData();
 }
 
 void UJS_SessionJoinWidget::MenuSwitching(int32 index)
@@ -79,9 +85,39 @@ void UJS_SessionJoinWidget::CreateSession()
 		category = TEXT("Talk");
 		break;
 	}
-	
-	//일단 4로 진행
+	UCreatorStorageSubsystem* storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+	TArray<FCreatorMapMetaData*> meta = storage->GetCreatorMapMetaDatas();
+
+	FString path = FPaths::ProjectContentDir() + meta[SelectIndex]->FileName;
+	FString JsonStr = storage->LoadCreatorMap(path);
+
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	system->SetMapName(meta[SelectIndex]->CreatorMapName);
+	system->SetupJson(JsonStr);
+
 	si->CreateSession(roomName, PlayerCount, CB_Category->GetSelectedOption());
+}
+
+void UJS_SessionJoinWidget::SetupMapData()
+{
+	SB_Maps->ClearChildren();
+	
+	UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+	TArray<FCreatorMapMetaData*> MetaDataList = system->GetCreatorMapMetaDatas();
+	int32 idx = 0;
+	for (FCreatorMapMetaData* MetaData : MetaDataList)
+	{
+		UJS_HostSlotWidget* SlotWidget = CreateWidget<UJS_HostSlotWidget>(GetWorld(), SlotFactory);
+		SlotWidget->SetupInfo(MetaData, this, idx++);
+		SlotWidget->SetVisibility(ESlateVisibility::Visible);
+		SB_Maps->AddChild(SlotWidget);
+	}
+}
+
+void UJS_SessionJoinWidget::OnClickSlot(int32 slotIdx)
+{
+	BD_CreateRoom->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	SelectIndex = slotIdx;
 }
 
 void UJS_SessionJoinWidget::AddSessionSlotWidget(const FRoomInfo& info)
@@ -186,6 +222,15 @@ void UJS_SessionJoinWidget::OnClickedJoinQuit()
 {
 	BD_JoinRoom->SetVisibility(ESlateVisibility::Hidden);
 	LobbySelectedIndex = -1;
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	PC->SetShowMouseCursor(false);
+	PC->SetInputMode(FInputModeGameOnly());
+	AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+	if (Player)
+	{
+		Player->Direction = FVector::ZeroVector;
+		Player->bCanMove = true;
+	}
 }
 
 void UJS_SessionJoinWidget::OnClickedCreateQuit()
@@ -200,4 +245,10 @@ void UJS_SessionJoinWidget::OnClickedQuit()
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	PC->SetShowMouseCursor(false);
 	PC->SetInputMode(FInputModeGameOnly());
+	AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+	if (Player)
+	{
+		Player->Direction = FVector::ZeroVector;
+		Player->bCanMove = true;
+	}
 }

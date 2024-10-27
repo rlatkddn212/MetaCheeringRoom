@@ -11,6 +11,7 @@
 #include "VideoWidget.h"
 #include "Net/UnrealNetwork.h"
 #include "MetaCheeringRoom.h"
+#include "MediaPlayer.h"
 
 // Sets default values for this component's properties
 UJS_NetComponent::UJS_NetComponent()
@@ -182,6 +183,8 @@ void UJS_NetComponent::GetVideoURL()
 			UE_LOG(LogTemp, Log, TEXT("재생할 비디오 URL: %s"), *VideoURL);
 			GetWorld()->GetTimerManager().ClearTimer(GetVedioTimerHandle);
 			FTimerHandle StartMediaHandle;
+			Me->MediaPlayer->Pause();
+			Me->MediaPlayer2->Pause();
 			GetWorld()->GetTimerManager().SetTimer(StartMediaHandle,this,&UJS_NetComponent::Play,20.f,false);
 
 		}
@@ -245,11 +248,13 @@ void UJS_NetComponent::GetInfoFromAIServer()
 		{
 			if (bWasSuccessful && Response->GetResponseCode() == 200)
 			{
-
+				FString Res = Response->GetContentAsString();
+				ParseYoutubeVedioData(Res);
+				UE_LOG(LogTemp, Warning, TEXT("성공"));
 			}
 			else
 			{
-
+				UE_LOG(LogTemp, Warning, TEXT("실패"));
 			}
 		});
 
@@ -284,54 +289,11 @@ void UJS_NetComponent::ParseChzzkVedioData(const FString& json)
 
 				if (thumbnail == "" && AdultOnlyTexture)
 				{
-					Me->VedioInfoList.Add(FVedioInfo(true, time, title, channel, streamURL, AdultOnlyTexture));
+					Me->VedioInfoList.Add(FVedioInfo(true, time, title, channel, streamURL, AdultOnlyTexture, TEXT("Chzzk")));
 					continue;
 				}
 
-				// 필요한 추가 로직으로 데이터를 처리할 수 있음
-				TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
-				HttpRequest->SetURL(thumbnail);
-				HttpRequest->SetVerb("GET");
-				HttpRequest->OnProcessRequestComplete().BindLambda([this, title, channel, streamURL, time](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
-				{
-					if (bWasSuccessful && Response.IsValid())
-					{
-						const TArray<uint8>& ImageData = Response->GetContent();
-						// 이미지 포맷이 JPG/PNG인지 파악하고 적절히 디코딩
-						IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-						TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::JPEG);
-						if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num()))
-						{
-							TArray<uint8> RawImageData;
-							if (ImageWrapper->GetRaw(ERGBFormat::RGBA, 8, RawImageData))
-							{
-								UTexture2D* NewTexture = UTexture2D::CreateTransient(
-									ImageWrapper->GetWidth(),
-									ImageWrapper->GetHeight(),
-									PF_R8G8B8A8
-								);
-								FTexture2DMipMap& Mip = NewTexture->GetPlatformData()->Mips[0];
-								Mip.SizeX = ImageWrapper->GetWidth();
-								Mip.SizeY = ImageWrapper->GetHeight();
-								Mip.BulkData.Lock(LOCK_READ_WRITE);
-								// 텍스처에 이미지 데이터 복사
-								void* TextureData = Mip.BulkData.Realloc(RawImageData.Num());
-								FMemory::Memcpy(TextureData, RawImageData.GetData(), RawImageData.Num());
-								Mip.BulkData.Unlock();
-								NewTexture->UpdateResource();
-								
-								Me->VedioInfoList.Add(FVedioInfo(true,time,title,channel,streamURL,NewTexture));
-								this->GetWorld()->GetTimerManager().SetTimer(VideoInfoSettingHaldle, this, &UJS_NetComponent::VideoInfoSetting, 1.f, false);
-								
-							}
-						}
-					}
-					else
-					{
-						UE_LOG(LogTemp, Warning, TEXT("실패"));
-					}
-				});
-				HttpRequest->ProcessRequest();
+				GetThumbnail(thumbnail,title,channel,streamURL,time,TEXT("Chzzk"));
 			}
 		}
 	}
@@ -356,7 +318,8 @@ void UJS_NetComponent::ParseYoutubeVedioData(const FString& json)
 				FString thumbnail = StreamObject->GetStringField(TEXT("liveThumbnail"));
 				FString streamURL = StreamObject->GetStringField(TEXT("watchUrl"));
 				FString time = TEXT("Live");
-				// 필요한 추가 로직으로 데이터를 처리할 수 있음
+				
+				GetThumbnail(thumbnail, title, channel, streamURL, time, TEXT("Youtube"));
 			}
 		}
 	}
@@ -379,4 +342,50 @@ void UJS_NetComponent::VideoInfoSetting()
 			Me->VideoWidget->SettingLiveInfo(Me->VedioInfoList);
 		}
 	}
+}
+
+void UJS_NetComponent::GetThumbnail(FString URL, FString title, FString channel, FString streamURL, FString time, FString category)
+{
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+	HttpRequest->SetURL(URL);
+	HttpRequest->SetVerb("GET");
+	HttpRequest->OnProcessRequestComplete().BindLambda([this, title, channel, streamURL, time, category](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+		{
+			if (bWasSuccessful && Response.IsValid())
+			{
+				const TArray<uint8>& ImageData = Response->GetContent();
+				// 이미지 포맷이 JPG/PNG인지 파악하고 적절히 디코딩
+				IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+				TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::JPEG);
+				if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num()))
+				{
+					TArray<uint8> RawImageData;
+					if (ImageWrapper->GetRaw(ERGBFormat::RGBA, 8, RawImageData))
+					{
+						UTexture2D* NewTexture = UTexture2D::CreateTransient(
+							ImageWrapper->GetWidth(),
+							ImageWrapper->GetHeight(),
+							PF_R8G8B8A8
+						);
+						FTexture2DMipMap& Mip = NewTexture->GetPlatformData()->Mips[0];
+						Mip.SizeX = ImageWrapper->GetWidth();
+						Mip.SizeY = ImageWrapper->GetHeight();
+						Mip.BulkData.Lock(LOCK_READ_WRITE);
+						// 텍스처에 이미지 데이터 복사
+						void* TextureData = Mip.BulkData.Realloc(RawImageData.Num());
+						FMemory::Memcpy(TextureData, RawImageData.GetData(), RawImageData.Num());
+						Mip.BulkData.Unlock();
+						NewTexture->UpdateResource();
+
+						Me->VedioInfoList.Add(FVedioInfo(true, time, title, channel, streamURL, NewTexture, category));
+						VideoInfoSetting();
+					}
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("실패"));
+			}
+		});
+	HttpRequest->ProcessRequest();
 }

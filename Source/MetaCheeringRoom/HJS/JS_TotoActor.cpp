@@ -218,7 +218,7 @@ void AJS_TotoActor::ServerSetTimerLimit()
 	if (TotoLimitTIme <= 0)
 	{
 		FString timeLimitText = FString::Printf(TEXT("제출이 마감되었습니다."));
-		MulticastSetTimeUI(timeLimitText);
+		MulticastSetTimeUI(timeLimitText, TotoLimitTIme);
 	}
 	else
 	{
@@ -226,22 +226,33 @@ void AJS_TotoActor::ServerSetTimerLimit()
 		int32 sec = TotoLimitTIme % 60;
 		FString timeLimitText = FString::Printf(TEXT("%d:%2d 후에 제출이 마감됩니다."), min, sec);
 		TotoLimitTIme--;
-		MulticastSetTimeUI(timeLimitText);
+		MulticastSetTimeUI(timeLimitText, TotoLimitTIme);
 		GetWorld()->GetTimerManager().SetTimer(ToToLimitTimerHandle, this, &AJS_TotoActor::ServerSetTimerLimit, 1.f, false);
 	}
 }
 
-void AJS_TotoActor::MulticastSetTimeUI_Implementation(const FString& TimeText)
+void AJS_TotoActor::MulticastSetTimeUI_Implementation(const FString& TimeText, const int32& Time)
 {
-	if (ToToWidget)
+	if (Time <= 0)
 	{
-		// 더이상 예측 못하게 UI 바뀌기
-		ToToWidget->SetTimerText(TimeText);
-		ToToWidget->SetBettingStopUI();
+		if (ToToWidget)
+		{
+			// 더이상 예측 못하게 UI 바뀌기
+			ToToWidget->SetTimerText(TimeText);
+			ToToWidget->SetBettingStopUI();
+		}
+		if (TotoMakeWidget)
+		{
+			TotoMakeWidget->SetWidgetSwitcher(1);
+			TotoMakeWidget->bOpen = true;
+		}
 	}
-	if (TotoMakeWidget)
+	else
 	{
-		TotoMakeWidget->SetWidgetSwitcher(1);
-		TotoMakeWidget->bOpen = true;
+		if (ToToWidget)
+		{
+			ToToWidget->SetTimerText(TimeText);
+		}
 	}
+
 }

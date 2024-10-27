@@ -6,6 +6,7 @@
 #include "JS_SessionJoinWidget.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Character.h"
+#include "../SHK/HG_Player.h"
 
 // Sets default values
 AJS_JoinSessionTriggerBox::AJS_JoinSessionTriggerBox()
@@ -44,6 +45,12 @@ void AJS_JoinSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overl
 		{
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeUIOnly());
+			AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+			if (Player)
+			{
+				Player->Direction = FVector::ZeroVector;
+				Player->bCanMove = false;
+			}
 		}
 	}
 }

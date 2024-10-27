@@ -7,6 +7,7 @@
 #include "JS_TotoActor.h"
 #include "ToToMakeWidget.h"
 #include "GameFramework/Character.h"
+#include "../SHK/HG_Player.h"
 
 // Sets default values
 AJS_ToToMakeTrigger::AJS_ToToMakeTrigger()
@@ -35,8 +36,17 @@ void AJS_ToToMakeTrigger::ComponentBeginOverlap(UPrimitiveComponent* OverlappedC
 			{
 				TotoMakeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 				APlayerController* PC = GetWorld()->GetFirstPlayerController();
-				PC->SetShowMouseCursor(true);
-				PC->SetInputMode(FInputModeUIOnly());
+				if (PC)
+				{
+					PC->SetShowMouseCursor(true);
+					PC->SetInputMode(FInputModeUIOnly());
+					AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+					if (Player)
+					{
+						Player->Direction = FVector::ZeroVector;
+						Player->bCanMove = false;
+					}
+				}
 			}			
 		}
 	}

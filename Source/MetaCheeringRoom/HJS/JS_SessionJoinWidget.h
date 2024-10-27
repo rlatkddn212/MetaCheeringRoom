@@ -46,6 +46,15 @@ public:
 	UFUNCTION()
 	void CreateSession();
 
+	void SetupMapData();
+
+	void OnClickSlot(int32 slotIdx);
+
+	int32 SelectIndex = -1;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UJS_HostSlotWidget> SlotFactory;
+
 	// 방 만들기 End -----------------------------
 
 
