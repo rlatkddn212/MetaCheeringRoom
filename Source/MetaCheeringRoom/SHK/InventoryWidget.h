@@ -39,6 +39,8 @@ public:
 	UWrapBox* WB_SlotList_Emotion;
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
 	UWrapBox* WB_SlotList_Emoji;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
+	UWrapBox* WB_SlotList_Sound;
 
 	void InitInventoryUI();
 
@@ -82,10 +84,13 @@ public:
 	UButton* Btn_CostumeCategory;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	UButton* Btn_EmotionCategory;	
+	UButton* Btn_EmotionCategory;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
 	UButton* Btn_EmojiCategory;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
+	UButton* Btn_SoundCategory;
 
 	UPROPERTY(EditDefaultsOnly)
 	UMaterial* DefaultImage;
@@ -94,11 +99,16 @@ public:
 	void SelectCategory_Active();
 
 	UFUNCTION()
-	void SelectCategory_Costume(); 
+	void SelectCategory_Costume();
+
 	UFUNCTION()
-	void SelectCategory_Emotion(); 
+	void SelectCategory_Emotion();
+
 	UFUNCTION()
 	void SelectCategory_Emoji();
+
+	UFUNCTION()
+	void SelectCategory_Sound();
 
 
 	void DIsplaySelectedItemInfo();
@@ -109,12 +119,6 @@ public:
 	UFUNCTION()
 	void UseItem();
 
-// 	UFUNCTION(Server,Reliable)
-// 	void ServerRPCUseItem();
-// 
-// 	
-// 	UFUNCTION(NetMulticast,Reliable)
-// 	void MultiCastRPCUseItem(AHG_Player* p_Owner,AHG_EquipItem* ItemValue);
 	bool bSlotSelected = false;
 
 	TArray<UHG_SlotWidget*> EquipList;

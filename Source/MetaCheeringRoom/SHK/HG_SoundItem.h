@@ -20,4 +20,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	FString Name;
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_Use();
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastRPC_Use();
 };

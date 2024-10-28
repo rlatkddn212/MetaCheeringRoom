@@ -43,6 +43,10 @@ void UInventoryWidget::NativeConstruct()
 	{
 		Btn_EmojiCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Emoji);
 	}
+	if (!Btn_SoundCategory->OnClicked.IsBound())
+	{
+		Btn_SoundCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Sound);
+	}
 
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 	SelectedCategory = WB_SlotList_Active;
@@ -86,6 +90,10 @@ void UInventoryWidget::InitInventoryUI()
 					else if (slot.ItemInfo.ItemCategory == EItemCategory::Category_Emoji)
 					{
 						WB_SlotList_Emoji->AddChildToWrapBox(SlotWidget);
+					}
+					else if (slot.ItemInfo.ItemCategory == EItemCategory::Category_Sound)
+					{
+						WB_SlotList_Sound->AddChildToWrapBox(SlotWidget);
 					}
 					else
 					{
@@ -149,6 +157,13 @@ void UInventoryWidget::SelectCategory_Emoji()
 {
 	SelectedCategory = WB_SlotList_Emoji;
 	WS_Category->SetActiveWidgetIndex(3);
+	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
+}
+
+void UInventoryWidget::SelectCategory_Sound()
+{
+	SelectedCategory = WB_SlotList_Sound;
+	WS_Category->SetActiveWidgetIndex(4);
 	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
 }
 
@@ -222,7 +237,7 @@ void UInventoryWidget::UseItem()
 					OwningPlayer->SpawnItem(SelectedSlot->SlotInfo.ItemInfo);
 					ThrowAwaySelectedItem();
 				}
-				else if (SelectedCategory == WB_SlotList_Emoji)
+				else if (SelectedCategory == WB_SlotList_Emoji || SelectedCategory == WB_SlotList_Sound)
 				{
 					OwningPlayer->SpawnItem(SelectedSlot->SlotInfo.ItemInfo);
 				}
