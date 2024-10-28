@@ -17,11 +17,17 @@ class METACHEERINGROOM_API USW_CreatorMenuWidget : public UUserWidget
 	virtual void NativeConstruct() override;
 
 public:
+	UPROPERTY(meta=(BindWidget))
+	class UBorder* BD_Toast;
+
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* SaveButton;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* QuitButton;
+	
+	UPROPERTY(meta=(BindWidgetAnim),Transient)
+	class UWidgetAnimation* ToastAnim;
 
 	UFUNCTION()
 	void SaveCreatorMap();

@@ -6,6 +6,7 @@
 #include "../CreatorMapSubsystem.h"
 #include "../CreatorStorageSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/Border.h"
 
 void USW_CreatorMenuWidget::NativeConstruct()
 {
@@ -24,6 +25,9 @@ void USW_CreatorMenuWidget::SaveCreatorMap()
 
 	UCreatorStorageSubsystem * storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
 	storage->SaveCreatorMap(str, MapName);
+	BD_Toast->SetVisibility(ESlateVisibility::Visible);
+	// UI Animation 재생하기
+	PlayAnimation(ToastAnim);
 }
 
 void USW_CreatorMenuWidget::Quit()
