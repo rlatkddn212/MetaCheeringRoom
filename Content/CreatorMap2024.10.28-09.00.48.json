@@ -1,0 +1,60 @@
+{
+	"rootObjects": [
+		{
+			"ObjectName": "BP_Cylinder_C_0",
+			"TranslationX": 24.666665301041121,
+			"TranslationY": -202.39318414707358,
+			"TranslationZ": -0.50000123660929319,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		},
+		{
+			"ObjectName": "BP_Cylinder_C_1",
+			"TranslationX": -112.45857215802233,
+			"TranslationY": -185.78842909465538,
+			"TranslationZ": -0.49999768898294406,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		},
+		{
+			"ObjectName": "BP_Plane_C_0",
+			"TranslationX": -74.369814280595449,
+			"TranslationY": -17.222187713788401,
+			"TranslationZ": -0.49999874631447483,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		},
+		{
+			"ObjectName": "BP_Cone_C_0",
+			"TranslationX": -79.346283941682458,
+			"TranslationY": -82.084937841635337,
+			"TranslationZ": -0.50000384282174082,
+			"RotationX": 0,
+			"RotationY": 0,
+			"RotationZ": 0,
+			"RotationW": 1,
+			"ScaleX": 1,
+			"ScaleY": 1,
+			"ScaleZ": 1,
+			"Objects": []
+		}
+	]
+}

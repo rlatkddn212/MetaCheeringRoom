@@ -175,7 +175,6 @@ void AJS_TotoActor::ServerBettingToto_Implementation(int32 point, int32 select, 
 void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 {
 	// 멀티캐스트로 예측 결과 안내
-
 	// 각 플레이어의 게임 인스턴스에 포인트를 지급하기 ( 멀티캐스트, 인자값으로 넘겨주기? )
 	TArray<FString> Keys;
 	TArray<int32> Values;
@@ -219,6 +218,8 @@ void AJS_TotoActor::ServerSetTimerLimit()
 	{
 		FString timeLimitText = FString::Printf(TEXT("제출이 마감되었습니다."));
 		MulticastSetTimeUI(timeLimitText, TotoLimitTIme);
+		MulticastAlarmToto(TEXT("승부예측이 마감되었습니다!"));
+
 	}
 	else
 	{
