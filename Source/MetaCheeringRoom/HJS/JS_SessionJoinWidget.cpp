@@ -88,7 +88,7 @@ void UJS_SessionJoinWidget::CreateSession()
 	UCreatorStorageSubsystem* storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
 	TArray<FCreatorMapMetaData*> meta = storage->GetCreatorMapMetaDatas();
 
-	FString path = FPaths::ProjectContentDir() + meta[SelectIndex]->FileName;
+	FString path = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + meta[SelectIndex]->FileName;
 	FString JsonStr = storage->LoadCreatorMap(path);
 
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
