@@ -30,7 +30,8 @@ public:
 	void URLSendToAIServer(const FString& VideoURL);
 
 	// 서버 URL
-	const FString ServerURL = "http://127.0.0.1:5000";
+	UPROPERTY(EditAnywhere)
+	FString ServerURL = "https://3df3-221-163-19-142.ngrok-free.app";
 
 	// 생성 Key
 	FString StreamURL = TEXT("/convert_stream");
@@ -75,8 +76,9 @@ public:
 	UFUNCTION()
 	void GetInfoFromAIServer();
 
-	void ParseChzzkVedioData(const FString& json);
-	void ParseYoutubeVedioData(const FString& json);
+	void ParseChzzkVideoData(const FString& json);
+	void ParseYoutubeVideoData(const FString& json);
+	void ParseVODVideoData(const FString& json);
 
 	UPROPERTY(EditAnywhere)
 	UTexture2D* AdultOnlyTexture;

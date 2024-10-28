@@ -227,7 +227,7 @@ void UJS_NetComponent::GetInfoFromAIServer()
 			if (bWasSuccessful && Response->GetResponseCode() == 200)
 			{
 				FString Res = Response->GetContentAsString();
-				ParseChzzkVedioData(Res);
+				ParseChzzkVideoData(Res);
 				UE_LOG(LogTemp, Warning, TEXT("성공"));
 			}
 			else
@@ -249,7 +249,32 @@ void UJS_NetComponent::GetInfoFromAIServer()
 			if (bWasSuccessful && Response->GetResponseCode() == 200)
 			{
 				FString Res = Response->GetContentAsString();
-				ParseYoutubeVedioData(Res);
+				ParseYoutubeVideoData(Res);
+				UE_LOG(LogTemp, Warning, TEXT("성공"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("실패"));
+			}
+		});
+
+	// 요청 전송
+	HttpRequest->ProcessRequest();
+
+	// 요청 전송
+	HttpRequest->ProcessRequest();
+
+	HttpRequest = FHttpModule::Get().CreateRequest();
+	HttpRequest->SetURL(ServerURL + TEXT("/vod_list"));
+	HttpRequest->SetVerb("GET");
+
+	// HTTP 응답 처리
+	HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+		{
+			if (bWasSuccessful && Response->GetResponseCode() == 200)
+			{
+				FString Res = Response->GetContentAsString();
+				ParseVODVideoData(Res);
 				UE_LOG(LogTemp, Warning, TEXT("성공"));
 			}
 			else
@@ -262,7 +287,7 @@ void UJS_NetComponent::GetInfoFromAIServer()
 	HttpRequest->ProcessRequest();
 }
 
-void UJS_NetComponent::ParseChzzkVedioData(const FString& json)
+void UJS_NetComponent::ParseChzzkVideoData(const FString& json)
 {
 	TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create(json);
 	TSharedPtr<FJsonObject> response = MakeShareable(new FJsonObject());
@@ -299,7 +324,7 @@ void UJS_NetComponent::ParseChzzkVedioData(const FString& json)
 	}
 }
 
-void UJS_NetComponent::ParseYoutubeVedioData(const FString& json)
+void UJS_NetComponent::ParseYoutubeVideoData(const FString& json)
 {
 	TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create(json);
 	TSharedPtr<FJsonObject> response = MakeShareable(new FJsonObject());
@@ -320,6 +345,31 @@ void UJS_NetComponent::ParseYoutubeVedioData(const FString& json)
 				FString time = TEXT("Live");
 				
 				GetThumbnail(thumbnail, title, channel, streamURL, time, TEXT("Youtube"));
+			}
+		}
+	}
+}
+
+void UJS_NetComponent::ParseVODVideoData(const FString& json)
+{
+	TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create(json);
+	TSharedPtr<FJsonObject> response = MakeShareable(new FJsonObject());
+	if (FJsonSerializer::Deserialize(reader, response))
+	{
+		TArray<TSharedPtr<FJsonValue>> VODs = response->GetArrayField(TEXT("vod_files"));
+
+		for (TSharedPtr<FJsonValue> VideoValue : VODs)
+		{
+			TSharedPtr<FJsonObject> VideoObject = VideoValue->AsObject();
+			if (VideoObject.IsValid())
+			{
+				FString title = VideoObject->GetStringField(TEXT("filename"));
+				FString channel = TEXT("VOD");
+				FString thumbnail = ServerURL + VideoObject->GetStringField(TEXT("thumbnail"));
+				FString streamURL = ServerURL + TEXT("/vod/") + VideoObject->GetStringField(TEXT("filename"));
+				FString time = VideoObject->GetStringField(TEXT("duration"));
+
+				GetThumbnail(thumbnail, title, channel, streamURL, time, TEXT("VOD"));
 			}
 		}
 	}
@@ -376,8 +426,14 @@ void UJS_NetComponent::GetThumbnail(FString URL, FString title, FString channel,
 						FMemory::Memcpy(TextureData, RawImageData.GetData(), RawImageData.Num());
 						Mip.BulkData.Unlock();
 						NewTexture->UpdateResource();
-
-						Me->VedioInfoList.Add(FVedioInfo(true, time, title, channel, streamURL, NewTexture, category));
+						if (category == TEXT("VOD"))
+						{
+							Me->VedioInfoList.Add(FVedioInfo(false, time, title, channel, streamURL, NewTexture, category));
+						}
+						else
+						{
+							Me->VedioInfoList.Add(FVedioInfo(true, time, title, channel, streamURL, NewTexture, category));
+						}
 						VideoInfoSetting();
 					}
 				}

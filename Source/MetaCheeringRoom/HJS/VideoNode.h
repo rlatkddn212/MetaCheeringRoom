@@ -29,6 +29,8 @@ public:
 
 	FString PlayURL;
 
+	bool bLive = true;
+
 	UFUNCTION()
 	void PlayStream();
 

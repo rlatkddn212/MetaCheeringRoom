@@ -88,6 +88,13 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastPlayMedia(const FString& VideoURL);
+	
+	UFUNCTION()
+	void PlayVOD(const FString& VideoURL);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayVOD(const FString& VideoURL);
+	
 	UFUNCTION()
 	void RequestMediaURL(FString URL);
 	bool bUsingFirstPlayer = true; // 현재 어느 플레이어가 사용 중인지 체크

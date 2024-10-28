@@ -149,6 +149,31 @@ void AJS_Screen::PlayMedia(const FString& VideoURL)
 	MultiCastPlayMedia(VideoURL);
 }
 
+void AJS_Screen::PlayVOD(const FString& VideoURL)
+{
+	MulticastPlayVOD(VideoURL);
+}
+
+void AJS_Screen::MulticastPlayVOD_Implementation(const FString& VideoURL)
+{
+	// 만약 재생 중인 미디어 플레이어가 있다면 전부 멈추기
+	MediaPlayer->PlayOnOpen = true;
+	// Media를 재생
+	// MediaSource의 URL 설정
+	MediaTexture->SetMediaPlayer(MediaPlayer);
+	if (MediaSource)
+	{
+		PRINTLOG(TEXT("%s"), *NetComp->VideoURL);
+		MediaSource->StreamUrl = VideoURL;
+		// 미디어 재생 시작
+		if (MediaPlayer)
+		{
+			MediaPlayer->OpenSource(MediaSource);
+			bUsingFirstPlayer = true;
+		}
+	}
+}
+
 void AJS_Screen::MultiCastPlayMedia_Implementation(const FString& VideoURL)
 {
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
