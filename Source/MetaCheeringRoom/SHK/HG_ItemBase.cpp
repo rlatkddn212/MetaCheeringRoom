@@ -84,6 +84,7 @@ void AHG_ItemBase::SetItemData(FItemData ItemValue)
 	ItemData.ItemName = ItemValue.ItemName;
 	ItemData.ItemPrice = ItemValue.ItemPrice;
 	ItemData.ItemCategory= ItemValue.ItemCategory;
+	ItemData.Sound = ItemValue.Sound;
 }
 
 EItemCategory AHG_ItemBase::GetItemCategory()

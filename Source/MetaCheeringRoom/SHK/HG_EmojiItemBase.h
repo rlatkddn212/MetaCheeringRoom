@@ -44,6 +44,14 @@ public:
 
 	void ChangeMaterialTexture();
 
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_FollowPlayer();
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastRPC_FollowPlayer();
+
+	void FollowPlayer();
+
 	UPROPERTY(Replicated)
 	FRotator Rot;
 	

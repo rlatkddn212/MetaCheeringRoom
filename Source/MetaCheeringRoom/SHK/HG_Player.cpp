@@ -462,27 +462,6 @@ void AHG_Player::MulticastRPC_Emotion_Implementation(UAnimMontage* Montage)
 	Anim->PlaySelectedMontage(Montage);
 }
 
-// void AHG_Player::StartEmotion(UAnimMontage* Montage)
-// {
-// 	if (HasAuthority())
-// 	{
-// 		bPlayEmotionMontage = true;
-// 		SelectedMontage = Montage;
-// 		OnRep_PlayEmotionMontage();
-// 	}
-// }
-
-// void AHG_Player::OnRep_PlayEmotionMontage()
-// {
-// 	if (bPlayEmotionMontage && SelectedMontage)
-// 	{
-// 		if (Anim)
-// 		{
-// 			Anim->PlaySelectedMontage(SelectedMontage);
-// 		}
-// 	}
-// }
-
 void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
 {
 	FVector SpawnLocation;
