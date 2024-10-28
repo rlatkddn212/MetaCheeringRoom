@@ -160,6 +160,7 @@ void AHG_Player::Tick(float DeltaTime)
 	{
 		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
 	}
+	SpringArmComp->TargetArmLength =150.0f;
 
 	// 상점 UI 업데이트
 	if (StoreWidget)
