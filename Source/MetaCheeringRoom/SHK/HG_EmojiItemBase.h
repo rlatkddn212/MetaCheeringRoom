@@ -13,17 +13,22 @@ UCLASS()
 class METACHEERINGROOM_API AHG_EmojiItemBase : public AHG_ItemBase
 {
 	GENERATED_BODY()
+
+public:
+	AHG_EmojiItemBase();
 protected:
 	virtual void BeginPlay() override;
 public:
 	virtual void Use() override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FString Name;
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server, Reliable)
 	void ServerRPC_ChangeMeshMaterial();
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -31,11 +36,17 @@ public:
 
 	void ChangeMeshMaterial();
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server, Reliable)
 	void ServerRPC_ChangeMaterialTexture();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_ChangeMaterialTexture();
 
 	void ChangeMaterialTexture();
+
+	UPROPERTY(Replicated)
+	FRotator Rot;
+	
+	UPROPERTY(Replicated)
+	FVector Loc;
 };

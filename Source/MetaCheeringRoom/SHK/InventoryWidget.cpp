@@ -247,7 +247,7 @@ void UInventoryWidget::UseItem()
 				}
 				else if(SelectedCategory == WB_SlotList_Emotion)
 				{
-					OwningPlayer->Anim->PlaySelectedMontage(SelectedSlot->SlotInfo.ItemInfo.Montage);
+					OwningPlayer->ServerRPC_Emotion(SelectedSlot->SlotInfo.ItemInfo.Montage);
 					RemoveFromParent();
 				}
 			}
