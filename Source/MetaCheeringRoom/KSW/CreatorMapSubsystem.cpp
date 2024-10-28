@@ -83,7 +83,7 @@ FString UCreatorMapSubsystem::SerializeCreatorMapToJson(const FCreatorMap& Map)
     }
 
     TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-    JsonObject->SetArrayField("rootObjects", JsonRootArray);
+    JsonObject->SetArrayField(TEXT("rootObjects"), JsonRootArray);
 
     FString OutputString;
     TSharedRef<TJsonWriter<TCHAR>> Writer = TJsonWriterFactory<TCHAR>::Create(&OutputString);
@@ -109,7 +109,8 @@ FCreatorMap UCreatorMapSubsystem::DeserializeJsonToCreatorMap(const FString& Jso
             for (const TSharedPtr<FJsonValue>& JsonValue : *JsonRootArray)
             {
                 ASW_CreatorObject* ChildObject = DeserializeCreatorObject(JsonValue->AsObject());
-                AddObject(ChildObject);
+                if (ChildObject)
+                    AddObject(ChildObject);
             }
         }
     }
@@ -134,6 +135,10 @@ TSharedPtr<FJsonObject> UCreatorMapSubsystem::SerializeCreatorObject(const ASW_C
     // CreatorObject의 이름과 변환 정보를 JSON에 직렬화
     JsonObject->SetStringField(TEXT("ObjectName"), CreatorObject->GetName());
 
+    JsonObject->SetNumberField(TEXT("CreatorObjectType"), CreatorObject->CreatorObjectType);
+    JsonObject->SetNumberField(TEXT("CreatorObjectId"), CreatorObject->CreatorObjectId);
+    JsonObject->SetNumberField(TEXT("CreatorObjectUId"), CreatorObject->CreatorObjectUId);
+
     FTransform transform = CreatorObject->GetTransform();
     // 변환 정보를 JSON 객체로 직렬화
     JsonObject->SetNumberField(TEXT("TranslationX"), transform.GetLocation().X);
@@ -157,8 +162,8 @@ TSharedPtr<FJsonObject> UCreatorMapSubsystem::SerializeCreatorObject(const ASW_C
    TArray<TSharedPtr<FJsonValue>> JsonChildren;
     for (const AActor* Child : AttachedActors)
     {
-        const ASW_CreatorObject* CreatorObject = Cast<ASW_CreatorObject>(Child); 
-        JsonChildren.Add(MakeShareable(new FJsonValueObject(SerializeCreatorObject(CreatorObject))));
+        const ASW_CreatorObject* NewCreatorObject = Cast<ASW_CreatorObject>(Child); 
+        JsonChildren.Add(MakeShareable(new FJsonValueObject(SerializeCreatorObject(NewCreatorObject))));
     }
 
     JsonObject->SetArrayField(TEXT("Objects"), JsonChildren);
@@ -171,15 +176,32 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
     if (!JsonObject.IsValid())
     {
         UE_LOG(LogTemp, Warning, TEXT("Invalid JSON Object provided."));
-        return nullptr;  // null 반환
+        return nullptr;
     }
-
+    
+    int32 CreatorObjectType = 1;
+    int32 CreatorObjectId = 1;
+    
+    JsonObject->TryGetNumberField(TEXT("CreatorObjectType"), CreatorObjectType);
+    JsonObject->TryGetNumberField(TEXT("CreatorObjectId"), CreatorObjectId);
     UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
-    TArray<FCreatorObjectData*> CreatorObjectsStruct = system->GetCreatorObjects();
-    // CreatorObject를 생성
-    ASW_CreatorObject* CreatorObject = CreateObject(CreatorObjectsStruct[0]);
+    TMap<int32, FCreatorObjectData*> CreatorObjectsStruct = system->GetCreatorObjects(CreatorObjectType);
+    if (!CreatorObjectsStruct.Contains(CreatorObjectId))
+	{
+        UE_LOG(LogTemp, Warning, TEXT("Invalid CreatorObject provided."));
+		return nullptr;
+	}
 
-     // JSON에서 이름과 변환 정보를 가져오기
+    // CreatorObject를 생성
+    ASW_CreatorObject* CreatorObject = CreateObject(CreatorObjectsStruct[CreatorObjectId]);
+
+    CreatorObject->CreatorObjectId = CreatorObjectId;
+    CreatorObject->CreatorObjectType = CreatorObjectType;
+
+    JsonObject->TryGetNumberField(TEXT("CreatorObjectUId"), CreatorObject->CreatorObjectUId);
+    UniqueCreatorItemId = FMath::Max(UniqueCreatorItemId, CreatorObject->CreatorObjectUId + 1);
+
+    // JSON에서 이름과 변환 정보를 가져오기
     CreatorObject->SetActorLabel(JsonObject->GetStringField(TEXT("ObjectName")));
 
     // 변환 정보 역직렬화
@@ -213,7 +235,8 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
         {
             ASW_CreatorObject* ChildObject =  DeserializeCreatorObject(JsonValue->AsObject());
             //AttachObject(CreatorObject, ChildObject);
-            AddObject(ChildObject, CreatorObject);
+            if (ChildObject)
+                AddObject(ChildObject, CreatorObject);
         }
     }
 
@@ -233,22 +256,22 @@ ASW_CreatorObject* UCreatorMapSubsystem::CreateObject(FCreatorObjectData* Object
     CreatingObject->SetActorLocation(FVector::ZeroVector);
     CreatingObject->SetActorRotation(FRotator::ZeroRotator);
     CreatingObject->CreatingObjectData = ObjectData;
+    CreatingObject->CreatorObjectType = ObjectData->CObjectType;
+    CreatingObject->CreatorObjectId = ObjectData->CObjectId;
 
 	return CreatingObject;
-
 }
 
 void UCreatorMapSubsystem::AddObject(ASW_CreatorObject* CreatingObject, ASW_CreatorObject* ParentObject /*= nullptr*/)
 {
     int32 CreatorItemId = UniqueCreatorItemId++;
-    CreatingObject->CreatorItemId = CreatorItemId;
+    CreatingObject->CreatorObjectUId = CreatorItemId;
     CreatorItemMap.Add(CreatorItemId, CreatingObject);
 
 	if (ParentObject != nullptr)
 	{
         // 부모 액터에 추가
         AttachObject(ParentObject, CreatingObject);
-        //CreatingObject->AttachToActor(ParentObject, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 	else
 	{
@@ -271,7 +294,7 @@ void UCreatorMapSubsystem::RemoveObjectRecursive(ASW_CreatorObject* Object)
 			}
 		}
 
-		CreatorItemMap.Remove(Object->CreatorItemId);
+		CreatorItemMap.Remove(Object->CreatorObjectId);
 		Object->Destroy();
 	}
 }
@@ -299,7 +322,7 @@ void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecurs
 			}
 		}
 
-		CreatorItemMap.Remove(Object->CreatorItemId);
+		CreatorItemMap.Remove(Object->CreatorObjectId);
 		Object->Destroy();
 	}
 }

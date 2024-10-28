@@ -5,6 +5,7 @@
 #include "../SHK/HG_GameModeBase.h"
 #include "UI/SW_CreateCreatorWidget.h"
 #include "Components/BoxComponent.h"
+#include "../SHK/HG_Player.h"
 
 // Sets default values
 ASW_CreateCreatorTriggerBox::ASW_CreateCreatorTriggerBox()
@@ -45,6 +46,12 @@ void ASW_CreateCreatorTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Ove
 		{
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeUIOnly());
+			AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+			if (Player)
+			{
+				Player->Direction = FVector::ZeroVector;
+				Player->bCanMove = false;
+			}
 		}
 	}
 }

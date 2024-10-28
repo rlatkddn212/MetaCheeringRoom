@@ -9,6 +9,8 @@
 #include "../CreatorStorageSubsystem.h"
 #include "SW_CreateCreatorSlotWidget.h"
 #include "Components/ScrollBox.h"
+#include "SHK/HG_Player.h"
+#include "GameFramework/Controller.h"
 
 void USW_CreateCreatorWidget::NativeConstruct()
 {
@@ -59,7 +61,16 @@ void USW_CreateCreatorWidget::OnCreate()
 void USW_CreateCreatorWidget::OnBack()
 {
 	// 이 위젯을 닫는다.
-	this->RemoveFromParent();
+	SetVisibility(ESlateVisibility::Hidden);
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	PC->SetShowMouseCursor(false);
+	PC->SetInputMode(FInputModeGameOnly());
+	AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+	if (Player)
+	{
+		Player->Direction = FVector::ZeroVector;
+		Player->bCanMove = true;
+	}
 }
 
 void USW_CreateCreatorWidget::OnCreateLevel()
@@ -90,7 +101,8 @@ void USW_CreateCreatorWidget::OnChange()
 	UCreatorStorageSubsystem* storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
 	TArray<FCreatorMapMetaData*> meta = storage->GetCreatorMapMetaDatas();
 
-	FString path = FPaths::ProjectContentDir() + meta[SelectSlotIdx]->FileName;
+	// Save/CreatorMap/파일이름.json 파일을 로드해서 레벨을 변경하는 함수를 호출
+	FString path = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + meta[SelectSlotIdx]->FileName;
 	FString JsonStr = storage->LoadCreatorMap(path);
 	
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();

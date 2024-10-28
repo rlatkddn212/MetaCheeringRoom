@@ -15,15 +15,6 @@ void USW_CreatorHierarchyWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	//UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
-	//TArray<FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects();
-
-	//for (int i = 0; i < CreatorObjects.Num(); i++)
-	//{
-	//	USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
-	//	ChildWidget->SetObject(CreatorObjects[i]);
-	//	ObjectScrollBox->AddChild(ChildWidget);
-	//}
 }
 
 void USW_CreatorHierarchyWidget::ReloadItem()

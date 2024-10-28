@@ -13,6 +13,11 @@ struct FCreatorObjectData : public FTableRowBase
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CObjectType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CObjectId;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ItemName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -65,8 +70,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FString GetCreatorName() const;
 
-	FCreatorObjectData* GetCreatorObjectData(int idx);
-	TArray<FCreatorObjectData*> GetCreatorObjects() { return CreatorObjects; }
+	FCreatorObjectData* GetCreatorObjectData(int32 objectType, int32 objectId);
+	TMap<int32, FCreatorObjectData*> GetCreatorObjects(int32 objectType);
 	TArray<FCreatorMapMetaData*> GetCreatorMapMetaDatas() { return CreatorMapMetaDatas; }
 
 	FString LoadCreatorMap(FString FilePath);
@@ -82,7 +87,7 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	class UDataTable* ItemDataTable;
 	// 크리에이터 툴에 사용할 수 있는 오브젝트
-	TArray<FCreatorObjectData*> CreatorObjects;
+	TMap<int32, TMap<int32, FCreatorObjectData*>> CreatorObjectMaps;
 	
 	TArray<FCreatorMapMetaData*> CreatorMapMetaDatas;
 	FString MetaDataFile = "CreatorMapMetaDataList.json";

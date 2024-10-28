@@ -15,17 +15,17 @@ UCreatorStorageSubsystem::UCreatorStorageSubsystem()
 
 void UCreatorStorageSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
-	ItemDataTable->GetAllRows(TEXT(""), CreatorObjects);
-	for (auto* Row : CreatorObjects)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UCreatorStorageSubsystem"));
-		UE_LOG(LogTemp, Warning, TEXT("ItemName : %s"), *Row->ItemName);
-	}
+	TArray<FCreatorObjectData*> Objects;
 
-	for (auto* Row : CreatorObjects)
+	ItemDataTable->GetAllRows(TEXT(""), Objects);
+	for (auto* Row : Objects)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UCreatorStorageSubsystem"));
-		UE_LOG(LogTemp, Warning, TEXT("ItemName : %s"), *Row->ItemName);
+		if (!CreatorObjectMaps.Contains(Row->CObjectType))
+		{
+			CreatorObjectMaps.Add(Row->CObjectType, TMap<int32, FCreatorObjectData*>());
+		}
+
+		CreatorObjectMaps[Row->CObjectType].Add(Row->CObjectId, Row);
 	}
 
 	// CreatorMapMetaDatas
@@ -34,7 +34,7 @@ void UCreatorStorageSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UCreatorStorageSubsystem::Deinitialize()
 {
-	CreatorObjects.Empty();
+	CreatorObjectMaps.Empty();
 }
 
 void UCreatorStorageSubsystem::SetCreatorName(const FString& NewCreatorName)
@@ -47,9 +47,27 @@ FString UCreatorStorageSubsystem::GetCreatorName() const
 	return "";
 }
 
-FCreatorObjectData* UCreatorStorageSubsystem::GetCreatorObjectData(int idx)
+FCreatorObjectData* UCreatorStorageSubsystem::GetCreatorObjectData(int32 objectType, int32 objectId)
 {
-	return CreatorObjects[idx];
+	if (CreatorObjectMaps.Contains(objectType))
+	{
+		if (CreatorObjectMaps[objectType].Contains(objectId))
+		{
+			return CreatorObjectMaps[objectType][objectId];
+		}
+	}
+
+	return nullptr;
+}
+
+TMap<int32, FCreatorObjectData*> UCreatorStorageSubsystem::GetCreatorObjects(int32 objectType)
+{
+	if (CreatorObjectMaps.Contains(objectType))
+	{
+		return CreatorObjectMaps[objectType];
+	}
+
+	return TMap<int32, FCreatorObjectData*>();
 }
 
 FString UCreatorStorageSubsystem::LoadCreatorMap(FString FilePath)
@@ -63,14 +81,20 @@ FString UCreatorStorageSubsystem::LoadCreatorMap(FString FilePath)
 	UE_LOG(LogTemp, Error, TEXT("Failed to load CreatorMap from %s"), *FilePath);
 
 	return "";
-
 }
 
 bool UCreatorStorageSubsystem::SaveCreatorMap(FString JsonStr, FString MapName)
 {
 	// 날짜 추가
-	//FString path = FPaths::ProjectContentDir() + TEXT("CreatorMap.json");
-	FString FilePath = FPaths::ProjectContentDir() + TEXT("CreatorMap") + FDateTime::Now().ToString() + TEXT(".json");
+	FString FilePath = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + TEXT("CreatorMap") + FDateTime::Now().ToString() + TEXT(".json");
+
+	// 파일이 이미 있는지 검사
+	if (FPaths::FileExists(FilePath))
+	{
+		// TODO : 파일 생성 실패 팝업
+		UE_LOG(LogTemp, Error, TEXT("Failed to save CreatorMap to %s"), *FilePath);
+		return false;
+	}
 
 	 if (FFileHelper::SaveStringToFile(JsonStr, *FilePath))
 	 {
@@ -95,7 +119,7 @@ void UCreatorStorageSubsystem::LoadMetaData()
 {
 	FString JsonStr;
 
-	FString MetaDataFilePath = FPaths::ProjectContentDir() + MetaDataFile;
+	FString MetaDataFilePath = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + MetaDataFile;
 	if (FFileHelper::LoadFileToString(JsonStr, *MetaDataFilePath))
 	{
 		UE_LOG(LogTemp, Log, TEXT("CreatorMap loaded from %s"), *MetaDataFilePath);
@@ -143,7 +167,8 @@ void UCreatorStorageSubsystem::SaveMetaData()
 	FString JsonStr;
 	TSharedRef<TJsonWriter<TCHAR>> JsonWriter = TJsonWriterFactory<TCHAR>::Create(&JsonStr);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter);
-	FString MetaDataFilePath = FPaths::ProjectContentDir() + MetaDataFile;
+
+	FString MetaDataFilePath = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + MetaDataFile;
 	if (FFileHelper::SaveStringToFile(JsonStr, *MetaDataFilePath))
 	{
 		UE_LOG(LogTemp, Log, TEXT("CreatorMap saved to %s"), *MetaDataFilePath);
@@ -162,7 +187,7 @@ void UCreatorStorageSubsystem::AddMetaData(FCreatorMapMetaData* MetaData)
 
 void UCreatorStorageSubsystem::RemoveMetaData(int32 idx)
 {
-	FString FilePath = FPaths::ProjectContentDir() + CreatorMapMetaDatas[idx]->FileName;
+	FString FilePath = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + CreatorMapMetaDatas[idx]->FileName;
 	if (FPaths::FileExists(FilePath))
 	{
 		FPlatformFileManager::Get().GetPlatformFile().DeleteFile(*FilePath);

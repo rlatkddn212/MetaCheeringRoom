@@ -37,7 +37,9 @@ public:
 
 	struct FCreatorObjectData* CreatingObjectData;
 
-	int32 CreatorItemId;
+	int32 CreatorObjectType;
+	int32 CreatorObjectId;
+	int32 CreatorObjectUId;
 
 	FChangeSelected OnChangeSelected;
 
@@ -91,8 +93,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* ZScaleRectMesh;
-
-	UStaticMesh* CreateCylinderMesh(float Radius, float Height, int32 SegmentCount);
 
 	void SelectAxis(bool isX, bool isY, bool isZ);
 	void SelectRotationAxis(bool isX, bool isY, bool isZ);

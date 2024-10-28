@@ -11,12 +11,11 @@ void USW_CreatorObjectWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
-	TArray<FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects();
-
-	for (int i = 0; i < CreatorObjects.Num(); i++)
+	TMap<int32, FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects(1);
+	for (auto& CreatorObject : CreatorObjects)
 	{
 		USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
-		ChildWidget->SetObject(CreatorObjects[i]);
+		ChildWidget->SetObject(CreatorObject.Value);
 		ObjectScrollBox->AddChild(ChildWidget);
 	}
 }
