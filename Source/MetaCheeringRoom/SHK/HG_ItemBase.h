@@ -17,6 +17,7 @@ enum class EItemCategory: uint8
 	Category_Active UMETA(DisplayName = "Active"),
 	Category_Emotion UMETA(DisplayName = "Emotion"),
 	Category_Emoji UMETA(DisplayName = "Emoji"),
+	Category_Sound UMETA(DisplayName = "Sound"),
 };
 
 USTRUCT(BlueprintType)
@@ -41,6 +42,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* Montage;
+
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* Sound;
 
 	bool operator==(const FItemData& Other) const
 	{

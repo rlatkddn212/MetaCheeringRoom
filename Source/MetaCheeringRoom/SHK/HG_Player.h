@@ -187,4 +187,7 @@ public:
 	UFUNCTION()
 	void ExitTheStore();
 
+	// 오디오
+	UPROPERTY(EditDefaultsOnly)
+	class UAudioComponent* AudioComp;
 };

@@ -20,10 +20,22 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FString Name;
 
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_ChangeMeshMaterial();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_ChangeMeshMaterial();
+
 	void ChangeMeshMaterial();
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_ChangeMaterialTexture();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_ChangeMaterialTexture();
 
 	void ChangeMaterialTexture();
 };
