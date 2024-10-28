@@ -157,7 +157,8 @@ void UToToMakeWidget::OnClickStartBtn()
 void UToToMakeWidget::OnClickAdjustBtn()
 {
 	// ToToActor에 Result 결과 뿌려주기
-
+	AJS_TotoActor* TotoActor = Cast<AJS_TotoActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AJS_TotoActor::StaticClass()));
+	TotoActor->MulticastAlarmToto(TEXT("예측 결과가 나왔습니다!!"));
 	// 처음 상태로 되돌리기
 	InitMakeWidget();
 }
