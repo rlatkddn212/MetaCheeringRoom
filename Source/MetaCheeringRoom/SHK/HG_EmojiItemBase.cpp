@@ -31,7 +31,12 @@ void AHG_EmojiItemBase::Tick(float DeltaTime)
 	
 }
 
-void AHG_EmojiItemBase::ChangeMeshMaterial()
+void AHG_EmojiItemBase::ServerRPC_ChangeMeshMaterial_Implementation()
+{
+	MulticastRPC_ChangeMeshMaterial();
+}
+
+void AHG_EmojiItemBase::MulticastRPC_ChangeMeshMaterial_Implementation()
 {
 	UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/SHK/Material/M_Emoji.M_Emoji"));
 	if (NewMaterial && MeshComp)
@@ -39,6 +44,16 @@ void AHG_EmojiItemBase::ChangeMeshMaterial()
 		MeshComp->SetMaterial(0, NewMaterial);
 	}
 }
+
+void AHG_EmojiItemBase::ChangeMeshMaterial()
+{
+	ServerRPC_ChangeMeshMaterial();
+}
+
+void AHG_EmojiItemBase::ServerRPC_ChangeMaterialTexture()
+{
+}
+
 
 void AHG_EmojiItemBase::ChangeMaterialTexture()
 {
