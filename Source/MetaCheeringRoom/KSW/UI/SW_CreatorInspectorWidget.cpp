@@ -118,11 +118,13 @@ void USW_CreatorInspectorWidget::OnPositionZChanged(const FText& Text, ETextComm
 
 void USW_CreatorInspectorWidget::OnRotationXChanged(const FText& Text, ETextCommit::Type CommitMethod)
 {
+	// (Pitch=2.000000,Yaw=3.000000,Roll=1.000000)	
+	// (X=62.702991,Y=1746.899573,Z=709.000000)
 	float x = FCString::Atof(*Text.ToString());
 	float y = FCString::Atof(*RotY->GetText().ToString());
 	float z = FCString::Atof(*RotZ->GetText().ToString());
 
-	OnChangeRotation(FRotator(x, y, z));
+	OnChangeRotation(FRotator(y, z, x));
 }
 
 void USW_CreatorInspectorWidget::OnRotationYChanged(const FText& Text, ETextCommit::Type CommitMethod)
@@ -131,7 +133,7 @@ void USW_CreatorInspectorWidget::OnRotationYChanged(const FText& Text, ETextComm
 	float y = FCString::Atof(*Text.ToString());
 	float z = FCString::Atof(*RotZ->GetText().ToString());
 
-	OnChangeRotation(FRotator(x, y, z));
+	OnChangeRotation(FRotator(y, z, x));
 }
 
 void USW_CreatorInspectorWidget::OnRotationZChanged(const FText& Text, ETextCommit::Type CommitMethod)
@@ -140,7 +142,7 @@ void USW_CreatorInspectorWidget::OnRotationZChanged(const FText& Text, ETextComm
 	float y = FCString::Atof(*RotY->GetText().ToString());
 	float z = FCString::Atof(*Text.ToString());
 
-	OnChangeRotation(FRotator(x, y, z));
+	OnChangeRotation(FRotator(y, z, x));
 }
 
 void USW_CreatorInspectorWidget::OnScaleXChanged(const FText& Text, ETextCommit::Type CommitMethod)

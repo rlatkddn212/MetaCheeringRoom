@@ -85,8 +85,9 @@ FString UCreatorStorageSubsystem::LoadCreatorMap(FString FilePath)
 
 bool UCreatorStorageSubsystem::SaveCreatorMap(FString JsonStr, FString MapName)
 {
+	FString FileName = TEXT("CreatorMap") + FDateTime::Now().ToString() + TEXT(".json");
 	// 날짜 추가
-	FString FilePath = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + TEXT("CreatorMap") + FDateTime::Now().ToString() + TEXT(".json");
+	FString FilePath = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + FileName;
 
 	// 파일이 이미 있는지 검사
 	if (FPaths::FileExists(FilePath))
@@ -102,7 +103,7 @@ bool UCreatorStorageSubsystem::SaveCreatorMap(FString JsonStr, FString MapName)
 
 		 FCreatorMapMetaData* metaData = new FCreatorMapMetaData();
 		 metaData->CreatorMapName = MapName;
-		 metaData->FileName = FilePath;
+		 metaData->FileName = FileName;
 		 metaData->ThumbnailFileName = "ThumbnailFileName";
 		 metaData->CreatedTime = FDateTime::Now();
 		 AddMetaData(metaData);
