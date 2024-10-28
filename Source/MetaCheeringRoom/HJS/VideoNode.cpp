@@ -20,6 +20,12 @@ void UVideoNode::PlayStream()
 
 	if (Screen)
 	{
+		if (bLive == false)
+		{
+			Screen->PlayVOD(PlayURL);
+			return;
+		}
+
 		UE_LOG(LogTemp,Warning,TEXT("URL : %s"),*PlayURL);
 		Screen->RequestMediaURL(PlayURL);
 		

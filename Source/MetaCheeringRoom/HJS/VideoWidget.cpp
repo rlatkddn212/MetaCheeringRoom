@@ -17,6 +17,7 @@ void UVideoWidget::NativeConstruct()
 	BTN_CategoryLive->OnClicked.AddDynamic(this, &UVideoWidget::SettingLive);
 	BTN_CategoryVOD->OnClicked.AddDynamic(this, &UVideoWidget::SettingVOD);
 	BTN_Quit->OnClicked.AddDynamic(this, &UVideoWidget::OnClickQuitBtn);
+	SettingLive();
 
 }
 
@@ -50,6 +51,8 @@ void UVideoWidget::SettingLiveInfo(TArray<FVedioInfo>& LiveInfoList)
 {
 	SB_Live->ClearChildren();
 	int32 count = 0;
+
+	// 복잡한데... 그냥 두 번 돌면서 따로 추가하자
 	for (int32 i = 0; i < LiveInfoList.Num()/4+1; i++)
 	{
 		UVideoList* VideoList = CreateWidget<UVideoList>(this,VideoListFactory);
@@ -62,6 +65,12 @@ void UVideoWidget::SettingLiveInfo(TArray<FVedioInfo>& LiveInfoList)
 			if (count >= LiveInfoList.Num())
 			{
 				break;
+			}
+			if (LiveInfoList[count].bLive == false)
+			{
+				count++;
+				j--;
+				continue;
 			}
 			// Node를 생성해
 			UVideoNode* VideoNode = CreateWidget<UVideoNode>(VideoList, VideoNodeFactory);
@@ -97,6 +106,65 @@ void UVideoWidget::SettingLiveInfo(TArray<FVedioInfo>& LiveInfoList)
 			break;
 		}
 	}
+
+	SB_VOD->ClearChildren();
+	count = 0;
+	// 복잡한데... 그냥 두 번 돌면서 따로 추가하자
+	for (int32 i = 0; i < LiveInfoList.Num() / 4 + 1; i++)
+	{
+		UVideoList* VideoList = CreateWidget<UVideoList>(this, VideoListFactory);
+		VideoList->NativeConstruct();
+		VideoList->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		// 인포 리스트에 있는 정보를 받아와서
+		for (int32 j = 0; j < 4; j++)
+		{
+			// 4개 단위로 쪼개서 비디오리스트에 넣고
+			if (count >= LiveInfoList.Num())
+			{
+				break;
+			}
+			if (LiveInfoList[count].bLive == true)
+			{
+				count++;
+				j--;
+				continue;
+			}
+			// Node를 생성해
+			UVideoNode* VideoNode = CreateWidget<UVideoNode>(VideoList, VideoNodeFactory);
+			VideoNode->SetVisibility(ESlateVisibility::Visible);
+			if (VideoNode)
+			{
+				// Node에 세팅해주기
+				FString Title = RemoveEmojis(LiveInfoList[count].Title);
+				if (LiveInfoList[count].Category == TEXT("Chzzk"))
+				{
+					Title = Title.LeftChop(10);
+				}
+				if (LiveInfoList[count].Title.Len() > 26)
+				{
+					Title = Title.Left(26);
+					Title = Title + TEXT("...");
+				}
+
+				VideoNode->TEXT_Title->SetText(FText::FromString(Title));
+				VideoNode->TEXT_Owner->SetText(FText::FromString(LiveInfoList[count].Owner));
+				VideoNode->TEXT_Time->SetText(FText::FromString(LiveInfoList[count].Time));
+				VideoNode->IMG_Thumbnail->SetBrushFromTexture(LiveInfoList[count].Thumbnail);
+				VideoNode->PlayURL = LiveInfoList[count].StreamURL;
+				VideoNode->bLive = false;
+				VideoList->NodeArr[j]->AddChild(VideoNode);
+			}
+			count++;
+		}
+		// 비디오 리스트를 스크롤바에 추가하기
+		SB_VOD->AddChild(VideoList);
+
+		if (count >= LiveInfoList.Num())
+		{
+			break;
+		}
+	}
+
 }
 
 bool UVideoWidget::IsEmoji(char32_t Codepoint)
