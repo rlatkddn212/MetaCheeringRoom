@@ -452,9 +452,53 @@ void AHG_Player::ExitTheStore()
 	}
 }
 
+void AHG_Player::ServerRPC_Emotion_Implementation(UAnimMontage* Montage)
+{
+	MulticastRPC_Emotion(Montage);
+}
+
+void AHG_Player::MulticastRPC_Emotion_Implementation(UAnimMontage* Montage)
+{
+	Anim->PlaySelectedMontage(Montage);
+}
+
+// void AHG_Player::StartEmotion(UAnimMontage* Montage)
+// {
+// 	if (HasAuthority())
+// 	{
+// 		bPlayEmotionMontage = true;
+// 		SelectedMontage = Montage;
+// 		OnRep_PlayEmotionMontage();
+// 	}
+// }
+
+// void AHG_Player::OnRep_PlayEmotionMontage()
+// {
+// 	if (bPlayEmotionMontage && SelectedMontage)
+// 	{
+// 		if (Anim)
+// 		{
+// 			Anim->PlaySelectedMontage(SelectedMontage);
+// 		}
+// 	}
+// }
+
 void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
 {
-	auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(p_ItemInfo.ItemClass, GetActorLocation(), GetActorRotation());
+	FVector SpawnLocation;
+	FRotator SpawnRotation;
+	if (p_ItemInfo.ItemCategory == EItemCategory::Category_Emoji)
+	{
+		SpawnLocation = GetActorLocation() + FVector(0.0f, 0.0f, 120.0f);
+		SpawnRotation = GetActorRotation() + FRotator(90.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		SpawnLocation = GetActorLocation();
+		SpawnRotation = GetActorRotation();
+	}
+	auto* SpawnedItem = GetWorld()->SpawnActor<AHG_ItemBase>(p_ItemInfo.ItemClass, SpawnLocation, SpawnRotation);
+
 	if (SpawnedItem != nullptr)
 	{
 		SpawnedItem->SetReplicates(true);
@@ -463,7 +507,7 @@ void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
 		{
 			SpawnedItem->SetActorHiddenInGame(true);
 		}
-		SpawnedItem->Use();
+		MulticastRPCSpawnItem(SpawnedItem);
 	}
 }
 
@@ -471,9 +515,6 @@ void AHG_Player::MulticastRPCSpawnItem_Implementation(AHG_ItemBase* ItemValue)
 {
 	if (ItemValue)
 	{
-		ItemValue->SetReplicates(true);
-		ItemValue->SetOwner(this);
-		ItemValue->SetActorHiddenInGame(true);
 		ItemValue->Use();
 	}
 }

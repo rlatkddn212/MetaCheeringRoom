@@ -2,6 +2,15 @@
 
 
 #include "SHK/HG_EmojiItemBase.h"
+#include "Net/UnrealNetwork.h"
+
+AHG_EmojiItemBase::AHG_EmojiItemBase()
+{
+	PrimaryActorTick.bCanEverTick = true;
+
+	bReplicates = true;
+	SetReplicateMovement(true);
+}
 
 void AHG_EmojiItemBase::BeginPlay()
 {
@@ -27,6 +36,8 @@ void AHG_EmojiItemBase::Tick(float DeltaTime)
 	{
 		SetActorLocation(Owner->GetActorLocation() + FVector(0.0f, 0.0f, 120.0f));
 		SetActorRelativeRotation(Owner->GetActorRotation() + FRotator(90.0f,0.0f,0.0f));
+		Loc = GetActorLocation();
+		Rot = GetActorRotation();
 	}
 	
 }
@@ -50,12 +61,12 @@ void AHG_EmojiItemBase::ChangeMeshMaterial()
 	ServerRPC_ChangeMeshMaterial();
 }
 
-void AHG_EmojiItemBase::ServerRPC_ChangeMaterialTexture()
+void AHG_EmojiItemBase::ServerRPC_ChangeMaterialTexture_Implementation()
 {
+	MulticastRPC_ChangeMaterialTexture();
 }
 
-
-void AHG_EmojiItemBase::ChangeMaterialTexture()
+void AHG_EmojiItemBase::MulticastRPC_ChangeMaterialTexture_Implementation()
 {
 	if (MeshComp)
 	{
@@ -66,4 +77,17 @@ void AHG_EmojiItemBase::ChangeMaterialTexture()
 			DynamicMaterial->SetTextureParameterValue(FName("BaseTexture"), ItemData.ItemIcon);
 		}
 	}
+}
+
+void AHG_EmojiItemBase::ChangeMaterialTexture()
+{
+	ServerRPC_ChangeMaterialTexture();
+}
+
+void AHG_EmojiItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AHG_EmojiItemBase, Rot);
+	DOREPLIFETIME(AHG_EmojiItemBase, Loc);
 }

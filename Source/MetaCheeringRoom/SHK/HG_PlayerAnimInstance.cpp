@@ -36,7 +36,10 @@ void UHG_PlayerAnimInstance::PlaySelectedMontage(UAnimMontage* p_Montage)
 	{
 		Montage_Play(p_Montage);
 
-		Owner->bCanMove = false;
-		Owner->CameraComp->FieldOfView = 120.0f;
+		if (Owner->IsLocallyControlled())
+		{
+			Owner->bCanMove = false;
+			Owner->CameraComp->FieldOfView = 120.0f;
+		}
 	}
 }
