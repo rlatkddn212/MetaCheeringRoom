@@ -8,7 +8,7 @@
 
 
 UENUM(BlueprintType)
-enum class EItemCategory: uint8
+enum class EItemCategory : uint8
 {
 	Category_OneHandGrab UMETA(DisplayName = "OneHandGrab"),
 	Category_TwoHandGrab UMETA(DisplayName = "TwoHandGrab"),
@@ -36,15 +36,15 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AHG_ItemBase> ItemClass;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	EItemCategory ItemCategory;
 
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* Montage;
 
-	UPROPERTY(EditDefaultsOnly)
-	USoundBase* Sound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<USoundWave> Sound;
 
 	bool operator==(const FItemData& Other) const
 	{

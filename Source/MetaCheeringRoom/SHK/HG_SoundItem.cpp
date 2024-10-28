@@ -12,16 +12,29 @@ void AHG_SoundItem::BeginPlay()
 	this->ItemData.ItemName = Name;
 	InitItemData();
 
+	//SetLifeSpan(0.5f);
 }
 
 void AHG_SoundItem::Use()
+{
+	ServerRPC_Use();
+}
+
+void AHG_SoundItem::ServerRPC_Use_Implementation()
+{
+	MulticastRPC_Use();
+}
+
+void AHG_SoundItem::MulticastRPC_Use_Implementation()
 {
 	if (Owner)
 	{
 		auto* Player = Cast<AHG_Player>(Owner);
 		if (Player)
 		{
-			Player->AudioComp->SetSound(this->ItemData.Sound);
+			UE_LOG(LogTemp,Warning,TEXT("11"));
+			USoundWave* Sound = ItemData.Sound.LoadSynchronous();
+			Player->AudioComp->SetSound(Sound);
 			Player->AudioComp->Play();
 		}
 	}

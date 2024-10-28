@@ -8,6 +8,8 @@ AHG_EmojiItemBase::AHG_EmojiItemBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	MeshComp->SetIsReplicated(true);
+
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
@@ -18,7 +20,7 @@ void AHG_EmojiItemBase::BeginPlay()
 
 	this->ItemData.ItemName = Name;
 	InitItemData();
-	
+
 	SetLifeSpan(4.0f);
 }
 
@@ -32,14 +34,7 @@ void AHG_EmojiItemBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Owner)
-	{
-		SetActorLocation(Owner->GetActorLocation() + FVector(0.0f, 0.0f, 120.0f));
-		SetActorRelativeRotation(Owner->GetActorRotation() + FRotator(90.0f,0.0f,0.0f));
-		Loc = GetActorLocation();
-		Rot = GetActorRotation();
-	}
-	
+	FollowPlayer();
 }
 
 void AHG_EmojiItemBase::ServerRPC_ChangeMeshMaterial_Implementation()
@@ -82,6 +77,27 @@ void AHG_EmojiItemBase::MulticastRPC_ChangeMaterialTexture_Implementation()
 void AHG_EmojiItemBase::ChangeMaterialTexture()
 {
 	ServerRPC_ChangeMaterialTexture();
+}
+
+void AHG_EmojiItemBase::FollowPlayer()
+{
+	ServerRPC_FollowPlayer();
+}
+
+void AHG_EmojiItemBase::ServerRPC_FollowPlayer_Implementation()
+{
+	MulticastRPC_FollowPlayer();
+}
+
+void AHG_EmojiItemBase::MulticastRPC_FollowPlayer_Implementation()
+{
+	if (Owner)
+	{
+		SetActorLocation(Owner->GetActorLocation() + FVector(0.0f, 0.0f, 120.0f));
+		SetActorRelativeRotation(Owner->GetActorRotation() + FRotator(90.0f, 0.0f, 0.0f));
+		Loc = GetActorLocation();
+		Rot = GetActorRotation();
+	}
 }
 
 void AHG_EmojiItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
