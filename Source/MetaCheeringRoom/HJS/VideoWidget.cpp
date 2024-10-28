@@ -18,7 +18,6 @@ void UVideoWidget::NativeConstruct()
 	BTN_CategoryVOD->OnClicked.AddDynamic(this, &UVideoWidget::SettingVOD);
 	BTN_Quit->OnClicked.AddDynamic(this, &UVideoWidget::OnClickQuitBtn);
 	SettingLive();
-
 }
 
 void UVideoWidget::OnClickQuitBtn()
