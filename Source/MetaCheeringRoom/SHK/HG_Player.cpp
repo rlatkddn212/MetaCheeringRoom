@@ -19,6 +19,7 @@
 #include "HG_GameInstance.h"
 #include "HG_PlayerAnimInstance.h"
 #include "HG_StoreWidget.h"
+#include "Components/AudioComponent.h"
 
 AHG_Player::AHG_Player()
 {
@@ -57,6 +58,9 @@ AHG_Player::AHG_Player()
 	UpperComp = CreateDefaultSubobject<USceneComponent>(TEXT("UpperComp"));
 	UpperComp->SetupAttachment(GetMesh(), TEXT("UpperPosition"));
 	UpperComp->SetIsReplicated(true);
+
+	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
+	AudioComp->SetIsReplicated(true);
 
 	bReplicates = true;
 	SetReplicateMovement(true);
