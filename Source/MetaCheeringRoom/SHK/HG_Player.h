@@ -190,4 +190,20 @@ public:
 	// 오디오
 	UPROPERTY(EditDefaultsOnly)
 	class UAudioComponent* AudioComp;
+
+// 	UPROPERTY(ReplicatedUsing = OnRep_PlayEmotionMontage)
+// 	bool bPlayEmotionMontage;
+
+// 	void StartEmotion(UAnimMontage* Montage);
+// 
+// 	UFUNCTION()
+// 	void OnRep_PlayEmotionMontage();
+
+// 	UPROPERTY(Replicated)
+// 	UAnimMontage* SelectedMontage;
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_Emotion(UAnimMontage* Montage);
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastRPC_Emotion(UAnimMontage* Montage);
+
 };
