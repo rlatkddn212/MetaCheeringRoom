@@ -164,7 +164,13 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 		}
 
 		FVector X = FVector(fDir, 0, 0) * Delta.Size();
-		Me->SetActorScale3D(GizmoStartScale + X);
+		FVector scaleVector = GizmoStartScale + X;
+
+		scaleVector.X = FMath::RoundToFloat(scaleVector.X * 10.0f) / 10.0f;
+		scaleVector.Y = FMath::RoundToFloat(scaleVector.Y * 10.0f) / 10.0f;
+		scaleVector.Z = FMath::RoundToFloat(scaleVector.Z * 10.0f) / 10.0f;
+
+		Me->SetActorScale3D(scaleVector);
 		PC->OnObjectChanged();
 		// Delta Debugline
 		//DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
@@ -186,7 +192,13 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 
 		FVector Y = FVector(0, fDir, 0) * Delta.Size();
 
-		Me->SetActorScale3D(GizmoStartScale + Y);
+		FVector scaleVector = GizmoStartScale + Y;
+
+		scaleVector.X = FMath::RoundToFloat(scaleVector.X * 10.0f) / 10.0f;
+		scaleVector.Y = FMath::RoundToFloat(scaleVector.Y * 10.0f) / 10.0f;
+		scaleVector.Z = FMath::RoundToFloat(scaleVector.Z * 10.0f) / 10.0f;
+
+		Me->SetActorScale3D(scaleVector);
 		PC->OnObjectChanged();
 		//DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
 	}
@@ -207,7 +219,14 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 		// z 축 스케일을 키운다.
 		// Me->SetActorScale3D(GizmoStartScale + Delta);
 		FVector Z = FVector(0, 0, fDir) * Delta.Size();
-		Me->SetActorScale3D(GizmoStartScale + Z);
+
+		FVector scaleVector = GizmoStartScale + Z;
+
+		scaleVector.X = FMath::RoundToFloat(scaleVector.X * 10.0f) / 10.0f;
+		scaleVector.Y = FMath::RoundToFloat(scaleVector.Y * 10.0f) / 10.0f;
+		scaleVector.Z = FMath::RoundToFloat(scaleVector.Z * 10.0f) / 10.0f;
+
+		Me->SetActorScale3D(scaleVector);
 		PC->OnObjectChanged();
 		//DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
 	}

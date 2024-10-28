@@ -105,35 +105,19 @@ void UCreatorPositionGizmoComponent::SetAxisSelected(bool isX, bool isY, bool is
 void UCreatorPositionGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D MousePosition)
 {
 	ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (IsXAxisSelected)
-	{
-		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
-		FVector ClosestPoint = OnMouseClick(MousePosition);
+	FVector CurrentPosition = OnMouseClick(MouseDownPosition);
+	FVector ClosestPoint = OnMouseClick(MousePosition);
 
-		FVector Delta = ClosestPoint - CurrentPosition;
-		Me->SetActorLocation(GizmoStartLocation + Delta);
-		PC->OnObjectChanged();
-	}
+	FVector Delta = ClosestPoint - CurrentPosition;
+	FVector NewLocation = GizmoStartLocation + Delta;
 
-	if (IsYAxisSelected)
-	{
-		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
-		FVector ClosestPoint = OnMouseClick(MousePosition);
+	// NewLocation을 반올림하여 계산
+	NewLocation.X = FMath::RoundToFloat(NewLocation.X / 10.0f) * 10.0f;
+	NewLocation.Y = FMath::RoundToFloat(NewLocation.Y / 10.0f) * 10.0f;
+	NewLocation.Z = FMath::RoundToFloat(NewLocation.Z / 10.0f) * 10.0f;
 
-		FVector Delta = ClosestPoint - CurrentPosition;
-		Me->SetActorLocation(GizmoStartLocation + Delta);
-		PC->OnObjectChanged();
-	}
-
-	if (IsZAxisSelected)
-	{
-		FVector CurrentPosition = OnMouseClick(MouseDownPosition);
-		FVector ClosestPoint = OnMouseClick(MousePosition);
-
-		FVector Delta = ClosestPoint - CurrentPosition;
-		Me->SetActorLocation(GizmoStartLocation + Delta);
-		PC->OnObjectChanged();
-	}
+	Me->SetActorLocation(NewLocation);
+	PC->OnObjectChanged();
 }
 
 FVector UCreatorPositionGizmoComponent::OnMouseClick(const FVector2D& ScreenPosition)

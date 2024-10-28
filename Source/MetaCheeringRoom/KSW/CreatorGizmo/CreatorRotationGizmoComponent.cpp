@@ -130,9 +130,16 @@ void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 		FVector DeltaDirection = Delta.GetSafeNormal();
 
 		FQuat RotationDelta;
-		RotationDelta = FQuat(DeltaDirection, Delta.Size() * 0.01f);
+		double AngleRad = Delta.Size() * 0.01f;
+		// 라디안을 디그리고 변경 10단위로 반올림
+		double angle = FMath::RadiansToDegrees(AngleRad);
+		angle = FMath::RoundToDouble(angle / 10.0f) * 10.0f;
+		AngleRad = FMath::DegreesToRadians(angle);
+		RotationDelta = FQuat(DeltaDirection, AngleRad);
 		
 		FQuat NewRotation = RotationDelta * CurrentRotation;
+
+		// 회전값 적용 10단위
 		Me->SetActorRotation(NewRotation);
 		PC->OnObjectChanged();
 	}
@@ -151,7 +158,14 @@ void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 		FVector DeltaDirection = Delta.GetSafeNormal();
 		
 		FQuat RotationDelta;
-		RotationDelta = FQuat(DeltaDirection, Delta.Size() * 0.01f);
+
+		double AngleRad = Delta.Size() * 0.01f;
+		// 라디안을 디그리고 변경 10단위로 반올림
+		double angle = FMath::RadiansToDegrees(AngleRad);
+		angle = FMath::RoundToDouble(angle / 10.0f) * 10.0f;
+		AngleRad = FMath::DegreesToRadians(angle);
+
+		RotationDelta = FQuat(DeltaDirection, AngleRad);
 		
 		FQuat NewRotation = RotationDelta * CurrentRotation;
 		Me->SetActorRotation(NewRotation);
@@ -169,7 +183,14 @@ void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 		FVector DeltaDirection = Delta.GetSafeNormal();
 
 		FQuat RotationDelta;
-		RotationDelta = FQuat(DeltaDirection, Delta.Size() * 0.01f);
+
+		double AngleRad = Delta.Size() * 0.01f;
+		// 라디안을 디그리고 변경 10단위로 반올림
+		double angle = FMath::RadiansToDegrees(AngleRad);
+		angle = FMath::RoundToDouble(angle / 10.0f) * 10.0f;
+		AngleRad = FMath::DegreesToRadians(angle);
+		
+		RotationDelta = FQuat(DeltaDirection, AngleRad);
 		
 		FQuat NewRotation = RotationDelta * CurrentRotation;
 		Me->SetActorRotation(NewRotation);
