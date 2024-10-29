@@ -99,4 +99,21 @@ public:
 	void RequestMediaURL(FString URL);
 	bool bUsingFirstPlayer = true; // 현재 어느 플레이어가 사용 중인지 체크
 	void PrepareNextMediaSource();
+
+
+	FTimerHandle AddPointTImerHandle;
+	UFUNCTION()
+	void AddPoint();
+
+	UPROPERTY()
+	class AHG_Player* Player;
+
+	TArray<int32> PointArr = {10,20,30,40,50};
+
+	UPROPERTY()
+	TSubclassOf<class UJS_GoldWidget> GoldWidgetFactory;
+
+	UPROPERTY()
+	UJS_GoldWidget* GoldWidget;
+
 };

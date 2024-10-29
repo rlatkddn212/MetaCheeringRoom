@@ -96,4 +96,8 @@ public:
 
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastSetTimeUI(const FString& TimeText, const int32& Time);
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastInitToto();
+
 };

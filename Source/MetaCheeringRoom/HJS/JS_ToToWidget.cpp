@@ -13,6 +13,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "HJS/JS_TotoActor.h"
 #include "../SHK/HG_Player.h"
+#include "Components/EditableTextBox.h"
+#include "../SHK/HG_PlayerGoodsComponent.h"
 
 
 void UJS_ToToWidget::NativeConstruct()
@@ -22,27 +24,61 @@ void UJS_ToToWidget::NativeConstruct()
 
 	BTN_Betting1->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickBetting1Btn);
 	BTN_Betting2->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickBetting2Btn);
+	BTN_BettingWeight->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickBettingWeightBtn);
+	ET_BettingWeight1->OnTextChanged.AddDynamic(this, &UJS_ToToWidget::OnBetting1Changed);
+	ET_BettingWeight2->OnTextChanged.AddDynamic(this, &UJS_ToToWidget::OnBetting2Changed);
+	BTN_WeightBetting1->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickWeightBtn1);
+	BTN_WeightBetting2->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickWeightBtn2);
 }
 
 void UJS_ToToWidget::OnClickBetting1Btn()
 {
-	// 플레이어가 이만한 포인트가 있는 지 체크하는 부분
 	int32 BettingPoint = FCString::Atoi(*TEXT_Betting1->GetText().ToString());
 	// 베팅하기
 	AJS_TotoActor* TotoActor = Cast<AJS_TotoActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AJS_TotoActor::StaticClass()));
 	
+	// 플레이어가 이만한 포인트가 있는 지 체크하는 부분
+	AHG_Player* Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	if (Player)
+	{
+		UHG_PlayerGoodsComponent* PG = Player->GoodsComp;
+		if (PG)
+		{
+			if (BettingPoint > PG->GetGold())
+			{
+				return;
+			}
+			PG->AddGold(-BettingPoint);
+		}
+	}
 	TotoActor->BettingToto(BettingPoint,1);
+	BTN_Betting2->SetIsEnabled(false);
+	BTN_WeightBetting2->SetIsEnabled(false);
 }
 
 void UJS_ToToWidget::OnClickBetting2Btn()
 {
 	// 플레이어가 이만한 포인트가 있는 지 체크하는 부분
-
 	int32 BettingPoint = FCString::Atoi(*TEXT_Betting2->GetText().ToString());
 	// 베팅하기
 	AJS_TotoActor* TotoActor = Cast<AJS_TotoActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AJS_TotoActor::StaticClass()));
 
+	AHG_Player* Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	if (Player)
+	{
+		UHG_PlayerGoodsComponent* PG = Player->GoodsComp;
+		if (PG)
+		{
+			if (BettingPoint > PG->GetGold())
+			{
+				return;
+			}
+			PG->AddGold(-BettingPoint);
+		}
+	}
 	TotoActor->BettingToto(BettingPoint, 2);
+	BTN_Betting1->SetIsEnabled(false);
+	BTN_WeightBetting1->SetIsEnabled(false);
 }
 
 void UJS_ToToWidget::OnClickQuitBtn()
@@ -129,4 +165,93 @@ void UJS_ToToWidget::ToToInitSetting()
 {
 	BD_ToToMain->SetVisibility(ESlateVisibility::Visible);
 	BB_ToToMain->SetVisibility(ESlateVisibility::Visible);
+}
+
+
+void UJS_ToToWidget::InitWidget()
+{
+	TEXT_ToToName->SetText(FText::FromString(TEXT("")));
+	TEXT_TimeLimit->SetText(FText::FromString(TEXT("시작 대기중입니다.")));
+	WS_Betting->SetActiveWidgetIndex(0);
+	BTN_Betting1->SetIsEnabled(true);
+	BTN_Betting2->SetIsEnabled(true);
+}
+
+void UJS_ToToWidget::OnClickBettingWeightBtn()
+{
+	WS_Betting->SetActiveWidgetIndex(1);
+}
+
+void UJS_ToToWidget::OnBetting1Changed(const FText& Text)
+{
+
+	if (!Text.ToString().IsNumeric())
+	{
+		ET_BettingWeight1->SetText(FText::FromString(TEXT("")));
+		return;
+	}
+
+	AHG_Player* player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	int32 PlayerGold = 0;
+	if (player)
+	{
+		UHG_PlayerGoodsComponent* goodsComp = player->GoodsComp;
+		if (goodsComp)
+		{
+			PlayerGold = goodsComp->GetGold();
+		}
+	}
+	FString GoldText;
+	if (FCString::Atoi(*Text.ToString()) >= PlayerGold)
+	{
+		GoldText = FString::Printf(TEXT("%d"), PlayerGold);
+	}
+	else
+	{
+		GoldText = Text.ToString();
+	}
+	ET_BettingWeight1->SetText(FText::FromString(GoldText));
+	TEXT_Betting1->SetText(FText::FromString(GoldText));
+}
+
+void UJS_ToToWidget::OnBetting2Changed(const FText& Text)
+{
+	if (!Text.ToString().IsNumeric())
+	{
+		ET_BettingWeight2->SetText(FText::FromString(TEXT("")));
+		return;
+	}
+	AHG_Player* player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	int32 PlayerGold = 0;
+	if (player)
+	{
+		UHG_PlayerGoodsComponent* goodsComp = player->GoodsComp;
+		if (goodsComp)
+		{
+			PlayerGold = goodsComp->GetGold();
+		}
+	}
+	FString GoldText;
+	if (FCString::Atoi(*Text.ToString()) >= PlayerGold)
+	{
+		GoldText = FString::Printf(TEXT("%d"), PlayerGold);
+	}
+	else
+	{
+		GoldText = Text.ToString();
+	}
+	ET_BettingWeight2->SetText(FText::FromString(GoldText));
+	TEXT_Betting2->SetText(FText::FromString(GoldText));
+}
+
+void UJS_ToToWidget::OnClickWeightBtn1()
+{
+	OnClickBetting1Btn();
+	WS_Betting->SetActiveWidgetIndex(0);
+}
+
+void UJS_ToToWidget::OnClickWeightBtn2()
+{
+	OnClickBetting2Btn();
+	WS_Betting->SetActiveWidgetIndex(0);
 }

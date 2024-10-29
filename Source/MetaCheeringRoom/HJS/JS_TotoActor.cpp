@@ -87,8 +87,9 @@ void AJS_TotoActor::MakeToto(FString totoName, FString select1, FString select2,
 	Select2 = select2;
 	TotoLimitTIme = second;
 	ServerSetTimerLimit();
-	MulticastSetToToUI(totoName,select1,select2);
+	MulticastInitToto();
 	MulticastAlarmToto(TEXT("승부예측이 시작되었습니다!"));
+	MulticastSetToToUI(totoName,select1,select2);
 }
 
 void AJS_TotoActor::MulticastSetToToUI_Implementation(const FString& totoName, const FString& select1, const FString& select2, int32 second, int32 totalSelect1 /*= 0*/, int32 totalSelect2 /*= 0*/, int32 totalBettor1 /*= 0*/, int32 totalBettor2 /*= 0*/, float totalOdds1 /*= 1.f*/, float totalOdds2 /*= 1.f*/)
@@ -185,6 +186,7 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 			Keys.Add(Elem.Key);
 			Values.Add(Elem.Value);
 		}
+		MulticastAdjustPoint(Keys, Values, TotalOdds1);
 	}
 	else
 	{
@@ -193,7 +195,10 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 			Keys.Add(Elem.Key);
 			Values.Add(Elem.Value);
 		}
+		MulticastAdjustPoint(Keys, Values, TotalOdds2);
 	}
+
+	
 }
 
 void AJS_TotoActor::MulticastAdjustPoint_Implementation(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd)
@@ -256,4 +261,25 @@ void AJS_TotoActor::MulticastSetTimeUI_Implementation(const FString& TimeText, c
 		}
 	}
 
+}
+
+void AJS_TotoActor::MulticastInitToto_Implementation()
+{
+
+	// 전체 포인트
+	TotalSelect1 = 0;
+	TotalSelect2 = 0;
+	// 전체 참여자
+	TotalBettor1 = 0;
+	TotalBettor2 = 0;
+	// 전체 배당
+	TotalOdds1 = 0.f;
+	TotalOdds2 = 0.f;
+	// 내 선택
+	MySelect = -1;
+
+	if (ToToWidget)
+	{
+		ToToWidget->InitWidget();
+	}
 }
