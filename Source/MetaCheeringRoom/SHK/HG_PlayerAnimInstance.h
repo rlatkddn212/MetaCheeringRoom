@@ -25,6 +25,9 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_TwerkEnd();
+	
+	UFUNCTION()
+	void AnimNotify_HDEnd();
 
 	class AHG_Player* Owner;
 
