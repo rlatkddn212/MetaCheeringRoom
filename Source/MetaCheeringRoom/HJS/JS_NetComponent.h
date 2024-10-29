@@ -31,7 +31,7 @@ public:
 
 	// 서버 URL
 	UPROPERTY(EditAnywhere)
-	FString ServerURL = "https://3df3-221-163-19-142.ngrok-free.app";
+	FString ServerURL = "http://121.165.108.133:13579";
 
 	// 생성 Key
 	FString StreamURL = TEXT("/convert_stream");
