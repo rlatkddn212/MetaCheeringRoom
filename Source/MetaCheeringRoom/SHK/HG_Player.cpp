@@ -120,7 +120,6 @@ void AHG_Player::Tick(float DeltaTime)
 	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, TC, Params);
 	if (bHit)
 	{
-		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Green, false, 1.0f);
 		LookingPoint = OutHit.ImpactPoint;
 
 		if (LookAtActor != OutHit.GetActor() && bIsStand)
@@ -231,7 +230,6 @@ void AHG_Player::DetectObject()
 	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, TC, Params);
 	if (bHit)
 	{
-		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Yellow, false, 1.0f);
 		if (auto* Item = Cast<AHG_ItemBase>(OutHit.GetActor()))
 		{
 			if (!Item->bEquiped)
