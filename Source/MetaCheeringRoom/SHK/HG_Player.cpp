@@ -27,7 +27,6 @@ AHG_Player::AHG_Player()
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->TargetArmLength = 200.0f;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp);
@@ -93,8 +92,10 @@ void AHG_Player::BeginPlay()
 		EquipItemToSocket(ID);
 	}
 
+
 	InventoryComp->Inventory = GI->CurrentInventory;
 	GoodsComp->SetGold(GI->CurrentGold);
+	TargetValue1 = SpringArmComp->TargetArmLength;
 }
 
 void AHG_Player::Tick(float DeltaTime)
@@ -152,6 +153,8 @@ void AHG_Player::Tick(float DeltaTime)
 		}
 	}
 
+
+
 	if (bDetectStand)
 	{
 		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 3.5f);
@@ -160,7 +163,7 @@ void AHG_Player::Tick(float DeltaTime)
 	{
 		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
 	}
-
+	UE_LOG(LogTemp,Warning,TEXT("%f"),SpringArmComp->TargetArmLength);
 	// 상점 UI 업데이트
 	if (StoreWidget)
 	{

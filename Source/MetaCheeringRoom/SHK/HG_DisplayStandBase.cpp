@@ -103,7 +103,6 @@ void AHG_DisplayStandBase::Detected(bool Value, APawn* p_DetectActor)
 		}
 		else
 		{
-			Player->SpringArmComp->SetRelativeLocation(FVector(0.f, 0.f, 20.0f));
 			Player->CameraComp->SetRelativeRotation(FRotator(0.f, -20.f, 0.f));
 			Player->CameraComp->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 			InteractionWidget->SetRelativeLocation(FVector(0.f, 0.f, 0.f));

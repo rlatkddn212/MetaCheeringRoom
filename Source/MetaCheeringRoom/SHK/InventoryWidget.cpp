@@ -64,6 +64,7 @@ void UInventoryWidget::InitInventoryUI()
 	WB_SlotList_Costume->ClearChildren();
 	WB_SlotList_Emotion->ClearChildren();
 	WB_SlotList_Emoji->ClearChildren();
+	WB_SlotList_Sound->ClearChildren();
 	SelectedSlot = nullptr;
 	DIsplaySelectedItemInfo();
 	if (this->GetOwningPlayer() != nullptr)

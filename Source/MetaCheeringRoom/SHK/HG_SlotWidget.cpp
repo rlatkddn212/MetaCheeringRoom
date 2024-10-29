@@ -26,7 +26,7 @@ void UHG_SlotWidget::NativeConstruct()
 void UHG_SlotWidget::OnButtonClicked()
 {
 	Owner->SelectedSlot = this;
-	if (Owner->SelectedCategory == Owner->WB_SlotList_Active || Owner->SelectedCategory == Owner->WB_SlotList_Emoji)
+	if (Owner->SelectedCategory == Owner->WB_SlotList_Active || Owner->SelectedCategory == Owner->WB_SlotList_Emoji || Owner->SelectedCategory == Owner->WB_SlotList_Sound)
 	{
 		Owner->TB_Use->SetText(FText::FromString(TEXT("사용하기")));
 	}
