@@ -163,7 +163,6 @@ void AHG_Player::Tick(float DeltaTime)
 	{
 		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
 	}
-	UE_LOG(LogTemp,Warning,TEXT("%f"),SpringArmComp->TargetArmLength);
 	// 상점 UI 업데이트
 	if (StoreWidget)
 	{
@@ -337,20 +336,17 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 			mesh->AttachToComponent(UpperComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			break;
 		case EItemCategory::Category_OneHandGrab:
-			UE_LOG(LogTemp, Warning, TEXT("3"));
 			mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			break;
 		case EItemCategory::Category_TwoHandGrab:
 			if (!bPassed)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("1"));
 				mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 				bPassed = true;
 				EquipItemToSocket(ItemValue->GetItemData());
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("2"));
 				mesh->AttachToComponent(HandLComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 				bPassed = false;
 			}
