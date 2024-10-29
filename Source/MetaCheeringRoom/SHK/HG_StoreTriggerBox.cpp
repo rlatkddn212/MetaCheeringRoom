@@ -37,6 +37,9 @@ void AHG_StoreTriggerBox::OnMyBeginOverlap(UPrimitiveComponent* OverlappedCompon
 {
 	if (auto* Player = Cast<AHG_Player>(OtherActor))
 	{
-		Player->EnterTheStore();
+		if (Player->IsLocallyControlled())
+		{
+			Player->EnterTheStore();
+		}
 	}
 }
