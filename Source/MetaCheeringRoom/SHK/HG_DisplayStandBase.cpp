@@ -86,6 +86,7 @@ void AHG_DisplayStandBase::SetItemData(FItemData ItemValue)
 	ItemData.ItemPrice = ItemValue.ItemPrice;
 	ItemData.ItemCategory = ItemValue.ItemCategory;
 	ItemData.Montage = ItemValue.Montage;
+	ItemData.Sound = ItemValue.Sound;
 }
 
 void AHG_DisplayStandBase::Detected(bool Value, APawn* p_DetectActor)

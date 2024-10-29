@@ -28,6 +28,9 @@ public:
 	
 	UFUNCTION()
 	void AnimNotify_HDEnd();
+	UFUNCTION()
+	void AnimNotify_PrayEnd();
+
 
 	class AHG_Player* Owner;
 

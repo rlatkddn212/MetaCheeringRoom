@@ -39,6 +39,15 @@ void UHG_PlayerAnimInstance::AnimNotify_HDEnd()
 	}
 }
 
+void UHG_PlayerAnimInstance::AnimNotify_PrayEnd()
+{
+	if (Owner)
+	{
+		Owner->bCanMove = true;
+		Owner->CameraComp->FieldOfView = 90.0f;
+	}
+}
+
 void UHG_PlayerAnimInstance::PlaySelectedMontage(UAnimMontage* p_Montage)
 {
 	if (p_Montage)

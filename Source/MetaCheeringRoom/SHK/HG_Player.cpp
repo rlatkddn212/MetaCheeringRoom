@@ -20,6 +20,7 @@
 #include "HG_PlayerAnimInstance.h"
 #include "HG_StoreWidget.h"
 #include "Components/AudioComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AHG_Player::AHG_Player()
 {
