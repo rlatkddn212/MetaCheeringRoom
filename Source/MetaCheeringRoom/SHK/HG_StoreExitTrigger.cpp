@@ -24,6 +24,9 @@ void AHG_StoreExitTrigger::OnMyBeginOverlap(UPrimitiveComponent* OverlappedCompo
 {
 	if (auto* Player = Cast<AHG_Player>(OtherActor))
 	{
-		Player->ExitTheStore();
+		if (Player->IsLocallyControlled())
+		{
+			Player->ExitTheStore();
+		}
 	}
 }
