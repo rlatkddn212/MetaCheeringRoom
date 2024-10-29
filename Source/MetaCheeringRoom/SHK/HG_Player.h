@@ -163,7 +163,7 @@ public:
 	TArray<FItemData> InitEquipItemList;
 	bool bDetectStand = false;
 
-	float TargetValue1 = 200.0f;
+	float TargetValue1 = 150.0f;
 	float TargetValue2 = -50.0f;
 
 	FVector LookingPoint;
