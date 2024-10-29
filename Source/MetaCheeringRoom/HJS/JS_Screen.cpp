@@ -2,6 +2,8 @@
 
 
 #include "HJS/JS_Screen.h"
+#include "../SHK/HG_PlayerGoodsComponent.h"
+#include "../SHK/HG_Player.h"
 #include "JS_NetComponent.h"
 #include "MediaPlayer.h"
 #include "MediaSoundComponent.h"
@@ -58,7 +60,7 @@ void AJS_Screen::BeginPlay()
 				VideoWidget = CreateWidget<UVideoWidget>(GetWorld(),VideoWidgetFactory);
 				if (VideoWidget)
 				{
-					VideoWidget->AddToViewport();
+					VideoWidget->AddToViewport(30);
 					VideoWidget->SetVisibility(ESlateVisibility::Hidden);
 				}
 			}
@@ -70,7 +72,16 @@ void AJS_Screen::BeginPlay()
 			// 다 가져와서 어딘가에 리스트로 저장해야 함. 구조체를 하나 만들기
 		}
 	}
-	
+	Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	if (Player)
+	{
+		if (Player->IsLocallyControlled())
+		{
+			Player->EnterTheStore();
+			GetWorldTimerManager().SetTimer(AddPointTImerHandle, this, &AJS_Screen::AddPoint, 5.f, false);
+		}
+	}
+
 }
 
 // Called every frame
@@ -141,6 +152,30 @@ void AJS_Screen::PrepareNextMediaSource()
 				MediaPlayer2->OpenSource(MediaSource2);
 			}
 		}
+	}
+}
+
+void AJS_Screen::AddPoint()
+{
+	
+	if (Player)
+	{
+		if (Player->IsLocallyControlled())
+		{
+			if (!Player->StoreWidget || !Player->bStoreWidget)
+			{
+				Player->EnterTheStore();
+			}
+			UHG_PlayerGoodsComponent* PG = Player->GoodsComp;
+			int32 GoldWeight = PointArr[FMath::RandRange(0,PointArr.Num()-1)];
+			PG->AddGold(GoldWeight);
+			GetWorldTimerManager().SetTimer(AddPointTImerHandle,this,&AJS_Screen::AddPoint,5.f,false);
+		}
+	}
+	else
+	{
+		Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+		GetWorldTimerManager().SetTimer(AddPointTImerHandle, this, &AJS_Screen::AddPoint, 1.f, false);
 	}
 }
 

@@ -114,4 +114,20 @@ public:
 	UFUNCTION()
 	void ToToInitSetting();
 
+	void InitWidget();
+
+	UFUNCTION()
+	void OnClickBettingWeightBtn();
+
+	UFUNCTION()
+	void OnBetting1Changed(const FText& Text);
+
+	UFUNCTION()
+	void OnBetting2Changed(const FText& Text);
+
+	UFUNCTION()
+	void OnClickWeightBtn1();
+	UFUNCTION()
+	void OnClickWeightBtn2();
+
 };
