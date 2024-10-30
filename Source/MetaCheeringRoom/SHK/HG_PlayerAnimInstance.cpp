@@ -27,6 +27,11 @@ void UHG_PlayerAnimInstance::AnimNotify_TwerkEnd()
 	{
 		Owner->bCanMove = true;
 		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
 	}
 }
 
@@ -36,6 +41,11 @@ void UHG_PlayerAnimInstance::AnimNotify_HDEnd()
 	{
 		Owner->bCanMove = true;
 		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
 	}
 }
 
@@ -45,6 +55,11 @@ void UHG_PlayerAnimInstance::AnimNotify_PrayEnd()
 	{
 		Owner->bCanMove = true;
 		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if(pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
 	}
 }
 

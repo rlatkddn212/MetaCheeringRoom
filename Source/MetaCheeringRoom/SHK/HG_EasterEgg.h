@@ -27,7 +27,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* BoxCollisionComp;
 
-	float StayTime = 10.0f;
+	float StayTime = 5.0f;
 
 	bool bStaying = false;
 
