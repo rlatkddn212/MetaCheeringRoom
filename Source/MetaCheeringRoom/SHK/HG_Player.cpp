@@ -280,10 +280,10 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 
 void AHG_Player::Emotion()
 {
-	if (Anim)
-	{
-		Anim->PlayTwerkEmotionMontage();
-	}
+// 	if (Anim)
+// 	{
+// 		Anim->PlayTwerkEmotionMontage();
+// 	}
 }
 
 void AHG_Player::PopUpPurchaseWidget()
