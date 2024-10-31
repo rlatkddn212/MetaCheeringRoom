@@ -6,6 +6,7 @@
 #include "HG_Player.h"
 #include "HG_GameInstance.h"
 #include "HG_PlayerInventoryComponent.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 AHG_EasterEgg::AHG_EasterEgg()
@@ -22,7 +23,7 @@ void AHG_EasterEgg::BeginPlay()
 	BoxCollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AHG_EasterEgg::OnMyBeginOverlap);
 	BoxCollisionComp->OnComponentEndOverlap.AddDynamic(this, &AHG_EasterEgg::OnMyEndOverlap);
 
-	ItemData.ItemName = "PrayForFaker";
+	ItemData.ItemName = "Faker";
 	InitItemData();
 }
 
@@ -58,7 +59,7 @@ void AHG_EasterEgg::OnMyEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		UE_LOG(LogTemp, Warning, TEXT("소하혁"));
 		bStaying = false;
-		StayTime = 10.0f;
+		StayTime = 5.0f;
 	}
 }
 
@@ -67,6 +68,13 @@ void AHG_EasterEgg::EasterEggComplete()
 	if (OverlapPlayer)
 	{
 		OverlapPlayer->InventoryComp->AddtoInventory(ItemData,1);
+		bStaying = false;
+		UUserWidget* FakerWidget = CreateWidget<UUserWidget>(GetWorld(),WidgetFactory);
+		if (FakerWidget)
+		{
+			FakerWidget->AddToViewport();
+		}
+		StayTime = 5.0f;
 	}
 }
 
