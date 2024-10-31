@@ -112,7 +112,7 @@ void AHG_Player::Tick(float DeltaTime)
 	FHitResult OutHit;
 	int32 BoneIndex = GetMesh()->GetBoneIndex(TEXT("head"));
 	FVector Start = this->GetMesh()->GetBoneTransform(BoneIndex).GetLocation();
-	FVector End = Start + CameraComp->GetForwardVector() * 300.0f;
+	FVector End = Start + CameraComp->GetForwardVector() * 200.0f;
 
 	ECollisionChannel TC = ECC_WorldDynamic;
 	FCollisionQueryParams Params;

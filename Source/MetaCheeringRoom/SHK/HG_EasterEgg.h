@@ -51,4 +51,9 @@ public:
 	void InitItemData();
 
 	void SetItemData(FItemData p_ItemData);
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UUserWidget> WidgetFactory;
+
+	bool bOnce = false;
 };

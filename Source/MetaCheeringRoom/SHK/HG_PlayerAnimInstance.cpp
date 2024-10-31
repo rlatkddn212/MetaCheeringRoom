@@ -63,6 +63,20 @@ void UHG_PlayerAnimInstance::AnimNotify_PrayEnd()
 	}
 }
 
+void UHG_PlayerAnimInstance::AnimNotify_MLTEnd()
+{
+	if (Owner)
+	{
+		Owner->bCanMove = true;
+		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
+	}
+}
+
 void UHG_PlayerAnimInstance::PlaySelectedMontage(UAnimMontage* p_Montage)
 {
 	if (p_Montage)
