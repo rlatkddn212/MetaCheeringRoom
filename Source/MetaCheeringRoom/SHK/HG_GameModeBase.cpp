@@ -6,7 +6,10 @@
 #include "HG_GameInstance.h"
 #include "../HJS/JS_SessionGameInstanceSubSystem.h"
 #include "../KSW/UI/SW_CreateCreatorWidget.h"
-
+#include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/OnlineSubsystem.h"
+#include "Interfaces/OnlineIdentityInterface.h"
+#include "OnlineSubsystemUtils.h"
+#include "MetaCheeringRoom.h"
 void AHG_GameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -31,9 +34,24 @@ void AHG_GameModeBase::BeginPlay()
 		UJS_SessionGameInstanceSubSystem* si = gi->GetSubsystem<UJS_SessionGameInstanceSubSystem>();
 		if (si)
 		{
+			// Online Subsystem 인스턴스 가져오기
+			IOnlineSubsystem* SubSystem = IOnlineSubsystem::Get(TEXT("Steam"));
+			if (SubSystem)
+			{
+				// Identity 인터페이스 가져오기
+				IOnlineIdentityPtr IdentityInterface = SubSystem->GetIdentityInterface();
+				if (IdentityInterface.IsValid())
+				{
+					// 로컬 플레이어의 유니크 넷 ID 가져오기
+					FUniqueNetIdPtr UserId = IdentityInterface->GetUniquePlayerId(0);
+					if (UserId.IsValid())
+					{
+						// Steam ID를 문자열로 변환
+						si->PlayerName = FName(UserId->ToString());
+					}
+				}
+			}
 			si->FindOtherSessions();
 		}
 	}
-
-
 }

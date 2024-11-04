@@ -7,6 +7,8 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/Character.h"
 #include "../SHK/HG_Player.h"
+#include "../SHK/HG_GameInstance.h"
+#include "JS_SessionGameInstanceSubSystem.h"
 
 // Sets default values
 AJS_JoinSessionTriggerBox::AJS_JoinSessionTriggerBox()
@@ -51,6 +53,16 @@ void AJS_JoinSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overl
 				Player->Direction = FVector::ZeroVector;
 				Player->bCanMove = false;
 			}
+		}
+	}
+
+	UHG_GameInstance* gi = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
+	if (gi)
+	{
+		UJS_SessionGameInstanceSubSystem* si = gi->GetSubsystem<UJS_SessionGameInstanceSubSystem>();
+		if (si)
+		{
+			si->FindOtherSessions();
 		}
 	}
 }
