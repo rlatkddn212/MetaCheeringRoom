@@ -34,12 +34,10 @@ void AHG_EasterEgg::Tick(float DeltaTime)
 	if (bStaying)
 	{
 		StayTime -= DeltaTime;
-	}
-
-	if (StayTime <= 0)
-	{
-		UE_LOG(LogTemp,Warning,TEXT("외쳐 대상혁!!"));
-		EasterEggComplete();
+		if (StayTime <= 0)
+		{
+			EasterEggComplete();
+		}
 	}
 }
 
@@ -48,7 +46,6 @@ void AHG_EasterEgg::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	if (auto* Player = Cast<AHG_Player>(OtherActor))
 	{
 		OverlapPlayer = Player;
-		UE_LOG(LogTemp, Warning, TEXT("대상혁"));
 		bStaying = true;
 	}
 }
@@ -57,7 +54,6 @@ void AHG_EasterEgg::OnMyEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 {
 	if (auto* Player = Cast<AHG_Player>(OtherActor))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("소하혁"));
 		bStaying = false;
 		StayTime = 5.0f;
 	}
