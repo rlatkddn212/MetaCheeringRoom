@@ -11,6 +11,9 @@
 #include "MetaCheeringRoom.h"
 #include "StreamMediaSource.h"
 #include "VideoWidget.h"
+#include "JS_ExitWidget.h"
+#include "Net/UnrealNetwork.h"
+#include "JS_PlayerController.h"
 
 // Sets default values
 AJS_Screen::AJS_Screen()
@@ -25,7 +28,7 @@ AJS_Screen::AJS_Screen()
 	MediaSound2 = CreateDefaultSubobject<UMediaSoundComponent>(TEXT("MediaSound2"));
 	MediaSound2->SetupAttachment(RootComponent);
 
-	//bReplicates = true;
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -36,17 +39,22 @@ void AJS_Screen::BeginPlay()
 	NetComp->Me = this;
 	MediaPlayer->OnEndReached.AddDynamic(this, &AJS_Screen::OnMediaEndReached);
 	MediaPlayer2->OnEndReached.AddDynamic(this, &AJS_Screen::OnMediaEndReached);
+	MediaPlayer->OnMediaOpenFailed.AddDynamic(this, &AJS_Screen::OnFailedLoadVideo1);
+	MediaPlayer2->OnMediaOpenFailed.AddDynamic(this, &AJS_Screen::OnFailedLoadVideo2);
+	MediaPlayer->OnMediaOpened.AddDynamic(this, &AJS_Screen::OnSucceedLoadVideo1);
+	MediaPlayer2->OnMediaOpened.AddDynamic(this, &AJS_Screen::OnSucceedLoadVideo2);
 	MediaPlayer->PlayOnOpen = true;
 	MediaPlayer2->PlayOnOpen = false;
 	MediaPlayer->SetLooping(false);
 	MediaPlayer2->SetLooping(false);
-
+	
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if(PC)
 	{
-		SetOwner(PC);
+		GetWorldTimerManager().SetTimer(PlayVedioHandle, this, &AJS_Screen::RepPlayVideo, 1.f, false);
 		if (PC->HasAuthority())
 		{
+			SetOwner(PC);
 			if (MediaSound)
 			{
 				MediaSound->SetMediaPlayer(MediaPlayer);
@@ -81,7 +89,6 @@ void AJS_Screen::BeginPlay()
 			GetWorldTimerManager().SetTimer(AddPointTImerHandle, this, &AJS_Screen::AddPoint, 5.f, false);
 		}
 	}
-
 }
 
 // Called every frame
@@ -105,6 +112,7 @@ void AJS_Screen::AddVedioInfo(FVedioInfo Info)
 
 void AJS_Screen::OnMediaEndReached()
 {
+
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	PrepareNextMediaSource();
 	MediaPlayer->PlayOnOpen = false;
@@ -113,12 +121,20 @@ void AJS_Screen::OnMediaEndReached()
 	{
 		MediaTexture->SetMediaPlayer(MediaPlayer2);
 		MediaPlayer2->Play();
+		if (PC->HasAuthority())
+		{
+			RepVideoURL = MediaSource2->StreamUrl;
+		}
 		bUsingFirstPlayer = false;
 	}
 	else
 	{
 		MediaTexture->SetMediaPlayer(MediaPlayer);
 		MediaPlayer->Play();
+		if (PC->HasAuthority())
+		{
+			RepVideoURL = MediaSource->StreamUrl;
+		}
 		bUsingFirstPlayer = true;
 	}
 }
@@ -138,7 +154,7 @@ void AJS_Screen::PrepareNextMediaSource()
 			MediaSource->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
 			if (MediaPlayer)
 			{
-				MediaPlayer->OpenSource(MediaSource);
+				PRINTLOG(TEXT("%d"), MediaPlayer->OpenSource(MediaSource));
 			}
 		}
 	}
@@ -149,7 +165,7 @@ void AJS_Screen::PrepareNextMediaSource()
 			MediaSource2->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
 			if (MediaPlayer2)
 			{
-				MediaPlayer2->OpenSource(MediaSource2);
+				PRINTLOG(TEXT("%d"), MediaPlayer2->OpenSource(MediaSource2));
 			}
 		}
 	}
@@ -179,8 +195,73 @@ void AJS_Screen::AddPoint()
 	}
 }
 
+void AJS_Screen::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AJS_Screen, RepVideoURL);
+	DOREPLIFETIME(AJS_Screen, RepVideoURL2);
+	DOREPLIFETIME(AJS_Screen, bUsingFirstPlayer);
+}
+
+
+void AJS_Screen::RepPlayVideo()
+{
+	PRINTLOG(TEXT("%s"), *RepVideoURL);
+	if (RepVideoURL != TEXT(""))
+	{
+		NetComp->VideoURL = RepVideoURL;
+		AJS_PlayerController* PC = Cast<AJS_PlayerController>(GetWorld()->GetFirstPlayerController());
+		if (PC)
+		{
+			PC->ServerHandleVideoPlay();
+		}
+	}
+}
+
+void AJS_Screen::OnFailedLoadVideo1(FString FailedUrl)
+{
+	FailCount1++;
+	if (FailCount1 > 3)
+	{
+		return;
+	}
+	GetWorldTimerManager().SetTimer(FailLoadVideo1Handle, this, &AJS_Screen::VideoSourceLoad1, 3.f, false);
+}
+
+void AJS_Screen::OnSucceedLoadVideo1(FString Url)
+{
+	FailCount1 = 0;
+}
+
+void AJS_Screen::VideoSourceLoad1()
+{
+	MediaPlayer->OpenSource(MediaSource);
+}
+
+void AJS_Screen::OnFailedLoadVideo2(FString FailedUrl)
+{
+	FailCount2++;
+	if (FailCount2 > 3)
+	{
+		return;
+	}
+	GetWorldTimerManager().SetTimer(FailLoadVideo2Handle, this, &AJS_Screen::VideoSourceLoad2, 3.f, false);
+}
+
+void AJS_Screen::OnSucceedLoadVideo2(FString Url)
+{
+	FailCount2 = 0;
+}
+
+void AJS_Screen::VideoSourceLoad2()
+{
+	MediaPlayer2->OpenSource(MediaSource2);
+}
+
 void AJS_Screen::PlayMedia(const FString& VideoURL)
 {
+	RepVideoURL = VideoURL;
 	MultiCastPlayMedia(VideoURL);
 }
 
@@ -209,12 +290,17 @@ void AJS_Screen::MulticastPlayVOD_Implementation(const FString& VideoURL)
 	}
 }
 
-void AJS_Screen::MultiCastPlayMedia_Implementation(const FString& VideoURL)
+void AJS_Screen::PlayVideoRepURL(const FString& VideoURL)
 {
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 
 	// 만약 재생 중인 미디어 플레이어가 있다면 전부 멈추기
 	MediaPlayer->PlayOnOpen = true;
+	GetWorldTimerManager().ClearTimer(FailLoadVideo1Handle);
+	GetWorldTimerManager().ClearTimer(FailLoadVideo2Handle);
+	FailCount2 = 0;
+	FailCount1 = 0;
+
 	// Media를 재생
 	// MediaSource의 URL 설정
 	MediaTexture->SetMediaPlayer(MediaPlayer);
@@ -236,7 +322,44 @@ void AJS_Screen::MultiCastPlayMedia_Implementation(const FString& VideoURL)
 		MediaSource2->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
 		if (MediaPlayer2)
 		{
-			MediaPlayer2->OpenSource(MediaSource2);
+			PRINTLOG(TEXT("%d"), MediaPlayer2->OpenSource(MediaSource2));
+		}
+	}
+}
+
+void AJS_Screen::MultiCastPlayMedia_Implementation(const FString& VideoURL)
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	
+	// 만약 재생 중인 미디어 플레이어가 있다면 전부 멈추기
+	MediaPlayer->PlayOnOpen = true;
+	GetWorldTimerManager().ClearTimer(FailLoadVideo1Handle);
+	GetWorldTimerManager().ClearTimer(FailLoadVideo2Handle);
+	FailCount2 = 0;
+	FailCount1 = 0;
+	
+	// Media를 재생
+	// MediaSource의 URL 설정
+	MediaTexture->SetMediaPlayer(MediaPlayer);
+	if (MediaSource)
+	{
+		PRINTLOG(TEXT("%s"), *NetComp->VideoURL);
+		MediaSource->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
+		// 미디어 재생 시작
+		if (MediaPlayer)
+		{
+			MediaPlayer->OpenSource(MediaSource);
+			MediaPlayer->Play();
+			bUsingFirstPlayer = true;
+		}
+	}
+	if (MediaSource2)
+	{
+		NetComp->SetVideoURL();
+		MediaSource2->StreamUrl = NetComp->VideoURL + TEXT(".mp4");
+		if (MediaPlayer2)
+		{
+			PRINTLOG(TEXT("%d"),MediaPlayer2->OpenSource(MediaSource2));
 		}
 	}
 }

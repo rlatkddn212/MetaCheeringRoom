@@ -10,8 +10,9 @@
 #include "Containers/StringConv.h"
 #include <string>
 #include "MetaCheeringRoom.h"
+#include "Interfaces/OnlineIdentityInterface.h"
+#include "OnlineSubsystemUtils.h"
 //세션 이름
-const static FName SESSION_NAME = TEXT("Cheering");
 
 void UJS_SessionGameInstanceSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -28,6 +29,7 @@ void UJS_SessionGameInstanceSubSystem::Initialize(FSubsystemCollectionBase& Coll
 		SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UJS_SessionGameInstanceSubSystem::OnMyJoinSessionComplete);
 		SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UJS_SessionGameInstanceSubSystem::OnMyDestroySessionComplete);
 	}
+
 }
 
 void UJS_SessionGameInstanceSubSystem::CreateSession(const FString& RoomName, int32 PlayerCount, const FString& Category)
@@ -62,7 +64,7 @@ void UJS_SessionGameInstanceSubSystem::CreateSession(const FString& RoomName, in
 		FString roomname = StringBase64Encode(RoomName);
 		SessionSettings.Set<FString>(FName("Category"), Category, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 		SessionSettings.Set<FString>(FName("Room_Name"), roomname, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-		SessionSettings.Set<FString>(FName("Host_Name"), SESSION_NAME.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+		SessionSettings.Set<FString>(FName("Host_Name"), PlayerName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
 		// SessionSettings에서 값을 가져와 로그로 출력
 
@@ -106,7 +108,7 @@ void UJS_SessionGameInstanceSubSystem::JoinToSession(int32 Index)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Joining"));
 	auto result = SessionSearch->SearchResults[Index];
-	SessionInterface->JoinSession(0, FName(SESSION_NAME), result);
+	SessionInterface->JoinSession(0, FName(PlayerName), result);
 }
 
 void UJS_SessionGameInstanceSubSystem::DestroySession()
@@ -267,7 +269,7 @@ void UJS_SessionGameInstanceSubSystem::ExitSession()
 
 void UJS_SessionGameInstanceSubSystem::ServerRPCExitSession_Implementation()
 {
-	SessionInterface->DestroySession(SESSION_NAME);
+	SessionInterface->DestroySession(PlayerName);
 	MulticastRPCExitSession();
 }
 
@@ -279,7 +281,7 @@ void UJS_SessionGameInstanceSubSystem::MulticastRPCExitSession_Implementation()
 	}
 	//방퇴장 요청
 	//클라이언트 입장에서는 그냥 나가는 거 호스트 입장에선 파괴하는거
-	//SessionInterface->DestroySession(SESSION_NAME);
+	//SessionInterface->DestroySession(SessionName);
 
 	// 모든 클라이언트에게 세션이 종료되었음을 알림
 	if (GetWorld()->IsNetMode(NM_Client))
@@ -295,13 +297,13 @@ void UJS_SessionGameInstanceSubSystem::ClientLeaveSession_Implementation()
 {
 	if (SessionInterface.IsValid())
 	{
-		SessionInterface->DestroySession(SESSION_NAME);
+		SessionInterface->DestroySession(PlayerName);
 	}
 
 	// 로비로 이동
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if (PC)
 	{
-		PC->ClientTravel("/Game/JJH/MAP_Reallobby_SHN", TRAVEL_Absolute);
+		PC->ClientTravel("/Game/SHK/Level/HG_LobbyLevel", TRAVEL_Absolute);
 	}
 }

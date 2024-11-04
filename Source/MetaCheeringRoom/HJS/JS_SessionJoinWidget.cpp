@@ -223,14 +223,6 @@ void UJS_SessionJoinWidget::OnClickedJoinQuit()
 	BD_JoinRoom->SetVisibility(ESlateVisibility::Hidden);
 	LobbySelectedIndex = -1;
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	PC->SetShowMouseCursor(false);
-	PC->SetInputMode(FInputModeGameOnly());
-	AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
-	if (Player)
-	{
-		Player->Direction = FVector::ZeroVector;
-		Player->bCanMove = true;
-	}
 }
 
 void UJS_SessionJoinWidget::OnClickedCreateQuit()
@@ -241,7 +233,11 @@ void UJS_SessionJoinWidget::OnClickedCreateQuit()
 void UJS_SessionJoinWidget::OnClickedQuit()
 {
 	SetVisibility(ESlateVisibility::Hidden);
-	
+	SB_All->ClearChildren();
+	SB_ESports->ClearChildren();
+	SB_Soccer->ClearChildren();
+	SB_Idol->ClearChildren();
+	SB_Talk->ClearChildren();
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	PC->SetShowMouseCursor(false);
 	PC->SetInputMode(FInputModeGameOnly());

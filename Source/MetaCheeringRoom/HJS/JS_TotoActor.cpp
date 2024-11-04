@@ -34,7 +34,7 @@ void AJS_TotoActor::BeginPlay()
 			TotoMakeWidget = CreateWidget<UToToMakeWidget>(GetWorld(), TotoMakeWidgetFactory);
 			if (TotoMakeWidget)
 			{
-				TotoMakeWidget->AddToViewport();
+				TotoMakeWidget->AddToViewport(30);
 				TotoMakeWidget->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
@@ -44,7 +44,7 @@ void AJS_TotoActor::BeginPlay()
 			ToToWidget = CreateWidget<UJS_ToToWidget>(GetWorld(), ToToWidgetFactory);
 			if (ToToWidget)
 			{
-				ToToWidget->AddToViewport();
+				ToToWidget->AddToViewport(29);
 				//ToToWidget->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
@@ -56,7 +56,7 @@ void AJS_TotoActor::BeginPlay()
 			ToToWidget = CreateWidget<UJS_ToToWidget>(GetWorld(),ToToWidgetFactory);
 			if (ToToWidget)
 			{
-				ToToWidget->AddToViewport();
+				ToToWidget->AddToViewport(29);
 				//ToToWidget->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
