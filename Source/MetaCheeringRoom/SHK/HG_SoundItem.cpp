@@ -22,19 +22,18 @@ void AHG_SoundItem::Use()
 
 void AHG_SoundItem::ServerRPC_Use_Implementation()
 {
-	MulticastRPC_Use();
+	USoundWave* Sound = ItemData.Sound.LoadSynchronous();
+	MulticastRPC_Use(Owner,Sound);
 }
 
-void AHG_SoundItem::MulticastRPC_Use_Implementation()
+void AHG_SoundItem::MulticastRPC_Use_Implementation(APawn* p_Owner, USoundWave* p_Sound)
 {
-	if (Owner)
+	if (p_Owner)
 	{
-		auto* Player = Cast<AHG_Player>(Owner);
+		auto* Player = Cast<AHG_Player>(p_Owner);
 		if (Player)
 		{
-			UE_LOG(LogTemp,Warning,TEXT("11"));
-			USoundWave* Sound = ItemData.Sound.LoadSynchronous();
-			Player->AudioComp->SetSound(Sound);
+			Player->AudioComp->SetSound(p_Sound);
 			Player->AudioComp->Play();
 		}
 	}

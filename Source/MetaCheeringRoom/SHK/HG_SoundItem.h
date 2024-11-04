@@ -25,5 +25,5 @@ public:
 	void ServerRPC_Use();
 
 	UFUNCTION(NetMulticast,Reliable)
-	void MulticastRPC_Use();
+	void MulticastRPC_Use(APawn* p_Owner, USoundWave* p_Sound);
 };
