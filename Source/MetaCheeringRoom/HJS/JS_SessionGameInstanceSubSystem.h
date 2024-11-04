@@ -85,6 +85,8 @@ public:
 	FString RoomNameValue;
 	FString HostNameValue;
 
+	FName PlayerName;
+
 	//방 퇴장 요청 -> UI에서 호출
 	UFUNCTION(BlueprintCallable)
 	void ExitSession();

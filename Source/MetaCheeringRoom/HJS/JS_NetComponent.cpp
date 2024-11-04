@@ -20,8 +20,7 @@ UJS_NetComponent::UJS_NetComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ..
-	
+
 }
 
 
@@ -185,7 +184,7 @@ void UJS_NetComponent::GetVideoURL()
 			FTimerHandle StartMediaHandle;
 			Me->MediaPlayer->Pause();
 			Me->MediaPlayer2->Pause();
-			GetWorld()->GetTimerManager().SetTimer(StartMediaHandle,this,&UJS_NetComponent::Play,20.f,false);
+			GetWorld()->GetTimerManager().SetTimer(StartMediaHandle,this,&UJS_NetComponent::Play,10.f,false);
 
 		}
 		else
@@ -381,6 +380,13 @@ void UJS_NetComponent::MulticastVideoURLWrite_Implementation(const FString& URL,
 	StreamID = streamID;
 	SegmentNumber = segmentNumber;
 	PRINTLOG(TEXT("%s"), *VideoURL);
+}
+
+void UJS_NetComponent::RepVideoURLWrite(const FString& URL, const FString& streamID, int32 segmentNumber)
+{
+	VideoURL = URL;
+	StreamID = streamID;
+	SegmentNumber = segmentNumber;
 }
 
 void UJS_NetComponent::VideoInfoSetting()

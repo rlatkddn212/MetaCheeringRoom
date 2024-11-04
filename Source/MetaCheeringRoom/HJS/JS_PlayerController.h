@@ -22,4 +22,21 @@ public:
     class AJS_TotoActor* TotoActor;
 	UFUNCTION(Server, Reliable)
 	void ServerHandleBettingToTo(int32 point, int32 select, const FString& UserId);
+
+	UPROPERTY()
+    class AJS_Screen* ScreenActor;
+	UFUNCTION(Server, Reliable)
+	void ServerHandleVideoPlay();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UJS_ExitWidget> ExitWidgetFactory;
+	
+	UPROPERTY(BlueprintReadOnly)
+	class UJS_ExitWidget* ExitWidget;
+
+	UPROPERTY()
+    class AJS_Screen* MyScreenActor;
+
+	UFUNCTION(Client, Reliable)
+	void ClientHandleVideoPlay(const FString& URL, const FString& streamID, int32 segmentNumber);
 };

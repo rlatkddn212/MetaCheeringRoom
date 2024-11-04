@@ -50,7 +50,7 @@ public:
 	void SendHeartBeat();
 
 	// Video Key
-	FString VideoURL;
+	FString VideoURL = TEXT("");
 
 	int32 SegmentNumber;
 
@@ -85,6 +85,8 @@ public:
 
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastVideoURLWrite(const FString& URL, const FString& streamID,int32 segmentNumber);
+
+	void RepVideoURLWrite(const FString& URL, const FString& streamID, int32 segmentNumber);
 
 	FTimerHandle VideoInfoSettingHaldle;
 

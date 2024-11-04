@@ -22,7 +22,6 @@ public:
 	TSubclassOf<class UJS_SessionJoinWidget> SessionWidgetFactory;
 	UPROPERTY()
 	class UJS_SessionJoinWidget* SessionWidget;
-
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class USW_CreateCreatorWidget> CreateCreatorWidgetFactory;

@@ -96,7 +96,11 @@ public:
 	void MulticastPlayVOD(const FString& VideoURL);
 	
 	UFUNCTION()
+	void PlayVideoRepURL(const FString& VideoURL);
+
+	UFUNCTION()
 	void RequestMediaURL(FString URL);
+	UPROPERTY(Replicated)
 	bool bUsingFirstPlayer = true; // 현재 어느 플레이어가 사용 중인지 체크
 	void PrepareNextMediaSource();
 
@@ -116,4 +120,39 @@ public:
 	UPROPERTY()
 	UJS_GoldWidget* GoldWidget;
 
+	UPROPERTY(Replicated)
+	FString RepVideoURL = TEXT("");
+
+	UPROPERTY(Replicated)
+	FString RepVideoURL2 = TEXT("");
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	FTimerHandle PlayVedioHandle;
+
+	UFUNCTION()
+	void RepPlayVideo();
+
+	UFUNCTION()
+	void OnFailedLoadVideo1(FString FailedUrl);
+
+	UFUNCTION()
+	void OnSucceedLoadVideo1(FString Url);
+
+	FTimerHandle FailLoadVideo1Handle;
+	UFUNCTION()
+	void VideoSourceLoad1();
+
+	int32 FailCount1 = 0;
+
+	UFUNCTION()
+	void OnFailedLoadVideo2(FString FailedUrl);
+
+	UFUNCTION()
+	void OnSucceedLoadVideo2(FString Url);
+
+	FTimerHandle FailLoadVideo2Handle;
+	UFUNCTION()
+	void VideoSourceLoad2();
+	int32 FailCount2 = 0;
 };
