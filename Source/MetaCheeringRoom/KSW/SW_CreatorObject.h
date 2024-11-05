@@ -32,6 +32,9 @@ public:
 
 	void DoDestroy();
 
+	// 기즈모 사이즈 변경
+	void SetGizmoSize(float size);
+
 	// 변환
 	void ChangeToolMode(ECreatorToolState state);
 
@@ -49,6 +52,9 @@ public:
 	UPROPERTY()
 	class UMaterialInstanceDynamic* Mat;
 	
+    UPROPERTY(EditAnywhere)
+	class USceneComponent* GizmoRoot;
+
 	UPROPERTY()
 	class UCreatorPositionGizmoComponent* PositionGizmo;
 	UPROPERTY()
@@ -108,4 +114,6 @@ public:
 	void OnChangeRotation(FRotator Rot);
 	UFUNCTION()
 	void OnChangeScale(FVector Scale);
+
+	bool IsSelectedObject;
 };

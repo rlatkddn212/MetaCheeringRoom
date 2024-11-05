@@ -52,7 +52,89 @@ void ASW_CreatorPlayerController::BeginPlay()
 void ASW_CreatorPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+}
+
+void ASW_CreatorPlayerController::OnMouseOver()
+{
+	if (!SelectedObject)
+		return;
+
+	SelectedObject->SelectAxis(false, false, false);
+	SelectedObject->SelectRotationAxis(false, false, false);
+	SelectedObject->SelectScaleAxis(false, false, false);
+
+	FVector2D MousePosition;
+	if (GetMousePosition(MousePosition.X, MousePosition.Y))
+	{
+		FVector WorldLocation, WorldDirection;
+		// 화면 좌표를 월드 좌표로 변환
+		DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldLocation, WorldDirection);
+
+		{
+			FVector TraceStart = WorldLocation;
+			FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0f);  // 트레이스 거리 설정
+
+			FHitResult HitResult;
+			FCollisionQueryParams Params;
+			Params.AddIgnoredActor(GetPawn());  // 자신의 캐릭터는 무시
+
+			FCollisionObjectQueryParams ObjectParams;
+			ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel3);
+
+			// 라인 트레이스 실행
+			bool bHit = GetWorld()->LineTraceSingleByObjectType(HitResult, TraceStart, TraceEnd, ObjectParams, Params);
+
+			if (bHit)
+			{
+				if (bHit && HitResult.Component.IsValid())
+				{
+					// 아니 컴포넌트 이름 출력
+					//UE_LOG(LogTemp, Log, TEXT("Clicked on Component: %s"), *HitResult.Component->GetName());
+
+					if (HitResult.Component->ComponentTags.Contains(FName("XAxisMesh")))
+					{
+						SelectedObject->SelectAxis(true, false, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("YAxisMesh")))
+					{
+						SelectedObject->SelectAxis(false, true, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("ZAxisMesh")))
+					{
+						SelectedObject->SelectAxis(false, false, true);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("XRingMesh")))
+					{
+						SelectedObject->SelectRotationAxis(true, false, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("YRingMesh")))
+					{
+						SelectedObject->SelectRotationAxis(false, true, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("ZRingMesh")))
+					{
+						SelectedObject->SelectRotationAxis(false, false, true);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("XScaleMesh")))
+					{
+						SelectedObject->SelectScaleAxis(true, false, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("YScaleMesh")))
+					{
+						SelectedObject->SelectScaleAxis(false, true, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("ZScaleMesh")))
+					{
+						SelectedObject->SelectScaleAxis(false, false, true);
+					}
+				}
+			}
+			else
+			{
+				// UE_LOG(LogTemp, Log, TEXT("No Actor hit."));
+			}
+		}
+	}
 }
 
 bool ASW_CreatorPlayerController::OnLeftClick()
@@ -83,7 +165,7 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 				if (bHit && HitResult.Component.IsValid())
 				{
 					// 아니 컴포넌트 이름 출력
-					UE_LOG(LogTemp, Log, TEXT("Clicked on Component: %s"), *HitResult.Component->GetName());
+					//UE_LOG(LogTemp, Log, TEXT("Clicked on Component: %s"), *HitResult.Component->GetName());
 
 					if (HitResult.Component->ComponentTags.Contains(FName("XAxisMesh")))
 					{
@@ -127,7 +209,7 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 			}
 			else
 			{
-				UE_LOG(LogTemp, Log, TEXT("No Actor hit."));
+				//UE_LOG(LogTemp, Log, TEXT("No Actor hit."));
 			}
 		}
 

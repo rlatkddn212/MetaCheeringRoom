@@ -30,6 +30,9 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	// 마우스 오버됨
+	void OnMouseOver();
+
 	// 마우스 왼쪽 클릭 처리 함수
 	bool OnLeftClick();
 

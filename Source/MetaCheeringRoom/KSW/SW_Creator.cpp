@@ -38,6 +38,11 @@ void ASW_Creator::Tick(float DeltaTime)
 	SetActorLocation(p);
 
 	Direction = FVector::ZeroVector;
+
+	if (PC && MouseState != ECreatorMouseState::GizmoDrag)
+	{
+		PC->OnMouseOver();
+	}
 }
 
 // Called to bind functionality to input

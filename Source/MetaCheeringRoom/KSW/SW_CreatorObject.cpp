@@ -32,6 +32,9 @@ ASW_CreatorObject::ASW_CreatorObject()
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Root;
 
+	GizmoRoot = CreateDefaultSubobject<USceneComponent>(TEXT("GizmoRoot"));
+	GizmoRoot->SetupAttachment(Root);
+
 	// 루트 컴포넌트 생성 및 설정
 	// X축 메시 생성 및 초기화
 	XAxisMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XAxisMesh"));
@@ -63,9 +66,9 @@ ASW_CreatorObject::ASW_CreatorObject()
 	ZAxisMesh->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
 	ZAxisMesh->SetRelativeRotation(FRotator(90.f, 0.f, 0.f));
 
-	XAxisMesh->SetupAttachment(Root);
-	YAxisMesh->SetupAttachment(Root);
-	ZAxisMesh->SetupAttachment(Root);
+	XAxisMesh->SetupAttachment(GizmoRoot);
+	YAxisMesh->SetupAttachment(GizmoRoot);
+	ZAxisMesh->SetupAttachment(GizmoRoot);
 	XAxisMesh->SetAbsolute(false, false, true);
 	YAxisMesh->SetAbsolute(false, false, true);
 	ZAxisMesh->SetAbsolute(false, false, true);
@@ -101,9 +104,9 @@ ASW_CreatorObject::ASW_CreatorObject()
 	}
 
 	// root에 부착한다.
-	XRingMesh->SetupAttachment(Root);
-	YRingMesh->SetupAttachment(Root);
-	ZRingMesh->SetupAttachment(Root);
+	XRingMesh->SetupAttachment(GizmoRoot);
+	YRingMesh->SetupAttachment(GizmoRoot);
+	ZRingMesh->SetupAttachment(GizmoRoot);
 
 	XScaleAxisMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XScaleAxisMesh"));
 	YScaleAxisMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("YScaleAxisMesh"));
@@ -160,9 +163,9 @@ ASW_CreatorObject::ASW_CreatorObject()
 	YScaleRectMesh->SetRelativeScale3D(FVector(250.0f, 0.25f, 0.25f));
 	ZScaleRectMesh->SetRelativeScale3D(FVector(250.0f, 0.25f, 0.25f));
 
-	XScaleAxisMesh->SetupAttachment(Root);
-	YScaleAxisMesh->SetupAttachment(Root);
-	ZScaleAxisMesh->SetupAttachment(Root);
+	XScaleAxisMesh->SetupAttachment(GizmoRoot);
+	YScaleAxisMesh->SetupAttachment(GizmoRoot);
+	ZScaleAxisMesh->SetupAttachment(GizmoRoot);
 
 	XScaleRectMesh->SetupAttachment(XScaleAxisMesh, "Socket");
 	YScaleRectMesh->SetupAttachment(YScaleAxisMesh, "Socket");
@@ -193,10 +196,21 @@ void ASW_CreatorObject::BeginPlay()
 void ASW_CreatorObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (IsSelectedObject)
+	{
+		FVector Target = GetWorld()->GetFirstPlayerController()->PlayerCameraManager->GetCameraLocation();
+
+		// Target과의 거리가 멀수록 HP바가 커진다.
+		float Distance = FVector::Distance(Target, GetActorLocation());
+		float Scale = Distance / 750;
+
+		SetGizmoSize(Scale * 2.0f);
+	}
 }
 
 void ASW_CreatorObject::OnSelected(bool isSelected)
 {
+	IsSelectedObject = isSelected;
 	if (!isSelected)
 	{
 		ChangeToolMode(ECreatorToolState::Selection);
@@ -209,6 +223,21 @@ void ASW_CreatorObject::OnSelected(bool isSelected)
 void ASW_CreatorObject::DoDestroy()
 {
 	Destroy();
+}
+
+void ASW_CreatorObject::SetGizmoSize(float size)
+{
+	XAxisMesh->SetRelativeScale3D(FVector(1.0f * size, 1.0f * size, 1.0f * size));
+	YAxisMesh->SetRelativeScale3D(FVector(1.0f * size, 1.0f * size, 1.0f * size));
+	ZAxisMesh->SetRelativeScale3D(FVector(1.0f * size, 1.0f * size, 1.0f * size));
+
+	XRingMesh->SetRelativeScale3D(FVector(1.0f * size, 1.0f * size, 1.0f * size));
+	YRingMesh->SetRelativeScale3D(FVector(1.0f * size, 1.0f * size, 1.0f * size));
+	ZRingMesh->SetRelativeScale3D(FVector(1.0f * size, 1.0f * size, 1.0f * size));
+
+	XScaleAxisMesh->SetRelativeScale3D(FVector(0.004f * size, 4.0f * size, 4.0f * size));
+	YScaleAxisMesh->SetRelativeScale3D(FVector(0.004f * size, 4.0f * size, 4.0f * size));
+	ZScaleAxisMesh->SetRelativeScale3D(FVector(0.004f * size, 4.0f * size, 4.0f * size));
 }
 
 void ASW_CreatorObject::ChangeToolMode(ECreatorToolState state)
