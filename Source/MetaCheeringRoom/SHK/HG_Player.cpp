@@ -534,6 +534,7 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AHG_Player, EquipItemList);
+	
 }
 
 

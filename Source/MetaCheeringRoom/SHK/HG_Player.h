@@ -206,4 +206,6 @@ public:
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastRPC_Emotion(UAnimMontage* Montage);
 
+	class UObjectPool* ObjectPool;
+
 };
