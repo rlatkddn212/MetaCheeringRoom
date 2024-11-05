@@ -64,6 +64,22 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Del;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Alt;
+
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Ctrl;
+
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_C;
+
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_V;
+
 
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
@@ -95,6 +111,24 @@ public:
 	
 	UFUNCTION()
 	void OnMyDelete(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnMyCtrlStarted(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnMyCtrlCompleted(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnMyAltStarted(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnMyAltCompleted(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnMyC(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnMyV(const FInputActionValue& Value);
 
 	FVector Direction;
 
@@ -107,4 +141,10 @@ public:
 
 	// 마우스 클릭시 초기 위치
 	FVector2D MouseDownPosition;
+
+	bool bIsCtrlPressed = false;
+	bool bIsAltPressed = false;
+
+	float LastInputTime = 0.0f;
+	float InputDelay = 0.2f;
 };

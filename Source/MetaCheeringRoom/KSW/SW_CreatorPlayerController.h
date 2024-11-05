@@ -72,4 +72,9 @@ public:
 	void DeleteSelectedObject();
 
 	void ReloadHierarchy();
+
+	void CopySelectedObject();
+	void PasteSelectedObject();
+
+	class ASW_CreatorObject* CopiedObject;
 };

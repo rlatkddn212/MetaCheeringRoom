@@ -243,6 +243,61 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
     return CreatorObject;
 }
 
+
+ASW_CreatorObject* UCreatorMapSubsystem::CopyObjectRecursive(ASW_CreatorObject* SourceObject)
+{
+    UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+	int32 CreatorObjectType = SourceObject->CreatorObjectType;
+	int32 CreatorObjectId = SourceObject->CreatorObjectId;
+
+    TMap<int32, FCreatorObjectData*> CreatorObjectsStruct = system->GetCreatorObjects(CreatorObjectType);
+    if (!CreatorObjectsStruct.Contains(CreatorObjectId))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Invalid CreatorObject provided."));
+        return nullptr;
+    }
+
+    // CreatorObject를 생성
+    ASW_CreatorObject* CreatorObject = CreateObject(CreatorObjectsStruct[CreatorObjectId]);
+
+    CreatorObject->CreatorObjectId = CreatorObjectId;
+    CreatorObject->CreatorObjectType = CreatorObjectType;
+
+    CreatorObject->SetActorTransform(SourceObject->GetActorTransform());
+
+    TArray<AActor*> ChildActors;
+    SourceObject->GetAttachedActors(ChildActors);
+    for (AActor* ChildActor : ChildActors)
+    {
+        ASW_CreatorObject* ChildCreatorObject = Cast<ASW_CreatorObject>(ChildActor);
+        if (ChildCreatorObject != nullptr)
+        {
+			ASW_CreatorObject* NewChildObject = CopyObjectRecursive(ChildCreatorObject);
+			if (NewChildObject != nullptr)
+			{
+                AddObject(NewChildObject, CreatorObject);
+			}
+        }
+    }
+
+	return CreatorObject;
+}
+
+ASW_CreatorObject* UCreatorMapSubsystem::CopyObject(ASW_CreatorObject* Object)
+{
+    // 부모를 가져온다.
+    ASW_CreatorObject* ParentObject = FindParentObject(Object);
+
+    // 복사본을 생성한다.
+    ASW_CreatorObject* NewObject = CopyObjectRecursive(Object);
+	if (NewObject != nullptr)
+	{
+        AddObject(NewObject, ParentObject);
+    }
+
+	return NewObject;
+}
+
 ASW_CreatorObject* UCreatorMapSubsystem::CreateObject(FCreatorObjectData* ObjectData)
 {
     FActorSpawnParameters SpawnParams;
@@ -353,6 +408,7 @@ void UCreatorMapSubsystem::DetechObject(ASW_CreatorObject* ParentObject, ASW_Cre
 	    ChildObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
     }
 }
+
 
 ASW_CreatorObject* UCreatorMapSubsystem::FindParentObject(ASW_CreatorObject* ChildObject)
 {

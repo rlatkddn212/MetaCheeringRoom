@@ -394,3 +394,20 @@ void ASW_CreatorPlayerController::ReloadHierarchy()
 	CreatorWidget->CreatorHierarchyWidget->ReloadItem();
 }
 
+void ASW_CreatorPlayerController::CopySelectedObject()
+{
+	CopiedObject = SelectedObject;
+}
+
+void ASW_CreatorPlayerController::PasteSelectedObject()
+{
+	if (CopiedObject)
+	{
+		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+		ASW_CreatorObject* NewSelectedObject = system->CopyObject(CopiedObject);
+		DoSelectObject(NewSelectedObject);
+
+		ReloadHierarchy();
+	}
+}
+

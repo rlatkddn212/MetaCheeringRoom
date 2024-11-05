@@ -80,6 +80,13 @@ void ASW_Creator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	input->BindAction(IA_LClick, ETriggerEvent::Completed, this, &ASW_Creator::OnMyLClickCompleted);
 
 	input->BindAction(IA_Del, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyDelete);
+
+	input->BindAction(IA_Ctrl, ETriggerEvent::Started, this, &ASW_Creator::OnMyCtrlStarted);
+	input->BindAction(IA_Ctrl, ETriggerEvent::Completed, this, &ASW_Creator::OnMyCtrlCompleted);
+	input->BindAction(IA_Alt, ETriggerEvent::Started, this, &ASW_Creator::OnMyAltStarted);
+	input->BindAction(IA_Alt, ETriggerEvent::Completed, this, &ASW_Creator::OnMyAltCompleted);
+	input->BindAction(IA_C, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyC);
+	input->BindAction(IA_V, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyV);
 }
 
 void ASW_Creator::OnMyMove(const FInputActionValue& Value)
@@ -199,6 +206,56 @@ void ASW_Creator::OnMyDelete(const FInputActionValue& Value)
 	if (PC)
 	{
 		PC->DeleteSelectedObject();
+	}
+}
+
+void ASW_Creator::OnMyCtrlStarted(const FInputActionValue& Value)
+{
+	bIsCtrlPressed = true;
+}
+
+void ASW_Creator::OnMyCtrlCompleted(const FInputActionValue& Value)
+{
+	bIsCtrlPressed = false;
+}
+
+void ASW_Creator::OnMyAltStarted(const FInputActionValue& Value)
+{
+	bIsAltPressed = true;
+}
+
+void ASW_Creator::OnMyAltCompleted(const FInputActionValue& Value)
+{
+	bIsAltPressed = false;
+}
+
+void ASW_Creator::OnMyC(const FInputActionValue& Value)
+{
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+	if (CurrentTime - LastInputTime < InputDelay)
+	{
+		return;
+	}
+
+	LastInputTime = CurrentTime;
+	if (PC && bIsCtrlPressed)
+	{
+		PC->CopySelectedObject();
+	}
+}
+
+void ASW_Creator::OnMyV(const FInputActionValue& Value)
+{
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+	if (CurrentTime - LastInputTime < InputDelay)
+	{
+		return;
+	}
+
+	LastInputTime = CurrentTime;
+	if (PC && bIsCtrlPressed)
+	{
+		PC->PasteSelectedObject();
 	}
 }
 

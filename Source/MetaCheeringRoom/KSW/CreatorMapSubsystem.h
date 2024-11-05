@@ -74,10 +74,14 @@ public:
 	void AttachObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
 
 	void DetechObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
+	
+	ASW_CreatorObject* CopyObjectRecursive(ASW_CreatorObject* SourceObject);
+	ASW_CreatorObject* CopyObject(ASW_CreatorObject* SourceObject);
 
 	// 부모찾기
 	ASW_CreatorObject* FindParentObject(ASW_CreatorObject* ChildObject);
 
+	// 자식인지 확인
 	bool IsChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
 
 	FString LoadJsonStr;
