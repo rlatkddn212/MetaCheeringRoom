@@ -18,7 +18,7 @@ class METACHEERINGROOM_API UVideoWidget : public UUserWidget
 public:
 
 	virtual void NativeConstruct() override;
-
+	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaTime) override;
 	UPROPERTY(meta=(BindWIdget))
 	class UButton* BTN_CategoryLive;
 	UPROPERTY(meta=(BindWidget))
@@ -29,6 +29,8 @@ public:
 	class UScrollBox* SB_VOD;
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_Quit;
+	UPROPERTY(meta=(BindWidget))
+	class UBorder* BD_VideoList;
 
 	UFUNCTION()
 	void OnClickQuitBtn();
@@ -55,4 +57,21 @@ public:
 	bool IsLowSurrogate(TCHAR Char);
 
 	char32_t DecodeSurrogatePair(TCHAR HighSurrogate, TCHAR LowSurrogate);
+
+	bool bIsAnimating = false;
+	float AnimationAlpha = 0.f;
+	UPROPERTY(EditAnywhere)
+	float AnimationDuration = 0.8f;
+	UPROPERTY(EditAnywhere)
+	float StartPosition;
+	UPROPERTY(EditAnywhere)
+	float TargetOffset;
+	void PlayShowAnimation();
+	void OnAnimation(float DeltaTime);
+
+	UPROPERTY(meta=(BindWidgetAnim),Transient)
+	class UWidgetAnimation* ChangeBtnLive;
+	UPROPERTY(meta=(BindWidgetAnim),Transient)
+	class UWidgetAnimation* ChangeBtnVOD;
+	bool bLive = true;
 };

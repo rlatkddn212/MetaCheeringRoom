@@ -8,6 +8,8 @@
 #include "Components/ComboBoxString.h"
 #include "JS_NetComponent.h"
 #include "../SHK/HG_Player.h"
+#include "JS_EasingFunctionLib.h"
+#include "Components/Border.h"
 
 void UJS_SumarryRequestWidget::NativeConstruct()
 {
@@ -17,6 +19,12 @@ void UJS_SumarryRequestWidget::NativeConstruct()
 
 	Screen = Cast<AJS_Screen>(UGameplayStatics::GetActorOfClass(GetWorld(),AJS_Screen::StaticClass()));
 
+}
+
+void UJS_SumarryRequestWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
+{
+	Super::NativeTick(MyGeometry,DeltaTime);
+	OnAnimation(DeltaTime);
 }
 
 void UJS_SumarryRequestWidget::OnClickSummaryBtn()
@@ -55,5 +63,32 @@ void UJS_SumarryRequestWidget::OnClickCancelBtn()
 	{
 		Player->Direction = FVector::ZeroVector;
 		Player->bCanMove = true;
+	}
+}
+
+void UJS_SumarryRequestWidget::PlayShowAnimation()
+{
+	AnimationAlpha = 0.0f;
+	bIsAnimating = true;
+	StartPosition = BD_Summary->GetRenderTransform().Translation.Y - TargetOffset;
+}
+
+void UJS_SumarryRequestWidget::OnAnimation(float DeltaTime)
+{
+	if (bIsAnimating)
+	{
+		// Alpha 값 증가시키기
+		AnimationAlpha += DeltaTime / AnimationDuration;
+		AnimationAlpha = FMath::Clamp(AnimationAlpha, 0.0f, 1.f);  // 0~1 사이로 제한
+
+		// 이징 함수 호출 (UI가 나타날 때 ElasticEaseOut 적용)
+		float NewPosition = UJS_EasingFunctionLib::ElasticEaseOut(AnimationAlpha);
+		// NewPosition 값을 UI 위치에 적용 (예: Y 위치를 NewPosition으로 설정)
+		BD_Summary->SetRenderTranslation(FVector2D(0, StartPosition + NewPosition * TargetOffset));
+		// 애니메이션이 끝나면 bIsAnimating 비활성화
+		if (AnimationAlpha >= 1.0f)
+		{
+			bIsAnimating = false;
+		}
 	}
 }

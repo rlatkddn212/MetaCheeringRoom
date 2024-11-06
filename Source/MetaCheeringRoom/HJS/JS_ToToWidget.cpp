@@ -15,6 +15,7 @@
 #include "../SHK/HG_Player.h"
 #include "Components/EditableTextBox.h"
 #include "../SHK/HG_PlayerGoodsComponent.h"
+#include "JS_EasingFunctionLib.h"
 
 
 void UJS_ToToWidget::NativeConstruct()
@@ -29,6 +30,12 @@ void UJS_ToToWidget::NativeConstruct()
 	ET_BettingWeight2->OnTextChanged.AddDynamic(this, &UJS_ToToWidget::OnBetting2Changed);
 	BTN_WeightBetting1->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickWeightBtn1);
 	BTN_WeightBetting2->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickWeightBtn2);
+}
+
+void UJS_ToToWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
+{
+	Super::NativeTick(MyGeometry,DeltaTime);
+	OnAnimation(DeltaTime);
 }
 
 void UJS_ToToWidget::OnClickBetting1Btn()
@@ -254,4 +261,32 @@ void UJS_ToToWidget::OnClickWeightBtn2()
 {
 	OnClickBetting2Btn();
 	WS_Betting->SetActiveWidgetIndex(0);
+}
+
+void UJS_ToToWidget::PlayShowAnimation()
+{
+	AnimationAlpha = 0.0f;  
+	bIsAnimating = true;  
+	StartPosition = BD_ToToMain->GetRenderTransform().Translation.Y - TargetOffset; 
+}
+
+void UJS_ToToWidget::OnAnimation(float DeltaTime)
+{
+	if (bIsAnimating)
+	{
+		// Alpha 값 증가시키기
+		AnimationAlpha += DeltaTime / AnimationDuration;
+		AnimationAlpha = FMath::Clamp(AnimationAlpha, 0.0f, 1.f);  // 0~1 사이로 제한
+
+		// 이징 함수 호출 (UI가 나타날 때 ElasticEaseOut 적용)
+		float NewPosition = UJS_EasingFunctionLib::ElasticEaseOut(AnimationAlpha);
+		// NewPosition 값을 UI 위치에 적용 (예: Y 위치를 NewPosition으로 설정)
+		BD_ToToMain->SetRenderTranslation(FVector2D(0, StartPosition + NewPosition * TargetOffset));
+
+		// 애니메이션이 끝나면 bIsAnimating 비활성화
+		if (AnimationAlpha >= 1.0f)
+		{
+			bIsAnimating = false;
+		}
+	}
 }

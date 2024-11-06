@@ -15,6 +15,7 @@ class METACHEERINGROOM_API UVideoNode : public UUserWidget
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
+
 	UPROPERTY(meta=(BindWIdget))
 	class UBorder* IMG_Thumbnail;
 
