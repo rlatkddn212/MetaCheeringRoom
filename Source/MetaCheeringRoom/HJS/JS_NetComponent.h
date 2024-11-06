@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Delegates/DelegateCombinations.h"
 #include "JS_NetComponent.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSummaryResultSignature, const FString&, Result);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class METACHEERINGROOM_API UJS_NetComponent : public UActorComponent
@@ -93,5 +96,11 @@ public:
 	void VideoInfoSetting();
 
 	void GetThumbnail(FString URL, FString title, FString channel, FString streamURL, FString time, FString category);
+
+	void SendSummaryRequestVOD(FString StartTime, FString EndTime);
+
+	FString CurrentVODFileName = TEXT("");
+
+	FSummaryResultSignature OnSummarySignatureCompleteDelegate;
 
 };

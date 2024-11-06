@@ -259,6 +259,38 @@ void AJS_Screen::VideoSourceLoad2()
 	MediaPlayer2->OpenSource(MediaSource2);
 }
 
+void AJS_Screen::RequestSummaryVOD(int32 Time)
+{
+	if (!MediaPlayer || !NetComp) 
+	{
+		return;
+	}
+	// 현재 MediaPlayer의 재생 시간을 가져와
+	int32 CurrentTime = MediaPlayer->GetTime().GetTotalSeconds();
+
+	int32 Minute = CurrentTime / 60;
+	int32 Second = CurrentTime % 60;
+
+	FString EndTime = FString::Printf(TEXT("%02d:%02d"), Minute, Second);
+
+	// Time(분)만큼 땡기고 
+	int32 AdjustTime = CurrentTime - (Time*60);
+
+	// 만약 Time이 0보다 작다면 00:00으로
+	if (AdjustTime < 0)
+	{
+		AdjustTime = 0;
+	}
+	//00:00(분:초) 형태의 문자열로 만들기 EX) 05:00이라면 04:00으로
+	Minute = AdjustTime / 60;
+	Second = AdjustTime % 60;
+	
+	FString StartTime = FString::Printf(TEXT("%02d:%02d"), Minute, Second);
+	// 해서 AI Server에 요청 보내기
+	// 여기서 해야할 건, Time을 땡기고 숫자를 문자열로 바꿔서 NetComp의 함수를 호출
+	NetComp->SendSummaryRequestVOD(StartTime, EndTime);
+}
+
 void AJS_Screen::PlayMedia(const FString& VideoURL)
 {
 	RepVideoURL = VideoURL;
@@ -281,6 +313,11 @@ void AJS_Screen::MulticastPlayVOD_Implementation(const FString& VideoURL)
 	{
 		PRINTLOG(TEXT("%s"), *NetComp->VideoURL);
 		MediaSource->StreamUrl = VideoURL;
+		int32 Index;
+		if (VideoURL.FindLastChar('/', Index))
+		{
+			NetComp->CurrentVODFileName = VideoURL.RightChop(Index+1);
+		}
 		// 미디어 재생 시작
 		if (MediaPlayer)
 		{
