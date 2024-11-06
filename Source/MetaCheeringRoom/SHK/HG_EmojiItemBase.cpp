@@ -21,6 +21,8 @@ void AHG_EmojiItemBase::BeginPlay()
 	this->ItemData.ItemName = Name;
 	InitItemData();
 
+	SetActorScale3D(FVector(0.1f, 0.1f, 0.000001f));
+
 	SetLifeSpan(4.0f);
 }
 
@@ -33,6 +35,21 @@ void AHG_EmojiItemBase::Use()
 void AHG_EmojiItemBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// 목표 스케일
+	FVector TargetScale(0.7f, 0.7f, 0.000001f);
+
+	// 현재 스케일 가져오기
+	FVector CurrentScale = GetActorScale3D();
+
+	// 보간 속도 조절 (0에서 1 사이의 값, 클수록 빠름)
+	float LerpSpeed = 0.1f;
+
+	// 보간을 통해 새로운 스케일 계산
+	FVector NewScale = FMath::Lerp(CurrentScale, TargetScale, LerpSpeed);
+
+	// 새로운 스케일 적용
+	SetActorScale3D(NewScale);
 
 	FollowPlayer();
 }
