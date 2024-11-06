@@ -157,11 +157,16 @@ void AHG_Player::Tick(float DeltaTime)
 
 	if (bDetectStand)
 	{
+		Timing = 1.0f;
 		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 3.5f);
 	}
 	else
 	{
-		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
+		Timing-=DeltaTime;
+		if (Timing <= 0)
+		{
+			SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
+		}
 	}
 	// 상점 UI 업데이트
 	if (StoreWidget)
@@ -280,10 +285,8 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 
 void AHG_Player::Emotion()
 {
-// 	if (Anim)
-// 	{
-// 		Anim->PlayTwerkEmotionMontage();
-// 	}
+	FItemData Temp = GI->FindItemData("SadBee");
+	InventoryComp->AddtoInventory(Temp,1);
 }
 
 void AHG_Player::PopUpPurchaseWidget()

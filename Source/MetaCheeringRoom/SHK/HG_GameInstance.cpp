@@ -30,3 +30,19 @@ bool UHG_GameInstance::IsValidItem(FString ItemName)
 	}
 	return false;
 }
+
+FItemData UHG_GameInstance::FindItemData(FString ItemName)
+{
+	TArray<FItemData*> AllRows;
+
+	ItemDataTable->GetAllRows(TEXT(""), AllRows);
+
+	for (auto Row : AllRows)
+	{
+		if (Row->ItemName == ItemName)
+		{
+			return *Row;
+		}
+	}
+	return FItemData();
+}
