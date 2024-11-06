@@ -451,3 +451,46 @@ void UJS_NetComponent::GetThumbnail(FString URL, FString title, FString channel,
 		});
 	HttpRequest->ProcessRequest();
 }
+
+void UJS_NetComponent::SendSummaryRequestVOD(FString StartTime, FString EndTime)
+{
+
+	TMap<FString, FString> Senddata;
+
+	Senddata.Add(TEXT("VedioFileName"), CurrentVODFileName);
+	Senddata.Add(TEXT("StartTime"), StartTime);
+	Senddata.Add(TEXT("EndTime"), EndTime);
+
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+	HttpRequest->SetURL(ServerURL + TEXT("/save_times"));
+	HttpRequest->SetVerb("POST");
+	HttpRequest->SetHeader(TEXT("content-type"), TEXT("application/json"));
+	HttpRequest->SetContentAsString(MakeJson(Senddata));
+
+	// HTTP 응답 처리
+	HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+		{
+			if (bWasSuccessful && Response->GetResponseCode() == 200)
+			{
+				FString Res = Response->GetContentAsString();
+				TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create(Res);
+				TSharedPtr<FJsonObject> response = MakeShareable(new FJsonObject());
+
+				FString result;
+				if (FJsonSerializer::Deserialize(reader, response))
+				{
+					result = response->GetStringField(TEXT("Summary"));
+				}
+				// 브로드캐스트 하기
+				OnSummarySignatureCompleteDelegate.Broadcast(result);
+				UE_LOG(LogTemp, Error, TEXT("성공, 요약 결과 %s"), *result);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("실패"));
+			}
+		});
+
+	// 요청 전송
+	HttpRequest->ProcessRequest();
+}
