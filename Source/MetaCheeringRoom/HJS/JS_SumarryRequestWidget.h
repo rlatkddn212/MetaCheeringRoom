@@ -17,13 +17,15 @@ class METACHEERINGROOM_API UJS_SumarryRequestWidget : public UUserWidget
 public:
 	
 	virtual void NativeConstruct() override;
-
+	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaTime) override;
 	UPROPERTY(meta=(BindWidget))
 	class UComboBoxString* CB_Summary;
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_Summary;
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_Cancel;
+	UPROPERTY(meta=(BindWidget))
+	class UBorder* BD_Summary;
 
 	UPROPERTY()
 	class AJS_Screen* Screen;
@@ -32,5 +34,16 @@ public:
 	void OnClickSummaryBtn();
 	UFUNCTION()
 	void OnClickCancelBtn();
+
+	bool bIsAnimating = false;
+	float AnimationAlpha = 0.f;
+	UPROPERTY(EditAnywhere)
+	float AnimationDuration = 0.8f;
+	UPROPERTY(EditAnywhere)
+	float StartPosition;
+	UPROPERTY(EditAnywhere)
+	float TargetOffset = 200.f;
+	void PlayShowAnimation();
+	void OnAnimation(float DeltaTime);
 
 };

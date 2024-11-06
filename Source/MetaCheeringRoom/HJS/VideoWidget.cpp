@@ -10,6 +10,7 @@
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerController.h"
 #include "../SHK/HG_Player.h"
+#include "JS_EasingFunctionLib.h"
 
 void UVideoWidget::NativeConstruct()
 {
@@ -18,6 +19,7 @@ void UVideoWidget::NativeConstruct()
 	BTN_CategoryVOD->OnClicked.AddDynamic(this, &UVideoWidget::SettingVOD);
 	BTN_Quit->OnClicked.AddDynamic(this, &UVideoWidget::OnClickQuitBtn);
 	SettingLive();
+	PlayAnimation(ChangeBtnLive);
 }
 
 void UVideoWidget::OnClickQuitBtn()
@@ -36,14 +38,28 @@ void UVideoWidget::OnClickQuitBtn()
 
 void UVideoWidget::SettingLive()
 {
+	if (bLive)
+	{
+		return;
+	}
+	bLive = true;
 	SB_Live->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	SB_VOD->SetVisibility(ESlateVisibility::Hidden);
+	PlayAnimation(ChangeBtnLive);
+	PlayAnimation(ChangeBtnVOD, 0.f, 1, EUMGSequencePlayMode::Reverse);
 }
 
 void UVideoWidget::SettingVOD()
 {
+	if (!bLive)
+	{
+		return;
+	}
+	bLive = false;
 	SB_VOD->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	SB_Live->SetVisibility(ESlateVisibility::Hidden);
+	PlayAnimation(ChangeBtnVOD);
+	PlayAnimation(ChangeBtnLive, 0.f, 1, EUMGSequencePlayMode::Reverse);
 }
 
 void UVideoWidget::SettingLiveInfo(TArray<FVedioInfo>& LiveInfoList)
@@ -163,6 +179,7 @@ void UVideoWidget::SettingLiveInfo(TArray<FVedioInfo>& LiveInfoList)
 			break;
 		}
 	}
+	SB_VOD->SetVisibility(ESlateVisibility::Hidden);
 
 }
 
@@ -221,4 +238,50 @@ bool UVideoWidget::IsLowSurrogate(TCHAR Char)
 char32_t UVideoWidget::DecodeSurrogatePair(TCHAR HighSurrogate, TCHAR LowSurrogate)
 {
 	return (((HighSurrogate - 0xD800) << 10) | (LowSurrogate - 0xDC00)) + 0x10000;
+}
+
+
+void UVideoWidget::PlayShowAnimation()
+{
+	AnimationAlpha = 0.0f;   // Alpha 초기화
+	bIsAnimating = true;     // 애니메이션 시작
+	StartPosition = BD_VideoList->GetRenderTransform().Translation.Y-TargetOffset; // 초기 위치 설정
+}
+
+void UVideoWidget::OnAnimation(float DeltaTime)
+{
+	if (bIsAnimating)
+	{
+		// Alpha 값 증가시키기
+		AnimationAlpha += DeltaTime / AnimationDuration;
+		AnimationAlpha = FMath::Clamp(AnimationAlpha, 0.0f, 1.f);  // 0~1 사이로 제한
+
+		// 이징 함수 호출 (UI가 나타날 때 ElasticEaseOut 적용)
+		float NewPosition = UJS_EasingFunctionLib::FadeInEase(AnimationAlpha);
+
+		// NewPosition 값을 UI 위치에 적용 (예: Y 위치를 NewPosition으로 설정)
+		//BD_VideoList->SetRenderTranslation(FVector2D(0, StartPosition + NewPosition * TargetOffset));
+		FLinearColor LinearColor = BD_VideoList->GetBrushColor();
+		FLinearColor LinearColorContent = BD_VideoList->GetContentColorAndOpacity();
+		LinearColor.A = NewPosition;
+		if (LinearColor.A > 0.6f)
+		{
+			LinearColor.A = 0.6f;
+		}
+		LinearColorContent.A = NewPosition;
+		BD_VideoList->SetBrushColor(LinearColor);
+		BD_VideoList->SetContentColorAndOpacity(LinearColorContent);
+
+		// 애니메이션이 끝나면 bIsAnimating 비활성화
+		if (AnimationAlpha >= 1.0f)
+		{
+			bIsAnimating = false;
+		}
+	}
+}
+
+void UVideoWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
+{
+	Super::NativeTick(MyGeometry, DeltaTime);
+	OnAnimation(DeltaTime);
 }

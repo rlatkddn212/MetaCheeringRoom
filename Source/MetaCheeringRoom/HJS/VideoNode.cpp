@@ -7,6 +7,7 @@
 #include "VideoWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "../SHK/HG_Player.h"
+#include "JS_EasingFunctionLib.h"
 
 void UVideoNode::NativeConstruct()
 {

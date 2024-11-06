@@ -10,6 +10,8 @@
 #include "Components/SpinBox.h"
 #include "Components/WidgetSwitcher.h"
 #include "../SHK/HG_Player.h"
+#include "JS_EasingFunctionLib.h"
+#include "Components/Border.h"
 void UToToMakeWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -26,6 +28,12 @@ void UToToMakeWidget::NativeConstruct()
 	BTN_ResultSelect2->OnClicked.AddDynamic(this, &UToToMakeWidget::OnClickResult2Btn);
 	BTN_Adjust->OnClicked.AddDynamic(this, &UToToMakeWidget::OnClickAdjustBtn);
 
+}
+
+void UToToMakeWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
+{
+	Super::NativeTick(MyGeometry,DeltaTime);
+	OnAnimation(DeltaTime);
 }
 
 void UToToMakeWidget::SetWidgetSwitcher(int32 value)
@@ -203,5 +211,35 @@ void UToToMakeWidget::InitMakeWidget()
 	{
 		Player->Direction = FVector::ZeroVector;
 		Player->bCanMove = true;
+	}
+}
+
+void UToToMakeWidget::PlayShowAnimation()
+{
+	AnimationAlpha = 0.0f;   // Alpha 초기화
+	bIsAnimating = true;     // 애니메이션 시작
+	StartPosition1 = BD_MakeToto->GetRenderTransform().Translation.Y - TargetOffset; // 초기 위치 설정
+	StartPosition2 = BD_ResultToto->GetRenderTransform().Translation.Y - TargetOffset; // 초기 위치 설정
+}
+
+void UToToMakeWidget::OnAnimation(float DeltaTime)
+{
+	if (bIsAnimating)
+	{
+		// Alpha 값 증가시키기
+		AnimationAlpha += DeltaTime / AnimationDuration;
+		AnimationAlpha = FMath::Clamp(AnimationAlpha, 0.0f, 1.f);  // 0~1 사이로 제한
+
+		// 이징 함수 호출 (UI가 나타날 때 ElasticEaseOut 적용)
+		float NewPosition = UJS_EasingFunctionLib::ElasticEaseOut(AnimationAlpha);
+		// NewPosition 값을 UI 위치에 적용 (예: Y 위치를 NewPosition으로 설정)
+		BD_MakeToto->SetRenderTranslation(FVector2D(0, StartPosition1 + NewPosition * TargetOffset));
+		BD_ResultToto->SetRenderTranslation(FVector2D(0, StartPosition2 + NewPosition * TargetOffset));
+
+		// 애니메이션이 끝나면 bIsAnimating 비활성화
+		if (AnimationAlpha >= 1.0f)
+		{
+			bIsAnimating = false;
+		}
 	}
 }

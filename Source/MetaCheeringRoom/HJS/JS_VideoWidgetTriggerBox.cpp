@@ -34,6 +34,7 @@ void AJS_VideoWidgetTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overl
 			if (VideoWidget)
 			{
 				VideoWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+				VideoWidget->PlayShowAnimation();
 				APlayerController* PC = GetWorld()->GetFirstPlayerController();
 				if (PC)
 				{

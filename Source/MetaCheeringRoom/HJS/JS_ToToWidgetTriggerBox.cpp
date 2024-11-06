@@ -37,6 +37,7 @@ void AJS_ToToWidgetTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overla
 			if (ToToWidget)
 			{
 				ToToWidget->ToToInitSetting();
+				ToToWidget->PlayShowAnimation();
 				APlayerController* PC = GetWorld()->GetFirstPlayerController();
 				if(PC)
 				{

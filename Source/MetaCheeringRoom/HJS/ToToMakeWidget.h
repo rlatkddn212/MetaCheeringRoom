@@ -17,11 +17,12 @@ class METACHEERINGROOM_API UToToMakeWidget : public UUserWidget
 public:
 	
 	virtual void NativeConstruct() override;
-
+	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaTime) override;
 	void SetWidgetSwitcher(int32 value);
 
 	// ToToMake -------------------------
-
+	UPROPERTY(meta=(BindWidget))
+	class UBorder* BD_MakeToto;
 	UPROPERTY(EditAnywhere)
 	int32 MAX_TEXT_LEN = 15;
 	UPROPERTY(EditAnywhere)
@@ -67,7 +68,8 @@ public:
 	//  ---------------------------------------------
 
 	// ToTo Result ---------------------------------
-
+	UPROPERTY(meta=(BindWidget))
+	class UBorder* BD_ResultToto;
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* TEXT_BettingName;
 	UPROPERTY(meta=(BindWidget))
@@ -96,5 +98,19 @@ public:
 	bool bOpen = true;
 
 	void InitMakeWidget();
+
+	
+	bool bIsAnimating = false;
+	float AnimationAlpha = 0.f;
+	UPROPERTY(EditAnywhere)
+	float AnimationDuration = 0.8f;
+	UPROPERTY(EditAnywhere)
+	float StartPosition1;
+	UPROPERTY(EditAnywhere)
+	float StartPosition2;
+	UPROPERTY(EditAnywhere)
+	float TargetOffset = 200.f;
+	void PlayShowAnimation();
+	void OnAnimation(float DeltaTime);
 
 };

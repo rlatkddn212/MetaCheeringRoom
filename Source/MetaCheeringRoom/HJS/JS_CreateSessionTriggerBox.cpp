@@ -31,7 +31,6 @@ void AJS_CreateSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Ove
 		UI->SetVisibility(ESlateVisibility::Visible);
 		UI->MenuSwitching(0);
 		UI->SetupMapData();
-
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 
 		if (PC)

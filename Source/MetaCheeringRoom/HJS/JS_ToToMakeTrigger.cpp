@@ -35,6 +35,7 @@ void AJS_ToToMakeTrigger::ComponentBeginOverlap(UPrimitiveComponent* OverlappedC
 			if (TotoMakeWidget && TotoMakeWidget->bOpen)
 			{
 				TotoMakeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+				TotoMakeWidget->PlayShowAnimation();
 				APlayerController* PC = GetWorld()->GetFirstPlayerController();
 				if (PC)
 				{
