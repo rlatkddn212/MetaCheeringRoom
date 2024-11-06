@@ -8,7 +8,10 @@ public class MetaCheeringRoom : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "Json", "JsonUtilities", "HTTP", "MediaAssets", "OnlineSubsystem", "OnlineSubsystemSteam", "OnlineSubsystemUtils", "RenderCore", "RHI","MeshDescription", "StaticMeshDescription", "GeometryCore"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore",
+			"EnhancedInput", "UMG", "Json", "JsonUtilities", "HTTP", "MediaAssets", "OnlineSubsystem", 
+			"OnlineSubsystemSteam", "OnlineSubsystemUtils", "RenderCore", "RHI","MeshDescription", 
+			"StaticMeshDescription", "GeometryCore", "DesktopPlatform"});
 
         PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore"});
 

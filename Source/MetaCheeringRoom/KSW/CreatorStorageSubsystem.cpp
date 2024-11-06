@@ -2,6 +2,7 @@
 
 
 #include "KSW/CreatorStorageSubsystem.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 
 UCreatorStorageSubsystem::UCreatorStorageSubsystem()
 {

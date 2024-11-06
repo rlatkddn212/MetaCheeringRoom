@@ -49,6 +49,24 @@ struct FCreatorMapMetaData
 	FDateTime CreatedTime;
 };
 
+USTRUCT(BlueprintType)
+struct FCreatorFBXData
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CObjectType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CObjectId;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ItemName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* ItemIcon = nullptr;
+
+};
+
 /**
  * 
  */
@@ -91,4 +109,7 @@ private:
 	
 	TArray<FCreatorMapMetaData*> CreatorMapMetaDatas;
 	FString MetaDataFile = "CreatorMapMetaDataList.json";
+
+	TMap<int32, FCreatorFBXData*> CreatorFBXDatas;
+	FString FBXDataFile = "CreatorFBXDataList.json";
 };
