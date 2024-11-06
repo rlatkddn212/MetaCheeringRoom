@@ -24,6 +24,8 @@ public:
 
 	bool IsValidItem(FString ItemName);
 
+	FItemData FindItemData(FString ItemName);
+
 	int32 CurrentGold = 4000;
 
 	TArray<FSlotStruct> CurrentInventory;

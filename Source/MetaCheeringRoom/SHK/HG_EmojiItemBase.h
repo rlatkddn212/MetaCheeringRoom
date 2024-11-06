@@ -57,4 +57,6 @@ public:
 	
 	UPROPERTY(Replicated)
 	FVector Loc;
+
+	float SpawnTime;
 };

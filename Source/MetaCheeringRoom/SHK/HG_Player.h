@@ -208,6 +208,6 @@ public:
 
 	class UObjectPool* ObjectPool;
 
-
+	float Timing = 1.0f;
 
 };

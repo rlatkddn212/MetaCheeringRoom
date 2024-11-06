@@ -23,6 +23,8 @@ void AHG_EmojiItemBase::BeginPlay()
 
 	SetActorScale3D(FVector(0.1f, 0.1f, 0.000001f));
 
+	SpawnTime = GetWorld()->GetTimeSeconds();
+
 	SetLifeSpan(4.0f);
 }
 
@@ -37,7 +39,7 @@ void AHG_EmojiItemBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 목표 스케일
-	FVector TargetScale(0.7f, 0.7f, 0.000001f);
+	FVector TargetScale(1.0f, 1.0f, 0.000001f);
 
 	// 현재 스케일 가져오기
 	FVector CurrentScale = GetActorScale3D();
@@ -50,6 +52,15 @@ void AHG_EmojiItemBase::Tick(float DeltaTime)
 
 	// 새로운 스케일 적용
 	SetActorScale3D(NewScale);
+
+
+	float ElapsedTime = GetWorld()->GetTimeSeconds() - SpawnTime;
+	if (ElapsedTime > 3.2f)
+	{
+		NewScale = FMath::VInterpTo(GetActorScale3D(), FVector(-1.0f, -1.0f, 0.000001f), DeltaTime,5.0f);
+
+		SetActorScale3D(NewScale);
+	}
 
 	FollowPlayer();
 }
