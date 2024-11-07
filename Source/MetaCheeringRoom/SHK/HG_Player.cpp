@@ -97,6 +97,15 @@ void AHG_Player::BeginPlay()
 	InventoryComp->Inventory = GI->CurrentInventory;
 	GoodsComp->SetGold(GI->CurrentGold);
 	TargetValue1 = SpringArmComp->TargetArmLength;
+
+	if (GI->Anim)
+	{
+		this->GetMesh()->SetAnimInstanceClass(GI->Anim);
+	}
+	if (GI->SkeletalMesh)
+	{
+		this->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
+	}
 }
 
 void AHG_Player::Tick(float DeltaTime)
@@ -285,8 +294,12 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 
 void AHG_Player::Emotion()
 {
-	FItemData Temp = GI->FindItemData("SadBee");
-	InventoryComp->AddtoInventory(Temp,1);
+// 	FItemData Temp = GI->FindItemData("SadBee");
+// 	InventoryComp->AddtoInventory(Temp,1);
+	if (GI->AnimInstance)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("1234"));
+	}
 }
 
 void AHG_Player::PopUpPurchaseWidget()
