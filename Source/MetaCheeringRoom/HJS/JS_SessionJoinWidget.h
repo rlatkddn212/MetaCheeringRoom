@@ -17,7 +17,7 @@ class METACHEERINGROOM_API UJS_SessionJoinWidget : public UUserWidget
 public:
 	
 	virtual void NativeConstruct() override;
-
+	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaTime);
 	
 	UPROPERTY(meta=(BindWidget))
 	class UWidgetSwitcher* WS_Menu;
@@ -35,6 +35,8 @@ public:
 	class UScrollBox* SB_Maps;
 	UPROPERTY(meta=(BindWidget))
 	class UBorder* BD_CreateRoom;
+	UPROPERTY(meta=(BindWidget))
+	class UBorder* BD_CreateRoomPopup;
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_Create;
 	UPROPERTY(meta = (BindWidget))
@@ -54,6 +56,20 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UJS_HostSlotWidget> SlotFactory;
+
+	float AnimationAlpha = 0.f;
+	UPROPERTY(EditAnywhere)
+	float AnimationDuration = 0.8f;
+	UPROPERTY(EditAnywhere)
+	float StartMakeWidgetPosition;
+	UPROPERTY(EditAnywhere)
+	float TargetOffset = 200.f;
+	bool bMakeWidgetAnimating = false;
+	void PlayShowMakeSessionAnimation();
+	void OnMakeSessionAnimation(float DeltaTime);
+	bool bMakePopupAnimating = false;
+	void PlayShowMakePopupSessionAnimation();
+	void OnMakePopupSessionAnimation(float DeltaTime);
 
 	// 방 만들기 End -----------------------------
 
@@ -91,6 +107,8 @@ public:
 
 	UPROPERTY(meta=(BindWidget))
 	class UBorder* BD_JoinRoom;
+	UPROPERTY(meta=(BindWidget))
+	class UBorder* BD_JoinPopup;
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_JoinBack;
 	UPROPERTY(meta=(BindWidget))
@@ -132,6 +150,14 @@ public:
 	void OnClickedQuit();
 	UPROPERTY()
 	class UJS_SessionGameInstanceSubSystem* si;
+
+	bool bJoinPopupAnimating = false;
+	void PlayJoinPopupSessionAnimation();
+	void OnJoinPopupSessionAnimation(float DeltaTime);
+
+	bool bJoinWidgetAnimating = false;
+	void PlayShowJoinSessionAnimation();
+	void OnJoinSessionAnimation(float DeltaTime);
 	// 방 입장 End -------------------------------
 
 };
