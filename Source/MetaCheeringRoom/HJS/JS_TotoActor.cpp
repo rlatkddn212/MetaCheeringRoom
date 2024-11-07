@@ -13,11 +13,14 @@
 #include "JS_PlayerController.h"
 #include "../SHK/HG_Player.h"
 #include "../SHK/HG_PlayerGoodsComponent.h"
+#include "JS_AtkActor.h"
+#include "JS_AtkAnimInstance.h"
+#include "Components/TimelineComponent.h"
 
 // Sets default values
 AJS_TotoActor::AJS_TotoActor()
 {
-
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned
@@ -80,12 +83,20 @@ void AJS_TotoActor::BeginPlay()
 	}
 }
 
+void AJS_TotoActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	OnPlayerModify(DeltaTime);
+}
+
 void AJS_TotoActor::MakeToto(FString totoName, FString select1, FString select2, int32 second)
 {
 	TotoName = totoName;
 	Select1 = select1;
 	Select2 = select2;
 	TotoLimitTIme = second;
+	Betting1.Empty();
+	Betting2.Empty();
 	ServerSetTimerLimit();
 	MulticastInitToto();
 	MulticastAlarmToto(TEXT("승부예측이 시작되었습니다!"));
@@ -179,6 +190,8 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 	// 각 플레이어의 게임 인스턴스에 포인트를 지급하기 ( 멀티캐스트, 인자값으로 넘겨주기? )
 	TArray<FString> Keys;
 	TArray<int32> Values;
+	TArray<FString> LoseKeys;
+	TArray<int32> LoseValues;
 	if (ResultNum == 1)
 	{
 		for (auto& Elem : Betting1)
@@ -186,7 +199,11 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 			Keys.Add(Elem.Key);
 			Values.Add(Elem.Value);
 		}
-		MulticastAdjustPoint(Keys, Values, TotalOdds1);
+		for (auto& Elem : Betting2)
+		{
+			LoseKeys.Add(Elem.Key);
+			LoseValues.Add(Elem.Value);
+		}
 	}
 	else
 	{
@@ -195,10 +212,14 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 			Keys.Add(Elem.Key);
 			Values.Add(Elem.Value);
 		}
-		MulticastAdjustPoint(Keys, Values, TotalOdds2);
+		for (auto& Elem : Betting1)
+		{
+			LoseKeys.Add(Elem.Key);
+			LoseValues.Add(Elem.Value);
+		}
 	}
-
-	
+	MulticastAdjustPoint(Keys, Values, TotalOdds1);
+	MulticastAdjustLose(LoseKeys, LoseValues);
 }
 
 void AJS_TotoActor::MulticastAdjustPoint_Implementation(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd)
@@ -212,9 +233,28 @@ void AJS_TotoActor::MulticastAdjustPoint_Implementation(const TArray<FString>& K
 			break;
 		}
 	}
-	AHG_Player* Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 
 	Player->GoodsComp->AddGold(BettingPoint * Odd);
+}
+
+void AJS_TotoActor::MulticastAdjustLose_Implementation(const TArray<FString>& Keys, const TArray<int32>& Values)
+{
+	bool bLose = false;
+	for (int32 i = 0; i < Keys.Num(); i++)
+	{
+		if (Keys[i] == MyUserID)
+		{
+			bLose = true;
+			break;
+		}
+	}
+	// 만약 졌다면
+	if (bLose)
+	{
+		// 실패 애니메이션 시작
+		LoseAnimationPlay();
+	}
 }
 
 void AJS_TotoActor::ServerSetTimerLimit()
@@ -282,4 +322,142 @@ void AJS_TotoActor::MulticastInitToto_Implementation()
 	{
 		ToToWidget->InitWidget();
 	}
+}
+
+void AJS_TotoActor::LoseAnimationPlay()
+{
+	// 플레이어를 가져와서
+	Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	// 플레이어 앞에 액터를 소환하기, 플레이어에게 Attach하기
+	if (Player)
+	{
+		FVector SpawnLocation = Player->GetActorLocation() + Player->GetActorForwardVector() * 100.0f; // Offset distance
+		FRotator SpawnRotation = Player->GetActorRotation();
+
+		if (AtkActorFactory)
+		{
+			AActor* Actor = GetWorld()->SpawnActor<AActor>(AtkActorFactory, SpawnLocation, SpawnRotation);
+
+			AJS_AtkActor* AtkActor = Cast<AJS_AtkActor>(Actor);
+			if (AtkActor)
+			{
+				UJS_AtkAnimInstance* AnimIns = Cast<UJS_AtkAnimInstance>(AtkActor->SkelMesh->GetAnimInstance());
+				if (AnimIns)
+				{
+					AnimIns->SetTotoActor(this);
+				}
+			}
+		}
+	}
+}
+
+void AJS_TotoActor::PlayerModify()
+{
+	// 플레이어를 가져와서
+	if(!Player)
+	{
+		Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	}
+
+	if (Player)
+	{
+		OriginalScale = Player->GetMesh()->GetRelativeScale3D();
+	}
+	if (!bAnimating)
+	{
+		bAnimating = true;
+		CurrentTime = 0.0f;
+		CurrentPhase = EModifyPhase::Squashing;
+	}
+}
+
+void AJS_TotoActor::OnPlayerModify(float DeltaTime)
+{
+	if (!bAnimating || !Player)
+	{
+		return;
+	}
+
+	CurrentTime += DeltaTime;
+	FVector NewScale = OriginalScale;
+
+	switch (CurrentPhase)
+	{
+	case EModifyPhase::Squashing:
+	{
+		float Alpha = FMath::Clamp(CurrentTime / (AnimationDuration * 1.2f), 0.0f, 1.0f);
+
+		if (Alpha < 0.4f)  // 첫 단계: 매우 심하게 찌그러짐
+		{
+			float InitialSquashAlpha = Alpha * 2.5f;  // 0~0.4를 0~1로 변환
+			float ExtremeSquash = Squash * 0.5f;  // 더 심하게 찌그러짐 (Squash보다 더 작은 값)
+
+			NewScale.Z *= FMath::Lerp(1.0f, ExtremeSquash, InitialSquashAlpha);
+			NewScale.X *= FMath::Lerp(1.0f, 0.4f / ExtremeSquash, InitialSquashAlpha);
+			NewScale.Y *= FMath::Lerp(1.0f, 0.4f / ExtremeSquash, InitialSquashAlpha);
+		}
+		else  // 두 번째 단계: 적당한 찌그러짐으로 돌아옴
+		{
+			float RecoverAlpha = (Alpha - 0.4f) * 1.67f;  // 0.4~1을 0~1로 변환
+			float ExtremeSquash = Squash * 0.5f;
+
+			NewScale.Z *= FMath::Lerp(ExtremeSquash, Squash, RecoverAlpha);
+			NewScale.X *= FMath::Lerp(1.2f / ExtremeSquash, 0.35f / Squash, RecoverAlpha);
+			NewScale.Y *= FMath::Lerp(1.2f / ExtremeSquash, 0.35f / Squash, RecoverAlpha);
+		}
+
+		if (Alpha >= 1.0f)
+		{
+			CurrentPhase = EModifyPhase::Holding;
+			CurrentTime = 0.0f;
+		}
+		break;
+	}
+	case EModifyPhase::Holding:
+	{
+		// 찌그러진 상태 유지
+		NewScale.Z *= Squash;
+		NewScale.X *= 0.35f / Squash;
+		NewScale.Y *= 0.35f / Squash;
+
+		if (CurrentTime >= HoldTime)
+		{
+			CurrentPhase = EModifyPhase::Recovering;
+			CurrentTime = 0.0f;
+		}
+		break;
+	}
+	case EModifyPhase::Recovering:
+	{
+		float Alpha = FMath::Clamp(CurrentTime / (AnimationDuration * 1.5f), 0.0f, 1.0f);
+
+		if (Alpha < 0.5f)  // 첫 번째 단계: 길게 늘어나기 (띠용~)
+		{
+			float StretchAlpha = Alpha * 2.0f;  // 0~0.5를 0~1로 변환
+			float StretchIntensity = 1.8f;  // 늘어나는 정도
+
+			NewScale.Z *= FMath::Lerp(Squash, StretchIntensity, StretchAlpha);
+			NewScale.X *= FMath::Lerp(1.0f / Squash, 0.7f / StretchIntensity, StretchAlpha);
+			NewScale.Y *= FMath::Lerp(1.0f / Squash, 0.7f / StretchIntensity, StretchAlpha);
+		}
+		else  // 두 번째 단계: 원래 크기로 돌아오기
+		{
+			float RecoverAlpha = (Alpha - 0.5f) * 2.0f;  // 0.5~1을 0~1로 변환
+			float StretchIntensity = 1.8f;
+
+			NewScale.Z *= FMath::Lerp(StretchIntensity, 1.0f, RecoverAlpha);
+			NewScale.X *= FMath::Lerp(0.7f / StretchIntensity, 1.0f, RecoverAlpha);
+			NewScale.Y *= FMath::Lerp(0.7f / StretchIntensity, 1.0f, RecoverAlpha);
+		}
+
+		if (Alpha >= 1.0f)
+		{
+			bAnimating = false;
+			CurrentPhase = EModifyPhase::None;
+			NewScale = OriginalScale;  // 완전히 정확한 원래 크기로 복구
+		}
+		break;
+		}
+	}
+	Player->GetMesh()->SetRelativeScale3D(NewScale);
 }

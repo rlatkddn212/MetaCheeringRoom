@@ -268,24 +268,27 @@ void AJS_Screen::RequestSummaryVOD(int32 Time)
 	// 현재 MediaPlayer의 재생 시간을 가져와
 	int32 CurrentTime = MediaPlayer->GetTime().GetTotalSeconds();
 
-	int32 Minute = CurrentTime / 60;
+	int32 Hour = CurrentTime / 3600;
+	int32 Minute = (CurrentTime % 3600) / 60;
 	int32 Second = CurrentTime % 60;
 
-	FString EndTime = FString::Printf(TEXT("%02d:%02d"), Minute, Second);
+	FString EndTime = FString::Printf(TEXT("%02d:%02d:%02d"), Hour, Minute, Second);
 
 	// Time(분)만큼 땡기고 
-	int32 AdjustTime = CurrentTime - (Time*60);
+	int32 AdjustTime = CurrentTime - (Time * 60);
 
-	// 만약 Time이 0보다 작다면 00:00으로
+	// 만약 Time이 0보다 작다면 00:00:00으로
 	if (AdjustTime < 0)
 	{
 		AdjustTime = 0;
 	}
-	//00:00(분:초) 형태의 문자열로 만들기 EX) 05:00이라면 04:00으로
-	Minute = AdjustTime / 60;
+
+	// 00:00:00(시:분:초) 형태의 문자열로 만들기 EX) 01:05:00이라면 01:04:00으로
+	Hour = AdjustTime / 3600;
+	Minute = (AdjustTime % 3600) / 60;
 	Second = AdjustTime % 60;
-	
-	FString StartTime = FString::Printf(TEXT("%02d:%02d"), Minute, Second);
+
+	FString StartTime = FString::Printf(TEXT("%02d:%02d:%02d"), Hour, Minute, Second);
 	// 해서 AI Server에 요청 보내기
 	// 여기서 해야할 건, Time을 땡기고 숫자를 문자열로 바꿔서 NetComp의 함수를 호출
 	NetComp->SendSummaryRequestVOD(StartTime, EndTime);
