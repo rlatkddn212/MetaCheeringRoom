@@ -11,6 +11,8 @@
 #include "DesktopPlatformModule.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Widgets/SWidget.h"
+#include "../../../../Plugins/RuntimeLoadStaticMesh/Source/RuntimeLoadFbx/Public/FileIOBlueprintFunctionLibrary.h"
+#include "../CreatorMapSubsystem.h"
 
 void USW_CreatorObjectWidget::NativeConstruct()
 {
@@ -101,7 +103,28 @@ void USW_CreatorObjectWidget::OnImportButtonClicked()
 			// 여기서 선택된 파일로 작업 수행
 			UE_LOG(LogTemp, Log, TEXT("Selected File: %s"), *SelectedFilePath);
 
+			// FBX 파일 로드
+			// LoadFileAsync2StaticMeshActor(SelectedFilePath);
+			AActor* actor = UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(SelectedFilePath);
+			UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+			UCreatorMapSubsystem* CreatorMapSubsystem = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 
+			int32 CreatorObjectType = 1;
+			int32 CreatorObjectId = 1;
+			TMap<int32, FCreatorObjectData*> CreatorObjectsStruct = system->GetCreatorObjects(CreatorObjectType);
+			if (CreatorObjectsStruct.Contains(CreatorObjectId))
+			{
+				// CreatorObject를 생성
+				ASW_CreatorObject* CreatorObject = CreatorMapSubsystem->CreateObject(CreatorObjectsStruct[CreatorObjectId]);
+
+				actor->AttachToActor(CreatorObject, FAttachmentTransformRules::KeepWorldTransform);
+
+				CreatorMapSubsystem->AddObject(CreatorObject);
+			}
+
+			ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+			if (PC)
+				PC->ReloadHierarchy();
 		}
 	}
 }
