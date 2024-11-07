@@ -40,7 +40,7 @@ void AJS_JoinSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overl
 
 		UI->SetVisibility(ESlateVisibility::Visible);
 		UI->MenuSwitching(1);
-
+		UI->PlayShowJoinSessionAnimation();
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 
 		if (PC)

@@ -33,4 +33,12 @@ public:
 	TArray<FItemData> EquipItemInfoList;
 
 	TArray<int32> EquipSlotIndexList;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	class UAnimInstance* AnimInstance;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	TSubclassOf<class UAnimInstance> Anim;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	class USkeletalMesh* SkeletalMesh;
 };

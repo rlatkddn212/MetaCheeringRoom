@@ -18,6 +18,8 @@
 #include "../KSW/CreatorStorageSubsystem.h"
 #include "../KSW/CreatorMapSubsystem.h"
 #include "JS_HostSlotWidget.h"
+#include "Components/CanvasPanel.h"
+#include "JS_EasingFunctionLib.h"
 void UJS_SessionJoinWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -48,6 +50,15 @@ void UJS_SessionJoinWidget::NativeConstruct()
 	BTN_CreateQuit->OnClicked.AddDynamic(this, &UJS_SessionJoinWidget::OnClickedCreateQuit);
 
 	SetupMapData();
+}
+
+void UJS_SessionJoinWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
+{
+	Super::NativeTick(MyGeometry,DeltaTime);
+	OnMakeSessionAnimation(DeltaTime);
+	OnMakePopupSessionAnimation(DeltaTime);
+	OnJoinSessionAnimation(DeltaTime);
+	OnJoinPopupSessionAnimation(DeltaTime);
 }
 
 void UJS_SessionJoinWidget::MenuSwitching(int32 index)
@@ -117,7 +128,65 @@ void UJS_SessionJoinWidget::SetupMapData()
 void UJS_SessionJoinWidget::OnClickSlot(int32 slotIdx)
 {
 	BD_CreateRoom->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	PlayShowMakePopupSessionAnimation();
 	SelectIndex = slotIdx;
+}
+
+void UJS_SessionJoinWidget::PlayShowMakeSessionAnimation()
+{
+	AnimationAlpha = 0.0f;
+	bMakeWidgetAnimating = true;
+}
+
+void UJS_SessionJoinWidget::OnMakeSessionAnimation(float DeltaTime)
+{
+	if (bMakeWidgetAnimating)
+	{
+		// Alpha 값 증가시키기
+		AnimationAlpha += DeltaTime / AnimationDuration;
+		AnimationAlpha = FMath::Clamp(AnimationAlpha, 0.0f, 1.f);  // 0~1 사이로 제한
+
+		// 이징 함수 호출 (UI가 나타날 때 ElasticEaseOut 적용)
+		float NewPosition = UJS_EasingFunctionLib::FadeInEase(AnimationAlpha);
+
+		// NewPosition 값을 UI 위치에 적용 (예: Y 위치를 NewPosition으로 설정)
+		//BD_VideoList->SetRenderTranslation(FVector2D(0, StartPosition + NewPosition * TargetOffset));
+		CA_MakeSession->SetRenderOpacity(NewPosition);
+
+		// 애니메이션이 끝나면 bIsAnimating 비활성화
+		if (AnimationAlpha >= 1.0f)
+		{
+			bMakeWidgetAnimating = false;
+		}
+	}
+}
+
+void UJS_SessionJoinWidget::PlayShowMakePopupSessionAnimation()
+{
+	AnimationAlpha = 0.0f;
+	bMakePopupAnimating = true;
+	StartMakeWidgetPosition = BD_CreateRoomPopup->GetRenderTransform().Translation.Y - TargetOffset;
+}
+
+void UJS_SessionJoinWidget::OnMakePopupSessionAnimation(float DeltaTime)
+{
+	if (bMakePopupAnimating)
+	{
+		// Alpha 값 증가시키기
+		AnimationAlpha += DeltaTime / AnimationDuration;
+		AnimationAlpha = FMath::Clamp(AnimationAlpha, 0.0f, 1.f);  // 0~1 사이로 제한
+
+		// 이징 함수 호출 (UI가 나타날 때 ElasticEaseOut 적용)
+		float NewPosition = UJS_EasingFunctionLib::ElasticEaseOut(AnimationAlpha);
+		// NewPosition 값을 UI 위치에 적용 (예: Y 위치를 NewPosition으로 설정)
+		BD_CreateRoomPopup->SetRenderTranslation(FVector2D(0, StartMakeWidgetPosition + NewPosition * TargetOffset));
+
+		// 애니메이션이 끝나면 bIsAnimating 비활성화
+		if (AnimationAlpha >= 1.0f)
+		{
+			bMakePopupAnimating = false;
+		}
+	}
 }
 
 void UJS_SessionJoinWidget::AddSessionSlotWidget(const FRoomInfo& info)
@@ -163,6 +232,7 @@ void UJS_SessionJoinWidget::AddSessionSlotWidget(const FRoomInfo& info)
 void UJS_SessionJoinWidget::ShowJoinWidget()
 {
 	BD_JoinRoom->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	PlayJoinPopupSessionAnimation();
 }
 
 void UJS_SessionJoinWidget::CategorySwitching(int32 index)
@@ -246,5 +316,62 @@ void UJS_SessionJoinWidget::OnClickedQuit()
 	{
 		Player->Direction = FVector::ZeroVector;
 		Player->bCanMove = true;
+	}
+}
+
+void UJS_SessionJoinWidget::PlayJoinPopupSessionAnimation()
+{
+	AnimationAlpha = 0.0f;
+	bJoinPopupAnimating = true;
+	StartMakeWidgetPosition = BD_JoinPopup->GetRenderTransform().Translation.Y - TargetOffset;
+}
+
+void UJS_SessionJoinWidget::OnJoinPopupSessionAnimation(float DeltaTime)
+{
+	if (bJoinPopupAnimating)
+	{
+		// Alpha 값 증가시키기
+		AnimationAlpha += DeltaTime / AnimationDuration;
+		AnimationAlpha = FMath::Clamp(AnimationAlpha, 0.0f, 1.f);  // 0~1 사이로 제한
+
+		// 이징 함수 호출 (UI가 나타날 때 ElasticEaseOut 적용)
+		float NewPosition = UJS_EasingFunctionLib::ElasticEaseOut(AnimationAlpha);
+		// NewPosition 값을 UI 위치에 적용 (예: Y 위치를 NewPosition으로 설정)
+		BD_JoinPopup->SetRenderTranslation(FVector2D(0, StartMakeWidgetPosition + NewPosition * TargetOffset));
+
+		// 애니메이션이 끝나면 bIsAnimating 비활성화
+		if (AnimationAlpha >= 1.0f)
+		{
+			bJoinPopupAnimating = false;
+		}
+	}
+}
+
+void UJS_SessionJoinWidget::PlayShowJoinSessionAnimation()
+{
+	AnimationAlpha = 0.0f;
+	bJoinWidgetAnimating = true;
+}
+
+void UJS_SessionJoinWidget::OnJoinSessionAnimation(float DeltaTime)
+{
+	if (bJoinWidgetAnimating)
+	{
+		// Alpha 값 증가시키기
+		AnimationAlpha += DeltaTime / AnimationDuration;
+		AnimationAlpha = FMath::Clamp(AnimationAlpha, 0.0f, 1.f);  // 0~1 사이로 제한
+
+		// 이징 함수 호출 (UI가 나타날 때 ElasticEaseOut 적용)
+		float NewPosition = UJS_EasingFunctionLib::FadeInEase(AnimationAlpha);
+
+		// NewPosition 값을 UI 위치에 적용 (예: Y 위치를 NewPosition으로 설정)
+		//BD_VideoList->SetRenderTranslation(FVector2D(0, StartPosition + NewPosition * TargetOffset));
+		CA_FindSession->SetRenderOpacity(NewPosition);
+
+		// 애니메이션이 끝나면 bIsAnimating 비활성화
+		if (AnimationAlpha >= 1.0f)
+		{
+			bJoinWidgetAnimating = false;
+		}
 	}
 }
