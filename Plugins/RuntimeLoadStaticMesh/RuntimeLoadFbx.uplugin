@@ -1,0 +1,32 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "3.0",
+	"FriendlyName": "RuntimeLoadFbx",
+	"Description": "RuntimeLoadFbx is a plugin to import fbx file at Runtime .Support async/sync ,Support StaticMeshComponent/ProceduralMeshComponent",
+	"Category": "Fbx",
+	"CreatedBy": "Jack",
+	"CreatedByURL": "Justhelpy@163.com",
+	"DocsURL": "https://1drv.ms/b/s!Amcjd3wOL4hJgzz-q_thASLbrROt?e=PTyNMX",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/8569d319775140449b298bde26le9944",
+	"SupportURL": "Justhelpy@163.com",
+	"EngineVersion": "5.4.0",
+	"CanContainContent": true,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "RuntimeLoadFbx",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+				"Win64"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ProceduralMeshComponent",
+			"Enabled": true
+		}
+	]
+}
