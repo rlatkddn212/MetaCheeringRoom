@@ -6,6 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "JS_TotoActor.generated.h"
 
+enum class EModifyPhase
+{
+	None,
+	Squashing,    // 찌그러지는 중
+	Holding,      // 찌그러진 상태 유지
+	Recovering    // 원래대로 돌아가는 중
+};
+
 UCLASS()
 class METACHEERINGROOM_API AJS_TotoActor : public AActor
 {
@@ -18,6 +26,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 public:
 	// MakeUI
 	UPROPERTY(EditAnywhere)
@@ -85,6 +94,8 @@ public:
 
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastAdjustPoint(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd);
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastAdjustLose(const TArray<FString>& Keys, const TArray<int32>& Values);
 
 	// 끗
 	int32 TotoLimitTIme;
@@ -99,5 +110,29 @@ public:
 
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastInitToto();
+
+	void LoseAnimationPlay();
+
+	void PlayerModify();
+
+	void OnPlayerModify(float DeltaTime);
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AJS_AtkActor> AtkActorFactory;
+	UPROPERTY()
+	class AHG_Player* Player;	
+
+	FVector OriginalScale;
+	bool bAnimating = false;
+    UPROPERTY(EditAnywhere, Category = "Animation")
+    float AnimationDuration = 0.3f;
+    UPROPERTY(EditAnywhere, Category = "Animation")
+    float HoldTime = 5.0f;
+    UPROPERTY(EditAnywhere, Category = "Animation")
+    float Squash = 0.1f;
+    UPROPERTY(EditAnywhere, Category = "Animation")
+    float Stretch = 1.5f;
+	float CurrentTime = 0.0f;
+	EModifyPhase CurrentPhase = EModifyPhase::None;
 
 };
