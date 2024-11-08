@@ -2,7 +2,7 @@
 
 
 #include "KSW/SW_CreatorPlayerController.h"
-#include "SW_CreatorObject.h"
+#include "KSW/CreatorObject/SW_CreatorObject.h"
 #include "CreatorStorageSubsystem.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
@@ -239,7 +239,6 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 			}
 		}
         
-
         // 디버그용 트레이스 라인 표시 (빨간색)
         //DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
     }

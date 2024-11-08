@@ -12,7 +12,7 @@
 #include "Math/MathFwd.h"
 #include "../SW_CreatorPlayerController.h"
 #include "Components/Button.h"
-#include "../SW_CreatorObject.h"
+#include "../CreatorObject/SW_CreatorObject.h"
 #include "Delegates/Delegate.h"
 
 void USW_CreatorHierarchyItemWidget::NativeConstruct()

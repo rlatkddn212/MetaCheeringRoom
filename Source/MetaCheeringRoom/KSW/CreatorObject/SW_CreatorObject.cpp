@@ -1,12 +1,12 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KSW/SW_CreatorObject.h"
-#include "CreatorStorageSubsystem.h"
-#include "CreatorGizmo/CreatorScaleGizmoComponent.h"
-#include "CreatorGizmo/CreatorRotationGizmoComponent.h"
-#include "CreatorGizmo/CreatorPositionGizmoComponent.h"
-#include "SW_CreatorPlayerController.h"
+#include "KSW/CreatorObject/SW_CreatorObject.h"
+#include "KSW/CreatorStorageSubsystem.h"
+#include "KSW/CreatorGizmo/CreatorScaleGizmoComponent.h"
+#include "KSW/CreatorGizmo/CreatorRotationGizmoComponent.h"
+#include "KSW/CreatorGizmo/CreatorPositionGizmoComponent.h"
+#include "KSW/SW_CreatorPlayerController.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/UObjectGlobals.h"
 #include "MeshDescription.h"
@@ -15,13 +15,11 @@
 #include "StaticMeshResources.h"
 #include "StaticMeshAttributes.h"
 #include "Engine/StaticMeshSourceData.h"
-#include "RawMesh.h"
 #include "Chaos/Array.h"
 #include "Math/Vector.h"
 #include "UObject/NoExportTypes.h"
 #include "MeshDescription.h"
 #include "StaticMeshAttributes.h"
-
 
 // Sets default values
 ASW_CreatorObject::ASW_CreatorObject()

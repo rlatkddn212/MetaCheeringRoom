@@ -3,7 +3,7 @@
 
 #include "KSW/CreatorGizmo/CreatorPositionGizmoComponent.h"
 #include "Components/SceneComponent.h"
-#include "../SW_CreatorObject.h"
+#include "../CreatorObject/SW_CreatorObject.h"
 
 // Sets default values for this component's properties
 UCreatorPositionGizmoComponent::UCreatorPositionGizmoComponent()

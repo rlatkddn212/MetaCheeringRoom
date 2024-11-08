@@ -34,6 +34,7 @@ class METACHEERINGROOM_API UCreatorMapSubsystem : public UGameInstanceSubsystem
 
 private:
 	void RemoveObjectRecursive(ASW_CreatorObject* Object);
+	void RemoveActorRecursive(AActor* Actor);
 
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
@@ -69,6 +70,7 @@ public:
 
 	// 오브젝트 삭제 재귀적으로
 	void RemoveObject(ASW_CreatorObject* Object, bool isRecursive = false);
+
 
 	// 오브젝트 추가
 	void AttachObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);

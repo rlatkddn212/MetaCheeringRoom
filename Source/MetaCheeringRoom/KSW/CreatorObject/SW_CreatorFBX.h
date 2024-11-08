@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "KSW/SW_CreatorObject.h"
-#include "SW_CreatorStaticObject.generated.h"
+#include "KSW/CreatorObject/SW_CreatorObject.h"
+#include "SW_CreatorFBX.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class METACHEERINGROOM_API ASW_CreatorStaticObject : public ASW_CreatorObject
+class METACHEERINGROOM_API ASW_CreatorFBX : public ASW_CreatorObject
 {
 	GENERATED_BODY()
 public:
 	// Sets default values for this actor's properties
-	ASW_CreatorStaticObject();
+	ASW_CreatorFBX();
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,7 +27,5 @@ public:
 
 	virtual void OnSelected(bool isSelected) override;
 
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UStaticMeshComponent* Mesh;
+	void SelectChildActor(AActor* actor, bool isSelected);
 };

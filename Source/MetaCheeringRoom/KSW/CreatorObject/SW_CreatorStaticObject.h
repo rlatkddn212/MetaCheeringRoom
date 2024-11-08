@@ -3,20 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "KSW/SW_CreatorObject.h"
-#include "SW_CreatorSkeletonObject.generated.h"
+#include "KSW/CreatorObject/SW_CreatorObject.h"
+#include "SW_CreatorStaticObject.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class METACHEERINGROOM_API ASW_CreatorSkeletonObject : public ASW_CreatorObject
+class METACHEERINGROOM_API ASW_CreatorStaticObject : public ASW_CreatorObject
 {
 	GENERATED_BODY()
-
 public:
 	// Sets default values for this actor's properties
-	ASW_CreatorSkeletonObject();
+	ASW_CreatorStaticObject();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,6 +25,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void OnSelected(bool isSelected) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class USkeletalMeshComponent* Mesh;
+	class UStaticMeshComponent* Mesh;
 };

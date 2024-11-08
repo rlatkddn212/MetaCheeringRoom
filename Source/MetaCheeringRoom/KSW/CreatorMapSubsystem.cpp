@@ -8,7 +8,7 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonWriter.h"
-#include "SW_CreatorObject.h"
+#include "CreatorObject/SW_CreatorObject.h"
 #include "CreatorStorageSubsystem.h"
 #include "Engine/EngineTypes.h"
 #include "EngineUtils.h"
@@ -202,7 +202,7 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
     UniqueCreatorItemId = FMath::Max(UniqueCreatorItemId, CreatorObject->CreatorObjectUId + 1);
 
     // JSON에서 이름과 변환 정보를 가져오기
-    CreatorObject->SetActorLabel(JsonObject->GetStringField(TEXT("ObjectName")));
+    //CreatorObject->SetActorLabel(JsonObject->GetStringField(TEXT("ObjectName")));
 
     // 변환 정보 역직렬화
     FVector Translation(
@@ -354,6 +354,21 @@ void UCreatorMapSubsystem::RemoveObjectRecursive(ASW_CreatorObject* Object)
 	}
 }
 
+void UCreatorMapSubsystem::RemoveActorRecursive(AActor* Actor)
+{
+    if (Actor)
+    {
+        TArray<AActor*> AttachedActors;
+        Actor->GetAttachedActors(AttachedActors);
+        for (AActor* AttachedActor : AttachedActors)
+        {
+            RemoveActorRecursive(AttachedActor);
+        }
+    }
+
+    Actor->Destroy();
+}
+
 void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecursive /*= false*/)
 {
 	if (Object != nullptr)
@@ -374,6 +389,11 @@ void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecurs
 				{
                     RemoveObjectRecursive(AttachedCreatorObject);
 				}
+                else
+                {
+                    // 재귀적으로 자식 액터까지 삭제
+                    RemoveActorRecursive(AttachedActor);
+                }
 			}
 		}
 

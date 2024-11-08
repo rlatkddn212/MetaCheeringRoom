@@ -3,7 +3,7 @@
 
 #include "KSW/UI/SW_CreatorInspectorWidget.h"
 #include "Components/EditableText.h"
-#include "../SW_CreatorObject.h"
+#include "../CreatorObject/SW_CreatorObject.h"
 #include "Delegates/Delegate.h"
 #include "Delegates/DelegateCombinations.h"
 #include "Components/ScrollBox.h"

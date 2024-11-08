@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KSW/SW_CreatorStaticObject.h"
+#include "SW_CreatorStaticObject.h"
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "CreatorGizmo/CreatorPositionGizmoComponent.h"
-#include "CreatorGizmo/CreatorRotationGizmoComponent.h"
-#include "CreatorGizmo/CreatorScaleGizmoComponent.h"
+#include "KSW/CreatorGizmo/CreatorPositionGizmoComponent.h"
+#include "KSW/CreatorGizmo/CreatorRotationGizmoComponent.h"
+#include "KSW/CreatorGizmo/CreatorScaleGizmoComponent.h"
 
 ASW_CreatorStaticObject::ASW_CreatorStaticObject()
 {
@@ -34,7 +34,6 @@ void ASW_CreatorStaticObject::OnSelected(bool isSelected)
 	{
 		Mesh->SetRenderCustomDepth(true);
 		UE_LOG(LogTemp, Warning, TEXT("Selected"));
-
 	}
 	else
 	{

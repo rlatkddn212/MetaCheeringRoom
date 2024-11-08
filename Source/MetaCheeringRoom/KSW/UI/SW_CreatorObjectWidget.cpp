@@ -13,6 +13,7 @@
 #include "Widgets/SWidget.h"
 #include "../../../../Plugins/RuntimeLoadStaticMesh/Source/RuntimeLoadFbx/Public/FileIOBlueprintFunctionLibrary.h"
 #include "../CreatorMapSubsystem.h"
+#include "../CreatorFBXSubsystem.h"
 
 void USW_CreatorObjectWidget::NativeConstruct()
 {
@@ -105,11 +106,14 @@ void USW_CreatorObjectWidget::OnImportButtonClicked()
 
 			// FBX 파일 로드
 			// LoadFileAsync2StaticMeshActor(SelectedFilePath);
-			AActor* actor = UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(SelectedFilePath);
+
+			UCreatorFBXSubsystem* fbxSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
+			AActor* actor = fbxSubsystem->OpenFBX(SelectedFilePath);
+
 			UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
 			UCreatorMapSubsystem* CreatorMapSubsystem = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 
-			int32 CreatorObjectType = 1;
+			int32 CreatorObjectType = 5;
 			int32 CreatorObjectId = 1;
 			TMap<int32, FCreatorObjectData*> CreatorObjectsStruct = system->GetCreatorObjects(CreatorObjectType);
 			if (CreatorObjectsStruct.Contains(CreatorObjectId))

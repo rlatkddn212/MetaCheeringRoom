@@ -4,7 +4,7 @@
 #include "KSW/CreatorGizmo/CreatorRotationGizmoComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
-#include "../SW_CreatorObject.h"
+#include "../CreatorObject/SW_CreatorObject.h"
 
 // Sets default values for this component's properties
 UCreatorRotationGizmoComponent::UCreatorRotationGizmoComponent()
