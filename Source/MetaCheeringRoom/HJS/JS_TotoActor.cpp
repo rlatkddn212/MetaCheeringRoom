@@ -331,14 +331,15 @@ void AJS_TotoActor::LoseAnimationPlay()
 	// 플레이어 앞에 액터를 소환하기, 플레이어에게 Attach하기
 	if (Player)
 	{
-		FVector SpawnLocation = Player->GetActorLocation() + Player->GetActorForwardVector() * 100.0f; // Offset distance
-		FRotator SpawnRotation = Player->GetActorRotation();
+		FVector SpawnLocation = Player->GetActorLocation(); // Offset distance
+		SpawnLocation.Z += 50;
+		FRotator SpawnRotation = FRotator::ZeroRotator;
 
 		if (AtkActorFactory)
 		{
 			AActor* Actor = GetWorld()->SpawnActor<AActor>(AtkActorFactory, SpawnLocation, SpawnRotation);
 
-			AJS_AtkActor* AtkActor = Cast<AJS_AtkActor>(Actor);
+			AtkActor = Cast<AJS_AtkActor>(Actor);
 			if (AtkActor)
 			{
 				UJS_AtkAnimInstance* AnimIns = Cast<UJS_AtkAnimInstance>(AtkActor->SkelMesh->GetAnimInstance());
@@ -373,11 +374,16 @@ void AJS_TotoActor::PlayerModify()
 
 void AJS_TotoActor::OnPlayerModify(float DeltaTime)
 {
+	if (AtkActor)
+	{
+		FVector PlayerLocation = Player->GetActorLocation();
+		PlayerLocation.Z += 50;
+		AtkActor->SetActorLocation(PlayerLocation);
+	}
 	if (!bAnimating || !Player)
 	{
 		return;
 	}
-
 	CurrentTime += DeltaTime;
 	FVector NewScale = OriginalScale;
 
@@ -393,8 +399,8 @@ void AJS_TotoActor::OnPlayerModify(float DeltaTime)
 			float ExtremeSquash = Squash * 0.5f;  // 더 심하게 찌그러짐 (Squash보다 더 작은 값)
 
 			NewScale.Z *= FMath::Lerp(1.0f, ExtremeSquash, InitialSquashAlpha);
-			NewScale.X *= FMath::Lerp(1.0f, 0.4f / ExtremeSquash, InitialSquashAlpha);
-			NewScale.Y *= FMath::Lerp(1.0f, 0.4f / ExtremeSquash, InitialSquashAlpha);
+			NewScale.X *= FMath::Lerp(1.0f, 0.3f / ExtremeSquash, InitialSquashAlpha);
+			NewScale.Y *= FMath::Lerp(1.0f, 0.3f / ExtremeSquash, InitialSquashAlpha);
 		}
 		else  // 두 번째 단계: 적당한 찌그러짐으로 돌아옴
 		{
@@ -402,8 +408,8 @@ void AJS_TotoActor::OnPlayerModify(float DeltaTime)
 			float ExtremeSquash = Squash * 0.5f;
 
 			NewScale.Z *= FMath::Lerp(ExtremeSquash, Squash, RecoverAlpha);
-			NewScale.X *= FMath::Lerp(1.2f / ExtremeSquash, 0.35f / Squash, RecoverAlpha);
-			NewScale.Y *= FMath::Lerp(1.2f / ExtremeSquash, 0.35f / Squash, RecoverAlpha);
+			NewScale.X *= FMath::Lerp(1.2f / ExtremeSquash, 0.25f / Squash, RecoverAlpha);
+			NewScale.Y *= FMath::Lerp(1.2f / ExtremeSquash, 0.25f / Squash, RecoverAlpha);
 		}
 
 		if (Alpha >= 1.0f)
@@ -417,8 +423,8 @@ void AJS_TotoActor::OnPlayerModify(float DeltaTime)
 	{
 		// 찌그러진 상태 유지
 		NewScale.Z *= Squash;
-		NewScale.X *= 0.35f / Squash;
-		NewScale.Y *= 0.35f / Squash;
+		NewScale.X *= 0.25f / Squash;
+		NewScale.Y *= 0.25f / Squash;
 
 		if (CurrentTime >= HoldTime)
 		{

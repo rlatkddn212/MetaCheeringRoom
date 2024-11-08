@@ -135,4 +135,7 @@ public:
 	float CurrentTime = 0.0f;
 	EModifyPhase CurrentPhase = EModifyPhase::None;
 
+	UPROPERTY()
+	class AJS_AtkActor* AtkActor;
+
 };
