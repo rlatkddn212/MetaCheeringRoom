@@ -146,7 +146,7 @@ void UToToMakeWidget::OnClickStartBtn()
 	TEXT_Result1->SetText(ET_Select1->GetText());
 	TEXT_Result2->SetText(ET_Select2->GetText());
 	AJS_TotoActor* TotoActor = Cast<AJS_TotoActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AJS_TotoActor::StaticClass()));
-	int32 Second = SPB_TimeLimit->GetValue()*60;
+	int32 Second = SPB_TimeLimit->GetValue()*60 - 50;
 	TotoActor->MakeToto(ET_BettingName->GetText().ToString(),ET_Select1->GetText().ToString(),ET_Select2->GetText().ToString(), Second);
 	// 2. 창 닫기
 	SetVisibility(ESlateVisibility::Hidden);

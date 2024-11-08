@@ -112,4 +112,5 @@ public:
 	FButtonStyle EnableButtonStyle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ButtonStyle")
 	FButtonStyle HoverButtonStyle;
+
 };
