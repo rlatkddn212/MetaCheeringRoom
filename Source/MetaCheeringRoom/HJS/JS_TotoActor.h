@@ -96,6 +96,8 @@ public:
 	void MulticastAdjustPoint(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd);
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastAdjustLose(const TArray<FString>& Keys, const TArray<int32>& Values);
+	UFUNCTION()
+	void AdjustWin();
 
 	// 끗
 	int32 TotoLimitTIme;
@@ -134,8 +136,23 @@ public:
     float Stretch = 1.5f;
 	float CurrentTime = 0.0f;
 	EModifyPhase CurrentPhase = EModifyPhase::None;
-
+	float StunTime = 0.0f;  // 현재 스턴 시간
+	const float StunDuration = 1.5f;  // 스턴 지속시간
 	UPROPERTY()
 	class AJS_AtkActor* AtkActor;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AJS_StarActor> StarActorFactory;
+	UPROPERTY()
+    AJS_StarActor* StarActor;
+	void SpawnStarActor();
 
+	UPROPERTY(EditAnywhere)
+	class USoundBase* SpringSound;
+	UPROPERTY(EditAnywhere)
+	class USoundBase* PoofSound;
+	UPROPERTY(EditAnywhere)
+	class USoundBase* TadaSound;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> FanfareFactory;
 };
