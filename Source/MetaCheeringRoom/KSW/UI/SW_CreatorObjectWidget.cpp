@@ -14,6 +14,7 @@
 #include "../../../../Plugins/RuntimeLoadStaticMesh/Source/RuntimeLoadFbx/Public/FileIOBlueprintFunctionLibrary.h"
 #include "../CreatorMapSubsystem.h"
 #include "../CreatorFBXSubsystem.h"
+#include "../CreatorObject/SW_CreatorFBX.h"
 
 void USW_CreatorObjectWidget::NativeConstruct()
 {
@@ -107,9 +108,6 @@ void USW_CreatorObjectWidget::OnImportButtonClicked()
 			// FBX 파일 로드
 			// LoadFileAsync2StaticMeshActor(SelectedFilePath);
 
-			UCreatorFBXSubsystem* fbxSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
-			AActor* actor = fbxSubsystem->OpenFBX(SelectedFilePath);
-
 			UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
 			UCreatorMapSubsystem* CreatorMapSubsystem = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 
@@ -121,14 +119,29 @@ void USW_CreatorObjectWidget::OnImportButtonClicked()
 				// CreatorObject를 생성
 				ASW_CreatorObject* CreatorObject = CreatorMapSubsystem->CreateObject(CreatorObjectsStruct[CreatorObjectId]);
 
-				actor->AttachToActor(CreatorObject, FAttachmentTransformRules::KeepWorldTransform);
-
+				// 파일이름을 저장해둔다.
+				ASW_CreatorFBX* CreatorFBX = Cast<ASW_CreatorFBX>(CreatorObject);
+				FString FileName = FPaths::GetBaseFilename(SelectedFilePath) + "_" + FGuid::NewGuid().ToString() + ".fbx";
+				// FBX 파일을 로드한다.
+				UCreatorFBXSubsystem* CreatorFBXSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
+				AActor* actor = CreatorFBXSubsystem->OpenAndCopyFBX(SelectedFilePath, FileName);
+				if (actor)
+					actor->AttachToActor(CreatorObject, FAttachmentTransformRules::KeepWorldTransform);
 				CreatorMapSubsystem->AddObject(CreatorObject);
-			}
 
-			ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
-			if (PC)
-				PC->ReloadHierarchy();
+				ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+				if (PC)
+				{
+					PC->ReloadHierarchy();
+					PC->DoSelectObject(CreatorObject);
+				}
+
+				// 리플리케이트
+				if (CreatorFBX)
+				{
+					CreatorFBX->FBXFileName = FileName;
+				}
+			}
 		}
 	}
 }

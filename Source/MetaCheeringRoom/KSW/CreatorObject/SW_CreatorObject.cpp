@@ -382,3 +382,11 @@ void ASW_CreatorObject::OnChangeScale(FVector Scale)
 	SetActorScale3D(Scale);
 }
 
+void ASW_CreatorObject::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
+{
+	
+}
+
+void ASW_CreatorObject::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject)
+{
+}

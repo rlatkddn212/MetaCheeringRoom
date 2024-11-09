@@ -116,4 +116,7 @@ public:
 	void OnChangeScale(FVector Scale);
 
 	bool IsSelectedObject;
+public:
+	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const;
+	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject);
 };

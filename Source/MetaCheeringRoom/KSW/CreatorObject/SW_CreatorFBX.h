@@ -20,7 +20,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -28,4 +28,19 @@ public:
 	virtual void OnSelected(bool isSelected) override;
 
 	void SelectChildActor(AActor* actor, bool isSelected);
+
+	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
+	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
+
+	UPROPERTY(ReplicatedUsing = OnRep_FBXFileName)
+	FString FBXFileName;
+
+	UFUNCTION()
+	void OnRep_FBXFileName();
+
+	UFUNCTION()
+	void OpenFBXFile();
+	FTimerHandle TimerHandle;
+	//GetLifetimeReplicatedProps(LifeTime);
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
 };

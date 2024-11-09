@@ -4,8 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "HttpFwd.h"
 #include "CreatorFBXSubsystem.generated.h"
 
+// 업로드 성공 델리케이드
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUploadSuccess);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDownloadSuccess);
 
 USTRUCT(BlueprintType)
 struct FCreatorFBXMetaData
@@ -30,7 +34,16 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	AActor* OpenFBX(FString FilePath);
+	AActor* OpenAndCopyFBX(const FString& FilePath, const FString& NewFileName);
+	AActor* LoadFBX(FString FileName);
+
+	bool IsFileExist(const FString& FileName);
+	
+	void AnonymousLogin();
+	void OnAnonymousLoginComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+	void FileUploadToFirebase(const FString& FilePath, const FString& FileName);
+	void FileDownloadFromFirebase(const FString& SavePath, const FString& FileName, TFunction<void()> Func);
 
 	void LoadMetaData();
 	void SaveMetaData();
@@ -42,4 +55,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FCreatorFBXMetaData> MetaData;
+
+	// 로그인 정보
+	FString Token;
+
+	FOnUploadSuccess OnUploadSuccess;
+	FOnDownloadSuccess OnDownloadSuccess;
 };

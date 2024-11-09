@@ -83,6 +83,8 @@ public:
 	// 부모찾기
 	ASW_CreatorObject* FindParentObject(ASW_CreatorObject* ChildObject);
 
+	ASW_CreatorObject* GetParentCreatorObject(AActor* Object);
+
 	// 자식인지 확인
 	bool IsChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
 

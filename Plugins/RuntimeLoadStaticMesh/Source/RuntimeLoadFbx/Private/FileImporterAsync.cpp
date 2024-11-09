@@ -391,8 +391,6 @@ namespace FileIO
         }
 
         //FString fileName = FPaths::GetBaseFilename(filePath);
-
-
         TSharedPtr<AsyncData> asyncdata = MakeShared<AsyncData>();
         asyncdata->_filePath = filePath;
         //asyncdata->_actorClass = actorClass ? actorClass : AActor::StaticClass();

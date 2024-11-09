@@ -232,6 +232,16 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 				{
 					DoSelectObject(Object);
 				}
+				else
+				{
+					UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+					// 부모가 ASW_CreatorObject인지 확인
+					ASW_CreatorObject* ParentObject = system->GetParentCreatorObject(HitResult.GetActor());
+					if (ParentObject)
+					{
+						DoSelectObject(ParentObject);
+					}
+				}
 			}
 			else
 			{
