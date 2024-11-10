@@ -59,6 +59,25 @@ void USW_CreatorObjectWidget::NativeConstruct()
 			EffectObjectScrollBox->AddChild(ChildWidget);
 		}
 	}
+
+	{
+		TMap<int32, FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects(5);
+		if (CreatorObjects.Contains(1))
+		{
+			FCreatorObjectData* CreatorObject = CreatorObjects[1];
+			UCreatorFBXSubsystem* CreatorFBXSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
+			TMap<FString, FCreatorFBXMetaData> DataMap = CreatorFBXSubsystem->LoadMetaData();
+
+			for (auto& FBXData : DataMap)
+			{
+				USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
+				CreatorObject->ItemName = FBXData.Value.FileName;
+				ChildWidget->SetObject(CreatorObject);
+				FBXObjectScrollBox->AddChild(ChildWidget);
+			}
+		}
+	}
+
 	// 버튼 클릭처리
 	ShapeObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnShapeObjectButtonClicked);
 	SportsObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnSportsObjectButtonClicked);
@@ -121,10 +140,12 @@ void USW_CreatorObjectWidget::OnImportButtonClicked()
 
 				// 파일이름을 저장해둔다.
 				ASW_CreatorFBX* CreatorFBX = Cast<ASW_CreatorFBX>(CreatorObject);
+
+				URLFProgress* ProgressTracker = CreatorFBX->GetProgressTracker();
 				FString FileName = FPaths::GetBaseFilename(SelectedFilePath) + "_" + FGuid::NewGuid().ToString() + ".fbx";
 				// FBX 파일을 로드한다.
 				UCreatorFBXSubsystem* CreatorFBXSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
-				AActor* actor = CreatorFBXSubsystem->OpenAndCopyFBX(SelectedFilePath, FileName);
+				AActor* actor = CreatorFBXSubsystem->OpenAndCopyFBX(SelectedFilePath, FileName, ProgressTracker);
 				if (actor)
 					actor->AttachToActor(CreatorObject, FAttachmentTransformRules::KeepWorldTransform);
 				CreatorMapSubsystem->AddObject(CreatorObject);

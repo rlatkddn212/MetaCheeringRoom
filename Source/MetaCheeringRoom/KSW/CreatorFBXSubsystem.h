@@ -18,6 +18,9 @@ struct FCreatorFBXMetaData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString FileName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString FBXName;
 };
 
 /**
@@ -34,8 +37,8 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	AActor* OpenAndCopyFBX(const FString& FilePath, const FString& NewFileName);
-	AActor* LoadFBX(FString FileName);
+	AActor* OpenAndCopyFBX(const FString& FilePath, const FString& NewFileName, class URLFProgress* ProgressTracker);
+	AActor* LoadFBX(FString FileName, class URLFProgress* Progress);
 
 	bool IsFileExist(const FString& FileName);
 	
@@ -45,20 +48,21 @@ public:
 	void FileUploadToFirebase(const FString& FilePath, const FString& FileName);
 	void FileDownloadFromFirebase(const FString& SavePath, const FString& FileName, TFunction<void()> Func);
 
-	void LoadMetaData();
+	TMap<FString, FCreatorFBXMetaData> LoadMetaData();
 	void SaveMetaData();
 	// FBX 파일
-	void AddMetaData(FCreatorFBXMetaData* MetaData);
-	void RemoveMetaData(int32 idx);
-
-	AActor* CreateActorFromFBX(const FString& FileName, const FVector& Location, const FRotator& Rotation, const FVector& Scale);
+	void AddMetaData(FString FileName, FString FBXName);
+	void RemoveMetaData(FString FileName);
+	FCreatorFBXMetaData GetMetaData(FString FileName);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FCreatorFBXMetaData> MetaData;
+	TMap<FString, FCreatorFBXMetaData> MetaDataMap;
 
 	// 로그인 정보
 	FString Token;
 
 	FOnUploadSuccess OnUploadSuccess;
 	FOnDownloadSuccess OnDownloadSuccess;
+
+	FString MetaDataFile = "MetaData.json";
 };

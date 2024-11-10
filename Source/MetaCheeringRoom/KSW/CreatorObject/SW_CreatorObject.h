@@ -118,6 +118,8 @@ public:
 	UFUNCTION()
 	void OnChangeScale(FVector Scale);
 
+	virtual void SetFileName(const FString& FileName);
+
 	bool IsSelectedObject;
 public:
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const;

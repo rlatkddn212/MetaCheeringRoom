@@ -4,15 +4,36 @@
 #include "KSW/CreatorObject/SW_CreatorFBX.h"
 #include "Net/UnrealNetwork.h"
 #include "../CreatorFBXSubsystem.h"
+#include "RLFProgress.h"
+#include "../UI/SW_FBXLoadProgressWidget.h"
+#include "Components/WidgetComponent.h"
 
 ASW_CreatorFBX::ASW_CreatorFBX()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(Root);
+
+	LoadProgressWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("LoadProgressWidgetComponent"));
+	LoadProgressWidgetComponent->SetupAttachment(Root);
 }
 
 void ASW_CreatorFBX::BeginPlay()
 {
  	Super::BeginPlay();
+
+	ProgressTracker = NewObject<URLFProgress>();
+	ProgressTracker->progressCal.AddDynamic(this, &ThisClass::HandleProgress);
+	ProgressTracker->finishCal.AddDynamic(this, &ThisClass::HandleFinish);
+
+	// 위젯을 생성한다.
+	LoadProgressWidget = Cast<USW_FBXLoadProgressWidget>(LoadProgressWidgetComponent->GetUserWidgetObject());
+	if (LoadProgressWidget)
+	{
+		LoadProgressWidget->SetVisibility(ESlateVisibility::Visible);
+		LoadProgressWidget->SetBar(0.0f);
+	}
 }
 
 void ASW_CreatorFBX::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -26,13 +47,22 @@ void ASW_CreatorFBX::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ASW_CreatorFBX::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	// 자식을 0,0,0으로 이동
-	TArray<AActor*> AttachedActors;
-	GetAttachedActors(AttachedActors);
-	for (AActor* child : AttachedActors)
+	// 위젯을 카메라 방향으로 돌린다.
+	if (LoadProgressWidgetComponent)
 	{
-		child->SetActorLocation(GetActorLocation());
+		FVector Target = GetWorld()->GetFirstPlayerController()->PlayerCameraManager->GetCameraLocation();
+		FVector Dir = Target - LoadProgressWidgetComponent->GetComponentLocation();
+		FRotator Rot = Dir.ToOrientationRotator();
+		LoadProgressWidgetComponent->SetWorldRotation(Rot);
 	}
+
+	// 자식을 0,0,0으로 이동
+	//TArray<AActor*> AttachedActors;
+	//GetAttachedActors(AttachedActors);
+	//for (AActor* child : AttachedActors)
+	//{
+	//	child->SetActorLocation(GetActorLocation());
+	//}
 }
 
 void ASW_CreatorFBX::OnSelected(bool isSelected)
@@ -61,6 +91,22 @@ void ASW_CreatorFBX::SelectChildActor(AActor* actor, bool isSelected)
 	for (AActor* child : AttachedActors)
 	{
 		SelectChildActor(child, isSelected);
+	}
+}
+
+void ASW_CreatorFBX::SetFileName(const FString& FileName)
+{
+	// 이미 파일을 로드한 경우에는 다시 로드하지 않는다.
+	if (FBXFileName == FileName)
+	{
+		return;
+	}
+
+	FBXFileName = FileName; 
+	if (HasAuthority())
+	{
+		//한프레임 쉰다.
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ASW_CreatorFBX::OnRep_FBXFileName, 0.3f, false);
 	}
 }
 
@@ -111,7 +157,8 @@ void ASW_CreatorFBX::OpenFBXFile()
 		UE_LOG(LogTemp, Error, TEXT("File not found: %s"), *FBXFileName);
 		return;
 	}
-	AActor* actor = fbxSubsystem->LoadFBX(FBXFileName);
+
+	AActor* actor = fbxSubsystem->LoadFBX(FBXFileName, ProgressTracker);
 	// 액터 위치를 CreatorFBX의 위치로 설정한다.
 	if (actor)
 	{
@@ -125,4 +172,32 @@ void ASW_CreatorFBX::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& Out
 
 	// 추가 정보를 Replicate한다.
 	DOREPLIFETIME(ASW_CreatorFBX, FBXFileName);
+}
+
+void ASW_CreatorFBX::HandleProgress(const FString& FilePath, float Progress)
+{
+	UE_LOG(LogTemp, Log, TEXT("File %s is %.2f%% loaded."), *FilePath, Progress * 100);
+	// 위젯에 진행률을 표시한다.
+	if (LoadProgressWidget)
+	{
+		LoadProgressWidget->SetBar(Progress);
+	}
+}
+
+void ASW_CreatorFBX::HandleFinish(const FString& FilePath, AActor* ImportedActor)
+{
+	UE_LOG(LogTemp, Log, TEXT("File %s is loaded."), *FilePath);
+	// 액터 위치를 CreatorFBX의 위치로 설정한다.
+	if (ImportedActor)
+	{
+		ImportedActor->SetActorLocation(GetActorLocation());
+
+		// 메쉬를 숨긴다.
+		Mesh->SetVisibility(false);
+		// 위젯을 숨긴다.
+		if (LoadProgressWidget)
+		{
+			LoadProgressWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
 }

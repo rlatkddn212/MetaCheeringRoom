@@ -330,6 +330,8 @@ void UCreatorMapSubsystem::AddObject(ASW_CreatorObject* CreatingObject, ASW_Crea
     CreatingObject->CreatorObjectUId = CreatorItemId;
     CreatorItemMap.Add(CreatorItemId, CreatingObject);
 
+    CreatingObject->SetFileName(CreatingObject->CreatingObjectData->ItemName);
+
 	if (ParentObject != nullptr)
 	{
         // 부모 액터에 추가

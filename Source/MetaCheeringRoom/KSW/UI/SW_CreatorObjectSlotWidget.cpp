@@ -22,6 +22,7 @@
 #include "Widgets/SViewport.h"
 #include "Templates/SharedPointer.h"
 #include "Types/SlateVector2.h"
+#include "../CreatorFBXSubsystem.h"
 
 void USW_CreatorObjectSlotWidget::NativeConstruct()
 {
@@ -54,7 +55,17 @@ void USW_CreatorObjectSlotWidget::SetObject(FCreatorObjectData* data)
 {
 	ObjectData = data;
 	// ObjectData = data;
-	ObjectName->SetText(FText::FromString(data->ItemName));
+	if (data->CObjectType == 5)
+	{
+		UCreatorFBXSubsystem* CreatorFBX = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
+		FCreatorFBXMetaData metadata = CreatorFBX->GetMetaData(data->ItemName);
+		ObjectName->SetText(FText::FromString(metadata.FBXName));
+	}
+	else
+	{
+		ObjectName->SetText(FText::FromString(data->ItemName));
+	}
+
 	ObjectImage->SetBrushFromTexture(data->ItemIcon);
 }
 

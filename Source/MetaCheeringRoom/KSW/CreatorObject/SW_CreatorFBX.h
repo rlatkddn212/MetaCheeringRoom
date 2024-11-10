@@ -29,6 +29,8 @@ public:
 
 	void SelectChildActor(AActor* actor, bool isSelected);
 
+	virtual void SetFileName(const FString& FileName);
+
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
 
@@ -43,4 +45,23 @@ public:
 	FTimerHandle TimerHandle;
 	//GetLifetimeReplicatedProps(LifeTime);
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
+
+
+	UFUNCTION()
+	void HandleProgress(const FString& FilePath, float Progress);
+	UFUNCTION()
+	void HandleFinish(const FString& FilePath, AActor* ImportedActor);
+
+	class URLFProgress* GetProgressTracker() const { return ProgressTracker; }
+
+	class URLFProgress* ProgressTracker;
+
+	UPROPERTY(EditAnywhere, Category = "FBX")
+	class USW_FBXLoadProgressWidget* LoadProgressWidget;
+
+	UPROPERTY(EditAnywhere, Category = "FBX")
+	class UWidgetComponent* LoadProgressWidgetComponent;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UStaticMeshComponent* Mesh;
 };

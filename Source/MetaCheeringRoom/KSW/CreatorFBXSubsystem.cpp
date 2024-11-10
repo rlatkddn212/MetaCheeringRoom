@@ -8,6 +8,7 @@
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
+#include "../Plugins/RuntimeLoadStaticMesh/Source/RuntimeLoadFbx/Public/RLFProgress.h"
 
 void UCreatorFBXSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -18,7 +19,7 @@ void UCreatorFBXSubsystem::Deinitialize()
 {
 }
 
-AActor* UCreatorFBXSubsystem::OpenAndCopyFBX(const FString& FilePath, const FString& NewFileName)
+AActor* UCreatorFBXSubsystem::OpenAndCopyFBX(const FString& FilePath, const FString& NewFileName, class URLFProgress* ProgressTracker)
 {
 	FString CopyPath = FPaths::ProjectSavedDir() + TEXT("FBX/") + NewFileName;
 
@@ -37,16 +38,17 @@ AActor* UCreatorFBXSubsystem::OpenAndCopyFBX(const FString& FilePath, const FStr
 		UE_LOG(LogTemp, Error, TEXT("Failed to move file. %s"), *CopyPath);
 	}
 
-	AActor* actor = UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(FilePath);
+	AddMetaData(NewFileName, FPaths::GetBaseFilename(FilePath));
+	AActor* actor = UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(FilePath, ProgressTracker);
 
 	return actor;
 }
 
-AActor* UCreatorFBXSubsystem::LoadFBX(FString FileName)
+AActor* UCreatorFBXSubsystem::LoadFBX(FString FileName, URLFProgress* Progress)
 {
 	FString FilePath = FPaths::ProjectSavedDir() + TEXT("FBX/") + FileName;
 
-	return UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(FilePath);
+	return UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(FilePath, Progress);
 }
 
 bool UCreatorFBXSubsystem::IsFileExist(const FString& FileName)
@@ -160,4 +162,99 @@ void UCreatorFBXSubsystem::FileDownloadFromFirebase(const FString& SavePath, con
 		});
 
 	Request->ProcessRequest();
+}
+
+TMap<FString, FCreatorFBXMetaData> UCreatorFBXSubsystem::LoadMetaData()
+{	
+	MetaDataMap.Empty();
+	FString JsonStr;
+
+	FString MetaDataFilePath = FPaths::ProjectSavedDir() + TEXT("/FBX/") + MetaDataFile;
+	if (!FFileHelper::LoadFileToString(JsonStr, *MetaDataFilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Failed MetaData loaded from %s"), *MetaDataFilePath);
+		return MetaDataMap;
+	}
+
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
+
+	FJsonSerializer::Deserialize(JsonReader, JsonObject);
+	if (JsonObject == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to deserialize MetaData"));
+		return MetaDataMap;
+	}
+
+	// MetaData 를 채운다.
+	for (auto& Elem : JsonObject->Values)
+	{
+		FCreatorFBXMetaData NewMetaData;
+
+		TSharedPtr<FJsonObject> MetaDataObject = Elem.Value->AsObject();
+
+		NewMetaData.FileName = MetaDataObject->GetStringField("FileName");
+		NewMetaData.FBXName = MetaDataObject->GetStringField("FBXName");
+
+		this->MetaDataMap.Add(NewMetaData.FileName, NewMetaData);
+	}
+
+	return MetaDataMap;
+}
+
+void UCreatorFBXSubsystem::SaveMetaData()
+{
+	// MetaData를 저장한다.
+	FString JsonStr;
+
+	TSharedRef<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+
+	for (auto& Elem : MetaDataMap)
+	{
+		TSharedPtr<FJsonObject> MetaDataObject = MakeShareable(new FJsonObject);
+		MetaDataObject->SetStringField("FileName", Elem.Value.FileName);
+		MetaDataObject->SetStringField("FBXName", Elem.Value.FBXName);
+
+		JsonObject->SetObjectField(Elem.Key, MetaDataObject);
+	}
+
+	TSharedRef<TJsonWriter<TCHAR>> JsonWriter = TJsonWriterFactory<TCHAR>::Create(&JsonStr);
+	FJsonSerializer::Serialize(JsonObject, JsonWriter);
+
+	FString MetaDataFilePath = FPaths::ProjectSavedDir() + TEXT("/FBX/") + MetaDataFile;
+	if (FFileHelper::SaveStringToFile(JsonStr, *MetaDataFilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("MetaData saved to %s"), *MetaDataFilePath);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to save MetaData to %s"), *MetaDataFilePath);
+	}
+}
+
+void UCreatorFBXSubsystem::AddMetaData(FString FileName, FString FBXName)
+{
+	FCreatorFBXMetaData MetaData;
+	MetaData.FileName = FileName;
+	MetaData.FBXName = FBXName;
+
+	MetaDataMap.Add(FileName, MetaData);
+	SaveMetaData();
+}
+
+void UCreatorFBXSubsystem::RemoveMetaData(FString FileName)
+{
+	MetaDataMap.Remove(FileName);
+	SaveMetaData();
+}
+
+FCreatorFBXMetaData UCreatorFBXSubsystem::GetMetaData(FString FileName)
+{
+	if (!MetaDataMap.Contains(FileName))
+	{
+		UE_LOG(LogTemp, Error, TEXT("MetaData not found: %s"), *FileName);
+		return FCreatorFBXMetaData();
+	}
+
+	return MetaDataMap[FileName];
 }

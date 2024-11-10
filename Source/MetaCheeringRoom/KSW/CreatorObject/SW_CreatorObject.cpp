@@ -392,6 +392,11 @@ void ASW_CreatorObject::OnChangeScale(FVector Scale)
 	SetActorScale3D(Scale);
 }
 
+void ASW_CreatorObject::SetFileName(const FString& FileName)
+{
+	// FBX에서 사용한다.
+}
+
 void ASW_CreatorObject::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
 {
 	
