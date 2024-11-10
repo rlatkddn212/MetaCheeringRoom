@@ -30,6 +30,9 @@ public:
 
 	virtual void OnSelected(bool isSelected);
 
+	virtual void OnChangeColor(FLinearColor Color);
+	virtual FLinearColor GetColor();
+
 	void DoDestroy();
 
 	// 기즈모 사이즈 변경

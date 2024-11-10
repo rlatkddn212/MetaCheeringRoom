@@ -16,7 +16,17 @@ class METACHEERINGROOM_API ASW_CreatorPointLight : public ASW_CreatorLight
 
 public:
 	ASW_CreatorPointLight();
+
+
+	virtual void OnChangeColor(FLinearColor Color) override;
+
+	virtual FLinearColor GetColor() override;
+
+	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
+	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
+
 	// PointLight
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UPointLightComponent* LightComp;
+	FLinearColor LightColor;
 };

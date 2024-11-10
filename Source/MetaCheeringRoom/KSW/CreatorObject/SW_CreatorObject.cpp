@@ -218,6 +218,16 @@ void ASW_CreatorObject::OnSelected(bool isSelected)
 }
 
 
+void ASW_CreatorObject::OnChangeColor(FLinearColor Color)
+{
+	
+}
+
+FLinearColor ASW_CreatorObject::GetColor()
+{
+	return FLinearColor(1, 1, 1, 1);
+}
+
 void ASW_CreatorObject::DoDestroy()
 {
 	Destroy();

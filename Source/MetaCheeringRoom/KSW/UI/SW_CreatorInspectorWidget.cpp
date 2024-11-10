@@ -7,6 +7,9 @@
 #include "Delegates/Delegate.h"
 #include "Delegates/DelegateCombinations.h"
 #include "Components/ScrollBox.h"
+#include "Components/Image.h"
+#include "Components/Button.h"
+#include "Styling/SlateColor.h"
 
 void USW_CreatorInspectorWidget::NativeConstruct()
 {
@@ -53,6 +56,17 @@ void USW_CreatorInspectorWidget::OnChangeScale(FVector Scale)
 	ScaleZ->SetText(FText::FromString(FString::SanitizeFloat(Scale.Z)));
 }
 
+void USW_CreatorInspectorWidget::OnColorChanged(FLinearColor Color)
+{
+	// 버튼 색깔 변경
+	ColorImageButton->WidgetStyle.Normal.TintColor = FSlateColor(Color);
+
+	if (CreatorObject)
+	{
+		CreatorObject->OnChangeColor(Color);
+	}
+}
+
 void USW_CreatorInspectorWidget::OnChanged()
 {
 	if (CreatorObject)
@@ -68,6 +82,7 @@ void USW_CreatorInspectorWidget::SetObject(ASW_CreatorObject* Obj)
 	if (Obj == nullptr)
 	{
 		InspectorScrollBox->SetVisibility(ESlateVisibility::Hidden);
+		ColorImageButton->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor::White);
 	}
 	else
 	{
@@ -77,6 +92,7 @@ void USW_CreatorInspectorWidget::SetObject(ASW_CreatorObject* Obj)
 		ChangePosition.BindDynamic(Obj, &ASW_CreatorObject::OnChangePosition);
 		ChangeRotation.BindDynamic(Obj, &ASW_CreatorObject::OnChangeRotation);
 		ChangeScale.BindDynamic(Obj, &ASW_CreatorObject::OnChangeScale);
+		ColorImageButton->WidgetStyle.Normal.TintColor = FSlateColor(Obj->GetColor());
 
 		OnChanged();
 	}
@@ -113,7 +129,6 @@ void USW_CreatorInspectorWidget::OnPositionZChanged(const FText& Text, ETextComm
 	float z = FCString::Atof(*Text.ToString());
 
 	OnChangePosition(FVector(x, y, z));
-
 }
 
 void USW_CreatorInspectorWidget::OnRotationXChanged(const FText& Text, ETextCommit::Type CommitMethod)

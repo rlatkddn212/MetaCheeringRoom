@@ -27,6 +27,16 @@ public:
 
 	virtual void OnSelected(bool isSelected) override;
 
+	virtual void OnChangeColor(FLinearColor Color) override;
+
+	virtual FLinearColor GetColor() override;
+
+	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
+	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* Mesh;
+
+	UPROPERTY()
+	FLinearColor MeshColor;
 };

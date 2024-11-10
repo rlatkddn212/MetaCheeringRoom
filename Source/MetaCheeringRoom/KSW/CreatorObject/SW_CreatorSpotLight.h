@@ -17,7 +17,18 @@ class METACHEERINGROOM_API ASW_CreatorSpotLight : public ASW_CreatorLight
 public:
 	ASW_CreatorSpotLight();
 
+	virtual void OnChangeColor(FLinearColor Color) override;
+	virtual FLinearColor GetColor() override;
+	
+	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
+	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
+
 	// SpotLight
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USpotLightComponent* LightComp;
+
+	FLinearColor LightColor;
+	float LightIntensity;
+	float LightOuterConeAngle;
+	float LightInnerConeAngle;
 };

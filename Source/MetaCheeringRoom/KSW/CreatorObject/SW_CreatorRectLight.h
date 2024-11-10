@@ -17,7 +17,15 @@ class METACHEERINGROOM_API ASW_CreatorRectLight : public ASW_CreatorLight
 public:
 	ASW_CreatorRectLight();
 
+	virtual void OnChangeColor(FLinearColor Color) override;
+
+	virtual FLinearColor GetColor() override;
+
+	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
+	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
+
 	// RectLight
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class URectLightComponent* LightComp;
+	FLinearColor LightColor;
 };

@@ -16,7 +16,16 @@ class METACHEERINGROOM_API ASW_CreatorSkyLight : public ASW_CreatorLight
 	public:
 	ASW_CreatorSkyLight();
 	virtual void BeginPlay() override;
+
+	virtual void OnChangeColor(FLinearColor Color) override;
+
+	virtual FLinearColor GetColor() override;
+
+	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
+	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
+
 	// SkyLight
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USkyLightComponent* LightComp;
+	FLinearColor LightColor;
 };

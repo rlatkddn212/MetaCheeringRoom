@@ -59,6 +59,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	class UCheckBox* VisiableCheckBox;
 
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class UButton* ColorImageButton;
+	
 	UFUNCTION()
 	void OnObjectNameChanged(const FText& Text, ETextCommit::Type CommitMethod);
 
@@ -100,8 +103,16 @@ public:
 	// Change Scale
 	UFUNCTION()
 	void OnChangeScale(FVector Scale);
-
+	
+	UFUNCTION(BlueprintCallable)
+	void OnColorChanged(FLinearColor Color);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnColorButtonClicked();
+	
+	UFUNCTION()
 	void OnChanged();
+
 	void SetObject(class ASW_CreatorObject* Obj);
 
 	FChangePosition ChangePosition;

@@ -19,7 +19,15 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void OnChangeColor(FLinearColor Color) override;
+
+	virtual FLinearColor GetColor() override;
+
+	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
+	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
+
 	// DirectionalLight
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UDirectionalLightComponent* LightComp;
+	FLinearColor LightColor;
 };
