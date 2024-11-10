@@ -190,6 +190,8 @@ void ASW_CreatorFBX::HandleFinish(const FString& FilePath, AActor* ImportedActor
 	// 액터 위치를 CreatorFBX의 위치로 설정한다.
 	if (ImportedActor)
 	{
+		// Attach
+		ImportedActor->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 		ImportedActor->SetActorLocation(GetActorLocation());
 
 		// 메쉬를 숨긴다.

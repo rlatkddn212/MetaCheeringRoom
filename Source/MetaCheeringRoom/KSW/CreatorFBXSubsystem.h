@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "HttpFwd.h"
+#include "Containers/Queue.h"
+#include "Containers/Map.h"
 #include "CreatorFBXSubsystem.generated.h"
 
 // 업로드 성공 델리케이드
@@ -55,8 +57,13 @@ public:
 	void RemoveMetaData(FString FileName);
 	FCreatorFBXMetaData GetMetaData(FString FileName);
 
+	UFUNCTION()
+	void OnCompleteLoadFBX(const FString& FilePath, AActor* ImportedActor);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FString, FCreatorFBXMetaData> MetaDataMap;
+
+	TQueue<TPair<FString, class URLFProgress*>> LoadQueue;
 
 	// 로그인 정보
 	FString Token;
@@ -65,4 +72,6 @@ public:
 	FOnDownloadSuccess OnDownloadSuccess;
 
 	FString MetaDataFile = "MetaData.json";
+
+	bool bIsLoading = false;
 };

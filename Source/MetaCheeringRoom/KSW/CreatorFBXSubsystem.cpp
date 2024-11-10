@@ -13,6 +13,7 @@
 void UCreatorFBXSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	AnonymousLogin();
+	bIsLoading = false;
 }
 
 void UCreatorFBXSubsystem::Deinitialize()
@@ -39,16 +40,38 @@ AActor* UCreatorFBXSubsystem::OpenAndCopyFBX(const FString& FilePath, const FStr
 	}
 
 	AddMetaData(NewFileName, FPaths::GetBaseFilename(FilePath));
-	AActor* actor = UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(FilePath, ProgressTracker);
 
-	return actor;
+	ProgressTracker->finishCal.AddDynamic(this, &UCreatorFBXSubsystem::OnCompleteLoadFBX);
+	if (!bIsLoading)
+	{
+		bIsLoading = true;
+		AActor* actor = UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(FilePath, ProgressTracker);
+		return actor;
+	}
+	else
+	{
+		LoadQueue.Enqueue(TPair<FString, URLFProgress*>(FilePath, ProgressTracker));
+	}
+	
+	return nullptr;
 }
 
 AActor* UCreatorFBXSubsystem::LoadFBX(FString FileName, URLFProgress* Progress)
 {
 	FString FilePath = FPaths::ProjectSavedDir() + TEXT("FBX/") + FileName;
+	Progress->finishCal.AddDynamic(this, &UCreatorFBXSubsystem::OnCompleteLoadFBX);
+	if (!bIsLoading)
+	{
+		bIsLoading = true;
+		AActor* actor = UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(FilePath, Progress);
+		return actor;
+	}
+	else
+	{
+		LoadQueue.Enqueue(TPair<FString, URLFProgress*>(FilePath, Progress));
+	}
 
-	return UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(FilePath, Progress);
+	return nullptr;
 }
 
 bool UCreatorFBXSubsystem::IsFileExist(const FString& FileName)
@@ -153,7 +176,6 @@ void UCreatorFBXSubsystem::FileDownloadFromFirebase(const FString& SavePath, con
 					// 성공 델리게이트 호출
 					Func();
 				}
-				
 			}
 			else
 			{
@@ -257,4 +279,23 @@ FCreatorFBXMetaData UCreatorFBXSubsystem::GetMetaData(FString FileName)
 	}
 
 	return MetaDataMap[FileName];
+}
+
+void UCreatorFBXSubsystem::OnCompleteLoadFBX(const FString& FilePath, AActor* ImportedActor)
+{
+	UE_LOG(LogTemp, Log, TEXT("OnCompleteLoadFBX: %s"), *FilePath);
+	// 큐가 남아있다면
+	if (!LoadQueue.IsEmpty())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Queue is not empty"));
+		TPair<FString, URLFProgress*> Pair;
+		LoadQueue.Dequeue(Pair);
+
+		UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(Pair.Key, Pair.Value);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Queue is empty"));
+		bIsLoading = false;
+	}
 }

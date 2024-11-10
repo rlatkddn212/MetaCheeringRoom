@@ -12,6 +12,7 @@
 #include "CreatorStorageSubsystem.h"
 #include "Engine/EngineTypes.h"
 #include "EngineUtils.h"
+#include "CreatorFBXSubsystem.h"
 
 void UCreatorMapSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -63,6 +64,8 @@ void UCreatorMapSubsystem::SetupJson(FString JsonString)
 
 bool UCreatorMapSubsystem::LoadMap()
 {
+	UCreatorFBXSubsystem* fbxSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
+	fbxSubsystem->bIsLoading = false;
     InitMap();
     FCreatorMap LoadedMap = DeserializeJsonToCreatorMap(LoadJsonStr);
     return true;
