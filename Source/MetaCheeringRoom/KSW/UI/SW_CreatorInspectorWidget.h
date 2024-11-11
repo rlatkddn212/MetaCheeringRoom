@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-
 #include "SW_CreatorInspectorWidget.generated.h"
 
 // 델리게이트
 DECLARE_DYNAMIC_DELEGATE_OneParam(FChangePosition, FVector, Pos);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FChangeRotation, FRotator, Rot);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FChangeScale, FVector, Scale);
+
+// 컬러픽커 델리게이트
+DECLARE_DYNAMIC_DELEGATE_OneParam(FChangeColorPicker, FLinearColor, Color);
 
 /**
  * 
@@ -58,9 +60,6 @@ public:
 	// 체크박스
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	class UCheckBox* VisiableCheckBox;
-
-	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
-	class UButton* ColorImageButton;
 	
 	UFUNCTION()
 	void OnObjectNameChanged(const FText& Text, ETextCommit::Type CommitMethod);
@@ -118,5 +117,16 @@ public:
 	FChangePosition ChangePosition;
 	FChangeRotation ChangeRotation;
 	FChangeScale ChangeScale;
+	FChangeColorPicker ChangeColorPicker;
+
 	ASW_CreatorObject* CreatorObject;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class USW_PropertyFloatWidget> PropertyFloatWidgetFactory;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class USW_PropertyBoolWidget> PropertyBoolWidgetFactory;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class USW_PropertyColorWidget> PropertyColorWidgetFactory;
+
+	TMap<int32, class UUserWidget*> PropertyWidgets;
 };

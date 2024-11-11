@@ -24,6 +24,8 @@ void ASW_CreatorStaticObject::BeginPlay()
 	Mat = UMaterialInstanceDynamic::Create(Mesh->GetMaterial(0), this);
 	Mesh->SetMaterial(0, Mat);
 	MeshColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>();
+	Property->Value = MeshColor;
 }
 
 void ASW_CreatorStaticObject::Tick(float DeltaTime)
@@ -63,24 +65,14 @@ void ASW_CreatorStaticObject::OnChangeProperty(int32 id, UCreatorPropertyBase* C
 
 }
 
-UCreatorPropertyBase* ASW_CreatorStaticObject::GetProperty(int32 id)
+TMap<int32, UCreatorPropertyBase*> ASW_CreatorStaticObject::GetPropertyMap()
 {
-	if (id == 1)
-	{
-		if (PropertyMap.Contains(id))
-		{
-			return PropertyMap[id];
-		}
-		else
-		{
-			UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>();
-			Property->Value = MeshColor;
-			PropertyMap.Add(1, Property);
-			return Property;
-		}
-	}
+	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>();
+	Property->PropertyName = TEXT("Color");
+	Property->Value = MeshColor;
+	AddProperty(1, Property);
 
-	return nullptr;
+	return PropertyMap;
 }
 
 void ASW_CreatorStaticObject::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
@@ -105,8 +97,4 @@ void ASW_CreatorStaticObject::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObje
 	{
 		Mat->SetVectorParameterValue("Color", MeshColor);
 	}
-
-	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>();
-	Property->Value = MeshColor;
-	PropertyMap.Add(1, Property);
 }

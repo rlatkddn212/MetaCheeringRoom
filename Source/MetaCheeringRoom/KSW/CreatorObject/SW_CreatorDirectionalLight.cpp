@@ -42,15 +42,38 @@ void ASW_CreatorDirectionalLight::OnChangeProperty(int32 id, UCreatorPropertyBas
 		LightColor = ColorProperty->Value;
 		LightComp->SetLightColor(LightColor);
 	}
+
+	if (id == 2)
+	{
+		UCreatorFloatProperty* IntensityProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
+		LightComp->SetIntensity(IntensityProperty->Value);
+	}
+
+	if (id == 3)
+	{
+		UCreatorBoolProperty* CastShadowProperty = Cast<UCreatorBoolProperty>(CreatorProperty);
+		LightComp->SetCastShadows(CastShadowProperty->Value);
+	}
 }
 
-UCreatorPropertyBase* ASW_CreatorDirectionalLight::GetProperty(int32 id)
+TMap<int32, UCreatorPropertyBase*> ASW_CreatorDirectionalLight::GetPropertyMap()
 {
-	if (PropertyMap.Contains(id))
-	{
-		return PropertyMap[id];
-	}
-	return nullptr;
+	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>();
+	Property->PropertyName = TEXT("Color");
+	Property->Value = LightColor;
+	AddProperty(1, Property);
+
+	UCreatorFloatProperty* Property2 = NewObject<UCreatorFloatProperty>();
+	Property2->PropertyName = TEXT("Intensity");
+	Property2->Value = LightComp->Intensity;
+	AddProperty(2, Property2);
+
+	UCreatorBoolProperty* Property3 = NewObject<UCreatorBoolProperty>();
+	Property3->PropertyName = TEXT("CastShadow");
+	Property3->Value = LightComp->CastShadows;
+	AddProperty(3, Property3);
+
+	return PropertyMap;
 }
 
 void ASW_CreatorDirectionalLight::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
@@ -60,6 +83,9 @@ void ASW_CreatorDirectionalLight::RecordJsonAdditionalInfo(TSharedPtr<FJsonObjec
 	RecordJsonObject->SetNumberField(TEXT("ColorG"), LightColor.G);
 	RecordJsonObject->SetNumberField(TEXT("ColorB"), LightColor.B);
 	RecordJsonObject->SetNumberField(TEXT("ColorA"), LightColor.A);
+
+	RecordJsonObject->SetNumberField(TEXT("Intensity"), LightComp->Intensity);
+	RecordJsonObject->SetBoolField(TEXT("CastShadow"), LightComp->CastShadows);
 }
 
 void ASW_CreatorDirectionalLight::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject)
@@ -71,8 +97,11 @@ void ASW_CreatorDirectionalLight::SetupJsonAdditionalInfo(const TSharedPtr<FJson
 	LightColor.B = SetupJsonObject->GetNumberField(TEXT("ColorB"));
 	LightColor.A = SetupJsonObject->GetNumberField(TEXT("ColorA"));
 
-	//UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>(); Property->Value = LightColor; PropertyMap.Add(1, Property);
-	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>(); Property->Value = LightColor;	PropertyMap.Add(1, Property);
-
 	LightComp->SetLightColor(LightColor);
+
+	LightIntensity = SetupJsonObject->GetNumberField(TEXT("Intensity"));
+	LightComp->SetIntensity(LightIntensity);
+
+	CastShadow = SetupJsonObject->GetBoolField(TEXT("CastShadow"));
+	LightComp->SetCastShadows(CastShadow);
 }

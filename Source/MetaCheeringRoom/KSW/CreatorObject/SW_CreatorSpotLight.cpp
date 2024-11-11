@@ -24,15 +24,49 @@ void ASW_CreatorSpotLight::OnChangeProperty(int32 id, UCreatorPropertyBase* Crea
 		LightColor = ColorProperty->Value;
 		LightComp->SetLightColor(LightColor);
 	}
+
+	if (id == 2)
+	{
+		UCreatorFloatProperty* IntensityProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
+		LightComp->SetIntensity(IntensityProperty->Value);
+	}
+
+	if (id == 3)
+	{
+		UCreatorFloatProperty* OuterConeAngleProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
+		LightComp->SetOuterConeAngle(OuterConeAngleProperty->Value);
+	}
+
+	if (id == 4)
+	{
+		UCreatorFloatProperty* InnerConeAngleProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
+		LightComp->SetInnerConeAngle(InnerConeAngleProperty->Value);
+	}
 }
 
-UCreatorPropertyBase* ASW_CreatorSpotLight::GetProperty(int32 id)
+TMap<int32, UCreatorPropertyBase*> ASW_CreatorSpotLight::GetPropertyMap()
 {
-	if (PropertyMap.Contains(id))
-	{
-		return PropertyMap[id];
-	}
-	return nullptr;
+	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>(); 
+	Property->PropertyName = TEXT("Color");
+	Property->Value = LightColor;
+	AddProperty(1, Property);
+
+	UCreatorFloatProperty* Property2 = NewObject<UCreatorFloatProperty>();
+	Property2->PropertyName = TEXT("Intensity");
+	Property2->Value = LightComp->Intensity;
+	AddProperty(2, Property2);
+
+	UCreatorFloatProperty* Property3 = NewObject<UCreatorFloatProperty>();
+	Property3->PropertyName = TEXT("OuterConeAngle");
+	Property3->Value = LightComp->OuterConeAngle;
+	AddProperty(3, Property3);
+
+	UCreatorFloatProperty* Property4 = NewObject<UCreatorFloatProperty>();
+	Property4->PropertyName = TEXT("InnerConeAngle");
+	Property4->Value = LightComp->InnerConeAngle;
+	AddProperty(4, Property4);
+
+	return PropertyMap;
 }
 
 void ASW_CreatorSpotLight::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
@@ -42,6 +76,10 @@ void ASW_CreatorSpotLight::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& Rec
 	RecordJsonObject->SetNumberField(TEXT("ColorG"), LightColor.G);
 	RecordJsonObject->SetNumberField(TEXT("ColorB"), LightColor.B);
 	RecordJsonObject->SetNumberField(TEXT("ColorA"), LightColor.A);
+
+	RecordJsonObject->SetNumberField(TEXT("Intensity"), LightComp->Intensity);
+	RecordJsonObject->SetNumberField(TEXT("OuterConeAngle"), LightComp->OuterConeAngle);
+	RecordJsonObject->SetNumberField(TEXT("InnerConeAngle"), LightComp->InnerConeAngle);
 }
 
 void ASW_CreatorSpotLight::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject)
@@ -53,7 +91,14 @@ void ASW_CreatorSpotLight::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>
 	LightColor.B = SetupJsonObject->GetNumberField(TEXT("ColorB"));
 	LightColor.A = SetupJsonObject->GetNumberField(TEXT("ColorA"));
 
-	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>(); Property->Value = LightColor; PropertyMap.Add(1, Property);
-
 	LightComp->SetLightColor(LightColor);
+
+	LightIntensity = SetupJsonObject->GetNumberField(TEXT("Intensity"));
+	LightComp->SetIntensity(LightIntensity);
+
+	LightOuterConeAngle = SetupJsonObject->GetNumberField(TEXT("OuterConeAngle"));
+	LightComp->SetOuterConeAngle(LightOuterConeAngle);
+
+	LightInnerConeAngle = SetupJsonObject->GetNumberField(TEXT("InnerConeAngle"));
+	LightComp->SetInnerConeAngle(LightInnerConeAngle);
 }

@@ -10,6 +10,9 @@
 #include "Components/Image.h"
 #include "Components/Button.h"
 #include "Styling/SlateColor.h"
+#include "SW_PropertyFloatWidget.h"
+#include "SW_PropertyBoolWidget.h"
+#include "SW_PropertyColorWidget.h"
 
 void USW_CreatorInspectorWidget::NativeConstruct()
 {
@@ -58,13 +61,8 @@ void USW_CreatorInspectorWidget::OnChangeScale(FVector Scale)
 
 void USW_CreatorInspectorWidget::OnColorChanged(FLinearColor Color)
 {
-	// 버튼 색깔 변경
-	ColorImageButton->WidgetStyle.Normal.TintColor = FSlateColor(Color);
-
-	if (CreatorObject)
-	{
-		//CreatorObject->OnChangeProperty(Color);
-	}
+	// 콜백 실행
+	ChangeColorPicker.ExecuteIfBound(Color);
 }
 
 void USW_CreatorInspectorWidget::OnChanged()
@@ -82,7 +80,6 @@ void USW_CreatorInspectorWidget::SetObject(ASW_CreatorObject* Obj)
 	if (Obj == nullptr)
 	{
 		InspectorScrollBox->SetVisibility(ESlateVisibility::Hidden);
-		ColorImageButton->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor::White);
 	}
 	else
 	{
@@ -92,12 +89,59 @@ void USW_CreatorInspectorWidget::SetObject(ASW_CreatorObject* Obj)
 		ChangePosition.BindDynamic(Obj, &ASW_CreatorObject::OnChangePosition);
 		ChangeRotation.BindDynamic(Obj, &ASW_CreatorObject::OnChangeRotation);
 		ChangeScale.BindDynamic(Obj, &ASW_CreatorObject::OnChangeScale);
-		//ColorImageButton->WidgetStyle.Normal.TintColor = FSlateColor(Obj->GetProperty());
-
-		// 프로퍼티 UI 생성
-
 
 		OnChanged();
+
+		//PropertyWidgets에 추가된 위젯을 모두 제거
+		for (auto& Elem : PropertyWidgets)
+		{
+			Elem.Value->RemoveFromParent();
+			// 완전히 삭제
+			Elem.Value->ConditionalBeginDestroy();
+		}
+
+		PropertyWidgets.Empty();
+
+		TMap<int32, UCreatorPropertyBase*> PropertyMap = CreatorObject->GetPropertyMap();
+
+		// 반복문을 돌면서 위젯생성
+		for (auto& Elem : PropertyMap)
+		{
+			UCreatorPropertyBase* Property = Elem.Value;
+			if (Property->IsA<UCreatorFloatProperty>())
+			{
+				USW_PropertyFloatWidget* PropertyWidget = CreateWidget<USW_PropertyFloatWidget>(this, PropertyFloatWidgetFactory);
+				if (PropertyWidget)
+				{
+					InspectorScrollBox->AddChild(PropertyWidget);
+					PropertyWidgets.Add(Elem.Key, PropertyWidget);
+					PropertyWidget->SetInspectorWidget(this);
+					PropertyWidget->SetPropertyValue(Elem.Key, Cast<UCreatorFloatProperty>(Property));
+				}
+			}
+			else if (Property->IsA<UCreatorBoolProperty>())
+			{
+				USW_PropertyBoolWidget* PropertyWidget = CreateWidget<USW_PropertyBoolWidget>(this, PropertyBoolWidgetFactory);
+				if (PropertyWidget)
+				{
+					InspectorScrollBox->AddChild(PropertyWidget);
+					PropertyWidgets.Add(Elem.Key, PropertyWidget);
+					PropertyWidget->SetInspectorWidget(this);
+					PropertyWidget->SetPropertyValue(Elem.Key, Cast<UCreatorBoolProperty>(Property));
+				}
+			}
+			else if (Property->IsA<UCreatorColorProperty>())
+			{
+				USW_PropertyColorWidget* PropertyWidget = CreateWidget<USW_PropertyColorWidget>(this, PropertyColorWidgetFactory);
+				if (PropertyWidget)
+				{
+					InspectorScrollBox->AddChild(PropertyWidget);
+					PropertyWidgets.Add(Elem.Key, PropertyWidget);
+					PropertyWidget->SetInspectorWidget(this);
+					PropertyWidget->SetPropertyValue(Elem.Key, Cast<UCreatorColorProperty>(Property));
+				}
+			}
+		}
 	}
 }
 

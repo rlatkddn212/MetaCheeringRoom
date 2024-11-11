@@ -222,11 +222,6 @@ void ASW_CreatorObject::OnChangeProperty(int32 id, UCreatorPropertyBase* Creator
 	
 }
 
-UCreatorPropertyBase* ASW_CreatorObject::GetProperty(int32 id)
-{
-	return nullptr;
-}
-
 void ASW_CreatorObject::DoDestroy()
 {
 	Destroy();
@@ -320,6 +315,18 @@ void ASW_CreatorObject::ChangeToolMode(ECreatorToolState state)
 		YScaleRectMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		ZScaleRectMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
+	}
+}
+
+void ASW_CreatorObject::AddProperty(int32 id, UCreatorPropertyBase* Property)
+{
+	if (PropertyMap.Contains(id))
+	{
+		PropertyMap[id] = Property;
+	}
+	else
+	{
+		PropertyMap.Add(id, Property);
 	}
 }
 

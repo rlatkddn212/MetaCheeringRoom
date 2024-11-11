@@ -44,13 +44,14 @@ void ASW_CreatorSkyLight::OnChangeProperty(int32 id, UCreatorPropertyBase* Creat
 	}
 }
 
-UCreatorPropertyBase* ASW_CreatorSkyLight::GetProperty(int32 id)
+TMap<int32, UCreatorPropertyBase*> ASW_CreatorSkyLight::GetPropertyMap()
 {
-	if (PropertyMap.Contains(id))
-	{
-		return PropertyMap[id];
-	}
-	return nullptr;
+	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>();
+	Property->PropertyName = TEXT("Color");
+	Property->Value = LightColor;
+	AddProperty(1, Property);
+
+	return PropertyMap;
 }
 
 void ASW_CreatorSkyLight::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
@@ -71,8 +72,6 @@ void ASW_CreatorSkyLight::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>&
 	LightColor.B = SetupJsonObject->GetNumberField(TEXT("ColorB"));
 	LightColor.A = SetupJsonObject->GetNumberField(TEXT("ColorA"));
 	
-	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>(); Property->Value = LightColor; PropertyMap.Add(1, Property);
-
 	if (LightComp)
 	{
 		LightComp->SetLightColor(LightColor);

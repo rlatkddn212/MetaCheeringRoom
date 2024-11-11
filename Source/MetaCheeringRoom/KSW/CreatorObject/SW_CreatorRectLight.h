@@ -18,7 +18,7 @@ public:
 	ASW_CreatorRectLight();
 
 	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);
-	virtual UCreatorPropertyBase* GetProperty(int32 id);
+	virtual TMap<int32, UCreatorPropertyBase*> GetPropertyMap() override;
 
 
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
@@ -28,4 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class URectLightComponent* LightComp;
 	FLinearColor LightColor;
+	float LightIntensity;
+	float LightAttenuationRadius;
+	float LightSourceWidth;
+	float LightSourceHeight;
+	bool CastShadow;
 };

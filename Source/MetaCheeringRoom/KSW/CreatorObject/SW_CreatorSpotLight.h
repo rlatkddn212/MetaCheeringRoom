@@ -18,7 +18,7 @@ public:
 	ASW_CreatorSpotLight();
 
 	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);
-	virtual UCreatorPropertyBase* GetProperty(int32 id);
+	virtual TMap<int32, UCreatorPropertyBase*> GetPropertyMap() override;
 
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;

@@ -32,9 +32,8 @@ public:
 	virtual void OnSelected(bool isSelected);
 
 	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);
-	virtual UCreatorPropertyBase* GetProperty(int32 id);
-
-	TMap<int32, UCreatorPropertyBase*> GetPropertyMap() { return PropertyMap; }
+	
+	virtual TMap<int32, UCreatorPropertyBase*> GetPropertyMap() { return PropertyMap; }
 
 	void DoDestroy();
 
@@ -105,8 +104,11 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* ZScaleRectMesh;
-	
+
+	UPROPERTY()
 	TMap<int32, UCreatorPropertyBase*> PropertyMap;
+
+	void AddProperty(int32 id, UCreatorPropertyBase* Property);
 
 	void SelectAxis(bool isX, bool isY, bool isZ);
 	void SelectRotationAxis(bool isX, bool isY, bool isZ);
