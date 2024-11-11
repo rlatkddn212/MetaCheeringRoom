@@ -63,7 +63,7 @@ void USW_CreatorInspectorWidget::OnColorChanged(FLinearColor Color)
 
 	if (CreatorObject)
 	{
-		CreatorObject->OnChangeColor(Color);
+		//CreatorObject->OnChangeProperty(Color);
 	}
 }
 
@@ -92,7 +92,10 @@ void USW_CreatorInspectorWidget::SetObject(ASW_CreatorObject* Obj)
 		ChangePosition.BindDynamic(Obj, &ASW_CreatorObject::OnChangePosition);
 		ChangeRotation.BindDynamic(Obj, &ASW_CreatorObject::OnChangeRotation);
 		ChangeScale.BindDynamic(Obj, &ASW_CreatorObject::OnChangeScale);
-		ColorImageButton->WidgetStyle.Normal.TintColor = FSlateColor(Obj->GetColor());
+		//ColorImageButton->WidgetStyle.Normal.TintColor = FSlateColor(Obj->GetProperty());
+
+		// 프로퍼티 UI 생성
+
 
 		OnChanged();
 	}

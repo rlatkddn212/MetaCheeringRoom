@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "KSW/SW_CreatorPlayerController.h"
+#include "../CreatorMapSubsystem.h"
 #include "SW_CreatorObject.generated.h"
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FChangeSelected, bool, isSelected);
@@ -30,8 +31,10 @@ public:
 
 	virtual void OnSelected(bool isSelected);
 
-	virtual void OnChangeColor(FLinearColor Color);
-	virtual FLinearColor GetColor();
+	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);
+	virtual UCreatorPropertyBase* GetProperty(int32 id);
+
+	TMap<int32, UCreatorPropertyBase*> GetPropertyMap() { return PropertyMap; }
 
 	void DoDestroy();
 
@@ -102,6 +105,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* ZScaleRectMesh;
+	
+	TMap<int32, UCreatorPropertyBase*> PropertyMap;
 
 	void SelectAxis(bool isX, bool isY, bool isZ);
 	void SelectRotationAxis(bool isX, bool isY, bool isZ);

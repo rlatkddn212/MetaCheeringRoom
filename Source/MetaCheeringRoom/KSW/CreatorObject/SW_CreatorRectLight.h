@@ -17,9 +17,9 @@ class METACHEERINGROOM_API ASW_CreatorRectLight : public ASW_CreatorLight
 public:
 	ASW_CreatorRectLight();
 
-	virtual void OnChangeColor(FLinearColor Color) override;
+	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);
+	virtual UCreatorPropertyBase* GetProperty(int32 id);
 
-	virtual FLinearColor GetColor() override;
 
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;

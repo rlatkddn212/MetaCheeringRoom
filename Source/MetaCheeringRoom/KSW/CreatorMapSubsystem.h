@@ -5,16 +5,71 @@
 #include "CoreMinimal.h"
 #include "Templates/SharedPointer.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "UObject/NoExportTypes.h"
 #include "CreatorMapSubsystem.generated.h"
 
 class ASW_CreatorObject;
+
+
+// 오브젝트 속성 데이터
+UCLASS()
+class UCreatorPropertyBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+	FString PropertyName;
+
+	// 생성자
+	UCreatorPropertyBase()
+	{
+		PropertyName = TEXT("DefaultProperty");
+	}
+};
+
+
+// 상속 bool Type
+UCLASS()
+class UCreatorBoolProperty : public UCreatorPropertyBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Value;
+
+	UCreatorBoolProperty(){}
+};
+
+// 상속 float Type
+UCLASS()
+class UCreatorFloatProperty : public UCreatorPropertyBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Value;
+
+	UCreatorFloatProperty(){}
+};
+
+// 상속 Color Type
+UCLASS()
+class UCreatorColorProperty : public UCreatorPropertyBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor Value;
+
+	UCreatorColorProperty(){}
+};
 
 //struct
 USTRUCT(BlueprintType)
 struct FCreatorMap
 {
 	GENERATED_BODY()
-
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString MapName;
 

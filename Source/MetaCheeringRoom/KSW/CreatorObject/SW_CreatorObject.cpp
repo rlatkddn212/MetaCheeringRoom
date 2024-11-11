@@ -217,15 +217,14 @@ void ASW_CreatorObject::OnSelected(bool isSelected)
 	OnChangeSelected.ExecuteIfBound(isSelected);
 }
 
-
-void ASW_CreatorObject::OnChangeColor(FLinearColor Color)
+void ASW_CreatorObject::OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty)
 {
 	
 }
 
-FLinearColor ASW_CreatorObject::GetColor()
+UCreatorPropertyBase* ASW_CreatorObject::GetProperty(int32 id)
 {
-	return FLinearColor(1, 1, 1, 1);
+	return nullptr;
 }
 
 void ASW_CreatorObject::DoDestroy()

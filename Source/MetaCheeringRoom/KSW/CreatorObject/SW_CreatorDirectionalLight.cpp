@@ -6,6 +6,7 @@
 #include "EngineUtils.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Components/LightComponent.h"
+#include "UObject/UObjectGlobals.h"
 
 ASW_CreatorDirectionalLight::ASW_CreatorDirectionalLight()
 {
@@ -30,15 +31,26 @@ void ASW_CreatorDirectionalLight::BeginPlay()
 	LightColor = LightComp->GetLightColor();
 }
 
-void ASW_CreatorDirectionalLight::OnChangeColor(FLinearColor Color)
+void ASW_CreatorDirectionalLight::OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty)
 {
-	LightColor = Color;
-	LightComp->SetLightColor(Color);
+	Super::OnChangeProperty(id, CreatorProperty);
+
+	if (id == 1)
+	{
+		//UCreatorColorProperty* ColorProperty = Cast<UCreatorColorProperty>(CreatorProperty);
+		UCreatorColorProperty* ColorProperty = Cast<UCreatorColorProperty>(CreatorProperty);
+		LightColor = ColorProperty->Value;
+		LightComp->SetLightColor(LightColor);
+	}
 }
 
-FLinearColor ASW_CreatorDirectionalLight::GetColor()
+UCreatorPropertyBase* ASW_CreatorDirectionalLight::GetProperty(int32 id)
 {
-	return LightColor;
+	if (PropertyMap.Contains(id))
+	{
+		return PropertyMap[id];
+	}
+	return nullptr;
 }
 
 void ASW_CreatorDirectionalLight::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
@@ -59,5 +71,8 @@ void ASW_CreatorDirectionalLight::SetupJsonAdditionalInfo(const TSharedPtr<FJson
 	LightColor.B = SetupJsonObject->GetNumberField(TEXT("ColorB"));
 	LightColor.A = SetupJsonObject->GetNumberField(TEXT("ColorA"));
 
-	OnChangeColor(LightColor);
+	//UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>(); Property->Value = LightColor; PropertyMap.Add(1, Property);
+	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>(); Property->Value = LightColor;	PropertyMap.Add(1, Property);
+
+	LightComp->SetLightColor(LightColor);
 }

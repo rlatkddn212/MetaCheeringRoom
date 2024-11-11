@@ -27,9 +27,8 @@ public:
 
 	virtual void OnSelected(bool isSelected) override;
 
-	virtual void OnChangeColor(FLinearColor Color) override;
-
-	virtual FLinearColor GetColor() override;
+	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);
+	virtual UCreatorPropertyBase* GetProperty(int32 id);
 
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;

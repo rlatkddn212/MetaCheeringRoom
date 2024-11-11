@@ -32,15 +32,25 @@ void ASW_CreatorSkyLight::BeginPlay()
 	}
 }
 
-void ASW_CreatorSkyLight::OnChangeColor(FLinearColor Color)
+void ASW_CreatorSkyLight::OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty)
 {
-	LightColor = Color;
-	LightComp->SetLightColor(Color);
+	Super::OnChangeProperty(id, CreatorProperty);
+
+	if (id == 1)
+	{
+		UCreatorColorProperty* ColorProperty = Cast<UCreatorColorProperty>(CreatorProperty);
+		LightColor = ColorProperty->Value;
+		LightComp->SetLightColor(LightColor);
+	}
 }
 
-FLinearColor ASW_CreatorSkyLight::GetColor()
+UCreatorPropertyBase* ASW_CreatorSkyLight::GetProperty(int32 id)
 {
-	return LightColor;
+	if (PropertyMap.Contains(id))
+	{
+		return PropertyMap[id];
+	}
+	return nullptr;
 }
 
 void ASW_CreatorSkyLight::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
@@ -60,6 +70,11 @@ void ASW_CreatorSkyLight::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>&
 	LightColor.G = SetupJsonObject->GetNumberField(TEXT("ColorG"));
 	LightColor.B = SetupJsonObject->GetNumberField(TEXT("ColorB"));
 	LightColor.A = SetupJsonObject->GetNumberField(TEXT("ColorA"));
+	
+	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>(); Property->Value = LightColor; PropertyMap.Add(1, Property);
 
-	OnChangeColor(LightColor);
+	if (LightComp)
+	{
+		LightComp->SetLightColor(LightColor);
+	}
 }

@@ -14,17 +14,25 @@ ASW_CreatorSpotLight::ASW_CreatorSpotLight()
 	LightColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
-void ASW_CreatorSpotLight::OnChangeColor(FLinearColor Color)
+void ASW_CreatorSpotLight::OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty)
 {
-	Super::OnChangeColor(Color);
+	Super::OnChangeProperty(id, CreatorProperty);
 
-	LightColor = Color;
-	LightComp->SetLightColor(Color);
+	if (id == 1)
+	{
+		UCreatorColorProperty* ColorProperty = Cast<UCreatorColorProperty>(CreatorProperty);
+		LightColor = ColorProperty->Value;
+		LightComp->SetLightColor(LightColor);
+	}
 }
 
-FLinearColor ASW_CreatorSpotLight::GetColor()
+UCreatorPropertyBase* ASW_CreatorSpotLight::GetProperty(int32 id)
 {
-	return LightComp->GetLightColor();
+	if (PropertyMap.Contains(id))
+	{
+		return PropertyMap[id];
+	}
+	return nullptr;
 }
 
 void ASW_CreatorSpotLight::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
@@ -44,4 +52,8 @@ void ASW_CreatorSpotLight::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>
 	LightColor.G = SetupJsonObject->GetNumberField(TEXT("ColorG"));
 	LightColor.B = SetupJsonObject->GetNumberField(TEXT("ColorB"));
 	LightColor.A = SetupJsonObject->GetNumberField(TEXT("ColorA"));
+
+	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>(); Property->Value = LightColor; PropertyMap.Add(1, Property);
+
+	LightComp->SetLightColor(LightColor);
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "KSW/CreatorObject/SW_CreatorLight.h"
+#include "../CreatorMapSubsystem.h"
 #include "SW_CreatorDirectionalLight.generated.h"
 
 /**
@@ -19,9 +20,8 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual void OnChangeColor(FLinearColor Color) override;
-
-	virtual FLinearColor GetColor() override;
+	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);
+	virtual UCreatorPropertyBase* GetProperty(int32 id);
 
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;

@@ -47,20 +47,40 @@ void ASW_CreatorStaticObject::OnSelected(bool isSelected)
 	}
 }
 
-void ASW_CreatorStaticObject::OnChangeColor(FLinearColor Color)
+void ASW_CreatorStaticObject::OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty)
 {
-	Super::OnChangeColor(Color);
+	Super::OnChangeProperty(id, CreatorProperty);
 
-	MeshColor = Color;
-	if (Mat)
+	if (id == 1)
 	{
-		Mat->SetVectorParameterValue("Color", Color);
+		UCreatorColorProperty* ColorProperty = Cast<UCreatorColorProperty>(CreatorProperty);
+		MeshColor = ColorProperty->Value;
+		if (Mat)
+		{
+			Mat->SetVectorParameterValue("Color", MeshColor);
+		}
 	}
+
 }
 
-FLinearColor ASW_CreatorStaticObject::GetColor()
+UCreatorPropertyBase* ASW_CreatorStaticObject::GetProperty(int32 id)
 {
-	return MeshColor;
+	if (id == 1)
+	{
+		if (PropertyMap.Contains(id))
+		{
+			return PropertyMap[id];
+		}
+		else
+		{
+			UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>();
+			Property->Value = MeshColor;
+			PropertyMap.Add(1, Property);
+			return Property;
+		}
+	}
+
+	return nullptr;
 }
 
 void ASW_CreatorStaticObject::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
@@ -81,5 +101,12 @@ void ASW_CreatorStaticObject::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObje
 	MeshColor.B = SetupJsonObject->GetNumberField(TEXT("ColorB"));
 	MeshColor.A = SetupJsonObject->GetNumberField(TEXT("ColorA"));
 
-	OnChangeColor(MeshColor);
+	if (Mat)
+	{
+		Mat->SetVectorParameterValue("Color", MeshColor);
+	}
+
+	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>();
+	Property->Value = MeshColor;
+	PropertyMap.Add(1, Property);
 }
