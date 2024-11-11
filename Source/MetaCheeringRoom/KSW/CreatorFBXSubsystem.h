@@ -60,6 +60,8 @@ public:
 	UFUNCTION()
 	void OnCompleteLoadFBX(const FString& FilePath, AActor* ImportedActor);
 
+	void QueueLoadFBX();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FString, FCreatorFBXMetaData> MetaDataMap;
 

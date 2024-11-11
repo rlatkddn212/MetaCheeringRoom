@@ -148,6 +148,9 @@ class AsyncDataStatic
         , const TArray<UMaterialInterface*>& sectionsMat
     , TEnumAsByte<enum CalculateCollisionMethod> calCollision)
     {
+        static FCriticalSection StaticMeshTasksLock;
+        StaticMeshTasksLock.Lock();
+
         FMeshDescription MeshDescription = MeshDescriptionOrg;
         // If we got some valid data.
         if (MeshDescription.Polygons().Num() > 0)
@@ -220,6 +223,8 @@ class AsyncDataStatic
             //MeshCmp->BodyInstance.UpdateTriMeshVertices(vertexsAll);
             //MeshCmp->UpdateCollisionFromStaticMesh();
         }
+
+        StaticMeshTasksLock.Unlock();
     }
     FGraphEventRef CreateStaticMeshFromDescription(UStaticMeshComponent* MeshCmp,const FMeshDescription& MeshDescriptionOrg
     , const TArray<UMaterialInterface*>& sectionsMat)
@@ -242,6 +247,8 @@ class AsyncDataStatic
 
     AActor* createAMesh(MeshIO::InterMesh* mesh)
     {
+        static FCriticalSection AllParseTasksLock;
+        AllParseTasksLock.Lock();
         AActor* actor = GameThreadCreateActor(mesh);
         if (!actor)return nullptr;
         //actor->Rename(UTF8_TO_TCHAR(mesh->strNode));
@@ -272,9 +279,10 @@ class AsyncDataStatic
                         child->AttachToActor(actor, FAttachmentTransformRules::KeepWorldTransform);
                     }
                 }, TStatId(), NULL, ENamedThreads::GameThread);
-
+            
             _AllParseTasks.Add(AttachTask);
         }
+        AllParseTasksLock.Unlock();
         return actor;
     }
 
@@ -343,6 +351,8 @@ public:
 
     void FileLoadedAsync()
     {
+        static FCriticalSection ReadFileTaskLock;
+        ReadFileTaskLock.Lock();
         FbxIOSetting ios;
         ios.ConvertToAxis = 2;//转为右手Z向上，下面Mesh顶点和uv反转，参照了UnFbx::FFbxImporter::BuildStaticMeshFromGeometry
         ios.ConvertToUnit = 2;
@@ -358,6 +368,7 @@ public:
         _numMeshAll = fulldata->mats.numMeshAll;
         if (_numMeshAll == 0)
             _numMeshAll = 1;
+
 
         TArray<AActor*> meshActors;
         createFileActor(meshActors, meshs,true);
@@ -400,25 +411,26 @@ public:
             }
             
         }
-        if (_fprogress)
-        {
-            if (!IsInGameThread())
-            {
-                FGraphEventRef FinishTask = FFunctionGraphTask::CreateAndDispatchWhenReady([this]()
-                    {
-                        _fprogress->CalFinish(_rootActor.Get());
-                    }, TStatId(), NULL, ENamedThreads::GameThread);
-                FTaskGraphInterface::Get().WaitUntilTaskCompletes(FinishTask);
-            }
-            else
-            {
-                _fprogress->CalFinish(_rootActor.Get());
-            }
-            _fprogress->RemoveFromRoot();
-        }
+		if (_fprogress)
+		{
+			if (!IsInGameThread())
+			{
+				FGraphEventRef FinishTask = FFunctionGraphTask::CreateAndDispatchWhenReady([this]()
+					{
+						_fprogress->CalFinish(_rootActor.Get());
+					}, TStatId(), NULL, ENamedThreads::GameThread);
+				FTaskGraphInterface::Get().WaitUntilTaskCompletes(FinishTask);
+			}
+			else
+			{
+				_fprogress->CalFinish(_rootActor.Get());
+			}
+			_fprogress->RemoveFromRoot();
+		}
 
         //_rootActor->GetRootComponent()->SetMobility(EComponentMobility::Type::Static);
 
+        ReadFileTaskLock.Unlock();
     }
     static AActor* CreateActor(TWeakObjectPtr<UWorld> world,bool bCreateRoot = false, TSubclassOf<AActor> actorClass = nullptr)
     {

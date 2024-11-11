@@ -63,7 +63,7 @@ AActor* UCreatorFBXSubsystem::LoadFBX(FString FileName, URLFProgress* Progress)
 	if (!bIsLoading)
 	{
 		bIsLoading = true;
-		AActor* actor = UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(FilePath, Progress);
+		AActor* actor = UFileIOBlueprintFunctionLibrary::LoadFileAsync2ProceduralMeshActor(FilePath, Progress);
 		return actor;
 	}
 	else
@@ -291,6 +291,13 @@ FCreatorFBXMetaData UCreatorFBXSubsystem::GetMetaData(FString FileName)
 void UCreatorFBXSubsystem::OnCompleteLoadFBX(const FString& FilePath, AActor* ImportedActor)
 {
 	UE_LOG(LogTemp, Log, TEXT("OnCompleteLoadFBX: %s"), *FilePath);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UCreatorFBXSubsystem::QueueLoadFBX, 0.3f, false);
+}
+
+void UCreatorFBXSubsystem::QueueLoadFBX()
+{
 	// 큐가 남아있다면
 	if (!LoadQueue.IsEmpty())
 	{
@@ -298,7 +305,7 @@ void UCreatorFBXSubsystem::OnCompleteLoadFBX(const FString& FilePath, AActor* Im
 		TPair<FString, URLFProgress*> Pair;
 		LoadQueue.Dequeue(Pair);
 
-		UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(Pair.Key, Pair.Value);
+		UFileIOBlueprintFunctionLibrary::LoadFileAsync2ProceduralMeshActor(Pair.Key, Pair.Value);
 	}
 	else
 	{

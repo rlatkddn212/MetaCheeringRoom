@@ -7,6 +7,8 @@
 #include "RLFProgress.h"
 #include "../UI/SW_FBXLoadProgressWidget.h"
 #include "Components/WidgetComponent.h"
+#include "FileIOBlueprintFunctionLibrary.h"
+#include "../../../../Plugins/Runtime/ProceduralMeshComponent/Source/ProceduralMeshComponent/Public/ProceduralMeshComponent.h"
 
 ASW_CreatorFBX::ASW_CreatorFBX()
 {
@@ -22,8 +24,7 @@ ASW_CreatorFBX::ASW_CreatorFBX()
 void ASW_CreatorFBX::BeginPlay()
 {
  	Super::BeginPlay();
-
-	ProgressTracker = NewObject<URLFProgress>();
+	ProgressTracker = UFileIOBlueprintFunctionLibrary::CreateProgress();
 	ProgressTracker->progressCal.AddDynamic(this, &ThisClass::HandleProgress);
 	ProgressTracker->finishCal.AddDynamic(this, &ThisClass::HandleFinish);
 
@@ -43,6 +44,11 @@ void ASW_CreatorFBX::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	// 타이머핸들 제거
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+
+	ProgressValue = 0.0f;
+
+	isFileLoaded = false;
+	isComplete = false;
 }
 
 void ASW_CreatorFBX::Tick(float DeltaTime)
@@ -55,6 +61,30 @@ void ASW_CreatorFBX::Tick(float DeltaTime)
 		FVector Dir = Target - LoadProgressWidgetComponent->GetComponentLocation();
 		FRotator Rot = Dir.ToOrientationRotator();
 		LoadProgressWidgetComponent->SetWorldRotation(Rot);
+	}
+
+	if (!isFileLoaded)
+	{
+		// 위젯에 진행률을 표시한다.
+		if (LoadProgressWidget)
+		{
+			LoadProgressWidget->SetBar(ProgressValue);
+		}
+	}
+
+	if (!isComplete && isFileLoaded)
+	{
+		// 빈 메쉬로 만든다.
+		Mesh->SetStaticMesh(nullptr);
+
+		// 위젯을 완전히 제거
+		if (LoadProgressWidget)
+		{
+			//LoadProgressWidget->RemoveFromParent();
+			LoadProgressWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+
+		isComplete = true;
 	}
 
 	// 자식을 0,0,0으로 이동
@@ -81,9 +111,9 @@ void ASW_CreatorFBX::OnSelected(bool isSelected)
 
 void ASW_CreatorFBX::SelectChildActor(AActor* actor, bool isSelected)
 {
-	if (actor->GetRootComponent()->IsA(UStaticMeshComponent::StaticClass()))
+	if (actor->GetRootComponent()->IsA(UProceduralMeshComponent::StaticClass()))
 	{
-		UStaticMeshComponent* comp = Cast<UStaticMeshComponent>(actor->GetRootComponent());
+		UProceduralMeshComponent* comp = Cast<UProceduralMeshComponent>(actor->GetRootComponent());
 		comp->SetRenderCustomDepth(isSelected);
 	}
 
@@ -178,31 +208,19 @@ void ASW_CreatorFBX::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& Out
 void ASW_CreatorFBX::HandleProgress(const FString& FilePath, float Progress)
 {
 	UE_LOG(LogTemp, Log, TEXT("File %s is %.2f%% loaded."), *FilePath, Progress * 100);
-	// 위젯에 진행률을 표시한다.
-	if (LoadProgressWidget)
-	{
-		LoadProgressWidget->SetBar(Progress);
-	}
+
+	ProgressValue = Progress;
 }
 
 void ASW_CreatorFBX::HandleFinish(const FString& FilePath, AActor* ImportedActor)
 {
 	UE_LOG(LogTemp, Log, TEXT("File %s is loaded."), *FilePath);
+	isFileLoaded = true;
 	// 액터 위치를 CreatorFBX의 위치로 설정한다.
 	if (ImportedActor)
 	{
 		// Attach
 		ImportedActor->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 		ImportedActor->SetActorLocation(GetActorLocation());
-
-		// 빈 메쉬로 만든다.
-		Mesh->SetStaticMesh(nullptr);
-
-		// 위젯을 완전히 제거
-		if (LoadProgressWidget)
-		{
-			//LoadProgressWidget->RemoveFromParent();
-			LoadProgressWidget->SetVisibility(ESlateVisibility::Hidden);
-		}
 	}
 }

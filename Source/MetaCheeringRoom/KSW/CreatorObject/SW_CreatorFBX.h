@@ -64,4 +64,8 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* Mesh;
+
+	float ProgressValue;
+	bool isFileLoaded;
+	bool isComplete;
 };
