@@ -29,6 +29,7 @@ void ASW_CreatorFBX::BeginPlay()
 
 	// 위젯을 생성한다.
 	LoadProgressWidget = Cast<USW_FBXLoadProgressWidget>(LoadProgressWidgetComponent->GetUserWidgetObject());
+	LoadProgressWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	if (LoadProgressWidget)
 	{
 		LoadProgressWidget->SetVisibility(ESlateVisibility::Visible);
@@ -194,11 +195,13 @@ void ASW_CreatorFBX::HandleFinish(const FString& FilePath, AActor* ImportedActor
 		ImportedActor->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 		ImportedActor->SetActorLocation(GetActorLocation());
 
-		// 메쉬를 숨긴다.
-		Mesh->SetVisibility(false);
-		// 위젯을 숨긴다.
+		// 빈 메쉬로 만든다.
+		Mesh->SetStaticMesh(nullptr);
+
+		// 위젯을 완전히 제거
 		if (LoadProgressWidget)
 		{
+			//LoadProgressWidget->RemoveFromParent();
 			LoadProgressWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}

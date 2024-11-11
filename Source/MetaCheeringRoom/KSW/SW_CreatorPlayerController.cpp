@@ -295,6 +295,7 @@ bool ASW_CreatorPlayerController::DeleteDummyObject()
 		{
 			UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 			system->AddObject(CreatingObject);
+			CreatingObject->SetFileName(CreatingObject->CreatingObjectData->ItemName);
 			ReloadHierarchy();
 			OnObjectChanged();
 			DoSelectObject(CreatingObject);

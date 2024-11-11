@@ -169,6 +169,13 @@ void UCreatorFBXSubsystem::FileDownloadFromFirebase(const FString& SavePath, con
 		{
 			if (bWasSuccessful)
 			{
+				// 응답 코드 확인
+				if (Response->GetResponseCode() != 200)
+				{
+					UE_LOG(LogTemp, Error, TEXT("Failed to download file: %d"), Response->GetResponseCode());
+					return;
+				}
+
 				if (FFileHelper::SaveArrayToFile(Response->GetContent(), *FilePath))
 				{
 					UE_LOG(LogTemp, Log, TEXT("File downloaded successfully"));
