@@ -17,7 +17,7 @@ class METACHEERINGROOM_API UJS_HostSlotWidget : public USW_CreateCreatorSlotWidg
 public:
 	virtual void NativeConstruct() override;
 
-	void SetupInfo(struct FCreatorMapMetaData* metaData, class UJS_SessionJoinWidget* parent, int32 idx);
+	void SetupInfo(struct FCreatorMapMetaData* metaData, class UJS_CreateRoomWidget* parent, int32 idx);
 
 	UFUNCTION()
 	void OnClickHostBtn();
@@ -25,7 +25,7 @@ public:
 public:
 	
 	UPROPERTY()
-	UJS_SessionJoinWidget* SParent;
+	class UJS_CreateRoomWidget* SParent;
 
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_HostMap;

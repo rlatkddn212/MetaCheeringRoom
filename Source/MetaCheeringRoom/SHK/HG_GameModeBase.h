@@ -27,5 +27,9 @@ public:
 	TSubclassOf<class USW_CreateCreatorWidget> CreateCreatorWidgetFactory;
 	UPROPERTY()
 	class USW_CreateCreatorWidget* CreateCreatorWidget;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UJS_CreateRoomWidget> CreateRoomWidgetFactory;
+	UPROPERTY()
+	class UJS_CreateRoomWidget* CreateRoomWidget;
 
 };
