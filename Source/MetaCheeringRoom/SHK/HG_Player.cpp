@@ -21,6 +21,7 @@
 #include "HG_StoreWidget.h"
 #include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "HG_RemoteCS.h"
 
 AHG_Player::AHG_Player()
 {
@@ -76,16 +77,17 @@ void AHG_Player::BeginPlay()
 
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 
-	auto* pc = Cast<APlayerController>(Controller);
-	if (pc)
+	PC = Cast<APlayerController>(Controller);
+
+	if (PC)
 	{
-		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
 		if (subSys)
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
-		pc->SetShowMouseCursor(false);
-		pc->SetInputMode(FInputModeGameOnly());
+		PC->SetShowMouseCursor(false);
+		PC->SetInputMode(FInputModeGameOnly());
 	}
 	InitEquipItemList = GI->EquipItemInfoList;
 	for (auto ID : InitEquipItemList)
@@ -271,21 +273,20 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 			InventoryWidget->SetOwner(this);
 		}
 	}
-	auto* pc = Cast<APlayerController>(Controller);
-	if (pc)
+	if (PC)
 	{
 		if (!bToggle)
 		{
 			InventoryWidget->AddToViewport();
 			InventoryWidget->InitInventoryUI();
-			pc->SetShowMouseCursor(true);
+			PC->SetShowMouseCursor(true);
 			bToggle = !bToggle;
 			bCanMove = false;
 		}
 		else
 		{
 			InventoryWidget->RemoveFromParent();
-			pc->SetShowMouseCursor(false);
+			PC->SetShowMouseCursor(false);
 			bToggle = !bToggle;
 			bCanMove = true;
 		}
@@ -296,9 +297,20 @@ void AHG_Player::Emotion()
 {
 // 	FItemData Temp = GI->FindItemData("SadBee");
 // 	InventoryComp->AddtoInventory(Temp,1);
-	if (GI->AnimInstance)
+	if(bEquipItem)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("1234"));
+		auto RCSWidget = CreateWidget<UHG_RemoteCS>(GetWorld(), RCSClass);
+		if (RCSWidget)
+		{
+			RCSWidget->AddToViewport();
+			RCSWidget->SetOnwer(this);
+			if (PC)
+			{
+				PC->SetShowMouseCursor(true);
+				FInputModeUIOnly InputMode;
+				PC->SetInputMode(InputMode);
+			}
+		}
 	}
 }
 
@@ -309,22 +321,21 @@ void AHG_Player::PopUpPurchaseWidget()
 		PurchaseWidget = CreateWidget<UHG_ItemPurchaseWidget>(GetWorld(), PurchaseWidgetClass);
 		PurchaseWidget->SetOwner(this);
 	}
-	auto* pc = Cast<APlayerController>(Controller);
-	if (pc)
+	if (PC)
 	{
 		PurchaseWidget->SetItemInfo(TempData);
 		if (!bToggle)
 		{
 			PurchaseWidget->AddToViewport();
 			bCanMove = false;
-			pc->SetShowMouseCursor(true);
+			PC->SetShowMouseCursor(true);
 			bToggle = !bToggle;
 		}
 		else
 		{
 			PurchaseWidget->RemoveFromParent();
 			bCanMove = true;
-			pc->SetShowMouseCursor(false);
+			PC->SetShowMouseCursor(false);
 			bToggle = !bToggle;
 		}
 	}
@@ -340,7 +351,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 	check(mesh);
 	if (mesh)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Attach"));
+		bEquipItem = true;
 		mesh->SetSimulatePhysics(false);
 		switch (ItemValue->GetItemCategory())
 		{
@@ -363,6 +374,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 			else
 			{
 				mesh->AttachToComponent(HandLComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+				ItemValue->Equiped(this);
 				bPassed = false;
 			}
 			break;
@@ -376,6 +388,8 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 void AHG_Player::UnequipItem(const FString& NameValue)
 {
 	TArray<AHG_EquipItem*> ItemsToRemove;
+
+	bEquipItem = false;
 
 	for (AHG_EquipItem* item : EquipItemList)
 	{

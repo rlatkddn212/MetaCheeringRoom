@@ -210,4 +210,8 @@ public:
 
 	float Timing = 1.0f;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UHG_RemoteCS> RCSClass;
+
+	class APlayerController* PC;
 };
