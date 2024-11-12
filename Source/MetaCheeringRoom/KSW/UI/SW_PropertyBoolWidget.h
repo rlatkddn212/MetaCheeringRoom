@@ -15,6 +15,11 @@ class METACHEERINGROOM_API USW_PropertyBoolWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UCheckBox* bCheckBox;
+
+	UFUNCTION()
+	void OnCheckChanged(bool bIsChecked);
 
 	// Bind
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))

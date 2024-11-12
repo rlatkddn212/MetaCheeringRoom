@@ -13,6 +13,7 @@
 #include "SW_PropertyFloatWidget.h"
 #include "SW_PropertyBoolWidget.h"
 #include "SW_PropertyColorWidget.h"
+#include "SW_PropertyEnumWidget.h"
 
 void USW_CreatorInspectorWidget::NativeConstruct()
 {
@@ -139,6 +140,17 @@ void USW_CreatorInspectorWidget::SetObject(ASW_CreatorObject* Obj)
 					PropertyWidgets.Add(Elem.Key, PropertyWidget);
 					PropertyWidget->SetInspectorWidget(this);
 					PropertyWidget->SetPropertyValue(Elem.Key, Cast<UCreatorColorProperty>(Property));
+				}
+			}
+			else if (Property->IsA<UCreatorEnumProperty>())
+			{
+				USW_PropertyEnumWidget* PropertyWidget = CreateWidget<USW_PropertyEnumWidget>(this, PropertyEnumWidgetFactory);
+				if (PropertyWidget)
+				{
+					InspectorScrollBox->AddChild(PropertyWidget);
+					PropertyWidgets.Add(Elem.Key, PropertyWidget);
+					PropertyWidget->SetInspectorWidget(this);
+					PropertyWidget->SetPropertyValue(Elem.Key, Cast<UCreatorEnumProperty>(Property));
 				}
 			}
 		}

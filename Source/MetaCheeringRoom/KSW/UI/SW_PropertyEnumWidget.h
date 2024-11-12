@@ -4,15 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "SW_PropertyFloatWidget.generated.h"
+#include "SW_PropertyEnumWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class METACHEERINGROOM_API USW_PropertyFloatWidget : public UUserWidget
+class METACHEERINGROOM_API USW_PropertyEnumWidget : public UUserWidget
 {
 	GENERATED_BODY()
+	
 public:
 	virtual void NativeConstruct() override;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -26,15 +27,15 @@ public:
 	class UTextBlock* NameText;
 	
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	class UEditableText* ValueText;
+	class UComboBoxString* ComboValueString;
 
 	int32 PropertyId;
-	class UCreatorFloatProperty* FloatProperty;
+	class UCreatorEnumProperty* EnumProperty;
 
-	void SetPropertyValue(int32 id, class UCreatorFloatProperty* Property);
+	void SetPropertyValue(int32 id, class UCreatorEnumProperty* Property);
 	
 	UFUNCTION()
-	void OnFloatChanged(const FText& Text, ETextCommit::Type CommitMethod);
+	void OnEnumChanged(FString SelectedItem, ESelectInfo::Type SelectionTyp);
 
 	void SetInspectorWidget(class USW_CreatorInspectorWidget* InInspectorWidget) { InspectorWidget = InInspectorWidget; }
 

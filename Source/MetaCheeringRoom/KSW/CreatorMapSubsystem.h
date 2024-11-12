@@ -17,16 +17,24 @@ class UCreatorPropertyBase : public UObject
 {
 	GENERATED_BODY()
 public:
+	
+	UPROPERTY()
+	bool bCheckBox;
+
+	UPROPERTY()
+	bool bUse;
+
 	UPROPERTY()
 	FString PropertyName;
 
 	// 积己磊
 	UCreatorPropertyBase()
 	{
+		bCheckBox = false;
+		bUse = false;
 		PropertyName = TEXT("DefaultProperty");
 	}
 };
-
 
 // 惑加 bool Type
 UCLASS()
@@ -62,6 +70,21 @@ public:
 	FLinearColor Value;
 
 	UCreatorColorProperty(){}
+};
+
+// 惑加 Enum Type
+UCLASS()
+class UCreatorEnumProperty : public UCreatorPropertyBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Value;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FString> EnumValues;
+
+	UCreatorEnumProperty(){}
 };
 
 //struct

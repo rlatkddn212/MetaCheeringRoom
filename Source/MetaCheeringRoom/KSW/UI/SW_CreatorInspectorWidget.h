@@ -127,6 +127,8 @@ public:
 	TSubclassOf<class USW_PropertyBoolWidget> PropertyBoolWidgetFactory;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class USW_PropertyColorWidget> PropertyColorWidgetFactory;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class USW_PropertyEnumWidget> PropertyEnumWidgetFactory;
 
 	TMap<int32, class UUserWidget*> PropertyWidgets;
 };

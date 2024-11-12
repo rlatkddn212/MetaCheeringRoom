@@ -3,6 +3,14 @@
 
 #include "KSW/CreatorStorageSubsystem.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "IImageWrapperModule.h"
+#include "IImageWrapper.h"
+#include "IImageWrapperModule.h"
+#include "Misc/FileHelper.h"
+#include "Engine/Texture2D.h"
+#include "Engine/Texture.h"
+#include "Templates/SharedPointer.h"
+#include "../Util/UtilBlueprintFunctionLibrary.h"
 
 UCreatorStorageSubsystem::UCreatorStorageSubsystem()
 {
@@ -97,24 +105,25 @@ bool UCreatorStorageSubsystem::SaveCreatorMap(FString JsonStr, FString MapName)
 		UE_LOG(LogTemp, Error, TEXT("Failed to save CreatorMap to %s"), *FilePath);
 		return false;
 	}
+	FString ThumbnailFilename = MapName + "_" + FGuid::NewGuid().ToString();
+	UUtilBlueprintFunctionLibrary::CaptureScreenshot(ThumbnailFilename, L"");
+	if (FFileHelper::SaveStringToFile(JsonStr, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("CreatorMap saved to %s"), *FilePath);
 
-	 if (FFileHelper::SaveStringToFile(JsonStr, *FilePath))
-	 {
-		 UE_LOG(LogTemp, Log, TEXT("CreatorMap saved to %s"), *FilePath);
+		FCreatorMapMetaData* metaData = new FCreatorMapMetaData();
+		metaData->CreatorMapName = MapName;
+		metaData->FileName = FileName;
+		metaData->ThumbnailFileName = ThumbnailFilename;
+		metaData->CreatedTime = FDateTime::Now();
+		AddMetaData(metaData);
 
-		 FCreatorMapMetaData* metaData = new FCreatorMapMetaData();
-		 metaData->CreatorMapName = MapName;
-		 metaData->FileName = FileName;
-		 metaData->ThumbnailFileName = "ThumbnailFileName";
-		 metaData->CreatedTime = FDateTime::Now();
-		 AddMetaData(metaData);
+		return true;
+	}
 
-		 return true;
-	 }
+	UE_LOG(LogTemp, Error, TEXT("Failed to save CreatorMap to %s"), *FilePath);
 
-	 UE_LOG(LogTemp, Error, TEXT("Failed to save CreatorMap to %s"), *FilePath);
-
-	 return false;
+	return false;
 }
 
 void UCreatorStorageSubsystem::LoadMetaData()
@@ -198,3 +207,4 @@ void UCreatorStorageSubsystem::RemoveMetaData(int32 idx)
 	CreatorMapMetaDatas.RemoveAt(idx);
 	SaveMetaData();
 }
+

@@ -33,11 +33,18 @@ void ASW_CreatorSpotLight::OnChangeProperty(int32 id, UCreatorPropertyBase* Crea
 
 	if (id == 3)
 	{
+		UCreatorFloatProperty* AttenuationRadiusProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
+		LightComp->SetAttenuationRadius(AttenuationRadiusProperty->Value);
+	
+	}
+
+	if (id == 4)
+	{
 		UCreatorFloatProperty* OuterConeAngleProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
 		LightComp->SetOuterConeAngle(OuterConeAngleProperty->Value);
 	}
 
-	if (id == 4)
+	if (id == 5)
 	{
 		UCreatorFloatProperty* InnerConeAngleProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
 		LightComp->SetInnerConeAngle(InnerConeAngleProperty->Value);
@@ -57,14 +64,19 @@ TMap<int32, UCreatorPropertyBase*> ASW_CreatorSpotLight::GetPropertyMap()
 	AddProperty(2, Property2);
 
 	UCreatorFloatProperty* Property3 = NewObject<UCreatorFloatProperty>();
-	Property3->PropertyName = TEXT("OuterConeAngle");
-	Property3->Value = LightComp->OuterConeAngle;
+	Property3->PropertyName = TEXT("AttenuationRadius");
+	Property3->Value = LightComp->AttenuationRadius;
 	AddProperty(3, Property3);
 
 	UCreatorFloatProperty* Property4 = NewObject<UCreatorFloatProperty>();
-	Property4->PropertyName = TEXT("InnerConeAngle");
-	Property4->Value = LightComp->InnerConeAngle;
+	Property4->PropertyName = TEXT("OuterConeAngle");
+	Property4->Value = LightComp->OuterConeAngle;
 	AddProperty(4, Property4);
+
+	UCreatorFloatProperty* Property5 = NewObject<UCreatorFloatProperty>();
+	Property5->PropertyName = TEXT("InnerConeAngle");
+	Property5->Value = LightComp->InnerConeAngle;
+	AddProperty(5, Property5);
 
 	return PropertyMap;
 }
@@ -78,6 +90,7 @@ void ASW_CreatorSpotLight::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& Rec
 	RecordJsonObject->SetNumberField(TEXT("ColorA"), LightColor.A);
 
 	RecordJsonObject->SetNumberField(TEXT("Intensity"), LightComp->Intensity);
+	RecordJsonObject->SetNumberField(TEXT("AttenuationRadius"), LightComp->AttenuationRadius);
 	RecordJsonObject->SetNumberField(TEXT("OuterConeAngle"), LightComp->OuterConeAngle);
 	RecordJsonObject->SetNumberField(TEXT("InnerConeAngle"), LightComp->InnerConeAngle);
 }
@@ -95,6 +108,9 @@ void ASW_CreatorSpotLight::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>
 
 	LightIntensity = SetupJsonObject->GetNumberField(TEXT("Intensity"));
 	LightComp->SetIntensity(LightIntensity);
+
+	LightAttenuationRadius = SetupJsonObject->GetNumberField(TEXT("AttenuationRadius"));
+	LightComp->SetAttenuationRadius(LightAttenuationRadius);
 
 	LightOuterConeAngle = SetupJsonObject->GetNumberField(TEXT("OuterConeAngle"));
 	LightComp->SetOuterConeAngle(LightOuterConeAngle);

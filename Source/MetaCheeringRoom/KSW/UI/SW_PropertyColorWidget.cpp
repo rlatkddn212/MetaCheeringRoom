@@ -7,17 +7,44 @@
 #include "SW_CreatorInspectorWidget.h"
 #include "../CreatorMapSubsystem.h"
 #include "../CreatorObject/SW_CreatorObject.h"
+#include "Components/CheckBox.h"
 
 void USW_PropertyColorWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	ColorImageButton->OnClicked.AddDynamic(this, &USW_PropertyColorWidget::OnColorButtonClicked);
+	bCheckBox->OnCheckStateChanged.AddDynamic(this, &USW_PropertyColorWidget::OnCheckChanged);
+}
+
+void USW_PropertyColorWidget::OnCheckChanged(bool bIsChecked)
+{
+	if (InspectorWidget)
+	{
+		if (ColorProperty)
+		{
+			ColorProperty->bUse = bIsChecked;
+			ColorImageButton->SetIsEnabled(ColorProperty->bUse);
+			InspectorWidget->CreatorObject->OnChangeProperty(PropertyId, ColorProperty);
+		}
+	}
 }
 
 void USW_PropertyColorWidget::SetPropertyValue(int32 id, class UCreatorColorProperty* Property)
 {
 	PropertyId = id;
 	ColorProperty = Property;
+	// ÇöÀç°ª Property->Value;
+	if (Property->bCheckBox)
+	{
+		bCheckBox->SetVisibility(ESlateVisibility::Visible);
+		bCheckBox->SetCheckedState(Property->bUse ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+		ColorImageButton->SetIsEnabled(Property->bUse);
+	}
+	else
+	{
+		bCheckBox->SetVisibility(ESlateVisibility::Hidden);
+	}
+
 	NameText->SetText(FText::FromString(ColorProperty->PropertyName));
 	ColorImageButton->WidgetStyle.Normal.TintColor = FSlateColor(ColorProperty->Value);
 }
