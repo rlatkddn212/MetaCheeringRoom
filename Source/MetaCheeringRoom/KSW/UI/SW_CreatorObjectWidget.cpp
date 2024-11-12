@@ -15,6 +15,7 @@
 #include "../CreatorMapSubsystem.h"
 #include "../CreatorFBXSubsystem.h"
 #include "../CreatorObject/SW_CreatorFBX.h"
+#include "Components/TextBlock.h"
 
 void USW_CreatorObjectWidget::NativeConstruct()
 {
@@ -60,23 +61,7 @@ void USW_CreatorObjectWidget::NativeConstruct()
 		}
 	}
 
-	{
-		TMap<int32, FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects(5);
-		if (CreatorObjects.Contains(1))
-		{
-			FCreatorObjectData* CreatorObject = CreatorObjects[1];
-			UCreatorFBXSubsystem* CreatorFBXSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
-			TMap<FString, FCreatorFBXMetaData> DataMap = CreatorFBXSubsystem->LoadMetaData();
-
-			for (auto& FBXData : DataMap)
-			{
-				USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
-				CreatorObject->ItemName = FBXData.Value.FileName;
-				ChildWidget->SetObject(CreatorObject);
-				FBXObjectScrollBox->AddChild(ChildWidget);
-			}
-		}
-	}
+	FBXScrollReload();
 
 	// 버튼 클릭처리
 	ShapeObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnShapeObjectButtonClicked);
@@ -88,6 +73,47 @@ void USW_CreatorObjectWidget::NativeConstruct()
 	ImportButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnImportButtonClicked);
 
 	SetCreatorObjectTabState(ECreatorObjectTabState::ShapeObject);
+}
+
+void USW_CreatorObjectWidget::FBXScrollReload()
+{
+	// 비운다.
+	FBXObjectScrollBox->ClearChildren();
+
+	UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+
+	{
+		TMap<int32, FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects(5);
+		if (CreatorObjects.Contains(1))
+		{
+			UCreatorFBXSubsystem* CreatorFBXSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
+			TMap<FString, FCreatorFBXMetaData> DataMap = CreatorFBXSubsystem->LoadMetaData();
+
+			if (DataMap.Num() == 0)
+			{
+				VoidText->SetVisibility(ESlateVisibility::Visible);
+			}
+			else
+			{
+				// VoidText 부모 해제
+				VoidText->RemoveFromParent();
+				for (auto& FBXData : DataMap)
+				{
+					FCreatorObjectData* CreatorObject = new FCreatorObjectData();
+					CreatorObject->CObjectId = CreatorObjects[1]->CObjectId;
+					CreatorObject->CObjectType = CreatorObjects[1]->CObjectType;
+					CreatorObject->ItemClass = CreatorObjects[1]->ItemClass;
+					CreatorObject->ItemIcon = CreatorObjects[1]->ItemIcon;
+
+					USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
+					CreatorObject->ItemName = FBXData.Value.FileName;
+					ChildWidget->SetObject(CreatorObject);
+					FBXObjectScrollBox->AddChild(ChildWidget);
+				}
+			}
+
+		}
+	}
 }
 
 void USW_CreatorObjectWidget::OnImportButtonClicked()
@@ -162,6 +188,8 @@ void USW_CreatorObjectWidget::OnImportButtonClicked()
 				{
 					CreatorFBX->FBXFileName = FileName;
 				}
+
+				FBXScrollReload();
 			}
 		}
 	}

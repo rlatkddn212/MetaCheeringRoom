@@ -23,4 +23,14 @@ public:
 
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
+
+	class UExponentialHeightFogComponent* ExponentialHeightFogComp;
+	float FogDensity;
+	float FogHeightFalloff;
+	FLinearColor FogInscatteringLuminance;
+	float DirectionalInscatteringExponent;
+	float DirectionalInscatteringStartDistance;
+	bool bEnableVolumetricFog;
+	float VolumetricFogScatteringDistribution;
+	float VolumetricFogExtinctionScale;
 };

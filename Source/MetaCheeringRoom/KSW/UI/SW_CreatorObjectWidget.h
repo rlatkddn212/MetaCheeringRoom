@@ -83,8 +83,13 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* ImportButton;
 
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* VoidText;
+
 	FOnCreatorObjectTabStateChanged OnCreatorObjectTabStateChanged;
 	
+	void FBXScrollReload();
+
 	UFUNCTION()
 	void OnImportButtonClicked();
 
@@ -112,5 +117,4 @@ public:
 	FButtonStyle EnableButtonStyle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ButtonStyle")
 	FButtonStyle HoverButtonStyle;
-
 };
