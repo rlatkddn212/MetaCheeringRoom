@@ -7,6 +7,7 @@
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "../MetaCheeringRoom.h"
+#include "JS_CreateRoomWidget.h"
 
 void UJS_HostSlotWidget::NativeConstruct()
 {
@@ -14,7 +15,7 @@ void UJS_HostSlotWidget::NativeConstruct()
 	BTN_HostMap->OnClicked.AddDynamic(this, &UJS_HostSlotWidget::OnClickHostBtn);
 }
 
-void UJS_HostSlotWidget::SetupInfo(struct FCreatorMapMetaData* metaData, class UJS_SessionJoinWidget* parent, int32 idx)
+void UJS_HostSlotWidget::SetupInfo(FCreatorMapMetaData* metaData, UJS_CreateRoomWidget* parent, int32 idx)
 {
 	slotIdx = idx;
 	SParent = parent;
@@ -26,6 +27,5 @@ void UJS_HostSlotWidget::SetupInfo(struct FCreatorMapMetaData* metaData, class U
 
 void UJS_HostSlotWidget::OnClickHostBtn()
 {
-	PRINTLOG(TEXT("1111"));
 	SParent->OnClickSlot(slotIdx);
 }

@@ -68,7 +68,6 @@ void UJS_SessionJoinWidget::MenuSwitching(int32 index)
 
 void UJS_SessionJoinWidget::CreateSession()
 {
-
 	//
 	FString roomName = ED_RoomName->GetText().ToString();
 	roomName = roomName.TrimStartAndEnd();
@@ -119,7 +118,7 @@ void UJS_SessionJoinWidget::SetupMapData()
 	for (FCreatorMapMetaData* MetaData : MetaDataList)
 	{
 		UJS_HostSlotWidget* SlotWidget = CreateWidget<UJS_HostSlotWidget>(GetWorld(), SlotFactory);
-		SlotWidget->SetupInfo(MetaData, this, idx++);
+		//SlotWidget->SetupInfo(MetaData, this, idx++);
 		SlotWidget->SetVisibility(ESlateVisibility::Visible);
 		SB_Maps->AddChild(SlotWidget);
 	}

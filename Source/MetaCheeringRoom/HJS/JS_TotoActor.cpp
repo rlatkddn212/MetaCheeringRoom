@@ -16,6 +16,8 @@
 #include "JS_AtkActor.h"
 #include "JS_AtkAnimInstance.h"
 #include "Components/TimelineComponent.h"
+#include "JS_StarActor.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AJS_TotoActor::AJS_TotoActor()
@@ -225,17 +227,25 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 void AJS_TotoActor::MulticastAdjustPoint_Implementation(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd)
 {
 	int32 BettingPoint = 0;
+	bool bWin  =false;
 	for (int32 i=0;i<Keys.Num();i++)
 	{
 		if (Keys[i] == MyUserID)
 		{
 			BettingPoint = Values[i];
+			bWin = true;
 			break;
 		}
 	}
 	Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 
 	Player->GoodsComp->AddGold(BettingPoint * Odd);
+
+	if (bWin == true)
+	{
+		AdjustWin();
+	}
+
 }
 
 void AJS_TotoActor::MulticastAdjustLose_Implementation(const TArray<FString>& Keys, const TArray<int32>& Values)
@@ -257,9 +267,32 @@ void AJS_TotoActor::MulticastAdjustLose_Implementation(const TArray<FString>& Ke
 	}
 }
 
+void AJS_TotoActor::AdjustWin()
+{
+	if (!Player)
+	{
+		return;
+	}
+	
+	if (Player && Player->IsLocallyControlled())
+	{
+		// 축하 사운드 재생
+		UGameplayStatics::PlaySound2D(GetWorld(),TadaSound);
+	}
+
+	FVector SpawnLocation = Player->GetActorLocation(); // Offset distance
+	SpawnLocation.Z += 50;
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	if (FanfareFactory)
+	{
+		AActor* Actor = GetWorld()->SpawnActor<AActor>(FanfareFactory, SpawnLocation, SpawnRotation);
+	}
+}
+
 void AJS_TotoActor::ServerSetTimerLimit()
 {
-	if (TotoLimitTIme <= 0)
+	if (TotoLimitTIme < 0)
 	{
 		FString timeLimitText = FString::Printf(TEXT("제출이 마감되었습니다."));
 		MulticastSetTimeUI(timeLimitText, TotoLimitTIme);
@@ -279,7 +312,7 @@ void AJS_TotoActor::ServerSetTimerLimit()
 
 void AJS_TotoActor::MulticastSetTimeUI_Implementation(const FString& TimeText, const int32& Time)
 {
-	if (Time <= 0)
+	if (Time < 0)
 	{
 		if (ToToWidget)
 		{
@@ -331,6 +364,10 @@ void AJS_TotoActor::LoseAnimationPlay()
 	// 플레이어 앞에 액터를 소환하기, 플레이어에게 Attach하기
 	if (Player)
 	{
+		if (Player->IsLocallyControlled())
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), PoofSound);
+		}
 		FVector SpawnLocation = Player->GetActorLocation(); // Offset distance
 		SpawnLocation.Z += 50;
 		FRotator SpawnRotation = FRotator::ZeroRotator;
@@ -359,10 +396,19 @@ void AJS_TotoActor::PlayerModify()
 	{
 		Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	}
-
+	
 	if (Player)
 	{
+		if (Player->IsLocallyControlled())
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(),SpringSound);
+		}
 		OriginalScale = Player->GetMesh()->GetRelativeScale3D();
+		// 움직임 제한 시작
+		Player->bCanMove = false;
+		StunTime = 0.0f;
+		// 스타 액터 스폰
+		SpawnStarActor();
 	}
 	if (!bAnimating)
 	{
@@ -374,6 +420,23 @@ void AJS_TotoActor::PlayerModify()
 
 void AJS_TotoActor::OnPlayerModify(float DeltaTime)
 {
+
+	// 스턴 타이머 업데이트
+	if (Player && !Player->bCanMove)
+	{
+		StunTime += DeltaTime;
+		if (StunTime >= StunDuration)
+		{
+			Player->bCanMove = true;  // 움직임 다시 활성화
+			StunTime = -999999999;
+		}
+	}
+	if (StarActor)
+	{
+		FVector PlayerHeadLocation = Player->GetMesh()->GetSocketLocation(FName("head"));
+		PlayerHeadLocation.Z += 20;
+		StarActor->SetActorLocation(PlayerHeadLocation);
+	}
 	if (AtkActor)
 	{
 		FVector PlayerLocation = Player->GetActorLocation();
@@ -466,4 +529,19 @@ void AJS_TotoActor::OnPlayerModify(float DeltaTime)
 		}
 	}
 	Player->GetMesh()->SetRelativeScale3D(NewScale);
+}
+
+void AJS_TotoActor::SpawnStarActor()
+{
+	if (Player && StarActorFactory)
+	{
+		// 스켈레탈 메시의 헤드 소켓 위치 가져오기
+		FVector SpawnLocation = Player->GetMesh()->GetSocketLocation(FName("head"));
+		SpawnLocation.Z += 20.f;
+		FRotator SpawnRotation = Player->GetActorRotation();
+
+		// 스타 액터 스폰
+		FActorSpawnParameters SpawnParams;
+		StarActor = GetWorld()->SpawnActor<AJS_StarActor>(StarActorFactory, SpawnLocation, SpawnRotation, SpawnParams);
+	}
 }

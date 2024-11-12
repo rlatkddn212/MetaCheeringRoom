@@ -10,10 +10,17 @@
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "OnlineSubsystemUtils.h"
 #include "MetaCheeringRoom.h"
+#include "../HJS/JS_CreateRoomWidget.h"
 void AHG_GameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (CreateRoomWidgetFactory)
+	{
+		CreateRoomWidget = CreateWidget<UJS_CreateRoomWidget>(GetWorld(), CreateRoomWidgetFactory);
+		CreateRoomWidget->AddToViewport();
+		CreateRoomWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 	if (SessionWidgetFactory)
 	{
 		SessionWidget = CreateWidget<UJS_SessionJoinWidget>(GetWorld(), SessionWidgetFactory);
@@ -21,12 +28,14 @@ void AHG_GameModeBase::BeginPlay()
 		SessionWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 
+
 	if (CreateCreatorWidgetFactory)
 	{
 		CreateCreatorWidget = CreateWidget<USW_CreateCreatorWidget>(GetWorld(), CreateCreatorWidgetFactory);
 		CreateCreatorWidget->AddToViewport();
 		CreateCreatorWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
+
 
 	UHG_GameInstance* gi = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 	if (gi)

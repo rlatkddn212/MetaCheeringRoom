@@ -45,7 +45,6 @@ void AJS_CreateSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Ove
 				Player->bCanMove = false;
 			}
 		}
-
 	}
 }
 
