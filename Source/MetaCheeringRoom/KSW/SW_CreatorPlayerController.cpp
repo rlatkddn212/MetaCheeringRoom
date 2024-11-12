@@ -2,7 +2,7 @@
 
 
 #include "KSW/SW_CreatorPlayerController.h"
-#include "SW_CreatorObject.h"
+#include "KSW/CreatorObject/SW_CreatorObject.h"
 #include "CreatorStorageSubsystem.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
@@ -232,6 +232,16 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 				{
 					DoSelectObject(Object);
 				}
+				else
+				{
+					UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+					// 부모가 ASW_CreatorObject인지 확인
+					ASW_CreatorObject* ParentObject = system->GetParentCreatorObject(HitResult.GetActor());
+					if (ParentObject)
+					{
+						DoSelectObject(ParentObject);
+					}
+				}
 			}
 			else
 			{
@@ -239,7 +249,6 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 			}
 		}
         
-
         // 디버그용 트레이스 라인 표시 (빨간색)
         //DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
     }
@@ -286,6 +295,7 @@ bool ASW_CreatorPlayerController::DeleteDummyObject()
 		{
 			UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 			system->AddObject(CreatingObject);
+			CreatingObject->SetFileName(CreatingObject->CreatingObjectData->ItemName);
 			ReloadHierarchy();
 			OnObjectChanged();
 			DoSelectObject(CreatingObject);

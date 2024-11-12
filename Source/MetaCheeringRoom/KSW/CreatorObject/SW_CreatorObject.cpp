@@ -1,12 +1,12 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KSW/SW_CreatorObject.h"
-#include "CreatorStorageSubsystem.h"
-#include "CreatorGizmo/CreatorScaleGizmoComponent.h"
-#include "CreatorGizmo/CreatorRotationGizmoComponent.h"
-#include "CreatorGizmo/CreatorPositionGizmoComponent.h"
-#include "SW_CreatorPlayerController.h"
+#include "KSW/CreatorObject/SW_CreatorObject.h"
+#include "KSW/CreatorStorageSubsystem.h"
+#include "KSW/CreatorGizmo/CreatorScaleGizmoComponent.h"
+#include "KSW/CreatorGizmo/CreatorRotationGizmoComponent.h"
+#include "KSW/CreatorGizmo/CreatorPositionGizmoComponent.h"
+#include "KSW/SW_CreatorPlayerController.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/UObjectGlobals.h"
 #include "MeshDescription.h"
@@ -15,13 +15,11 @@
 #include "StaticMeshResources.h"
 #include "StaticMeshAttributes.h"
 #include "Engine/StaticMeshSourceData.h"
-#include "RawMesh.h"
 #include "Chaos/Array.h"
 #include "Math/Vector.h"
 #include "UObject/NoExportTypes.h"
 #include "MeshDescription.h"
 #include "StaticMeshAttributes.h"
-
 
 // Sets default values
 ASW_CreatorObject::ASW_CreatorObject()
@@ -219,6 +217,10 @@ void ASW_CreatorObject::OnSelected(bool isSelected)
 	OnChangeSelected.ExecuteIfBound(isSelected);
 }
 
+void ASW_CreatorObject::OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty)
+{
+	
+}
 
 void ASW_CreatorObject::DoDestroy()
 {
@@ -316,6 +318,18 @@ void ASW_CreatorObject::ChangeToolMode(ECreatorToolState state)
 	}
 }
 
+void ASW_CreatorObject::AddProperty(int32 id, UCreatorPropertyBase* Property)
+{
+	if (PropertyMap.Contains(id))
+	{
+		PropertyMap[id] = Property;
+	}
+	else
+	{
+		PropertyMap.Add(id, Property);
+	}
+}
+
 void ASW_CreatorObject::SelectAxis(bool isX, bool isY, bool isZ)
 {
 	PositionGizmo->SetAxisSelected(isX, isY, isZ);
@@ -384,3 +398,16 @@ void ASW_CreatorObject::OnChangeScale(FVector Scale)
 	SetActorScale3D(Scale);
 }
 
+void ASW_CreatorObject::SetFileName(const FString& FileName)
+{
+	// FBX에서 사용한다.
+}
+
+void ASW_CreatorObject::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
+{
+	
+}
+
+void ASW_CreatorObject::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject)
+{
+}

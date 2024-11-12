@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KSW/SW_CreatorSkeletonObject.h"
+#include "KSW/CreatorObject/SW_CreatorSkeletonObject.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SceneComponent.h"
 

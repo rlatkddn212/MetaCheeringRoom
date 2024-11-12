@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "KSW/SW_CreatorObject.h"
+#include "KSW/CreatorObject/SW_CreatorObject.h"
 #include "SW_CreatorSkeletonObject.generated.h"
 
 /**

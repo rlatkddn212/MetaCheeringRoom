@@ -8,10 +8,11 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonWriter.h"
-#include "SW_CreatorObject.h"
+#include "CreatorObject/SW_CreatorObject.h"
 #include "CreatorStorageSubsystem.h"
 #include "Engine/EngineTypes.h"
 #include "EngineUtils.h"
+#include "CreatorFBXSubsystem.h"
 
 void UCreatorMapSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -63,6 +64,8 @@ void UCreatorMapSubsystem::SetupJson(FString JsonString)
 
 bool UCreatorMapSubsystem::LoadMap()
 {
+	UCreatorFBXSubsystem* fbxSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
+	fbxSubsystem->bIsLoading = false;
     InitMap();
     FCreatorMap LoadedMap = DeserializeJsonToCreatorMap(LoadJsonStr);
     return true;
@@ -155,6 +158,8 @@ TSharedPtr<FJsonObject> UCreatorMapSubsystem::SerializeCreatorObject(const ASW_C
     JsonObject->SetNumberField(TEXT("ScaleX"), transform.GetScale3D().X);
     JsonObject->SetNumberField(TEXT("ScaleY"), transform.GetScale3D().Y);
     JsonObject->SetNumberField(TEXT("ScaleZ"), transform.GetScale3D().Z);
+
+    CreatorObject->RecordJsonAdditionalInfo(JsonObject);
     // 자식 객체 배열 직렬화
 
     TArray<AActor*> AttachedActors;
@@ -163,7 +168,10 @@ TSharedPtr<FJsonObject> UCreatorMapSubsystem::SerializeCreatorObject(const ASW_C
     for (const AActor* Child : AttachedActors)
     {
         const ASW_CreatorObject* NewCreatorObject = Cast<ASW_CreatorObject>(Child); 
-        JsonChildren.Add(MakeShareable(new FJsonValueObject(SerializeCreatorObject(NewCreatorObject))));
+		if (NewCreatorObject != nullptr)
+        {
+            JsonChildren.Add(MakeShareable(new FJsonValueObject(SerializeCreatorObject(NewCreatorObject))));
+        }
     }
 
     JsonObject->SetArrayField(TEXT("Objects"), JsonChildren);
@@ -202,7 +210,7 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
     UniqueCreatorItemId = FMath::Max(UniqueCreatorItemId, CreatorObject->CreatorObjectUId + 1);
 
     // JSON에서 이름과 변환 정보를 가져오기
-    CreatorObject->SetActorLabel(JsonObject->GetStringField(TEXT("ObjectName")));
+    //CreatorObject->SetActorLabel(JsonObject->GetStringField(TEXT("ObjectName")));
 
     // 변환 정보 역직렬화
     FVector Translation(
@@ -226,6 +234,8 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
 
     FTransform transform = FTransform(Rotation, Translation, Scale);
     CreatorObject->SetActorTransform(transform);
+
+    CreatorObject->SetupJsonAdditionalInfo(JsonObject);
 
     // 자식 객체 배열 역직렬화
     const TArray<TSharedPtr<FJsonValue>>* JsonChildren;
@@ -354,6 +364,21 @@ void UCreatorMapSubsystem::RemoveObjectRecursive(ASW_CreatorObject* Object)
 	}
 }
 
+void UCreatorMapSubsystem::RemoveActorRecursive(AActor* Actor)
+{
+    if (Actor)
+    {
+        TArray<AActor*> AttachedActors;
+        Actor->GetAttachedActors(AttachedActors);
+        for (AActor* AttachedActor : AttachedActors)
+        {
+            RemoveActorRecursive(AttachedActor);
+        }
+    }
+
+    Actor->Destroy();
+}
+
 void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecursive /*= false*/)
 {
 	if (Object != nullptr)
@@ -374,6 +399,11 @@ void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecurs
 				{
                     RemoveObjectRecursive(AttachedCreatorObject);
 				}
+                else
+                {
+                    // 재귀적으로 자식 액터까지 삭제
+                    RemoveActorRecursive(AttachedActor);
+                }
 			}
 		}
 
@@ -409,10 +439,27 @@ void UCreatorMapSubsystem::DetechObject(ASW_CreatorObject* ParentObject, ASW_Cre
     }
 }
 
-
 ASW_CreatorObject* UCreatorMapSubsystem::FindParentObject(ASW_CreatorObject* ChildObject)
 {
 	return Cast<ASW_CreatorObject>(ChildObject->GetAttachParentActor());
+}
+
+ASW_CreatorObject* UCreatorMapSubsystem::GetParentCreatorObject(AActor* Object)
+{
+	// 부모가 CreatorObject인지 확인
+    AActor* ParentActor = Object->GetAttachParentActor();
+    if (ParentActor == nullptr)
+    {
+		return nullptr;
+    }
+
+	ASW_CreatorObject* ParentObject = Cast<ASW_CreatorObject>(ParentActor);
+	if (ParentObject != nullptr)
+	{
+		return ParentObject;
+	}
+
+    return GetParentCreatorObject(ParentActor);
 }
 
 bool UCreatorMapSubsystem::IsChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
@@ -435,6 +482,6 @@ bool UCreatorMapSubsystem::IsChildObject(ASW_CreatorObject* ParentObject, ASW_Cr
 			}
 		}
 	}
-
+    
 	return false;
 }

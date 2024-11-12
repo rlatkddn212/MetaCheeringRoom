@@ -3,10 +3,16 @@
 
 #include "KSW/UI/SW_CreatorInspectorWidget.h"
 #include "Components/EditableText.h"
-#include "../SW_CreatorObject.h"
+#include "../CreatorObject/SW_CreatorObject.h"
 #include "Delegates/Delegate.h"
 #include "Delegates/DelegateCombinations.h"
 #include "Components/ScrollBox.h"
+#include "Components/Image.h"
+#include "Components/Button.h"
+#include "Styling/SlateColor.h"
+#include "SW_PropertyFloatWidget.h"
+#include "SW_PropertyBoolWidget.h"
+#include "SW_PropertyColorWidget.h"
 
 void USW_CreatorInspectorWidget::NativeConstruct()
 {
@@ -53,6 +59,12 @@ void USW_CreatorInspectorWidget::OnChangeScale(FVector Scale)
 	ScaleZ->SetText(FText::FromString(FString::SanitizeFloat(Scale.Z)));
 }
 
+void USW_CreatorInspectorWidget::OnColorChanged(FLinearColor Color)
+{
+	// 콜백 실행
+	ChangeColorPicker.ExecuteIfBound(Color);
+}
+
 void USW_CreatorInspectorWidget::OnChanged()
 {
 	if (CreatorObject)
@@ -79,6 +91,57 @@ void USW_CreatorInspectorWidget::SetObject(ASW_CreatorObject* Obj)
 		ChangeScale.BindDynamic(Obj, &ASW_CreatorObject::OnChangeScale);
 
 		OnChanged();
+
+		//PropertyWidgets에 추가된 위젯을 모두 제거
+		for (auto& Elem : PropertyWidgets)
+		{
+			Elem.Value->RemoveFromParent();
+			// 완전히 삭제
+			Elem.Value->ConditionalBeginDestroy();
+		}
+
+		PropertyWidgets.Empty();
+
+		TMap<int32, UCreatorPropertyBase*> PropertyMap = CreatorObject->GetPropertyMap();
+
+		// 반복문을 돌면서 위젯생성
+		for (auto& Elem : PropertyMap)
+		{
+			UCreatorPropertyBase* Property = Elem.Value;
+			if (Property->IsA<UCreatorFloatProperty>())
+			{
+				USW_PropertyFloatWidget* PropertyWidget = CreateWidget<USW_PropertyFloatWidget>(this, PropertyFloatWidgetFactory);
+				if (PropertyWidget)
+				{
+					InspectorScrollBox->AddChild(PropertyWidget);
+					PropertyWidgets.Add(Elem.Key, PropertyWidget);
+					PropertyWidget->SetInspectorWidget(this);
+					PropertyWidget->SetPropertyValue(Elem.Key, Cast<UCreatorFloatProperty>(Property));
+				}
+			}
+			else if (Property->IsA<UCreatorBoolProperty>())
+			{
+				USW_PropertyBoolWidget* PropertyWidget = CreateWidget<USW_PropertyBoolWidget>(this, PropertyBoolWidgetFactory);
+				if (PropertyWidget)
+				{
+					InspectorScrollBox->AddChild(PropertyWidget);
+					PropertyWidgets.Add(Elem.Key, PropertyWidget);
+					PropertyWidget->SetInspectorWidget(this);
+					PropertyWidget->SetPropertyValue(Elem.Key, Cast<UCreatorBoolProperty>(Property));
+				}
+			}
+			else if (Property->IsA<UCreatorColorProperty>())
+			{
+				USW_PropertyColorWidget* PropertyWidget = CreateWidget<USW_PropertyColorWidget>(this, PropertyColorWidgetFactory);
+				if (PropertyWidget)
+				{
+					InspectorScrollBox->AddChild(PropertyWidget);
+					PropertyWidgets.Add(Elem.Key, PropertyWidget);
+					PropertyWidget->SetInspectorWidget(this);
+					PropertyWidget->SetPropertyValue(Elem.Key, Cast<UCreatorColorProperty>(Property));
+				}
+			}
+		}
 	}
 }
 
@@ -113,7 +176,6 @@ void USW_CreatorInspectorWidget::OnPositionZChanged(const FText& Text, ETextComm
 	float z = FCString::Atof(*Text.ToString());
 
 	OnChangePosition(FVector(x, y, z));
-
 }
 
 void USW_CreatorInspectorWidget::OnRotationXChanged(const FText& Text, ETextCommit::Type CommitMethod)

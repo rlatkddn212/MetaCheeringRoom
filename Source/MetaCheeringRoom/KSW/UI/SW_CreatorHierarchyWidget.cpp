@@ -6,7 +6,7 @@
 #include "SW_CreatorObjectSlotWidget.h"
 #include "SW_CreatorHierarchyItemWidget.h"
 #include "Components/ScrollBox.h"
-#include "../SW_CreatorObject.h"
+#include "../CreatorObject/SW_CreatorObject.h"
 #include "Components/Widget.h"
 #include "SW_HierarchyDragOperation.h"
 

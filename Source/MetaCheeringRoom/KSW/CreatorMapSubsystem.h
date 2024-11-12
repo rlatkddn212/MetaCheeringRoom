@@ -5,16 +5,71 @@
 #include "CoreMinimal.h"
 #include "Templates/SharedPointer.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "UObject/NoExportTypes.h"
 #include "CreatorMapSubsystem.generated.h"
 
 class ASW_CreatorObject;
+
+
+// 오브젝트 속성 데이터
+UCLASS()
+class UCreatorPropertyBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+	FString PropertyName;
+
+	// 생성자
+	UCreatorPropertyBase()
+	{
+		PropertyName = TEXT("DefaultProperty");
+	}
+};
+
+
+// 상속 bool Type
+UCLASS()
+class UCreatorBoolProperty : public UCreatorPropertyBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Value;
+
+	UCreatorBoolProperty(){}
+};
+
+// 상속 float Type
+UCLASS()
+class UCreatorFloatProperty : public UCreatorPropertyBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Value;
+
+	UCreatorFloatProperty(){}
+};
+
+// 상속 Color Type
+UCLASS()
+class UCreatorColorProperty : public UCreatorPropertyBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor Value;
+
+	UCreatorColorProperty(){}
+};
 
 //struct
 USTRUCT(BlueprintType)
 struct FCreatorMap
 {
 	GENERATED_BODY()
-
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString MapName;
 
@@ -34,6 +89,7 @@ class METACHEERINGROOM_API UCreatorMapSubsystem : public UGameInstanceSubsystem
 
 private:
 	void RemoveObjectRecursive(ASW_CreatorObject* Object);
+	void RemoveActorRecursive(AActor* Actor);
 
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
@@ -70,6 +126,7 @@ public:
 	// 오브젝트 삭제 재귀적으로
 	void RemoveObject(ASW_CreatorObject* Object, bool isRecursive = false);
 
+
 	// 오브젝트 추가
 	void AttachObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
 
@@ -80,6 +137,8 @@ public:
 
 	// 부모찾기
 	ASW_CreatorObject* FindParentObject(ASW_CreatorObject* ChildObject);
+
+	ASW_CreatorObject* GetParentCreatorObject(AActor* Object);
 
 	// 자식인지 확인
 	bool IsChildObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);

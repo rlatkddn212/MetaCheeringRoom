@@ -13,6 +13,8 @@
 #include "Widgets/SWidget.h"
 #include "../../../../Plugins/RuntimeLoadStaticMesh/Source/RuntimeLoadFbx/Public/FileIOBlueprintFunctionLibrary.h"
 #include "../CreatorMapSubsystem.h"
+#include "../CreatorFBXSubsystem.h"
+#include "../CreatorObject/SW_CreatorFBX.h"
 
 void USW_CreatorObjectWidget::NativeConstruct()
 {
@@ -57,6 +59,25 @@ void USW_CreatorObjectWidget::NativeConstruct()
 			EffectObjectScrollBox->AddChild(ChildWidget);
 		}
 	}
+
+	{
+		TMap<int32, FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects(5);
+		if (CreatorObjects.Contains(1))
+		{
+			FCreatorObjectData* CreatorObject = CreatorObjects[1];
+			UCreatorFBXSubsystem* CreatorFBXSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
+			TMap<FString, FCreatorFBXMetaData> DataMap = CreatorFBXSubsystem->LoadMetaData();
+
+			for (auto& FBXData : DataMap)
+			{
+				USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
+				CreatorObject->ItemName = FBXData.Value.FileName;
+				ChildWidget->SetObject(CreatorObject);
+				FBXObjectScrollBox->AddChild(ChildWidget);
+			}
+		}
+	}
+
 	// 버튼 클릭처리
 	ShapeObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnShapeObjectButtonClicked);
 	SportsObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnSportsObjectButtonClicked);
@@ -105,11 +126,11 @@ void USW_CreatorObjectWidget::OnImportButtonClicked()
 
 			// FBX 파일 로드
 			// LoadFileAsync2StaticMeshActor(SelectedFilePath);
-			AActor* actor = UFileIOBlueprintFunctionLibrary::LoadFileAsync2StaticMeshActor(SelectedFilePath);
+
 			UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
 			UCreatorMapSubsystem* CreatorMapSubsystem = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 
-			int32 CreatorObjectType = 1;
+			int32 CreatorObjectType = 5;
 			int32 CreatorObjectId = 1;
 			TMap<int32, FCreatorObjectData*> CreatorObjectsStruct = system->GetCreatorObjects(CreatorObjectType);
 			if (CreatorObjectsStruct.Contains(CreatorObjectId))
@@ -117,14 +138,31 @@ void USW_CreatorObjectWidget::OnImportButtonClicked()
 				// CreatorObject를 생성
 				ASW_CreatorObject* CreatorObject = CreatorMapSubsystem->CreateObject(CreatorObjectsStruct[CreatorObjectId]);
 
-				actor->AttachToActor(CreatorObject, FAttachmentTransformRules::KeepWorldTransform);
+				// 파일이름을 저장해둔다.
+				ASW_CreatorFBX* CreatorFBX = Cast<ASW_CreatorFBX>(CreatorObject);
 
+				URLFProgress* ProgressTracker = CreatorFBX->GetProgressTracker();
+				FString FileName = FPaths::GetBaseFilename(SelectedFilePath) + "_" + FGuid::NewGuid().ToString() + ".fbx";
+				// FBX 파일을 로드한다.
+				UCreatorFBXSubsystem* CreatorFBXSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
+				AActor* actor = CreatorFBXSubsystem->OpenAndCopyFBX(SelectedFilePath, FileName, ProgressTracker);
+				if (actor)
+					actor->AttachToActor(CreatorObject, FAttachmentTransformRules::KeepWorldTransform);
 				CreatorMapSubsystem->AddObject(CreatorObject);
-			}
 
-			ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
-			if (PC)
-				PC->ReloadHierarchy();
+				ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+				if (PC)
+				{
+					PC->ReloadHierarchy();
+					PC->DoSelectObject(CreatorObject);
+				}
+
+				// 리플리케이트
+				if (CreatorFBX)
+				{
+					CreatorFBX->FBXFileName = FileName;
+				}
+			}
 		}
 	}
 }

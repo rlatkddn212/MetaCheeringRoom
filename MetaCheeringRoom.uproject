@@ -45,6 +45,16 @@
 		{
 			"Name": "Text3D",
 			"Enabled": true
+		},
+		{
+			"Name": "RuntimeLoadFbx",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/8569d319775140449b298bde26le9944"
+		},
+		{
+			"Name": "BlueprintColorPicker",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/9d311efe64b14bea9a9170c2067f0e2a"
 		}
 	]
 }

@@ -2,7 +2,7 @@
 
 
 #include "KSW/CreatorGizmo/CreatorScaleGizmoComponent.h"
-#include "../SW_CreatorObject.h"
+#include "../CreatorObject/SW_CreatorObject.h"
 
 // Sets default values for this component's properties
 UCreatorScaleGizmoComponent::UCreatorScaleGizmoComponent()

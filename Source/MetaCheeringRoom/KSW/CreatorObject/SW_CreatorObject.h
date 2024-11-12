@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SW_CreatorPlayerController.h"
+#include "KSW/SW_CreatorPlayerController.h"
+#include "../CreatorMapSubsystem.h"
 #include "SW_CreatorObject.generated.h"
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FChangeSelected, bool, isSelected);
@@ -29,6 +30,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void OnSelected(bool isSelected);
+
+	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);
+	
+	virtual TMap<int32, UCreatorPropertyBase*> GetPropertyMap() { return PropertyMap; }
 
 	void DoDestroy();
 
@@ -100,6 +105,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* ZScaleRectMesh;
 
+	UPROPERTY()
+	TMap<int32, UCreatorPropertyBase*> PropertyMap;
+
+	void AddProperty(int32 id, UCreatorPropertyBase* Property);
+
 	void SelectAxis(bool isX, bool isY, bool isZ);
 	void SelectRotationAxis(bool isX, bool isY, bool isZ);
 	void SelectScaleAxis(bool isX, bool isY, bool isZ);
@@ -115,5 +125,10 @@ public:
 	UFUNCTION()
 	void OnChangeScale(FVector Scale);
 
+	virtual void SetFileName(const FString& FileName);
+
 	bool IsSelectedObject;
+public:
+	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const;
+	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject);
 };

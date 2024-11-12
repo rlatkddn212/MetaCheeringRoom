@@ -38,12 +38,15 @@ void AHG_ChangeCharacterBox::OnMyBeginOverlap(UPrimitiveComponent* OverlappedCom
 {
 	if (OtherActor->IsA<AHG_Player>())
 	{
-		UE_LOG(LogTemp,Warning,TEXT("111"));
-		UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(),WidgetFactory);
-		
-		if (Widget)
+		auto Player = Cast<AHG_Player>(OtherActor);
+		if (Player->IsLocallyControlled())
 		{
-			Widget->AddToViewport();
+			UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetFactory);
+
+			if (Widget)
+			{
+				Widget->AddToViewport();
+			}
 		}
 	}
 }

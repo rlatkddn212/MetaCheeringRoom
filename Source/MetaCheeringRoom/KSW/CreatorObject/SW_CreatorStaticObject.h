@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "KSW/SW_CreatorObject.h"
+#include "KSW/CreatorObject/SW_CreatorObject.h"
 #include "SW_CreatorStaticObject.generated.h"
 
 /**
@@ -27,7 +27,15 @@ public:
 
 	virtual void OnSelected(bool isSelected) override;
 
-	
+	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);
+	virtual TMap<int32, UCreatorPropertyBase*> GetPropertyMap() override;
+
+	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
+	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* Mesh;
+
+	UPROPERTY()
+	FLinearColor MeshColor;
 };
