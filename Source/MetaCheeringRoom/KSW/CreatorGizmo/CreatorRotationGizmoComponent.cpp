@@ -29,24 +29,30 @@ void UCreatorRotationGizmoComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-    // Actor¸¦ °¡Á®¿È
-    Me = Cast<ASW_CreatorObject>(GetOwner());
+}
 
-    // ...
-    if (RedMat)
-    {
-        Me->XRingMesh->SetMaterial(0, RedMat);
-    }
+void UCreatorRotationGizmoComponent::OnComponentCreated()
+{
+	Super::OnComponentCreated();
 
-    if (GreenMat)
-    {
-        Me->YRingMesh->SetMaterial(0, GreenMat);
-    }
+	// Actor¸¦ °¡Á®¿È
+	Me = Cast<ASW_CreatorObject>(GetOwner());
 
-    if (BlueMat)
-    {
-        Me->ZRingMesh->SetMaterial(0, BlueMat);
-    }
+	// ...
+	if (RedMat)
+	{
+		Me->XRingMesh->SetMaterial(0, RedMat);
+	}
+
+	if (GreenMat)
+	{
+		Me->YRingMesh->SetMaterial(0, GreenMat);
+	}
+
+	if (BlueMat)
+	{
+		Me->ZRingMesh->SetMaterial(0, BlueMat);
+	}
 }
 
 void UCreatorRotationGizmoComponent::SetGizmoVisibility(bool isVisible)

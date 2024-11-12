@@ -29,38 +29,41 @@ void UCreatorScaleGizmoComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-    Me = Cast<ASW_CreatorObject>(GetOwner());
+}
 
-    // ...
-    if (RedMat)
-    {
-        Me->XScaleAxisMesh->SetMaterial(0, RedMat);
-        Me->XScaleAxisMesh->SetMaterial(1, RedMat);
+void UCreatorScaleGizmoComponent::OnComponentCreated()
+{
+	Super::OnComponentCreated();
+	// ...
+	Me = Cast<ASW_CreatorObject>(GetOwner());
+	// ...
+	if (RedMat)
+	{
+		Me->XScaleAxisMesh->SetMaterial(0, RedMat);
+		Me->XScaleAxisMesh->SetMaterial(1, RedMat);
 
 		Me->XScaleRectMesh->SetMaterial(0, RedMat);
 		Me->XScaleRectMesh->SetMaterial(1, RedMat);
-    }
+	}
 
-    if (GreenMat)
-    {
-        Me->YScaleAxisMesh->SetMaterial(0, GreenMat);
-        Me->YScaleAxisMesh->SetMaterial(1, GreenMat);
+	if (GreenMat)
+	{
+		Me->YScaleAxisMesh->SetMaterial(0, GreenMat);
+		Me->YScaleAxisMesh->SetMaterial(1, GreenMat);
 
 		Me->YScaleRectMesh->SetMaterial(0, GreenMat);
 		Me->YScaleRectMesh->SetMaterial(1, GreenMat);
-    }
+	}
 
-    if (BlueMat)
-    {
-        Me->ZScaleAxisMesh->SetMaterial(0, BlueMat);
-        Me->ZScaleAxisMesh->SetMaterial(1, BlueMat);
+	if (BlueMat)
+	{
+		Me->ZScaleAxisMesh->SetMaterial(0, BlueMat);
+		Me->ZScaleAxisMesh->SetMaterial(1, BlueMat);
 
 		Me->ZScaleRectMesh->SetMaterial(0, BlueMat);
 		Me->ZScaleRectMesh->SetMaterial(1, BlueMat);
-    }
+	}
 }
-
 
 // Called every frame
 void UCreatorScaleGizmoComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

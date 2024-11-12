@@ -29,26 +29,31 @@ void UCreatorPositionGizmoComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void UCreatorPositionGizmoComponent::OnComponentCreated()
+{
+	Super::OnComponentCreated();
 	Me = Cast<ASW_CreatorObject>(GetOwner());
 
 	// ...
-    if (RedMat)
-    {
-        Me->XAxisMesh->SetMaterial(0, RedMat);
-        Me->XAxisMesh->SetMaterial(1, RedMat);
-    }
+	if (RedMat)
+	{
+		Me->XAxisMesh->SetMaterial(0, RedMat);
+		Me->XAxisMesh->SetMaterial(1, RedMat);
+	}
 
-    if (GreenMat)
-    {
-        Me->YAxisMesh->SetMaterial(0, GreenMat);
-        Me->YAxisMesh->SetMaterial(1, GreenMat);
-    }
+	if (GreenMat)
+	{
+		Me->YAxisMesh->SetMaterial(0, GreenMat);
+		Me->YAxisMesh->SetMaterial(1, GreenMat);
+	}
 
-    if (BlueMat)
-    {
-        Me->ZAxisMesh->SetMaterial(0, BlueMat);
-        Me->ZAxisMesh->SetMaterial(1, BlueMat);
-    }
+	if (BlueMat)
+	{
+		Me->ZAxisMesh->SetMaterial(0, BlueMat);
+		Me->ZAxisMesh->SetMaterial(1, BlueMat);
+	}
 }
 
 void UCreatorPositionGizmoComponent::SetGizmoVisibility(bool isVisible)
