@@ -44,7 +44,7 @@ void AHG_CheeringStick::Tick(float DeltaTime)
 
 void AHG_CheeringStick::Equiped(APawn* Value)
 {
-	SetOwner(Value);
+	SetItemOwner(Value);
 }
 
 void AHG_CheeringStick::ChangeColor(FLinearColor Value)
@@ -66,9 +66,9 @@ void AHG_CheeringStick::ChangeIntensity(float Value)
 
 void AHG_CheeringStick::ApplyChange(FLinearColor Color, bool Bling, float Intensity)
 {
-	if (Owner)
+	if (ItemOwner)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Owner"));
+		UE_LOG(LogTemp, Warning, TEXT("ItemOwner"));
 	}
 	ServerRPC_ApplyChange(Color, Bling, Intensity);
 }

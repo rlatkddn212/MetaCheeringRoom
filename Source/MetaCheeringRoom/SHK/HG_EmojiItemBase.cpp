@@ -119,10 +119,10 @@ void AHG_EmojiItemBase::ServerRPC_FollowPlayer_Implementation()
 
 void AHG_EmojiItemBase::MulticastRPC_FollowPlayer_Implementation()
 {
-	if (Owner)
+	if (ItemOwner)
 	{
-		SetActorLocation(Owner->GetActorLocation() + FVector(0.0f, 0.0f, 70.0f));
-		SetActorRelativeRotation(Owner->GetActorRotation() + FRotator(90.0f, 0.0f, 0.0f));
+		SetActorLocation(ItemOwner->GetActorLocation() + FVector(0.0f, 0.0f, 70.0f));
+		SetActorRelativeRotation(ItemOwner->GetActorRotation() + FRotator(90.0f, 0.0f, 0.0f));
 		Loc = GetActorLocation();
 		Rot = GetActorRotation();
 	}

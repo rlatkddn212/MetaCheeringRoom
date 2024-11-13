@@ -356,11 +356,13 @@ void AHG_Player::PopUpPurchaseWidget()
 void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 {
 	if (ItemValue == nullptr) return;
-	ItemValue->Equiped(this);
 	EquipItemList.Add(ItemValue);
 	ItemValue->bEquiped = true;
 
-	GI->EquipItemInfoList.Add(ItemValue->GetItemData());
+	if (IsLocallyControlled())
+	{
+		GI->EquipItemInfoList.Add(ItemValue->GetItemData());	
+	}
 
 	auto* mesh = ItemValue->GetComponentByClass<UStaticMeshComponent>();
 	check(mesh);
@@ -380,6 +382,10 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 			break;
 		case EItemCategory::Category_OneHandGrab:
 			mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			if (HUD)
+			{
+				HUD->UpdateHUD(TEXT("E) 응원봉 조작하기"));
+			}
 			break;
 		case EItemCategory::Category_TwoHandGrab:
 			if (!bPassed)
@@ -450,6 +456,11 @@ void AHG_Player::UnequipItemToSocket(const FString& NameValue)
 void AHG_Player::DestroyItem(AHG_ItemBase* ItemValue)
 {
 	ServerRPCDestroyItem(ItemValue);
+}
+
+void AHG_Player::SpawnedMulticast()
+{
+	MulticastRPCEquipItemToSocket(EItem);
 }
 
 
@@ -529,7 +540,7 @@ void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
 	if (SpawnedItem != nullptr)
 	{
 		SpawnedItem->SetReplicates(true);
-		SpawnedItem->SetOwner(this);
+		SpawnedItem->SetItemOwner(this);
 		if (SpawnedItem->GetItemData().ItemCategory != EItemCategory::Category_Emoji)
 		{
 			SpawnedItem->SetActorHiddenInGame(true);
@@ -554,15 +565,23 @@ void AHG_Player::ServerRPCDestroyItem_Implementation(AHG_ItemBase* ItemValue)
 
 void AHG_Player::ServerRPCEquipItemToSocket_Implementation(FItemData p_ItemInfo)
 {
-	auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(p_ItemInfo.ItemClass, GetActorLocation(), GetActorRotation());
+	EItem = GetWorld()->SpawnActor<AHG_EquipItem>(p_ItemInfo.ItemClass, GetActorLocation(), GetActorRotation());
+
 	if (EItem)
 	{
-		MulticastRPCEquipItemToSocket(EItem);
+		FTimerHandle handle;
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_Player::SpawnedMulticast,0.1f,false);
 	}
 }
 
 void AHG_Player::MulticastRPCEquipItemToSocket_Implementation(AHG_EquipItem* ItemValue)
 {
+	if (ItemValue)
+	{
+		ItemValue->SetItemOwner(this);
+		ItemValue->SetOwner(Cast<APlayerController>(this->Controller));
+	}
+
 	EquipItem(ItemValue);
 }
 

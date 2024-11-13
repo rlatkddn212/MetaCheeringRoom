@@ -23,7 +23,7 @@ void AHG_SoundItem::Use()
 void AHG_SoundItem::ServerRPC_Use_Implementation()
 {
 	USoundWave* Sound = ItemData.Sound.LoadSynchronous();
-	MulticastRPC_Use(Owner,Sound);
+	MulticastRPC_Use(ItemOwner,Sound);
 }
 
 void AHG_SoundItem::MulticastRPC_Use_Implementation(APawn* p_Owner, USoundWave* p_Sound)
