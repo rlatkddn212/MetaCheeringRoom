@@ -40,7 +40,8 @@ void AJS_JoinSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overl
 
 		UI->SetVisibility(ESlateVisibility::Visible);
 		UI->MenuSwitching(1);
-		UI->PlayShowJoinSessionAnimation();
+		UI->PlayAnimation(UI->ShowWidget);
+		UI->OnClickedRefresh();
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 
 		if (PC)
@@ -53,16 +54,6 @@ void AJS_JoinSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overl
 				Player->Direction = FVector::ZeroVector;
 				Player->bCanMove = false;
 			}
-		}
-	}
-
-	UHG_GameInstance* gi = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
-	if (gi)
-	{
-		UJS_SessionGameInstanceSubSystem* si = gi->GetSubsystem<UJS_SessionGameInstanceSubSystem>();
-		if (si)
-		{
-			si->FindOtherSessions();
 		}
 	}
 }
