@@ -35,7 +35,11 @@ void UJS_CreateRoomWidget::NativeConstruct()
 	BTN_Hosting->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::CreateSession);
 	BTN_Quit->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedQuit);
 	BTN_HostingCancel->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedCreateQuit);
-	
+	BTN_CreateLevel->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedCreateLevel);
+	BTN_CreateCancel->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedCreateCancel);
+	BTN_Delete->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedDelete);
+	BTN_DeleteCancel->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedDeleteCancel);
+	BTN_CreateRoom->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedCreateRoom);
 	SetupMapData();
 }
 
@@ -145,20 +149,48 @@ void UJS_CreateRoomWidget::OnClickSlot(int32 slotIdx)
 void UJS_CreateRoomWidget::OnClickHosting()
 {
 	// 호스팅 팝업 열기 ( 애니메이션 )
+	PlayAnimation(HostingLevelPopup);
 }
 
 void UJS_CreateRoomWidget::OnClickModify()
 {
-	// 수정 팝업 열기 ( 애니메이션 )
+	// 수정 팝업은 없음
+	
 }
 
 void UJS_CreateRoomWidget::OnClickRemove()
 {
 	// 삭제 팝업 열기 ( 애니메이션 )
+	PlayAnimation(DeleteLevelPopup);
 }
 
 void UJS_CreateRoomWidget::OnClickedCreateQuit()
 {
 	// 애니메이션 역재생
 	PlayAnimation(HostingLevelPopup,0.f,1,EUMGSequencePlayMode::Reverse);
+}
+
+void UJS_CreateRoomWidget::OnClickedCreateRoom()
+{
+	// 맵 생성팝업 UI 애니메이션
+	PlayAnimation(CreateLevelPopup);
+}
+
+void UJS_CreateRoomWidget::OnClickedCreateCancel()
+{
+	PlayAnimation(CreateLevelPopup,0.f,1,EUMGSequencePlayMode::Reverse);
+}
+
+void UJS_CreateRoomWidget::OnClickedCreateLevel()
+{
+}
+
+void UJS_CreateRoomWidget::OnClickedDeleteCancel()
+{
+	PlayAnimation(DeleteLevelPopup, 0.f, 1, EUMGSequencePlayMode::Reverse);
+}
+
+void UJS_CreateRoomWidget::OnClickedDelete()
+{
+
 }
