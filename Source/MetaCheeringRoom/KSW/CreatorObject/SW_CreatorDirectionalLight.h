@@ -29,6 +29,7 @@ public:
 	// DirectionalLight
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UDirectionalLightComponent* LightComp;
+
 	FLinearColor LightColor;
 	float LightIntensity;
 	bool CastShadow;

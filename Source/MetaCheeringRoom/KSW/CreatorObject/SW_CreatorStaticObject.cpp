@@ -7,6 +7,7 @@
 #include "KSW/CreatorGizmo/CreatorPositionGizmoComponent.h"
 #include "KSW/CreatorGizmo/CreatorRotationGizmoComponent.h"
 #include "KSW/CreatorGizmo/CreatorScaleGizmoComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ASW_CreatorStaticObject::ASW_CreatorStaticObject()
 {
@@ -14,18 +15,20 @@ ASW_CreatorStaticObject::ASW_CreatorStaticObject()
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(Root);
-
+	bReplicates = true;
 }
 
 void ASW_CreatorStaticObject::BeginPlay()
 {
 	Super::BeginPlay();
 	// 매쉬의 머터리얼을 가져온다.
+
 	Mat = UMaterialInstanceDynamic::Create(Mesh->GetMaterial(0), this);
 	Mesh->SetMaterial(0, Mat);
-	MeshColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
 	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>();
 	Property->Value = MeshColor;
+	OnRep_MeshColorChanged();
 }
 
 void ASW_CreatorStaticObject::Tick(float DeltaTime)
@@ -57,6 +60,7 @@ void ASW_CreatorStaticObject::OnChangeProperty(int32 id, UCreatorPropertyBase* C
 	{
 		UCreatorColorProperty* ColorProperty = Cast<UCreatorColorProperty>(CreatorProperty);
 		MeshColor = ColorProperty->Value;
+
 		if (Mat)
 		{
 			Mat->SetVectorParameterValue("Color", MeshColor);
@@ -97,4 +101,18 @@ void ASW_CreatorStaticObject::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObje
 	{
 		Mat->SetVectorParameterValue("Color", MeshColor);
 	}
+}
+
+void ASW_CreatorStaticObject::OnRep_MeshColorChanged()
+{
+	if (Mat)
+	{
+		Mat->SetVectorParameterValue("Color", MeshColor);
+	}
+}
+
+void ASW_CreatorStaticObject::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASW_CreatorStaticObject, MeshColor);
 }

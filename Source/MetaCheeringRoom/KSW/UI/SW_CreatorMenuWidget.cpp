@@ -32,5 +32,5 @@ void USW_CreatorMenuWidget::SaveCreatorMap()
 
 void USW_CreatorMenuWidget::Quit()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), "HG_LobbyLevel", true);
+	UGameplayStatics::OpenLevel(GetWorld(), "HG_LobbyLevel_New", true);
 }

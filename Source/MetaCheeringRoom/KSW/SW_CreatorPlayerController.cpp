@@ -17,6 +17,8 @@
 #include "UI/SW_CreatorHierarchyWidget.h"
 #include "UI/SW_CreatorModelToolbarWidget.h"
 #include "UI/SW_CreatorInspectorWidget.h"
+#include "Widgets/InvalidateWidgetReason.h"
+#include "Blueprint/UserWidget.h"
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
 {

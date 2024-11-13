@@ -35,7 +35,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* Mesh;
+	
+	UPROPERTY(ReplicatedUsing = OnRep_MeshColorChanged)
+	FLinearColor MeshColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-	UPROPERTY()
-	FLinearColor MeshColor;
+	// ---------------------------------------------------------- server 동기화 부분
+	UFUNCTION()
+	void OnRep_MeshColorChanged();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
