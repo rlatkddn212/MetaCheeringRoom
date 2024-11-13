@@ -230,13 +230,16 @@ void UJS_SessionJoinWidget::AddSessionSlotWidget(const FRoomInfo& info)
 
 void UJS_SessionJoinWidget::ShowJoinWidget()
 {
-	BD_JoinRoom->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-	PlayJoinPopupSessionAnimation();
+	if (LobbySelectedIndex != -1)
+	{
+		si->JoinToSession(LobbySelectedIndex);
+	}
 }
 
 void UJS_SessionJoinWidget::CategorySwitching(int32 index)
 {
 	WS_Category->SetActiveWidgetIndex(index);
+	SelectNum = index;
 }
 
 void UJS_SessionJoinWidget::OnClickedCateAll()
@@ -246,22 +249,46 @@ void UJS_SessionJoinWidget::OnClickedCateAll()
 
 void UJS_SessionJoinWidget::OnClickedCateESports()
 {
+	if (SelectNum == 1)
+	{
+		return;
+	}
+	BtnReversePlay();
 	CategorySwitching(1);
+	PlayAnimation(ChangeBtnEsports);
 }
 
 void UJS_SessionJoinWidget::OnClickedCateSoccer()
 {
+	if (SelectNum == 2)
+	{
+		return;
+	}
+	BtnReversePlay();
 	CategorySwitching(2);
+	PlayAnimation(ChangeBtnSoccer);
 }
 
 void UJS_SessionJoinWidget::OnClickedCateIdol()
 {
+	if (SelectNum == 3)
+	{
+		return;
+	}
+	BtnReversePlay();
 	CategorySwitching(3);
+	PlayAnimation(ChangeBtnIdol);
 }
 
 void UJS_SessionJoinWidget::OnClickedCateTalk()
 {
+	if (SelectNum == 4)
+	{
+		return;
+	}
+	BtnReversePlay();
 	CategorySwitching(4);
+	PlayAnimation(ChangeBtnTalk);
 }
 
 void UJS_SessionJoinWidget::OnClickedRefresh()
@@ -276,6 +303,8 @@ void UJS_SessionJoinWidget::OnClickedRefresh()
 	if (si)
 	{
 		si->FindOtherSessions();
+		BtnReversePlay();
+		CategorySwitching(0);
 	}
 }
 
@@ -372,5 +401,27 @@ void UJS_SessionJoinWidget::OnJoinSessionAnimation(float DeltaTime)
 		{
 			bJoinWidgetAnimating = false;
 		}
+	}
+}
+
+void UJS_SessionJoinWidget::BtnReversePlay()
+{
+	// 0은 ALL, 1은 E스포츠, 2는 축구, 3은 아이돌
+	switch (SelectNum)
+	{
+	case 0:
+		break;
+	case 1:
+		PlayAnimation(ChangeBtnEsports, 0.f, 1, EUMGSequencePlayMode::Reverse);
+		break;
+	case 2:
+		PlayAnimation(ChangeBtnSoccer, 0.f, 1, EUMGSequencePlayMode::Reverse);
+		break;
+	case 3:
+		PlayAnimation(ChangeBtnIdol, 0.f, 1, EUMGSequencePlayMode::Reverse);
+		break;
+	case 4:
+		PlayAnimation(ChangeBtnTalk, 0.f, 1, EUMGSequencePlayMode::Reverse);
+		break;
 	}
 }

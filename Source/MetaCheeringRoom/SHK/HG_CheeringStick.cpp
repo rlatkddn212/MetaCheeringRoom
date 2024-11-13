@@ -85,7 +85,6 @@ void AHG_CheeringStick::BlingBling(float DeltaSecond)
 	{
 		CurrentIntensity -= DeltaSecond*100;
 		ChangeIntensity(CurrentIntensity);
-		UE_LOG(LogTemp, Warning, TEXT("down"));
 		if (CurrentIntensity < MinIntensity)
 		{
 			bToggle = true;
@@ -95,7 +94,6 @@ void AHG_CheeringStick::BlingBling(float DeltaSecond)
 	{
 		CurrentIntensity += DeltaSecond*100;
 		ChangeIntensity(CurrentIntensity);
-		UE_LOG(LogTemp, Warning, TEXT("Up"));
 		if (CurrentIntensity > MaxIntensity)
 		{
 			bToggle = false;

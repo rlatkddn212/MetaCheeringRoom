@@ -158,6 +158,22 @@ public:
 	bool bJoinWidgetAnimating = false;
 	void PlayShowJoinSessionAnimation();
 	void OnJoinSessionAnimation(float DeltaTime);
+
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	class UWidgetAnimation* ChangeBtnEsports;
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	class UWidgetAnimation* ChangeBtnSoccer;
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	class UWidgetAnimation* ChangeBtnIdol;
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	class UWidgetAnimation* ChangeBtnTalk;
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	class UWidgetAnimation* ShowWidget;
+
+	int32 SelectNum = 0;
+
+	void BtnReversePlay();
+
 	// 방 입장 End -------------------------------
 
 };

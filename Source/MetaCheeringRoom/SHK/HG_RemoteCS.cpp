@@ -12,26 +12,28 @@
 
 void UHG_RemoteCS::NativeConstruct()
 {
-	Btn_Red->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClickRed);
-	Btn_Orange->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClickOrange);
-	Btn_Yellow->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClicYellow);
-	Btn_Green->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClickGreen);
-	Btn_Blue->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClickBlue);
-	Btn_Sodomy->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClickSodomy);
-	Btn_Purple->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClickPurple);
-	Btn_White->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClickWhite);
-	Btn_Black->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClickBlack);
-	Btn_Grey->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClickGrey);
-	Btn_Commit->OnClicked.AddDynamic(this,&UHG_RemoteCS::OnClickCommit);
+	Btn_Red->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickRed);
+	Btn_Orange->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickOrange);
+	Btn_Yellow->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClicYellow);
+	Btn_Green->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickGreen);
+	Btn_Blue->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickBlue);
+	Btn_Sodomy->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickSodomy);
+	Btn_Purple->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickPurple);
+	Btn_White->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickWhite);
+	Btn_Black->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickBlack);
+	Btn_Grey->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickGrey);
+	Btn_Commit->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickCommit);
+	Btn_Close->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickClose);
 
-	ET_Intesity->OnTextCommitted.AddDynamic(this,&UHG_RemoteCS::OnTextEnter);
+	ET_Intesity->OnTextCommitted.AddDynamic(this, &UHG_RemoteCS::OnTextEnter);
 
 	CB_Bling->OnCheckStateChanged.AddDynamic(this, &UHG_RemoteCS::OnCheckBoxChanged);
 }
 
+
 void UHG_RemoteCS::OnClickRed()
 {
-	Color = FLinearColor(1.0f,0.0f,0.0f);
+	Color = FLinearColor(1.0f, 0.0f, 0.0f);
 }
 
 void UHG_RemoteCS::OnClickOrange()
@@ -87,27 +89,39 @@ void UHG_RemoteCS::OnClickCommit()
 		auto* C_CheerSticks = Cast<AHG_CheeringStick>(CheerStick);
 		if (C_CheerSticks)
 		{
-			C_CheerSticks->ApplyChange(Color,bChecked,Intensity);
-		} 
+			C_CheerSticks->ApplyChange(Color, bChecked, Intensity);
+		}
 	}
 
 	RemoveFromParent();
 
-	if (Onwer->PC)
+	if (Owner->PC)
 	{
-		Onwer->PC->SetShowMouseCursor(false);
+		Owner->PC->SetShowMouseCursor(false);
 
 		FInputModeGameOnly InputMode;
-		Onwer->PC->SetInputMode(InputMode);
+		Owner->PC->SetInputMode(InputMode);
 	}
 
+}
+
+void UHG_RemoteCS::OnClickClose()
+{
+	RemoveFromParent();
+	if (Owner->PC)
+	{
+		Owner->PC->SetShowMouseCursor(false);
+
+		FInputModeGameOnly InputMode;
+		Owner->PC->SetInputMode(InputMode);
+	}
 }
 
 void UHG_RemoteCS::OnTextEnter(const FText& Text, ETextCommit::Type CommitMethod)
 {
 	if (CommitMethod == ETextCommit::OnEnter || ETextCommit::OnUserMovedFocus)
 	{
-		FDefaultValueHelper::ParseFloat(Text.ToString() , Intensity);
+		FDefaultValueHelper::ParseFloat(Text.ToString(), Intensity);
 	}
 }
 
@@ -116,9 +130,9 @@ void UHG_RemoteCS::OnCheckBoxChanged(bool bIsChecked)
 	bChecked = bIsChecked;
 }
 
-void UHG_RemoteCS::SetOnwer(AHG_Player* Value)
+void UHG_RemoteCS::SetOwner(AHG_Player* Value)
 {
-	Onwer = Value;
+	Owner = Value;
 }
 
 
