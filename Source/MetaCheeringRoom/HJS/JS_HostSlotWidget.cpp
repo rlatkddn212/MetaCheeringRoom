@@ -8,6 +8,8 @@
 #include "Components/Button.h"
 #include "../MetaCheeringRoom.h"
 #include "JS_CreateRoomWidget.h"
+#include "../Util/UtilBlueprintFunctionLibrary.h"
+#include "Components/Image.h"
 
 void UJS_HostSlotWidget::NativeConstruct()
 {
@@ -23,6 +25,9 @@ void UJS_HostSlotWidget::SetupInfo(FCreatorMapMetaData* metaData, UJS_CreateRoom
 	TEXT_Creator->SetText(FText::FromString(metaData->CreatorName));
 	TEXT_Date->SetText(FText::FromString(metaData->CreatedTime.ToString()));
 	TEXT_MapName->SetText(FText::FromString(metaData->CreatorMapName));
+	UTexture2D* Texture = UUtilBlueprintFunctionLibrary::LoadScreenshotAsTexture(metaData->ThumbnailFileName);
+	if (Texture)
+		IMG_Thumbnail->SetBrushFromTexture(Texture);
 }
 
 void UJS_HostSlotWidget::OnClickHostBtn()
