@@ -6,6 +6,9 @@
 #include "JS_CreateRoomWidget.h"
 #include "Components/TextBlock.h"
 #include "../KSW/CreatorStorageSubsystem.h"
+#include "../Util/UtilBlueprintFunctionLibrary.h"
+#include "Engine/Texture2D.h"
+#include "Components/Image.h"
 
 void UJS_CreateRoomNode::NativeConstruct()
 {
@@ -56,4 +59,8 @@ void UJS_CreateRoomNode::SetupInfo(struct FCreatorMapMetaData* metaData, class U
 	Parent = parent;
 	MapMetaData = metaData;
 	TEXT_MapName->SetText(FText::FromString(metaData->CreatorMapName));
+
+	UTexture2D* Texture = UUtilBlueprintFunctionLibrary::LoadScreenshotAsTexture(metaData->ThumbnailFileName);
+	if (Texture)
+		IMG_Thumbnail->SetBrushFromTexture(Texture);
 }
