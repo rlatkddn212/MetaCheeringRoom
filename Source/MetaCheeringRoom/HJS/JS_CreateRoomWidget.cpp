@@ -21,6 +21,7 @@
 #include "Components/CanvasPanel.h"
 #include "JS_EasingFunctionLib.h"
 #include "JS_CreateRoomNode.h"
+#include "Kismet/GameplayStatics.h"
 
 
 
@@ -155,7 +156,17 @@ void UJS_CreateRoomWidget::OnClickHosting()
 void UJS_CreateRoomWidget::OnClickModify()
 {
 	// 수정 팝업은 없음
-	
+	UCreatorStorageSubsystem* storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+	TArray<FCreatorMapMetaData*> meta = storage->GetCreatorMapMetaDatas();
+
+	FString path = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + meta[SelectIndex]->FileName;
+	FString JsonStr = storage->LoadCreatorMap(path);
+
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	system->SetMapName(meta[SelectIndex]->CreatorMapName);
+	system->SetupJson(JsonStr);
+
+	UGameplayStatics::OpenLevel(GetWorld(), LevelName, true);
 }
 
 void UJS_CreateRoomWidget::OnClickRemove()
@@ -183,6 +194,13 @@ void UJS_CreateRoomWidget::OnClickedCreateCancel()
 
 void UJS_CreateRoomWidget::OnClickedCreateLevel()
 {
+	// 레벨 생성 로직
+	FString NewLevelName = ED_LevelName->GetText().ToString();
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	system->SetupJson("[]");
+	system->SetMapName(NewLevelName);
+
+	UGameplayStatics::OpenLevel(GetWorld(), LevelName, true);
 }
 
 void UJS_CreateRoomWidget::OnClickedDeleteCancel()
@@ -192,5 +210,8 @@ void UJS_CreateRoomWidget::OnClickedDeleteCancel()
 
 void UJS_CreateRoomWidget::OnClickedDelete()
 {
-
+	UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+	system->RemoveMetaData(SelectIndex);
+	SetupMapData();
+	PlayAnimation(DeleteLevelPopup, 0.f, 1, EUMGSequencePlayMode::Reverse);
 }
