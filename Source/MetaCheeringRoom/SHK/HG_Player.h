@@ -213,5 +213,6 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UHG_RemoteCS> RCSClass;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	class APlayerController* PC;
 };

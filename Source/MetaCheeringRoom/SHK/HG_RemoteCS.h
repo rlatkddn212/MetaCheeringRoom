@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "HG_Player.h"
 #include "HG_RemoteCS.generated.h"
 
 /**
@@ -58,6 +59,9 @@ public:
 	UButton* Btn_Commit;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_Close;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UCheckBox* CB_Bling;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
@@ -98,6 +102,9 @@ public:
 	void OnClickCommit();
 
 	UFUNCTION()
+	void OnClickClose();
+
+	UFUNCTION()
 	void OnTextEnter(const FText& Text, ETextCommit::Type CommitMethod);
 
 	UFUNCTION()
@@ -113,9 +120,10 @@ public:
 
 	float Intensity;
 
-	class AHG_Player* Onwer;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	AHG_Player* Owner;
 
-	void SetOnwer(AHG_Player* Value);
+	void SetOwner(AHG_Player* Value);
 
 	bool bChecked = false;
 };

@@ -303,7 +303,7 @@ void AHG_Player::Emotion()
 		if (RCSWidget)
 		{
 			RCSWidget->AddToViewport();
-			RCSWidget->SetOnwer(this);
+			RCSWidget->SetOwner(this);
 			if (PC)
 			{
 				PC->SetShowMouseCursor(true);
