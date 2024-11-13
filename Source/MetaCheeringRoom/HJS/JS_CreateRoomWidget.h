@@ -67,6 +67,31 @@ public:
 	
 
 	// 방 만들기, 수정, 삭제 Start ----------------------------
-
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	class UWidgetAnimation* CreateLevelPopup;
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	class UWidgetAnimation* DeleteLevelPopup;
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* ED_LevelName;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BTN_CreateCancel;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BTN_CreateLevel;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BTN_DeleteCancel;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BTN_Delete;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BTN_CreateRoom;
+	UFUNCTION()
+	void OnClickedCreateRoom();
+	UFUNCTION()
+	void OnClickedCreateCancel();
+	UFUNCTION()
+	void OnClickedCreateLevel();
+	UFUNCTION()
+	void OnClickedDeleteCancel();
+	UFUNCTION()
+	void OnClickedDelete();
 	// 방 만들기, 수정, 삭제 End ------------------------------
 };
