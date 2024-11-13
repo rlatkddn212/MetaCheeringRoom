@@ -30,6 +30,7 @@ void AHG_EquipItem::Tick(float DeltaTime)
 
 void AHG_EquipItem::Equiped(APawn* Value)
 {
-	SetOwner(Value);
+	SetItemOwner(Value);
+	SetOwner(Cast<APlayerController>(Value->GetController()));
 }
 

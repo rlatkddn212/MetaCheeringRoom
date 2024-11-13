@@ -22,7 +22,7 @@ void AHG_FireCracker::Use()
 
 void AHG_FireCracker::ServerRPCUse_Implementation()
 {
-	MulticastRPCUse(Owner);
+	MulticastRPCUse(ItemOwner);
 }
 
 void AHG_FireCracker::MulticastRPCUse_Implementation(APawn* pawn)

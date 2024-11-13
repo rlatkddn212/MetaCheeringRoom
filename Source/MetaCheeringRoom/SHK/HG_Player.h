@@ -69,7 +69,6 @@ public:
 	UFUNCTION()
 	void Emotion();
 
-
 	FVector Direction;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -134,7 +133,7 @@ public:
 	void ServerRPCEquipItemToSocket(FItemData p_ItemInfo);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPCEquipItemToSocket(AHG_EquipItem* ItemValue);
+	void MulticastRPCEquipItemToSocket(AHG_EquipItem* Value);
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPCUnequipItemToSocket(const FString& NameValue);
@@ -144,6 +143,7 @@ public:
 
 	void DestroyItem(AHG_ItemBase* ItemValue);
 
+	void SpawnedMulticast();
 	UFUNCTION(Server, Reliable)
 	void ServerRPCDestroyItem(AHG_ItemBase* ItemValue);
 
@@ -221,4 +221,5 @@ public:
 	UPROPERTY(EditDefaultsOnly,Replicated)
 	UHG_HUD* HUD;
 
+	class AHG_EquipItem* EItem;
 };

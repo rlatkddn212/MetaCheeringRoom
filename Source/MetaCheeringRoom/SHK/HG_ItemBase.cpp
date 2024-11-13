@@ -47,9 +47,9 @@ void AHG_ItemBase::Use()
 {
 }
 
-void AHG_ItemBase::SetOwner(APawn* Value)
+void AHG_ItemBase::SetItemOwner(APawn* Value)
 {
-	Owner = Value;
+	ItemOwner = Value;
 }
 
 void AHG_ItemBase::SetItemName(FString Value)

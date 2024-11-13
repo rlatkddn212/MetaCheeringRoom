@@ -88,9 +88,12 @@ void UHG_RemoteCS::OnClickCommit()
 	for (auto* CheerStick : CheerSticks)
 	{
 		auto* C_CheerStick = Cast<AHG_CheeringStick>(CheerStick);
-		if (C_CheerStick)
+		if (C_CheerStick->ItemOwner == this->Owner)
 		{
-			C_CheerStick->ApplyChange(Color, bChecked, Intensity);
+			if (C_CheerStick)
+			{
+				C_CheerStick->ApplyChange(Color, bChecked, Intensity);
+			}
 		}
 	}
 

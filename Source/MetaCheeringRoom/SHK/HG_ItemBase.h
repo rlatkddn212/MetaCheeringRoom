@@ -83,7 +83,7 @@ public:
 
 	virtual void Use();
 
-	virtual void SetOwner(APawn* Value);
+	virtual void SetItemOwner(APawn* Value);
 
 	void SetItemName(FString Value);
 	FString GetItemName();
@@ -101,7 +101,7 @@ public:
 
 	class UHG_GameInstance* GI;
 
-	class APawn* Owner;
+	class APawn* ItemOwner;
 
 	bool bEquiped = false;
 };
