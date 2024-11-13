@@ -22,6 +22,8 @@
 #include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HG_RemoteCS.h"
+#include "HG_HUD.h"
+#include "HG_CheeringStick.h"
 
 AHG_Player::AHG_Player()
 {
@@ -108,6 +110,18 @@ void AHG_Player::BeginPlay()
 	{
 		this->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
 	}
+
+	if (IsLocallyControlled())
+	{
+		if (HeadUpClass)
+		{
+			HUD = CreateWidget<UHG_HUD>(GetWorld(), HeadUpClass);
+			if (HUD)
+			{
+				HUD->AddToViewport();
+			}
+		}
+	}
 }
 
 void AHG_Player::Tick(float DeltaTime)
@@ -173,7 +187,7 @@ void AHG_Player::Tick(float DeltaTime)
 	}
 	else
 	{
-		Timing-=DeltaTime;
+		Timing -= DeltaTime;
 		if (Timing <= 0)
 		{
 			SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
@@ -295,11 +309,9 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 
 void AHG_Player::Emotion()
 {
-// 	FItemData Temp = GI->FindItemData("SadBee");
-// 	InventoryComp->AddtoInventory(Temp,1);
-	if(bEquipItem)
+	if (bEquipItem)
 	{
-		auto RCSWidget = CreateWidget<UHG_RemoteCS>(GetWorld(), RCSClass);
+		auto* RCSWidget = CreateWidget<UHG_RemoteCS>(GetWorld(), RCSClass);
 		if (RCSWidget)
 		{
 			RCSWidget->AddToViewport();
@@ -344,15 +356,20 @@ void AHG_Player::PopUpPurchaseWidget()
 void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 {
 	if (ItemValue == nullptr) return;
+	ItemValue->Equiped(this);
 	EquipItemList.Add(ItemValue);
 	ItemValue->bEquiped = true;
+
 	GI->EquipItemInfoList.Add(ItemValue->GetItemData());
+
 	auto* mesh = ItemValue->GetComponentByClass<UStaticMeshComponent>();
 	check(mesh);
 	if (mesh)
 	{
 		bEquipItem = true;
+
 		mesh->SetSimulatePhysics(false);
+
 		switch (ItemValue->GetItemCategory())
 		{
 		case EItemCategory::Category_Bottom:
@@ -374,7 +391,10 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 			else
 			{
 				mesh->AttachToComponent(HandLComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-				ItemValue->Equiped(this);
+				if (HUD)
+				{
+					HUD->UpdateHUD(TEXT("E) 응원봉 조작하기"));
+				}
 				bPassed = false;
 			}
 			break;
@@ -537,10 +557,7 @@ void AHG_Player::ServerRPCEquipItemToSocket_Implementation(FItemData p_ItemInfo)
 	auto* EItem = GetWorld()->SpawnActor<AHG_EquipItem>(p_ItemInfo.ItemClass, GetActorLocation(), GetActorRotation());
 	if (EItem)
 	{
-		EItem->SetOwner(this);
-
 		MulticastRPCEquipItemToSocket(EItem);
-
 	}
 }
 
@@ -564,7 +581,9 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AHG_Player, EquipItemList);
-	
+	DOREPLIFETIME(AHG_Player, bEquipItem);
+	DOREPLIFETIME(AHG_Player, HUD);
+
 }
 
 

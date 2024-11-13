@@ -7,11 +7,17 @@
 #include "HG_HUD.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class METACHEERINGROOM_API UHG_HUD : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void NativeConstruct() override;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	class UTextBlock* TB_RemoteCS;
+
+	void UpdateHUD(FString Value);
 };

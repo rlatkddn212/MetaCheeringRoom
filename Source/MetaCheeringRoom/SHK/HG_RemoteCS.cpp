@@ -84,12 +84,13 @@ void UHG_RemoteCS::OnClickGrey()
 void UHG_RemoteCS::OnClickCommit()
 {
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), CSClass, CheerSticks);
+
 	for (auto* CheerStick : CheerSticks)
 	{
-		auto* C_CheerSticks = Cast<AHG_CheeringStick>(CheerStick);
-		if (C_CheerSticks)
+		auto* C_CheerStick = Cast<AHG_CheeringStick>(CheerStick);
+		if (C_CheerStick)
 		{
-			C_CheerSticks->ApplyChange(Color, bChecked, Intensity);
+			C_CheerStick->ApplyChange(Color, bChecked, Intensity);
 		}
 	}
 
@@ -102,7 +103,6 @@ void UHG_RemoteCS::OnClickCommit()
 		FInputModeGameOnly InputMode;
 		Owner->PC->SetInputMode(InputMode);
 	}
-
 }
 
 void UHG_RemoteCS::OnClickClose()
