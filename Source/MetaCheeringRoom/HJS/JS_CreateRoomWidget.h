@@ -93,5 +93,8 @@ public:
 	void OnClickedDeleteCancel();
 	UFUNCTION()
 	void OnClickedDelete();
+
+	UPROPERTY(EditAnywhere)
+	FName LevelName = TEXT("KswTestMap");
 	// 방 만들기, 수정, 삭제 End ------------------------------
 };
