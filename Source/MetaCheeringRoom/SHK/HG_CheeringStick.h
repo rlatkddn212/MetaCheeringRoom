@@ -1,4 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -36,6 +37,12 @@ public:
 	void ChangeIntensity(float Value);
 
 	void ApplyChange(FLinearColor Color,bool Bling,float Intensity);
+	
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_ApplyChange(FLinearColor Color, bool Bling, float Intensity);
+
+	UFUNCTION(NetMulticast,Reliable)
+	void Multicast_ApplyChange(FLinearColor Color, bool Bling, float Intensity);
 
 	void BlingBling(float DeltaSecond);
 
@@ -47,10 +54,6 @@ public:
 	bool bBling = false;
 
 	bool bToggle = false;
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UHG_HUD> HeadUpClass;
-
-	UHG_HUD* HUD;
 
 	class UMaterialInstanceDynamic* DynamicMaterial;
 };

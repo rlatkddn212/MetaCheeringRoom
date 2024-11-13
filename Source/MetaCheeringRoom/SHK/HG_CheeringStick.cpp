@@ -2,14 +2,16 @@
 
 
 #include "SHK/HG_CheeringStick.h"
-#include "SHK/HG_HUD.h"
 #include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Components/StaticMeshComponent.h"
+#include "HG_Player.h"
 
 AHG_CheeringStick::AHG_CheeringStick()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	this->bReplicates = true;
 }
 
 void AHG_CheeringStick::BeginPlay()
@@ -43,15 +45,6 @@ void AHG_CheeringStick::Tick(float DeltaTime)
 void AHG_CheeringStick::Equiped(APawn* Value)
 {
 	SetOwner(Value);
-
-	if (Owner != nullptr && Owner->IsLocallyControlled())
-	{
-		HUD = CreateWidget<UHG_HUD>(GetWorld(), HeadUpClass);
-		if (HUD)
-		{
-			HUD->AddToViewport();
-		}
-	}
 }
 
 void AHG_CheeringStick::ChangeColor(FLinearColor Value)
@@ -66,13 +59,26 @@ void AHG_CheeringStick::ChangeIntensity(float Value)
 {
 	if (DynamicMaterial)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%f"), Value);
 		DynamicMaterial->SetScalarParameterValue("Intensity", Value);
 		CurrentIntensity = Value;
 	}
 }
 
 void AHG_CheeringStick::ApplyChange(FLinearColor Color, bool Bling, float Intensity)
+{
+	if (Owner)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Owner"));
+	}
+	ServerRPC_ApplyChange(Color, Bling, Intensity);
+}
+
+void AHG_CheeringStick::ServerRPC_ApplyChange_Implementation(FLinearColor Color, bool Bling, float Intensity)
+{
+	Multicast_ApplyChange(Color, Bling, Intensity);
+}
+
+void AHG_CheeringStick::Multicast_ApplyChange_Implementation(FLinearColor Color, bool Bling, float Intensity)
 {
 	ChangeIntensity(Intensity);
 	ChangeColor(Color);
@@ -83,7 +89,7 @@ void AHG_CheeringStick::BlingBling(float DeltaSecond)
 {
 	if (!bToggle)
 	{
-		CurrentIntensity -= DeltaSecond*100;
+		CurrentIntensity -= DeltaSecond * 100;
 		ChangeIntensity(CurrentIntensity);
 		if (CurrentIntensity < MinIntensity)
 		{
@@ -92,7 +98,7 @@ void AHG_CheeringStick::BlingBling(float DeltaSecond)
 	}
 	else
 	{
-		CurrentIntensity += DeltaSecond*100;
+		CurrentIntensity += DeltaSecond * 100;
 		ChangeIntensity(CurrentIntensity);
 		if (CurrentIntensity > MaxIntensity)
 		{
@@ -100,3 +106,4 @@ void AHG_CheeringStick::BlingBling(float DeltaSecond)
 		}
 	}
 }
+

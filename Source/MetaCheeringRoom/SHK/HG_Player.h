@@ -155,6 +155,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPCSpawnItem(AHG_ItemBase* ItemValue);
 
+	UPROPERTY(Replicated)
 	bool bEquipItem = false;
 
 	UPROPERTY(Replicated)
@@ -191,28 +192,33 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UAudioComponent* AudioComp;
 
-// 	UPROPERTY(ReplicatedUsing = OnRep_PlayEmotionMontage)
-// 	bool bPlayEmotionMontage;
+	// 	UPROPERTY(ReplicatedUsing = OnRep_PlayEmotionMontage)
+	// 	bool bPlayEmotionMontage;
 
-// 	void StartEmotion(UAnimMontage* Montage);
-// 
-// 	UFUNCTION()
-// 	void OnRep_PlayEmotionMontage();
+	// 	void StartEmotion(UAnimMontage* Montage);
+	// 
+	// 	UFUNCTION()
+	// 	void OnRep_PlayEmotionMontage();
 
-// 	UPROPERTY(Replicated)
-// 	UAnimMontage* SelectedMontage;
-	UFUNCTION(Server,Reliable)
+	// 	UPROPERTY(Replicated)
+	// 	UAnimMontage* SelectedMontage;
+	UFUNCTION(Server, Reliable)
 	void ServerRPC_Emotion(UAnimMontage* Montage);
-	UFUNCTION(NetMulticast,Reliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_Emotion(UAnimMontage* Montage);
-
-	class UObjectPool* ObjectPool;
 
 	float Timing = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UHG_RemoteCS> RCSClass;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class APlayerController* PC;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UHG_HUD> HeadUpClass;
+
+	UPROPERTY(EditDefaultsOnly,Replicated)
+	UHG_HUD* HUD;
+
 };
