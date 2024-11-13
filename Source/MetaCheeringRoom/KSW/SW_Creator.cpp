@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Actor.h"
 #include "SW_CreatorPlayerController.h"
+#include "UI/SW_CameraSpeedWidget.h"
 
 // Sets default values
 ASW_Creator::ASW_Creator()
@@ -22,6 +23,12 @@ void ASW_Creator::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// À§Á¬ »ý¼º
+	CameraSpeedWidget = CreateWidget<USW_CameraSpeedWidget>(GetWorld(), CameraSpeedWidgetFactory);
+	if (CameraSpeedWidget)
+	{
+		CameraSpeedWidget->AddToViewport();
+	}
 }
 
 // Called every frame
@@ -34,7 +41,7 @@ void ASW_Creator::Tick(float DeltaTime)
 	Direction = t.TransformVector(Direction);
 
 	FVector p = GetActorLocation();
-	p += Direction * 500 * DeltaTime;
+	p += Direction * CameraSpeed * DeltaTime;
 	SetActorLocation(p);
 
 	Direction = FVector::ZeroVector;
@@ -87,6 +94,8 @@ void ASW_Creator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	input->BindAction(IA_Alt, ETriggerEvent::Completed, this, &ASW_Creator::OnMyAltCompleted);
 	input->BindAction(IA_C, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyC);
 	input->BindAction(IA_V, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyV);
+	input->BindAction(IA_CameraSpeedUp, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyCameraSpeedUp);
+	input->BindAction(IA_CameraSpeedDown, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyCameraSpeedDown);
 }
 
 void ASW_Creator::OnMyMove(const FInputActionValue& Value)
@@ -257,6 +266,36 @@ void ASW_Creator::OnMyV(const FInputActionValue& Value)
 	{
 		PC->PasteSelectedObject();
 	}
+}
+
+void ASW_Creator::OnMyCameraSpeedUp(const FInputActionValue& Value)
+{
+	if (10000.0f <= CameraSpeed) return;
+	if (2000.0f <= CameraSpeed)
+	{
+		CameraSpeed += 500;
+	}
+	else
+	{
+		CameraSpeed += 100;
+	}
+	
+	CameraSpeedWidget->SetCameraSpeed(CameraSpeed / 1000.0f);
+}
+
+void ASW_Creator::OnMyCameraSpeedDown(const FInputActionValue& Value)
+{
+	if (CameraSpeed <= 100) return;
+	if (2000.0f < CameraSpeed)
+	{
+		CameraSpeed -= 500;
+	}
+	else
+	{
+		CameraSpeed -= 100;
+	}
+
+	CameraSpeedWidget->SetCameraSpeed(CameraSpeed / 1000.0f);
 }
 
 void ASW_Creator::SetMouseState(ECreatorMouseState NewState)

@@ -79,7 +79,12 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_V;
-
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_CameraSpeedUp;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_CameraSpeedDown;
 
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
@@ -130,6 +135,11 @@ public:
 	UFUNCTION()
 	void OnMyV(const FInputActionValue& Value);
 
+	UFUNCTION()
+	void OnMyCameraSpeedUp(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyCameraSpeedDown(const FInputActionValue& Value);
+
 	FVector Direction;
 
 	ECreatorMouseState MouseState;
@@ -138,6 +148,11 @@ public:
 	class ASW_CreatorPlayerController* PC;
 
 	void SetMouseState(ECreatorMouseState NewState);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class USW_CameraSpeedWidget> CameraSpeedWidgetFactory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	class USW_CameraSpeedWidget* CameraSpeedWidget;
 
 	// 마우스 클릭시 초기 위치
 	FVector2D MouseDownPosition;
@@ -147,4 +162,6 @@ public:
 
 	float LastInputTime = 0.0f;
 	float InputDelay = 0.2f;
+
+	float CameraSpeed = 500.0f;
 };
