@@ -55,5 +55,7 @@ public:
 
 	bool bToggle = false;
 
+	float time = 0.1;
+
 	class UMaterialInstanceDynamic* DynamicMaterial;
 };

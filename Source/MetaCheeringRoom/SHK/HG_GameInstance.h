@@ -41,4 +41,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	class USkeletalMesh* SkeletalMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool bIsFirstAccess = true;
 };
