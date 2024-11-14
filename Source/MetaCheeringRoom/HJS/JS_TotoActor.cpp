@@ -260,6 +260,7 @@ void AJS_TotoActor::AdjustWin(AHG_Player* player)
 	if (FanfareFactory)
 	{
 		AActor* Actor = GetWorld()->SpawnActor<AActor>(FanfareFactory, SpawnLocation, SpawnRotation);
+		Actor->SetOwner(player);
 	}
 }
 
