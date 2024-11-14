@@ -75,6 +75,21 @@ public:
 	
 	UPROPERTY()
     UStaticMeshComponent* ZAxisMesh;
+	
+	UPROPERTY()
+    UStaticMeshComponent* XYAxisMeshX;
+	UPROPERTY()
+    UStaticMeshComponent* XYAxisMeshY;
+
+	UPROPERTY()
+    UStaticMeshComponent* XZAxisMeshX;
+	UPROPERTY()
+    UStaticMeshComponent* XZAxisMeshZ;
+
+	UPROPERTY()
+    UStaticMeshComponent* YZAxisMeshY;
+	UPROPERTY()
+    UStaticMeshComponent* YZAxisMeshZ;
 
 	
     /** X, Y, Z 회전용 링 메쉬 */
