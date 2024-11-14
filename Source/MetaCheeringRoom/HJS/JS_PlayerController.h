@@ -85,4 +85,7 @@ public:
 
 	UPROPERTY()
 	class AJS_AtkActor* AtkActor;
+
+	UFUNCTION(Server, Reliable)
+	void SetMyUserID(const FString& str);
 };

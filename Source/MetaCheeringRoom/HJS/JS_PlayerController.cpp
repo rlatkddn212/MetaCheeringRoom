@@ -41,23 +41,26 @@ void AJS_PlayerController::BeginPlay()
 			ExitWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
-	IOnlineSubsystem* SubSystem = IOnlineSubsystem::Get(TEXT("Steam"));
-	if (SubSystem)
-	{
-		// Identity 인터페이스 가져오기
-		IOnlineIdentityPtr IdentityInterface = SubSystem->GetIdentityInterface();
-		if (IdentityInterface.IsValid())
-		{
-			// 로컬 플레이어의 유니크 넷 ID 가져오기
-			FUniqueNetIdPtr UserId = IdentityInterface->GetUniquePlayerId(0);
-			if (UserId.IsValid())
-			{
-				// Steam ID를 문자열로 변환
-				MyUserID = UserId->ToString();
-			}
-		}
-	}
-	PRINTLOG(TEXT("Name : %s"), *MyUserID);
+	//if (IsLocalController())
+	//{
+	//	IOnlineSubsystem* SubSystem = IOnlineSubsystem::Get(TEXT("Steam"));
+	//	if (SubSystem)
+	//	{
+	//		// Identity 인터페이스 가져오기
+	//		IOnlineIdentityPtr IdentityInterface = SubSystem->GetIdentityInterface();
+	//		if (IdentityInterface.IsValid())
+	//		{
+	//			// 로컬 플레이어의 유니크 넷 ID 가져오기
+	//			FUniqueNetIdPtr UserId = IdentityInterface->GetUniquePlayerId(0);
+	//			if (UserId.IsValid())
+	//			{
+	//				// Steam ID를 문자열로 변환
+	//				MyUserID = UserId->ToString();
+	//			}
+	//		}
+	//	}
+	//	PRINTLOG(TEXT("Name : %s"), *MyUserID);
+	//}
 }
 
 void AJS_PlayerController::Tick(float Deltatime)
@@ -267,4 +270,9 @@ void AJS_PlayerController::SpawnStarActor()
 		FActorSpawnParameters SpawnParams;
 		StarActor = GetWorld()->SpawnActor<AJS_StarActor>(StarActorFactory, SpLocation, SpawnRotation, SpawnParams);
 	}
+}
+
+void AJS_PlayerController::SetMyUserID_Implementation(const FString& str)
+{
+	MyUserID = str;
 }
