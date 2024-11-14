@@ -41,7 +41,9 @@ public:
 	EItemCategory ItemCategory;
 
 	UPROPERTY(EditDefaultsOnly)
-	UAnimMontage* Montage;
+	UAnimMontage* Woman_Montage; 
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* Man_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftObjectPtr<USoundWave> Sound;

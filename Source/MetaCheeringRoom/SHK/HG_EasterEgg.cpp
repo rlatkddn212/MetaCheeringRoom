@@ -99,7 +99,8 @@ void AHG_EasterEgg::SetItemData(FItemData ItemValue)
 	ItemData.ItemName = ItemValue.ItemName;
 	ItemData.ItemPrice = ItemValue.ItemPrice;
 	ItemData.ItemCategory = ItemValue.ItemCategory;
-	ItemData.Montage = ItemValue.Montage;
+	ItemData.Woman_Montage = ItemValue.Woman_Montage;
+	ItemData.Man_Montage = ItemValue.Man_Montage;
 	ItemData.Sound = ItemValue.Sound;
 }
 

@@ -207,6 +207,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_Emotion(UAnimMontage* Montage);
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_InitCharacter();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_InitCharacter();
 	float Timing = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -218,8 +222,11 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UHG_HUD> HeadUpClass;
 
-	UPROPERTY(EditDefaultsOnly,Replicated)
+	UPROPERTY(EditDefaultsOnly, Replicated)
 	UHG_HUD* HUD;
 
 	class AHG_EquipItem* EItem;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	int32 Gender = 1;
 };

@@ -358,7 +358,14 @@ void UInventoryWidget::UseItem()
 					// 이모션 아이템을 사용했다면
 
 					// 플레이어가 Montage를 실행하도록 함
-					OwningPlayer->ServerRPC_Emotion(SelectedSlot->SlotInfo.ItemInfo.Montage);
+					if (OwningPlayer->Gender == 1)
+					{
+						OwningPlayer->ServerRPC_Emotion(SelectedSlot->SlotInfo.ItemInfo.Woman_Montage);
+					}
+					else if (OwningPlayer->Gender == 2)
+					{
+						OwningPlayer->ServerRPC_Emotion(SelectedSlot->SlotInfo.ItemInfo.Man_Montage);
+					}
 				}
 			}
 		}

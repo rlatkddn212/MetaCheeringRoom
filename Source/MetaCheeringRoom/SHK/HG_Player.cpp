@@ -97,19 +97,13 @@ void AHG_Player::BeginPlay()
 		EquipItemToSocket(ID);
 	}
 
+	ServerRPC_InitCharacter();
 
 	InventoryComp->Inventory = GI->CurrentInventory;
 	GoodsComp->SetGold(GI->CurrentGold);
 	TargetValue1 = SpringArmComp->TargetArmLength;
 
-	if (GI->Anim)
-	{
-		this->GetMesh()->SetAnimInstanceClass(GI->Anim);
-	}
-	if (GI->SkeletalMesh)
-	{
-		this->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
-	}
+	
 
 	if (IsLocallyControlled())
 	{
@@ -361,7 +355,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 
 	if (IsLocallyControlled())
 	{
-		GI->EquipItemInfoList.Add(ItemValue->GetItemData());	
+		GI->EquipItemInfoList.Add(ItemValue->GetItemData());
 	}
 
 	auto* mesh = ItemValue->GetComponentByClass<UStaticMeshComponent>();
@@ -570,7 +564,7 @@ void AHG_Player::ServerRPCEquipItemToSocket_Implementation(FItemData p_ItemInfo)
 	if (EItem)
 	{
 		FTimerHandle handle;
-		GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_Player::SpawnedMulticast,0.1f,false);
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_Player::SpawnedMulticast, 0.1f, false);
 	}
 }
 
@@ -593,6 +587,26 @@ void AHG_Player::ServerRPCUnequipItemToSocket_Implementation(const FString& Name
 void AHG_Player::MulticastRPCUnequipItemToSocket_Implementation(const FString& NameValue)
 {
 	UnequipItem(NameValue);
+}
+
+void AHG_Player::ServerRPC_InitCharacter_Implementation()
+{
+	Multicast_InitCharacter();
+}
+void AHG_Player::Multicast_InitCharacter_Implementation()
+{
+	if (GI->Gender != 0)
+	{
+		Gender = GI->Gender;
+	}
+	if (GI->Anim)
+	{
+		this->GetMesh()->SetAnimInstanceClass(GI->Anim);
+	}
+	if (GI->SkeletalMesh)
+	{
+		this->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
+	}
 }
 
 void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
