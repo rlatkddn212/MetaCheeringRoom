@@ -88,7 +88,6 @@ void AJS_TotoActor::BeginPlay()
 void AJS_TotoActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	OnPlayerModify(DeltaTime);
 }
 
 void AJS_TotoActor::MakeToto(FString totoName, FString select1, FString select2, int32 second)
@@ -220,67 +219,36 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 			LoseValues.Add(Elem.Value);
 		}
 	}
-	MulticastAdjustPoint(Keys, Values, TotalOdds1);
-	MulticastAdjustLose(LoseKeys, LoseValues);
+	ServerAdjustPoint(Keys, Values, TotalOdds1);
+	ServerAdjustLose(LoseKeys, LoseValues);
 }
 
-void AJS_TotoActor::MulticastAdjustPoint_Implementation(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd)
+void AJS_TotoActor::MulticastAdjustPoint_Implementation(class AHG_Player* player, int32 bettingpoint, float odd)
 {
-	int32 BettingPoint = 0;
-	bool bWin  =false;
-	for (int32 i=0;i<Keys.Num();i++)
-	{
-		if (Keys[i] == MyUserID)
-		{
-			BettingPoint = Values[i];
-			bWin = true;
-			break;
-		}
-	}
-	Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-
-	Player->GoodsComp->AddGold(BettingPoint * Odd);
-
-	if (bWin == true)
-	{
-		AdjustWin();
-	}
-
+	player->GoodsComp->AddGold(bettingpoint*odd);
+	AdjustWin(player);
 }
 
-void AJS_TotoActor::MulticastAdjustLose_Implementation(const TArray<FString>& Keys, const TArray<int32>& Values)
+void AJS_TotoActor::MulticastAdjustLose_Implementation(class AHG_Player* player)
 {
-	bool bLose = false;
-	for (int32 i = 0; i < Keys.Num(); i++)
-	{
-		if (Keys[i] == MyUserID)
-		{
-			bLose = true;
-			break;
-		}
-	}
-	// 만약 졌다면
-	if (bLose)
-	{
-		// 실패 애니메이션 시작
-		LoseAnimationPlay();
-	}
+	// 실패 애니메이션 시작
+	LoseAnimationPlay(player);
 }
 
-void AJS_TotoActor::AdjustWin()
+void AJS_TotoActor::AdjustWin(AHG_Player* player)
 {
-	if (!Player)
+	if (!player)
 	{
 		return;
 	}
 	
-	if (Player && Player->IsLocallyControlled())
+	if (player && player->IsLocallyControlled())
 	{
 		// 축하 사운드 재생
 		UGameplayStatics::PlaySound2D(GetWorld(),TadaSound);
 	}
 
-	FVector SpawnLocation = Player->GetActorLocation(); // Offset distance
+	FVector SpawnLocation = player->GetActorLocation(); // Offset distance
 	SpawnLocation.Z += 50;
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
@@ -297,7 +265,6 @@ void AJS_TotoActor::ServerSetTimerLimit()
 		FString timeLimitText = FString::Printf(TEXT("제출이 마감되었습니다."));
 		MulticastSetTimeUI(timeLimitText, TotoLimitTIme);
 		MulticastAlarmToto(TEXT("승부예측이 마감되었습니다!"));
-
 	}
 	else
 	{
@@ -307,6 +274,46 @@ void AJS_TotoActor::ServerSetTimerLimit()
 		TotoLimitTIme--;
 		MulticastSetTimeUI(timeLimitText, TotoLimitTIme);
 		GetWorld()->GetTimerManager().SetTimer(ToToLimitTimerHandle, this, &AJS_TotoActor::ServerSetTimerLimit, 1.f, false);
+	}
+}
+
+void AJS_TotoActor::ServerAdjustPoint(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd)
+{
+	int32 BettingPoint = 0;
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHG_Player::StaticClass(), Actors);
+	for (int32 i = 0; i < Keys.Num(); i++)
+	{
+		for (AActor* actor : Actors)
+		{
+			AHG_Player* player = Cast<AHG_Player>(actor);
+			AJS_PlayerController* PC = Cast<AJS_PlayerController>(player->GetController());
+			if (Keys[i] == PC->MyUserID)
+			{
+				MulticastAdjustPoint(player,Values[i], Odd);
+			}
+		}
+	}
+	Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+
+	Player->GoodsComp->AddGold(BettingPoint * Odd);
+}
+
+void AJS_TotoActor::ServerAdjustLose(const TArray<FString>& Keys, const TArray<int32>& Values)
+{
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHG_Player::StaticClass(), Actors);
+	for (int32 i = 0; i < Keys.Num(); i++)
+	{
+		for (AActor* actor : Actors)
+		{
+			AHG_Player* player = Cast<AHG_Player>(actor);
+			AJS_PlayerController* PC = Cast<AJS_PlayerController>(player->GetController());
+			if (Keys[i] == PC->MyUserID)
+			{
+				MulticastAdjustLose(player);
+			}
+		}
 	}
 }
 
@@ -338,7 +345,6 @@ void AJS_TotoActor::MulticastSetTimeUI_Implementation(const FString& TimeText, c
 
 void AJS_TotoActor::MulticastInitToto_Implementation()
 {
-
 	// 전체 포인트
 	TotalSelect1 = 0;
 	TotalSelect2 = 0;
@@ -357,18 +363,16 @@ void AJS_TotoActor::MulticastInitToto_Implementation()
 	}
 }
 
-void AJS_TotoActor::LoseAnimationPlay()
+void AJS_TotoActor::LoseAnimationPlay(AHG_Player* player)
 {
-	// 플레이어를 가져와서
-	Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	// 플레이어 앞에 액터를 소환하기, 플레이어에게 Attach하기
-	if (Player)
+	if (player)
 	{
-		if (Player->IsLocallyControlled())
+		if (player->IsLocallyControlled())
 		{
 			UGameplayStatics::PlaySound2D(GetWorld(), PoofSound);
 		}
-		FVector SpawnLocation = Player->GetActorLocation(); // Offset distance
+		FVector SpawnLocation = player->GetActorLocation(); // Offset distance
 		SpawnLocation.Z += 50;
 		FRotator SpawnRotation = FRotator::ZeroRotator;
 
@@ -379,169 +383,18 @@ void AJS_TotoActor::LoseAnimationPlay()
 			AtkActor = Cast<AJS_AtkActor>(Actor);
 			if (AtkActor)
 			{
+				AJS_PlayerController* PC = Cast<AJS_PlayerController>(player->GetController());
+				if (PC)
+				{
+					PC->AtkActor = AtkActor;
+				}
 				UJS_AtkAnimInstance* AnimIns = Cast<UJS_AtkAnimInstance>(AtkActor->SkelMesh->GetAnimInstance());
 				if (AnimIns)
 				{
+					AnimIns->Player = player;
 					AnimIns->SetTotoActor(this);
 				}
 			}
 		}
-	}
-}
-
-void AJS_TotoActor::PlayerModify()
-{
-	// 플레이어를 가져와서
-	if(!Player)
-	{
-		Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-	}
-	
-	if (Player)
-	{
-		if (Player->IsLocallyControlled())
-		{
-			UGameplayStatics::PlaySound2D(GetWorld(),SpringSound);
-		}
-		OriginalScale = Player->GetMesh()->GetRelativeScale3D();
-		// 움직임 제한 시작
-		Player->bCanMove = false;
-		StunTime = 0.0f;
-		// 스타 액터 스폰
-		SpawnStarActor();
-	}
-	if (!bAnimating)
-	{
-		bAnimating = true;
-		CurrentTime = 0.0f;
-		CurrentPhase = EModifyPhase::Squashing;
-	}
-}
-
-void AJS_TotoActor::OnPlayerModify(float DeltaTime)
-{
-
-	// 스턴 타이머 업데이트
-	if (Player && !Player->bCanMove)
-	{
-		StunTime += DeltaTime;
-		if (StunTime >= StunDuration)
-		{
-			Player->bCanMove = true;  // 움직임 다시 활성화
-			StunTime = -999999999;
-		}
-	}
-	if (StarActor)
-	{
-		FVector PlayerHeadLocation = Player->GetMesh()->GetSocketLocation(FName("head"));
-		PlayerHeadLocation.Z += 20;
-		StarActor->SetActorLocation(PlayerHeadLocation);
-	}
-	if (AtkActor)
-	{
-		FVector PlayerLocation = Player->GetActorLocation();
-		PlayerLocation.Z += 50;
-		AtkActor->SetActorLocation(PlayerLocation);
-	}
-	if (!bAnimating || !Player)
-	{
-		return;
-	}
-	CurrentTime += DeltaTime;
-	FVector NewScale = OriginalScale;
-
-	switch (CurrentPhase)
-	{
-	case EModifyPhase::Squashing:
-	{
-		float Alpha = FMath::Clamp(CurrentTime / (AnimationDuration * 1.2f), 0.0f, 1.0f);
-
-		if (Alpha < 0.4f)  // 첫 단계: 매우 심하게 찌그러짐
-		{
-			float InitialSquashAlpha = Alpha * 2.5f;  // 0~0.4를 0~1로 변환
-			float ExtremeSquash = Squash * 0.5f;  // 더 심하게 찌그러짐 (Squash보다 더 작은 값)
-
-			NewScale.Z *= FMath::Lerp(1.0f, ExtremeSquash, InitialSquashAlpha);
-			NewScale.X *= FMath::Lerp(1.0f, 0.3f / ExtremeSquash, InitialSquashAlpha);
-			NewScale.Y *= FMath::Lerp(1.0f, 0.3f / ExtremeSquash, InitialSquashAlpha);
-		}
-		else  // 두 번째 단계: 적당한 찌그러짐으로 돌아옴
-		{
-			float RecoverAlpha = (Alpha - 0.4f) * 1.67f;  // 0.4~1을 0~1로 변환
-			float ExtremeSquash = Squash * 0.5f;
-
-			NewScale.Z *= FMath::Lerp(ExtremeSquash, Squash, RecoverAlpha);
-			NewScale.X *= FMath::Lerp(1.2f / ExtremeSquash, 0.25f / Squash, RecoverAlpha);
-			NewScale.Y *= FMath::Lerp(1.2f / ExtremeSquash, 0.25f / Squash, RecoverAlpha);
-		}
-
-		if (Alpha >= 1.0f)
-		{
-			CurrentPhase = EModifyPhase::Holding;
-			CurrentTime = 0.0f;
-		}
-		break;
-	}
-	case EModifyPhase::Holding:
-	{
-		// 찌그러진 상태 유지
-		NewScale.Z *= Squash;
-		NewScale.X *= 0.25f / Squash;
-		NewScale.Y *= 0.25f / Squash;
-
-		if (CurrentTime >= HoldTime)
-		{
-			CurrentPhase = EModifyPhase::Recovering;
-			CurrentTime = 0.0f;
-		}
-		break;
-	}
-	case EModifyPhase::Recovering:
-	{
-		float Alpha = FMath::Clamp(CurrentTime / (AnimationDuration * 1.5f), 0.0f, 1.0f);
-
-		if (Alpha < 0.5f)  // 첫 번째 단계: 길게 늘어나기 (띠용~)
-		{
-			float StretchAlpha = Alpha * 2.0f;  // 0~0.5를 0~1로 변환
-			float StretchIntensity = 1.8f;  // 늘어나는 정도
-
-			NewScale.Z *= FMath::Lerp(Squash, StretchIntensity, StretchAlpha);
-			NewScale.X *= FMath::Lerp(1.0f / Squash, 0.7f / StretchIntensity, StretchAlpha);
-			NewScale.Y *= FMath::Lerp(1.0f / Squash, 0.7f / StretchIntensity, StretchAlpha);
-		}
-		else  // 두 번째 단계: 원래 크기로 돌아오기
-		{
-			float RecoverAlpha = (Alpha - 0.5f) * 2.0f;  // 0.5~1을 0~1로 변환
-			float StretchIntensity = 1.8f;
-
-			NewScale.Z *= FMath::Lerp(StretchIntensity, 1.0f, RecoverAlpha);
-			NewScale.X *= FMath::Lerp(0.7f / StretchIntensity, 1.0f, RecoverAlpha);
-			NewScale.Y *= FMath::Lerp(0.7f / StretchIntensity, 1.0f, RecoverAlpha);
-		}
-
-		if (Alpha >= 1.0f)
-		{
-			bAnimating = false;
-			CurrentPhase = EModifyPhase::None;
-			NewScale = OriginalScale;  // 완전히 정확한 원래 크기로 복구
-		}
-		break;
-		}
-	}
-	Player->GetMesh()->SetRelativeScale3D(NewScale);
-}
-
-void AJS_TotoActor::SpawnStarActor()
-{
-	if (Player && StarActorFactory)
-	{
-		// 스켈레탈 메시의 헤드 소켓 위치 가져오기
-		FVector SpawnLocation = Player->GetMesh()->GetSocketLocation(FName("head"));
-		SpawnLocation.Z += 20.f;
-		FRotator SpawnRotation = Player->GetActorRotation();
-
-		// 스타 액터 스폰
-		FActorSpawnParameters SpawnParams;
-		StarActor = GetWorld()->SpawnActor<AJS_StarActor>(StarActorFactory, SpawnLocation, SpawnRotation, SpawnParams);
 	}
 }
