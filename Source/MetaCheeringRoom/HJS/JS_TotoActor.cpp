@@ -67,19 +67,24 @@ void AJS_TotoActor::BeginPlay()
 		}
 	}
 	// Online Subsystem 인스턴스 가져오기
-	IOnlineSubsystem* SubSystem = IOnlineSubsystem::Get(TEXT("Steam"));
-	if (SubSystem)
+	AJS_PlayerController* PC = Cast<AJS_PlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
 	{
-		// Identity 인터페이스 가져오기
-		IOnlineIdentityPtr IdentityInterface = SubSystem->GetIdentityInterface();
-		if (IdentityInterface.IsValid())
+		IOnlineSubsystem* SubSystem = IOnlineSubsystem::Get(TEXT("Steam"));
+		if (SubSystem)
 		{
-			// 로컬 플레이어의 유니크 넷 ID 가져오기
-			FUniqueNetIdPtr UserId = IdentityInterface->GetUniquePlayerId(0);
-			if (UserId.IsValid())
+			// Identity 인터페이스 가져오기
+			IOnlineIdentityPtr IdentityInterface = SubSystem->GetIdentityInterface();
+			if (IdentityInterface.IsValid())
 			{
-				// Steam ID를 문자열로 변환
-				MyUserID = UserId->ToString();
+				// 로컬 플레이어의 유니크 넷 ID 가져오기
+				FUniqueNetIdPtr UserId = IdentityInterface->GetUniquePlayerId(0);
+				if (UserId.IsValid())
+				{
+					// Steam ID를 문자열로 변환
+					MyUserID = UserId->ToString();
+					PC->SetMyUserID(MyUserID);
+				}
 			}
 		}
 	}
