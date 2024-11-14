@@ -44,4 +44,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool bIsFirstAccess = true;
+
+	int32 Gender = 0;
 };
