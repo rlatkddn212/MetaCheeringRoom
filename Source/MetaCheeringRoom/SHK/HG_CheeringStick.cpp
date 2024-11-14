@@ -20,6 +20,9 @@ void AHG_CheeringStick::BeginPlay()
 	this->ItemData.ItemName = Name;
 	InitItemData();
 
+	this->SetActorHiddenInGame(true);
+
+
 	UMaterialInterface* Mat = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.MaterialInstanceConstant'/Game/SHK/Material/M_light_Inst.M_light_Inst'"));
 	if (Mat)
 	{
@@ -36,6 +39,12 @@ void AHG_CheeringStick::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	time -= DeltaTime;
+
+	if (time < 0)
+	{
+		this->SetActorHiddenInGame(false);
+	}
 	if (bBling)
 	{
 		BlingBling(DeltaTime);
