@@ -173,6 +173,87 @@ ASW_CreatorObject::ASW_CreatorObject()
 	YScaleAxisMesh->SetAbsolute(false, false, true);
 	ZScaleAxisMesh->SetAbsolute(false, false, true);
 
+	XYAxisMeshX = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XYAxisMeshX"));
+	XYAxisMeshY = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XYAxisMeshY"));
+	
+	XZAxisMeshX = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XZAxisMeshX"));
+	XZAxisMeshZ = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("XZAxisMeshZ"));
+
+	YZAxisMeshY = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("YZAxisMeshY"));
+	YZAxisMeshZ = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("YZAxisMeshZ"));
+
+	XYAxisMeshX->ComponentTags.Add(FName("XYAxisMesh"));
+	XYAxisMeshY->ComponentTags.Add(FName("XYAxisMesh"));
+
+	XZAxisMeshX->ComponentTags.Add(FName("XZAxisMesh"));
+	XZAxisMeshZ->ComponentTags.Add(FName("XZAxisMesh"));
+
+	YZAxisMeshY->ComponentTags.Add(FName("YZAxisMesh"));
+	YZAxisMeshZ->ComponentTags.Add(FName("YZAxisMesh"));
+
+	XYAxisMeshX->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	XYAxisMeshY->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+
+	XZAxisMeshX->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	XZAxisMeshZ->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+
+	YZAxisMeshY->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	YZAxisMeshZ->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> AxisMesh(TEXT("/Script/Engine.StaticMesh'/Game/Ksw/BoundingBoxEdge.BoundingBoxEdge'"));
+
+	if (ScaleAxisMesh.Succeeded())
+	{
+		XYAxisMeshX->SetStaticMesh(ScaleAxisMesh.Object);
+		XYAxisMeshY->SetStaticMesh(ScaleAxisMesh.Object);
+
+		XZAxisMeshX->SetStaticMesh(ScaleAxisMesh.Object);
+		XZAxisMeshZ->SetStaticMesh(ScaleAxisMesh.Object);
+
+		YZAxisMeshY->SetStaticMesh(ScaleAxisMesh.Object);
+		YZAxisMeshZ->SetStaticMesh(ScaleAxisMesh.Object);
+	}
+
+
+	//(Pitch=0.000000,Yaw=90.000000,Roll=0.000000)
+	XYAxisMeshX->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
+	XYAxisMeshX->SetRelativeScale3D(FVector(0.0011f, 1.5f, 1.5f));
+
+	//(X=7.000000,Y=11.000000,Z=0.000000)
+	//(Pitch=0.000000,Yaw=0.000000,Roll=0.000000)
+	//(X=1.000000,Y=2.000000,Z=2.000000)
+	XYAxisMeshY->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	XYAxisMeshY->SetRelativeScale3D(FVector(0.0011f, 1.5f, 1.5f));
+
+	// (X=11.000000,Y=0.000000,Z=7.000000)
+	// (Pitch=90.000000,Yaw=0.000000,Roll=0.000000)
+	XZAxisMeshX->SetRelativeRotation(FRotator(90.f, 0.f, 0.f));
+	XZAxisMeshX->SetRelativeScale3D(FVector(0.0011f, 1.5f, 1.5f));
+	
+	// (X=7.000000,Y=0.000000,Z=11.000000)
+	XZAxisMeshZ->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	XZAxisMeshZ->SetRelativeScale3D(FVector(0.0011f, 1.5f, 1.5f));
+
+	// (X=0.000000,Y=11.000000,Z=7.000000)
+	// (Pitch=90.000000,Yaw=0.000000,Roll=0.000000)
+	YZAxisMeshY->SetRelativeRotation(FRotator(90.f, 0.f, 0.f));
+	YZAxisMeshY->SetRelativeScale3D(FVector(0.0011f, 1.5f, 1.5f));
+
+	// (X=0.000000,Y=7.000000,Z=11.000000)
+	// (Pitch=0.000000,Yaw=90.000000,Roll=0.000000)
+	YZAxisMeshZ->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+	YZAxisMeshZ->SetRelativeScale3D(FVector(0.0011f, 1.5f, 1.5f));
+	
+	XYAxisMeshX->SetupAttachment(XAxisMesh, "Socket");
+	XYAxisMeshY->SetupAttachment(YAxisMesh, "Socket");
+
+	XZAxisMeshX->SetupAttachment(XAxisMesh, "Socket");
+	XZAxisMeshZ->SetupAttachment(ZAxisMesh, "Socket");
+
+	YZAxisMeshY->SetupAttachment(YAxisMesh, "Socket");
+	YZAxisMeshZ->SetupAttachment(ZAxisMesh, "Socket");
+
+	// 기즈모 컴포넌트 생성 및 설정
 	PositionGizmo = CreateDefaultSubobject<UCreatorPositionGizmoComponent>(TEXT("PositionGizmo"));
 	RotationGizmo = CreateDefaultSubobject<UCreatorRotationGizmoComponent>(TEXT("RotationGizmo"));
 	ScaleGizmo = CreateDefaultSubobject<UCreatorScaleGizmoComponent>(TEXT("ScaleGizmo"));
@@ -256,6 +337,20 @@ void ASW_CreatorObject::ChangeToolMode(ECreatorToolState state)
 	YAxisMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ZAxisMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	XYAxisMeshX->SetHiddenInGame(true);
+	XYAxisMeshY->SetHiddenInGame(true);
+	XZAxisMeshX->SetHiddenInGame(true);
+	XZAxisMeshZ->SetHiddenInGame(true);
+	YZAxisMeshY->SetHiddenInGame(true);
+	YZAxisMeshZ->SetHiddenInGame(true);
+
+	XYAxisMeshX->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	XYAxisMeshY->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	XZAxisMeshX->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	XZAxisMeshZ->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	YZAxisMeshY->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	YZAxisMeshZ->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	XRingMesh->SetHiddenInGame(true);
 	YRingMesh->SetHiddenInGame(true);
 	ZRingMesh->SetHiddenInGame(true);
@@ -290,6 +385,19 @@ void ASW_CreatorObject::ChangeToolMode(ECreatorToolState state)
 		XAxisMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		YAxisMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		ZAxisMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+		XYAxisMeshX->SetHiddenInGame(false);
+		XYAxisMeshY->SetHiddenInGame(false);
+		XZAxisMeshX->SetHiddenInGame(false);
+		XZAxisMeshZ->SetHiddenInGame(false);
+		YZAxisMeshY->SetHiddenInGame(false);
+		YZAxisMeshZ->SetHiddenInGame(false);
+		XYAxisMeshX->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		XYAxisMeshY->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		XZAxisMeshX->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		XZAxisMeshZ->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		YZAxisMeshY->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		YZAxisMeshZ->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	case ECreatorToolState::Rotation:
 		

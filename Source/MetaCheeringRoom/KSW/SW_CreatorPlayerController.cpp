@@ -105,6 +105,18 @@ void ASW_CreatorPlayerController::OnMouseOver()
 					{
 						SelectedObject->SelectAxis(false, false, true);
 					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("XYAxisMesh")))
+					{
+						SelectedObject->SelectAxis(true, true, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("XZAxisMesh")))
+					{
+						SelectedObject->SelectAxis(true, false, true);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("YZAxisMesh")))
+					{
+						SelectedObject->SelectAxis(false, true, true);
+					}
 					else if (HitResult.Component->ComponentTags.Contains(FName("XRingMesh")))
 					{
 						SelectedObject->SelectRotationAxis(true, false, false);
@@ -180,6 +192,18 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 					else if (HitResult.Component->ComponentTags.Contains(FName("ZAxisMesh")))
 					{
 						SelectedObject->SelectAxis(false, false, true);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("XYAxisMesh")))
+					{
+						SelectedObject->SelectAxis(true, true, false);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("XZAxisMesh")))
+					{
+						SelectedObject->SelectAxis(true, false, true);
+					}
+					else if (HitResult.Component->ComponentTags.Contains(FName("YZAxisMesh")))
+					{
+						SelectedObject->SelectAxis(false, true, true);
 					}
 					else if (HitResult.Component->ComponentTags.Contains(FName("XRingMesh")))
 					{

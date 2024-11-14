@@ -34,7 +34,10 @@ public:
 	void GetClickRay(const APlayerController* PlayerController, const FVector2D& ScreenPosition, FVector& RayOrigin, FVector& RayDirection);
 
 	FVector ClosestPointOnAxisToRay(const FVector& LinePoint, const FVector& LineDirection, const FVector& RayOrigin, const FVector& RayDirection);
-	
+
+	// xy, xz, yz평면 위의 점
+	FVector ClosestPointOnPlaneToRay(const FVector& PointOnPlane, const FVector& VectorA, const FVector& VectorB, const FVector& RayOrigin, const FVector& RayDirection);
+
 	// 선택한 축 정보 저장
 	UPROPERTY()
 	bool IsXAxisSelected;
@@ -42,6 +45,15 @@ public:
 	bool IsYAxisSelected;
 	UPROPERTY()
 	bool IsZAxisSelected;
+
+	UPROPERTY()
+	bool IsXYAxisSelected;
+
+	UPROPERTY()
+	bool IsXZAxisSelected;
+
+	UPROPERTY()
+	bool IsYZAxisSelected;
 
 	// 머터리얼 정보
 	UPROPERTY()
