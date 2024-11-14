@@ -172,7 +172,7 @@ void AHG_Player::Tick(float DeltaTime)
 		}
 	}
 
-
+	Anim = Cast<UHG_PlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
 	if (bDetectStand)
 	{
