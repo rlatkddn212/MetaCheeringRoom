@@ -43,19 +43,22 @@ void AJS_SummaryActor::BeginPlay()
 
 void AJS_SummaryActor::ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	SummaryReqWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-	SummaryReqWidget->PlayShowAnimation();
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-
-	if (PC)
+	AHG_Player* player = Cast<AHG_Player>(OtherActor);
+	if (player && player->IsLocallyControlled())
 	{
-		PC->SetShowMouseCursor(true);
-		PC->SetInputMode(FInputModeUIOnly());
-		AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
-		if (Player)
+		SummaryReqWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		SummaryReqWidget->PlayShowAnimation();
+		APlayerController* PC = Cast<APlayerController>(player->GetController());
+		if (PC)
 		{
-			Player->Direction = FVector::ZeroVector;
-			Player->bCanMove = false;
+			PC->SetShowMouseCursor(true);
+			PC->SetInputMode(FInputModeUIOnly());
+			AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+			if (Player)
+			{
+				Player->Direction = FVector::ZeroVector;
+				Player->bCanMove = false;
+			}
 		}
 	}
 }
