@@ -97,13 +97,18 @@ void AHG_Player::BeginPlay()
 		EquipItemToSocket(ID);
 	}
 
-	ServerRPC_InitCharacter();
+	ServerRPC_InitCharacter(this);
+
+	if (GI->SkeletalMesh)
+	{
+		SkeletalMesh = GI->SkeletalMesh;
+	}
 
 	InventoryComp->Inventory = GI->CurrentInventory;
 	GoodsComp->SetGold(GI->CurrentGold);
 	TargetValue1 = SpringArmComp->TargetArmLength;
 
-	
+
 
 	if (IsLocallyControlled())
 	{
@@ -589,30 +594,33 @@ void AHG_Player::MulticastRPCUnequipItemToSocket_Implementation(const FString& N
 	UnequipItem(NameValue);
 }
 
-void AHG_Player::ServerRPC_InitCharacter_Implementation()
+void AHG_Player::ServerRPC_InitCharacter_Implementation(AHG_Player* Value)
 {
-	Multicast_InitCharacter();
+	Multicast_InitCharacter(Value);
 }
-void AHG_Player::Multicast_InitCharacter_Implementation()
+void AHG_Player::Multicast_InitCharacter_Implementation(AHG_Player* Value)
 {
-	if (GI->Gender != 0)
+	if (Value)
 	{
-		Gender = GI->Gender;
-	}
-	if (GI->Anim)
-	{
-		this->GetMesh()->SetAnimInstanceClass(GI->Anim);
-	}
-	if (GI->SkeletalMesh)
-	{
-		this->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
-		if (Gender == 1)
+		if (GI->Gender != 0)
 		{
-			this->GetMesh()->SetRelativeScale3D(FVector(1.3f, 1.3f, 1.3f));
+			Value->Gender = GI->Gender;
 		}
-		else if (Gender == 2)
+		if (GI->Anim)
 		{
-			this->GetMesh()->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+			Value->GetMesh()->SetAnimInstanceClass(GI->Anim);
+		}
+		if (GI->SkeletalMesh)
+		{
+			Value->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
+			if (Gender == 1)
+			{
+				Value->GetMesh()->SetRelativeScale3D(FVector(1.3f, 1.3f, 1.3f));
+			}
+			else if (Gender == 2)
+			{
+				Value->GetMesh()->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+			}
 		}
 	}
 }
@@ -624,7 +632,7 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	DOREPLIFETIME(AHG_Player, EquipItemList);
 	DOREPLIFETIME(AHG_Player, bEquipItem);
 	DOREPLIFETIME(AHG_Player, HUD);
-
+	DOREPLIFETIME(AHG_Player, SkeletalMesh);
 }
 
 

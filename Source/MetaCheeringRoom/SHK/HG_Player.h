@@ -208,9 +208,9 @@ public:
 	void MulticastRPC_Emotion(UAnimMontage* Montage);
 
 	UFUNCTION(Server, Reliable)
-	void ServerRPC_InitCharacter();
+	void ServerRPC_InitCharacter(AHG_Player* Value);
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_InitCharacter();
+	void Multicast_InitCharacter(AHG_Player* Value);
 	float Timing = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -229,4 +229,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	int32 Gender = 1;
+
+	UPROPERTY(EditDefaultsOnly,Replicated)
+	class USkeletalMesh* SkeletalMesh;
 };
