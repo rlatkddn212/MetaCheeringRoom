@@ -600,26 +600,29 @@ void AHG_Player::ServerRPC_InitCharacter_Implementation(AHG_Player* Value)
 }
 void AHG_Player::Multicast_InitCharacter_Implementation(AHG_Player* Value)
 {
-	if (Value)
+	if (IsLocallyControlled())
 	{
-		if (GI->Gender != 0)
+		if (Value)
 		{
-			Value->Gender = GI->Gender;
-		}
-		if (GI->Anim)
-		{
-			Value->GetMesh()->SetAnimInstanceClass(GI->Anim);
-		}
-		if (GI->SkeletalMesh)
-		{
-			Value->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
-			if (Gender == 1)
+			if (GI->Gender != 0)
 			{
-				Value->GetMesh()->SetRelativeScale3D(FVector(1.3f, 1.3f, 1.3f));
+				Value->Gender = GI->Gender;
 			}
-			else if (Gender == 2)
+			if (GI->Anim)
 			{
-				Value->GetMesh()->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+				Value->GetMesh()->SetAnimInstanceClass(GI->Anim);
+			}
+			if (GI->SkeletalMesh)
+			{
+				Value->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
+				if (Gender == 1)
+				{
+					Value->GetMesh()->SetRelativeScale3D(FVector(1.3f, 1.3f, 1.3f));
+				}
+				else if (Gender == 2)
+				{
+					Value->GetMesh()->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+				}
 			}
 		}
 	}
