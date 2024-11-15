@@ -24,6 +24,16 @@ void UVideoNode::PlayStream()
 		if (bLive == false)
 		{
 			Screen->PlayVOD(PlayURL);
+			Screen->VideoWidget->SetVisibility(ESlateVisibility::Hidden);
+			APlayerController* PC = GetWorld()->GetFirstPlayerController();
+			PC->SetShowMouseCursor(false);
+			PC->SetInputMode(FInputModeGameOnly());
+			AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+			if (Player)
+			{
+				Player->Direction = FVector::ZeroVector;
+				Player->bCanMove = true;
+			}
 			return;
 		}
 
