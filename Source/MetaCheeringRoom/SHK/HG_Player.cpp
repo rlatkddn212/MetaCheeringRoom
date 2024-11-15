@@ -606,6 +606,14 @@ void AHG_Player::Multicast_InitCharacter_Implementation()
 	if (GI->SkeletalMesh)
 	{
 		this->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
+		if (Gender == 1)
+		{
+			this->GetMesh()->SetRelativeScale3D(FVector(1.3f, 1.3f, 1.3f));
+		}
+		else if (Gender == 2)
+		{
+			this->GetMesh()->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+		}
 	}
 }
 
