@@ -91,19 +91,19 @@ void AHG_Player::BeginPlay()
 		PC->SetShowMouseCursor(false);
 		PC->SetInputMode(FInputModeGameOnly());
 	}
+
 	InitEquipItemList = GI->EquipItemInfoList;
+
 	for (auto ID : InitEquipItemList)
 	{
 		EquipItemToSocket(ID);
 	}
 
-	ServerRPC_InitCharacter();
-
 	InventoryComp->Inventory = GI->CurrentInventory;
-	GoodsComp->SetGold(GI->CurrentGold);
-	TargetValue1 = SpringArmComp->TargetArmLength;
 
-	
+	GoodsComp->SetGold(GI->CurrentGold);
+
+	TargetValue1 = SpringArmComp->TargetArmLength;
 
 	if (IsLocallyControlled())
 	{
@@ -521,7 +521,7 @@ void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
 	FRotator SpawnRotation;
 	if (p_ItemInfo.ItemCategory == EItemCategory::Category_Emoji)
 	{
-		SpawnLocation = GetActorLocation() + FVector(0.0f, 0.0f, 120.0f);
+		SpawnLocation = GetActorLocation() + FVector(0.0f, 0.0f, 150.0f);
 		SpawnRotation = GetActorRotation() + FRotator(90.0f, 0.0f, 0.0f);
 	}
 	else
