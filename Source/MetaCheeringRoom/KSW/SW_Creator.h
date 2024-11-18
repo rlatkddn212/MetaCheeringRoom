@@ -139,8 +139,16 @@ public:
 	void OnMyCameraSpeedUp(const FInputActionValue& Value);
 	UFUNCTION()
 	void OnMyCameraSpeedDown(const FInputActionValue& Value);
-
+	
+	UPROPERTY(Replicated)
 	FVector Direction;
+
+	UPROPERTY(Replicated)
+	FVector CurrentLocation;
+
+	// 서버에서 동기화할 회전 값
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentRotation)
+	FRotator CurrentRotation; 
 
 	ECreatorMouseState MouseState;
 
@@ -164,4 +172,14 @@ public:
 	float InputDelay = 0.2f;
 
 	float CameraSpeed = 500.0f;
+	UFUNCTION(Server, Unreliable)
+	void Server_Movement(FVector MoveDirection);
+	UFUNCTION(Server, Unreliable)
+	void Server_LookAt(FVector2D LookVector);
+
+	UFUNCTION()
+	void OnRep_CurrentRotation();
+
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

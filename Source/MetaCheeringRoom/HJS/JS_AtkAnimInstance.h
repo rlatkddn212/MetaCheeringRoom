@@ -17,6 +17,8 @@ class METACHEERINGROOM_API UJS_AtkAnimInstance : public UAnimInstance
 public:
 	UPROPERTY()
 	class AJS_TotoActor* Toto;
+	UPROPERTY()
+	class AHG_Player* Player;
 
 	void SetTotoActor(class AJS_TotoActor* NewActor);
 	UFUNCTION()

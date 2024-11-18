@@ -95,10 +95,7 @@ void AJS_Screen::BeginPlay()
 void AJS_Screen::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
-
-
 
 void AJS_Screen::ClearVedioInfo()
 {
@@ -112,7 +109,12 @@ void AJS_Screen::AddVedioInfo(FVedioInfo Info)
 
 void AJS_Screen::OnMediaEndReached()
 {
-
+	if (bVod)
+	{
+		bVod = false;
+		return;
+	}
+	
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	PrepareNextMediaSource();
 	MediaPlayer->PlayOnOpen = false;
@@ -173,7 +175,6 @@ void AJS_Screen::PrepareNextMediaSource()
 
 void AJS_Screen::AddPoint()
 {
-	
 	if (Player)
 	{
 		if (Player->IsLocallyControlled())
@@ -309,6 +310,9 @@ void AJS_Screen::MulticastPlayVOD_Implementation(const FString& VideoURL)
 {
 	// 만약 재생 중인 미디어 플레이어가 있다면 전부 멈추기
 	MediaPlayer->PlayOnOpen = true;
+	GetWorldTimerManager().ClearTimer(FailLoadVideo1Handle);
+	GetWorldTimerManager().ClearTimer(FailLoadVideo2Handle);
+	bVod = true;
 	// Media를 재생
 	// MediaSource의 URL 설정
 	MediaTexture->SetMediaPlayer(MediaPlayer);
@@ -340,7 +344,7 @@ void AJS_Screen::PlayVideoRepURL(const FString& VideoURL)
 	GetWorldTimerManager().ClearTimer(FailLoadVideo2Handle);
 	FailCount2 = 0;
 	FailCount1 = 0;
-
+	bVod = false;
 	// Media를 재생
 	// MediaSource의 URL 설정
 	MediaTexture->SetMediaPlayer(MediaPlayer);

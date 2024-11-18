@@ -6,14 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "JS_TotoActor.generated.h"
 
-enum class EModifyPhase
-{
-	None,
-	Squashing,    // 찌그러지는 중
-	Holding,      // 찌그러진 상태 유지
-	Recovering    // 원래대로 돌아가는 중
-};
-
 UCLASS()
 class METACHEERINGROOM_API AJS_TotoActor : public AActor
 {
@@ -93,11 +85,11 @@ public:
 	void AdjustPoint(int32 ResultNum);
 
 	UFUNCTION(NetMulticast,Reliable)
-	void MulticastAdjustPoint(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd);
+	void MulticastAdjustPoint(class AHG_Player* player, int32 bettingpoint , float odd);
 	UFUNCTION(NetMulticast,Reliable)
-	void MulticastAdjustLose(const TArray<FString>& Keys, const TArray<int32>& Values);
+	void MulticastAdjustLose(class AHG_Player* player);
 	UFUNCTION()
-	void AdjustWin();
+	void AdjustWin(class AHG_Player* player);
 
 	// 끗
 	int32 TotoLimitTIme;
@@ -107,47 +99,25 @@ public:
 	UFUNCTION()
 	void ServerSetTimerLimit();
 
+	UFUNCTION()
+	void ServerAdjustPoint(const TArray<FString>& Keys, const TArray<int32>& Values, float Odd);
+	UFUNCTION()
+	void ServerAdjustLose(const TArray<FString>& Keys, const TArray<int32>& Values);
+
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastSetTimeUI(const FString& TimeText, const int32& Time);
 
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastInitToto();
 
-	void LoseAnimationPlay();
-
-	void PlayerModify();
-
-	void OnPlayerModify(float DeltaTime);
+	void LoseAnimationPlay(AHG_Player* player);
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AJS_AtkActor> AtkActorFactory;
 	UPROPERTY()
 	class AHG_Player* Player;	
-
-	FVector OriginalScale;
-	bool bAnimating = false;
-    UPROPERTY(EditAnywhere, Category = "Animation")
-    float AnimationDuration = 0.3f;
-    UPROPERTY(EditAnywhere, Category = "Animation")
-    float HoldTime = 5.0f;
-    UPROPERTY(EditAnywhere, Category = "Animation")
-    float Squash = 0.1f;
-    UPROPERTY(EditAnywhere, Category = "Animation")
-    float Stretch = 1.5f;
-	float CurrentTime = 0.0f;
-	EModifyPhase CurrentPhase = EModifyPhase::None;
-	float StunTime = 0.0f;  // 현재 스턴 시간
-	const float StunDuration = 1.5f;  // 스턴 지속시간
 	UPROPERTY()
 	class AJS_AtkActor* AtkActor;
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AJS_StarActor> StarActorFactory;
-	UPROPERTY()
-    AJS_StarActor* StarActor;
-	void SpawnStarActor();
-
-	UPROPERTY(EditAnywhere)
-	class USoundBase* SpringSound;
 	UPROPERTY(EditAnywhere)
 	class USoundBase* PoofSound;
 	UPROPERTY(EditAnywhere)
