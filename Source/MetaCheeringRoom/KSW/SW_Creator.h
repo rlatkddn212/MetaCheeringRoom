@@ -140,11 +140,7 @@ public:
 	UFUNCTION()
 	void OnMyCameraSpeedDown(const FInputActionValue& Value);
 	
-	UPROPERTY(Replicated)
 	FVector Direction;
-
-	UPROPERTY(Replicated)
-	FVector CurrentLocation;
 
 	// 서버에서 동기화할 회전 값
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentRotation)
@@ -173,13 +169,26 @@ public:
 
 	float CameraSpeed = 500.0f;
 	UFUNCTION(Server, Unreliable)
-	void Server_Movement(FVector MoveDirection);
+	void Server_Movement(const FVector& NewLocation);
 	UFUNCTION(Server, Unreliable)
-	void Server_LookAt(FVector2D LookVector);
+	void Server_Rotation(const FRotator& NewRotation);
 
 	UFUNCTION()
 	void OnRep_CurrentRotation();
 
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	// SceneComponent/
+	UPROPERTY(EditAnywhere)
+	class USceneComponent* RootSceneComponent;
+
+	// 스켈레탈 메쉬
+	UPROPERTY(EditAnywhere)
+	class USkeletalMeshComponent* HandMeshComponent;
+
+	// 카메라
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* CameraComponent;
+
 };
