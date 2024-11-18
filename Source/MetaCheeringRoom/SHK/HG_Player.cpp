@@ -88,20 +88,23 @@ void AHG_Player::BeginPlay()
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
+
 		PC->SetShowMouseCursor(false);
 		PC->SetInputMode(FInputModeGameOnly());
 	}
 
-	InitEquipItemList = GI->EquipItemInfoList;
-
-	for (auto ID : InitEquipItemList)
+	if (GI)
 	{
-		EquipItemToSocket(ID);
+		InitEquipItemList = GI->EquipItemInfoList;
+		for (auto ID : InitEquipItemList)
+		{
+			EquipItemToSocket(ID);
+		}
+
+		InventoryComp->Inventory = GI->CurrentInventory;
+
+		GoodsComp->SetGold(GI->CurrentGold);
 	}
-
-	InventoryComp->Inventory = GI->CurrentInventory;
-
-	GoodsComp->SetGold(GI->CurrentGold);
 
 	TargetValue1 = SpringArmComp->TargetArmLength;
 
@@ -332,18 +335,20 @@ void AHG_Player::PopUpPurchaseWidget()
 		PurchaseWidget->SetItemInfo(TempData);
 		if (!bToggle)
 		{
-			PurchaseWidget->AddToViewport();
 			bCanMove = false;
 			PC->SetShowMouseCursor(true);
+			PC->SetInputMode(FInputModeGameAndUI());
+			PurchaseWidget->AddToViewport(); 
 			bToggle = !bToggle;
 		}
-		else
-		{
-			PurchaseWidget->RemoveFromParent();
-			bCanMove = true;
-			PC->SetShowMouseCursor(false);
-			bToggle = !bToggle;
-		}
+// 		else
+// 		{
+// 			PurchaseWidget->RemoveFromParent();
+// 			bCanMove = true;
+// 			PC->SetShowMouseCursor(false);
+// 			PC->SetInputMode(FInputModeGameOnly());
+// 			bToggle = !bToggle;
+// 		}
 	}
 }
 
@@ -589,11 +594,11 @@ void AHG_Player::MulticastRPCUnequipItemToSocket_Implementation(const FString& N
 	UnequipItem(NameValue);
 }
 
-void AHG_Player::ServerRPC_InitCharacter_Implementation()
+void AHG_Player::ServerRPC_InitCharacter_Implementation(AHG_Player* Value)
 {
-	Multicast_InitCharacter();
+	Multicast_InitCharacter(Value);
 }
-void AHG_Player::Multicast_InitCharacter_Implementation()
+void AHG_Player::Multicast_InitCharacter_Implementation(AHG_Player* Value)
 {
 	if (GI->Gender != 0)
 	{

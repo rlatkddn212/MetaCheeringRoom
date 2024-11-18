@@ -9,40 +9,81 @@
 #include "HG_ItemBase.h"
 #include "Components/TextBlock.h"
 #include "HG_GameInstance.h"
+#include "HG_Player.h"
 
 void UHG_SlotWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (!(Button_InventorySlot->OnClicked.IsBound()))
+	if (!(Button_InventorySlot->OnHovered.IsBound()))
 	{
-		Button_InventorySlot->OnClicked.AddDynamic(this, &UHG_SlotWidget::OnButtonClicked);
+		Button_InventorySlot->OnHovered.AddDynamic(this, &UHG_SlotWidget::OnButtonHovered);
 	}
-	Img_Equip->SetVisibility(ESlateVisibility::Hidden);
+	if (!(Button_InventorySlot->OnUnhovered.IsBound()))
+	{
+		Button_InventorySlot->OnUnhovered.AddDynamic(this, &UHG_SlotWidget::OnButtonUnHovered);
+	}
+
+	if (!(Button_InventorySlot->OnPressed.IsBound()))
+	{
+		Button_InventorySlot->OnPressed.AddDynamic(this, &UHG_SlotWidget::OnButtonClicked);
+	}
+
+	NormalStyle = Button_InventorySlot->WidgetStyle;
 
 	MyIndex = Owner->GetSlotIndexInWB(this);
+}
+
+void UHG_SlotWidget::SetItemName()
+{
+	TB_ItemName->SetText(FText::FromString(SlotInfo.ItemInfo.ItemName));
 }
 
 void UHG_SlotWidget::OnButtonClicked()
 {
 	Owner->SelectedSlot = this;
-	if (Owner->SelectedCategory == Owner->WB_SlotList_Active || Owner->SelectedCategory == Owner->WB_SlotList_Emoji || Owner->SelectedCategory == Owner->WB_SlotList_Sound)
+	Owner->UseItem();
+
+	if (!Button_InventorySlot) return;
+
+	FSlateBrush PressedBrush;
+	PressedBrush.SetResourceObject(LoadObject<UTexture2D>(nullptr, TEXT("/Script/Engine.Texture2D'/Game/SHK/Texture/Inventory/slot.slot'")));
+	PressedBrush.ImageSize = FVector2D(78.0f, 78.0f); 
+	PressedBrush.TintColor = FSlateColor::UseForeground();
+	PressedBrush.DrawAs = ESlateBrushDrawType::RoundedBox;
+	
+	PressedBrush.OutlineSettings.CornerRadii = FVector4(4.0f, 4.0f, 4.0f, 4.0f);
+	PressedBrush.OutlineSettings.Color = FLinearColor(0.72f,0.72f,0.72f,1.0f);
+	PressedBrush.OutlineSettings.Width = 1.0f;
+	PressedBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+	PressedBrush.OutlineSettings.bUseBrushTransparency = true;
+
+	FButtonStyle Pressed = Button_InventorySlot->WidgetStyle;
+
+	Pressed.SetPressed(PressedBrush);
+
+	Button_InventorySlot->SetStyle(Pressed);
+	
+	Owner->RemoveFromParent();
+
+	if (auto OwningPlayer = Cast<AHG_Player>(Owner->GetOwningPlayer()->GetPawn()))
 	{
-		Owner->TB_Use->SetText(FText::FromString(TEXT("사용하기")));
+		OwningPlayer->PC->SetShowMouseCursor(false);
+		OwningPlayer->PC->SetInputMode(FInputModeGameOnly());
+		OwningPlayer->bCanMove = true;
+		OwningPlayer->bToggle = !OwningPlayer->bToggle;
 	}
-	else
-	{
-		UE_LOG(LogTemp,Warning,TEXT("%d"),MyIndex);
-		if (Owner->GI->EquipSlotIndexList.Contains(MyIndex))
-		{
-			Owner->TB_Use->SetText(FText::FromString(TEXT("해제하기")));
-		}
-		else
-		{
-			Owner->TB_Use->SetText(FText::FromString(TEXT("장착하기")));
-		}
-	}
-	Owner->DIsplaySelectedItemInfo();
+}
+
+void UHG_SlotWidget::OnButtonHovered()
+{
+	TB_ItemName->SetVisibility(ESlateVisibility::HitTestInvisible);
+	SetItemName();
+}
+
+void UHG_SlotWidget::OnButtonUnHovered()
+{
+	TB_ItemName->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UHG_SlotWidget::SetItemIcon()
