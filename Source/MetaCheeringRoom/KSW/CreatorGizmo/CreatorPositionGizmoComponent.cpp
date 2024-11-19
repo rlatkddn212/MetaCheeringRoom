@@ -220,7 +220,7 @@ void UCreatorPositionGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 	NewLocation.Y = FMath::RoundToFloat(NewLocation.Y / 10.0f) * 10.0f;
 	NewLocation.Z = FMath::RoundToFloat(NewLocation.Z / 10.0f) * 10.0f;
 
-	Me->SetActorLocation(NewLocation);
+	Me->Server_SetLocation(NewLocation);
 	PC->OnObjectChanged();
 }
 

@@ -39,6 +39,24 @@ public:
 	void CreatingDummyObject(struct FCreatorObjectData* ObjectData);
 	// 지워지지 않는경우
 
+	UFUNCTION(Server, Reliable)
+	void Server_CreatingDummyObject(const struct FCreatorObjectData& ObjectData);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_CreatingDummyObject(class ASW_CreatorObject* NewDummyObject);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetOwnerObject(class ASW_CreatorObject* OwnerObject, bool isOnwer);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DeleteCreatingDummyObject(class ASW_CreatorObject* DummyObject);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DeleteObject(class ASW_CreatorObject* DeleteObject);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DeleteObject(class ASW_CreatorObject* DeleteObject);
+
 	UFUNCTION()
 	void DoSelectObject(class ASW_CreatorObject* NewSelectObject);
 	
@@ -77,4 +95,5 @@ public:
 	void PasteSelectedObject();
 
 	class ASW_CreatorObject* CopiedObject;
+
 };

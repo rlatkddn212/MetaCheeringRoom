@@ -308,7 +308,8 @@ ASW_CreatorObject* UCreatorMapSubsystem::CopyObject(ASW_CreatorObject* Object)
 	return NewObject;
 }
 
-ASW_CreatorObject* UCreatorMapSubsystem::CreateObject(FCreatorObjectData* ObjectData)
+// 서버에서 호출
+ASW_CreatorObject* UCreatorMapSubsystem::CreateObject(const FCreatorObjectData* ObjectData)
 {
     FActorSpawnParameters SpawnParams;
     //SpawnParams.Owner = this;

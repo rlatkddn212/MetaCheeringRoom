@@ -19,6 +19,7 @@
 #include "UI/SW_CreatorInspectorWidget.h"
 #include "Widgets/InvalidateWidgetReason.h"
 #include "Blueprint/UserWidget.h"
+#include "Engine/TimerHandle.h"
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
 {
@@ -284,23 +285,78 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 	return false;
 }
 
+// 안씀
 void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData* ObjectData)
 {
-	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-	CreatingObject = system->CreateObject(ObjectData);
+	CreatingObject = nullptr;
+	Server_CreatingDummyObject(*ObjectData);
+}
 
-	DoSelectObject(CreatingObject);
+void ASW_CreatorPlayerController::Server_CreatingDummyObject_Implementation(const struct FCreatorObjectData& ObjectData)
+{
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	ASW_CreatorObject* NewDummyObject = system->CreateObject(&ObjectData);
+	// 멀티
+	if (NewDummyObject)
+	{
+		// Timer
+		// PC를 가져옴
+		NewDummyObject->SetOwner(this);
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, NewDummyObject]()
+			{
+				Multicast_CreatingDummyObject(NewDummyObject);
+			}, 0.2f, false);
+	}
+}
+
+void ASW_CreatorPlayerController::Multicast_CreatingDummyObject_Implementation(class ASW_CreatorObject* NewDummyObject)
+{
+	if (!IsLocalController())
+	{
+		return;
+	}
+	// 객체가 준비되었는지 확인한다.
+	if (NewDummyObject && NewDummyObject->IsActorInitialized())
+	{
+		CreatingObject = NewDummyObject;
+		DoSelectObject(NewDummyObject);
+		CreatorWidget->OnDragged(true);
+	}
+}
+
+void ASW_CreatorPlayerController::Server_SetOwnerObject_Implementation(class ASW_CreatorObject* OwnerObject, bool isOnwer)
+{
+	if (isOnwer)
+	{
+		OwnerObject->SetOwner(this);
+	}
+	else
+	{
+		OwnerObject->SetOwner(nullptr);
+	}
+}
+
+void ASW_CreatorPlayerController::Server_DeleteObject_Implementation(class ASW_CreatorObject* DeleteObject)
+{
+
+}
+
+void ASW_CreatorPlayerController::Multicast_DeleteObject_Implementation(class ASW_CreatorObject* DeleteObject)
+{
 	
-	CreatorWidget->OnDragged(true);
 }
 
 void ASW_CreatorPlayerController::DoSelectObject(class ASW_CreatorObject* NewSelectObject)
 {
 	if (SelectedObject)
+	{
 		SelectedObject->OnSelected(false);
+		Server_SetOwnerObject(SelectedObject, false);
+	}
 	NewSelectObject->OnSelected(true);
 	SelectedObject = NewSelectObject;
-
+	Server_SetOwnerObject(NewSelectObject, true);
 	CreatorWidget->CreatorInspectorWidget->SetObject(SelectedObject);
 	if (SelectedObject)
 		SelectedObject->ChangeToolMode(ToolState);
@@ -360,14 +416,14 @@ void ASW_CreatorPlayerController::MoveDummyObject(FVector2D MousePosition)
 
 		if (bHit)
 		{
-			CreatingObject->SetActorLocation(HitResult.Location);
+			CreatingObject->Server_SetLocation(HitResult.Location);
 		}
 		else
 		{
 			// 레이가 부딪히지 않았을 때
 			// 레이의 1000거리 지점으로 이동
 			FVector p = GetPawn()->GetActorLocation();
-			CreatingObject->SetActorLocation(p + WorldDirection * 1000);
+			CreatingObject->Server_SetLocation(p + WorldDirection * 1000);
 		}
 	}
 }

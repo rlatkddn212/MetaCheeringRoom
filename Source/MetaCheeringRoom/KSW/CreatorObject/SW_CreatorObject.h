@@ -43,7 +43,17 @@ public:
 	// º¯È¯
 	void ChangeToolMode(ECreatorToolState state);
 
-	struct FCreatorObjectData* CreatingObjectData;
+	UFUNCTION(Server, Reliable)
+	void Server_SetLocation(FVector Pos);
+	UFUNCTION(Server, Reliable)
+	void Server_SetRotation(FQuat Rot);
+	UFUNCTION(Server, Reliable)
+	void Server_SetScale(FVector Scale);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetScale(FVector Scale);
+
+	const struct FCreatorObjectData* CreatingObjectData;
 
 	int32 CreatorObjectType;
 	int32 CreatorObjectId;

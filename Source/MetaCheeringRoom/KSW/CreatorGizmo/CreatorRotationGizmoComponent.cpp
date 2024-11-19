@@ -146,7 +146,7 @@ void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 		FQuat NewRotation = RotationDelta * CurrentRotation;
 
 		// 회전값 적용 10단위
-		Me->SetActorRotation(NewRotation);
+		Me->Server_SetRotation(NewRotation);
 		PC->OnObjectChanged();
 	}
 
@@ -174,7 +174,7 @@ void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 		RotationDelta = FQuat(DeltaDirection, AngleRad);
 		
 		FQuat NewRotation = RotationDelta * CurrentRotation;
-		Me->SetActorRotation(NewRotation);
+		Me->Server_SetRotation(NewRotation);
 		PC->OnObjectChanged();
 	}
 
@@ -199,7 +199,7 @@ void UCreatorRotationGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D
 		RotationDelta = FQuat(DeltaDirection, AngleRad);
 		
 		FQuat NewRotation = RotationDelta * CurrentRotation;
-		Me->SetActorRotation(NewRotation);
+		Me->Server_SetRotation(NewRotation);
 		PC->OnObjectChanged();
 	}
 }

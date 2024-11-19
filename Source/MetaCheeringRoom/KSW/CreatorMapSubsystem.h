@@ -141,7 +141,7 @@ public:
 	FCreatorMap CreatorMap;
 
 	// 새로운 오브젝트 생성
-	ASW_CreatorObject* CreateObject(struct FCreatorObjectData* ObjectData);
+	ASW_CreatorObject* CreateObject(const struct FCreatorObjectData* ObjectData);
 
 	// 실제 월드에 추가한다. (UI에서 끌어서 임시로 생성하는 경우가 있어서 World에 추가하는 함수를 따로 만듦)
 	void AddObject(ASW_CreatorObject* CreatingObject, ASW_CreatorObject* ParentObject = nullptr);

@@ -89,7 +89,8 @@ void USW_CreatorObjectSlotWidget::NativeOnDragDetected(const FGeometry& InGeomet
 		LocalPixelMousePos.Y = FMath::Clamp(LocalPixelMousePos.Y * InGeometry.Scale, (double)TNumericLimits<int32>::Min(), (double)TNumericLimits<int32>::Max());
 
 		controller->CreatingDummyObject(ObjectData);
-		controller->MoveDummyObject(LocalPixelMousePos);
+		//controller->Server_CreatingDummyObject(*ObjectData);
+		// controller->MoveDummyObject(LocalPixelMousePos);
 		// 마우스 모드 변경
 	}
 

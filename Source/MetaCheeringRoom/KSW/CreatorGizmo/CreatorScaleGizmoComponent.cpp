@@ -173,7 +173,7 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 		scaleVector.Y = FMath::RoundToFloat(scaleVector.Y * 10.0f) / 10.0f;
 		scaleVector.Z = FMath::RoundToFloat(scaleVector.Z * 10.0f) / 10.0f;
 
-		Me->SetActorScale3D(scaleVector);
+		Me->Server_SetScale(scaleVector);
 		PC->OnObjectChanged();
 		// Delta Debugline
 		//DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
@@ -201,7 +201,7 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 		scaleVector.Y = FMath::RoundToFloat(scaleVector.Y * 10.0f) / 10.0f;
 		scaleVector.Z = FMath::RoundToFloat(scaleVector.Z * 10.0f) / 10.0f;
 
-		Me->SetActorScale3D(scaleVector);
+		Me->Server_SetScale(scaleVector);
 		PC->OnObjectChanged();
 		//DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
 	}
@@ -229,7 +229,7 @@ void UCreatorScaleGizmoComponent::Drag(FVector2D MouseDownPosition, FVector2D Mo
 		scaleVector.Y = FMath::RoundToFloat(scaleVector.Y * 10.0f) / 10.0f;
 		scaleVector.Z = FMath::RoundToFloat(scaleVector.Z * 10.0f) / 10.0f;
 
-		Me->SetActorScale3D(scaleVector);
+		Me->Server_SetScale(scaleVector);
 		PC->OnObjectChanged();
 		//DrawDebugLine(GetWorld(), CurrentPosition, CurrentPosition + Delta * 1000.0f, FColor::Red, false, 5.0f, 0, 2.0f);
 	}

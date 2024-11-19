@@ -426,6 +426,29 @@ void ASW_CreatorObject::ChangeToolMode(ECreatorToolState state)
 	}
 }
 
+void ASW_CreatorObject::Server_SetLocation_Implementation(FVector Pos)
+{
+	SetActorLocation(Pos);
+}
+
+void ASW_CreatorObject::Server_SetRotation_Implementation(FQuat Rot)
+{
+	SetActorRotation(Rot);
+}
+
+void ASW_CreatorObject::Server_SetScale_Implementation(FVector Scale)
+{
+	//SetActorScale3D(Scale);
+
+	// 멀티케스트
+	Multicast_SetScale(Scale);
+}
+
+void ASW_CreatorObject::Multicast_SetScale_Implementation(FVector Scale)
+{
+	SetActorScale3D(Scale);
+}
+
 void ASW_CreatorObject::AddProperty(int32 id, UCreatorPropertyBase* Property)
 {
 	if (PropertyMap.Contains(id))

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include "CreatorObject/SW_CreatorObject.h"
 #include "CreatorStorageSubsystem.generated.h"
 
 USTRUCT(BlueprintType)
