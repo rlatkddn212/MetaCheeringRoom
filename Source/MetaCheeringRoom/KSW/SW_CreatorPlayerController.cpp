@@ -20,6 +20,7 @@
 #include "Widgets/InvalidateWidgetReason.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/TimerHandle.h"
+#include "Creator/SW_CreatorGameState.h"
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
 {
@@ -302,11 +303,13 @@ void ASW_CreatorPlayerController::Server_CreatingDummyObject_Implementation(cons
 		// Timer
 		// PC를 가져옴
 		NewDummyObject->SetOwner(this);
-		FTimerHandle TimerHandle;
+
+		Multicast_CreatingDummyObject(NewDummyObject);
+		/*FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, NewDummyObject]()
 			{
 				Multicast_CreatingDummyObject(NewDummyObject);
-			}, 0.2f, false);
+			}, 0.1f, false);*/
 	}
 }
 
@@ -316,6 +319,7 @@ void ASW_CreatorPlayerController::Multicast_CreatingDummyObject_Implementation(c
 	{
 		return;
 	}
+
 	// 객체가 준비되었는지 확인한다.
 	if (NewDummyObject && NewDummyObject->IsActorInitialized())
 	{
@@ -327,6 +331,8 @@ void ASW_CreatorPlayerController::Multicast_CreatingDummyObject_Implementation(c
 
 void ASW_CreatorPlayerController::Server_SetOwnerObject_Implementation(class ASW_CreatorObject* OwnerObject, bool isOnwer)
 {
+	if (OwnerObject == nullptr)
+		return;
 	if (isOnwer)
 	{
 		OwnerObject->SetOwner(this);
@@ -339,17 +345,30 @@ void ASW_CreatorPlayerController::Server_SetOwnerObject_Implementation(class ASW
 
 void ASW_CreatorPlayerController::Server_DeleteCreatingDummyObject_Implementation(class ASW_CreatorObject* DummyObject)
 {
+	if (DummyObject)
+	{
+		DummyObject->Destroy();
+	}
+}
 
+void ASW_CreatorPlayerController::Server_AddCreatingDummyObject_Implementation(class ASW_CreatorObject* NewCreatingObject)
+{
+	// 게임스테이트
+	ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
+	if (GameState)
+	{
+		GameState->Multicast_AddCreatingDummyObject(NewCreatingObject);
+	}
 }
 
 void ASW_CreatorPlayerController::Server_DeleteObject_Implementation(class ASW_CreatorObject* DeleteObject)
 {
-
-}
-
-void ASW_CreatorPlayerController::Multicast_DeleteObject_Implementation(class ASW_CreatorObject* DeleteObject)
-{
-	
+	// 게임스테이트
+	ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
+	if (GameState)
+	{
+		GameState->Multicast_DeleteObject(DeleteObject);
+	}
 }
 
 void ASW_CreatorPlayerController::DoSelectObject(class ASW_CreatorObject* NewSelectObject)
@@ -367,14 +386,25 @@ void ASW_CreatorPlayerController::DoSelectObject(class ASW_CreatorObject* NewSel
 		SelectedObject->ChangeToolMode(ToolState);
 }
 
-bool ASW_CreatorPlayerController::DeleteDummyObject()
+void ASW_CreatorPlayerController::UnSelectServerDeleteObject(class ASW_CreatorObject* ServerDeleteObject)
+{
+	if (SelectedObject == ServerDeleteObject)
+	{
+		SelectedObject->OnSelected(false);
+		Server_SetOwnerObject(SelectedObject, false);
+		SelectedObject = nullptr;
+		CreatorWidget->CreatorInspectorWidget->SetObject(nullptr);
+	}
+}
+
+bool ASW_CreatorPlayerController::EndDragDummyObject()
 {
 	bool ret = CreatorWidget->IsDragOverUI();
 	if (ret)
 	{
 		if (CreatingObject)
 		{
-			CreatingObject->Destroy();
+			Server_DeleteCreatingDummyObject(CreatingObject);
 			CreatingObject = nullptr;
 		}
 	}
@@ -382,10 +412,7 @@ bool ASW_CreatorPlayerController::DeleteDummyObject()
 	{
 		if (CreatingObject)
 		{
-			UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-			system->AddObject(CreatingObject);
-			CreatingObject->SetFileName(CreatingObject->CreatingObjectData->ItemName);
-			ReloadHierarchy();
+			Server_AddCreatingDummyObject(CreatingObject);
 			OnObjectChanged();
 			DoSelectObject(CreatingObject);
 		}
@@ -479,12 +506,9 @@ void ASW_CreatorPlayerController::DeleteSelectedObject()
 {
 	if (SelectedObject)
 	{
+		Server_DeleteObject(SelectedObject);
 		CreatorWidget->CreatorInspectorWidget->SetObject(nullptr);
-		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-		system->RemoveObject(SelectedObject, true);
 		SelectedObject = nullptr;
-
-		ReloadHierarchy();
 	}
 }
 

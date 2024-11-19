@@ -90,7 +90,7 @@ void USW_CreatorObjectSlotWidget::NativeOnDragDetected(const FGeometry& InGeomet
 
 		controller->CreatingDummyObject(ObjectData);
 		//controller->Server_CreatingDummyObject(*ObjectData);
-		// controller->MoveDummyObject(LocalPixelMousePos);
+		controller->MoveDummyObject(LocalPixelMousePos);
 		// 마우스 모드 변경
 	}
 
@@ -118,7 +118,7 @@ void USW_CreatorObjectSlotWidget::NativeOnDragCancelled(const FDragDropEvent& In
 		FGeometry WidgetGeometry = GetCachedGeometry();
 
 		// UI 위에 있는지 확인
-			controller->DeleteDummyObject();
+			controller->EndDragDummyObject();
 
 		FInputModeGameAndUI InputMode;
 		controller->SetInputMode(InputMode);

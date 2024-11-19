@@ -361,7 +361,8 @@ void UCreatorMapSubsystem::RemoveObjectRecursive(ASW_CreatorObject* Object)
 		}
 
 		CreatorItemMap.Remove(Object->CreatorObjectId);
-		Object->Destroy();
+        if (GetWorld()->GetAuthGameMode())
+		    Object->Destroy();
 	}
 }
 
@@ -377,7 +378,8 @@ void UCreatorMapSubsystem::RemoveActorRecursive(AActor* Actor)
         }
     }
 
-    Actor->Destroy();
+    if (GetWorld()->GetAuthGameMode())
+        Actor->Destroy();
 }
 
 void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecursive /*= false*/)
@@ -409,7 +411,8 @@ void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecurs
 		}
 
 		CreatorItemMap.Remove(Object->CreatorObjectId);
-		Object->Destroy();
+		if (GetWorld()->GetAuthGameMode())
+		    Object->Destroy();
 	}
 }
 

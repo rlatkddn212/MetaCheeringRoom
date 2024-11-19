@@ -52,16 +52,19 @@ public:
 	void Server_DeleteCreatingDummyObject(class ASW_CreatorObject* DummyObject);
 
 	UFUNCTION(Server, Reliable)
-	void Server_DeleteObject(class ASW_CreatorObject* DeleteObject);
+	void Server_AddCreatingDummyObject(class ASW_CreatorObject* NewCreatingObject);
 
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_DeleteObject(class ASW_CreatorObject* DeleteObject);
+	UFUNCTION(Server, Reliable)
+	void Server_DeleteObject(class ASW_CreatorObject* DeleteObject);
 
 	UFUNCTION()
 	void DoSelectObject(class ASW_CreatorObject* NewSelectObject);
 	
+	// 서버에서 삭제된 오브젝트가 선택되어있는경우 선택해제
+	void UnSelectServerDeleteObject(class ASW_CreatorObject* ServerDeleteObject);
+
 	UFUNCTION()
-	bool DeleteDummyObject();
+	bool EndDragDummyObject();
 	void MoveDummyObject(FVector2D MousePosition);
 
 	void SetToolState(ECreatorToolState NewState);
