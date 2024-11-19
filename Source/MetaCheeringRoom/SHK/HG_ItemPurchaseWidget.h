@@ -23,26 +23,18 @@ public:
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	UImage* Img_ItemImg;
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UTextBlock* TB_ItemName;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UTextBlock* TB_ItemPrice;
-	
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	UButton* Btn_Purchase;
-	
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	UButton* Btn_Exit;
 
 	
-	UFUNCTION()
-	void OnClickPurchaseButton();
+	UFUNCTION(BlueprintCallable)
+	void OnPressQ();
 
-	UFUNCTION()
-	void OnClickExitButton();
+	
+	UFUNCTION(BlueprintCallable)
+	void OnClickEmptySpace();
 
 	void SetItemInfo(FItemData ItemInfo);
 	

@@ -23,11 +23,23 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class UImage* Img_ItemIcon;
+	
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	class UTextBlock* TB_ItemName;
+
+	void SetItemName();
 
 	UFUNCTION()
 	void OnButtonClicked();
+	
+	UFUNCTION()
+	void OnButtonHovered();
+	
+	UFUNCTION()
+	void OnButtonUnHovered();
 
 	void SetItemIcon();
+
 
 	void InitSlot(FSlotStruct p_Slot);
 
@@ -38,10 +50,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UInventoryWidget* Owner;
 
-	UPROPERTY(EditDefaultsOnly)
-	UImage* Img_Equip;
-
 	bool bSelected = false;
+
+	FButtonStyle NormalStyle;
 
 	int32 MyIndex;
 };

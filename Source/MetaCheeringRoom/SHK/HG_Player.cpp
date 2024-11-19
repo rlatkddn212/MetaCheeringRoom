@@ -88,39 +88,25 @@ void AHG_Player::BeginPlay()
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
+
 		PC->SetShowMouseCursor(false);
 		PC->SetInputMode(FInputModeGameOnly());
 	}
-	InitEquipItemList = GI->EquipItemInfoList;
-	for (auto ID : InitEquipItemList)
+
+	if (GI)
 	{
-		EquipItemToSocket(ID);
-	}
-
-	ServerRPC_InitCharacter(this);
-
-	if (GI->SkeletalMesh)
-	{
-		SkeletalMesh = GI->SkeletalMesh;
-	}
-
-	InventoryComp->Inventory = GI->CurrentInventory;
-	GoodsComp->SetGold(GI->CurrentGold);
-	TargetValue1 = SpringArmComp->TargetArmLength;
-
-
-
-	if (IsLocallyControlled())
-	{
-		if (HeadUpClass)
+		InitEquipItemList = GI->EquipItemInfoList;
+		for (auto ID : InitEquipItemList)
 		{
-			HUD = CreateWidget<UHG_HUD>(GetWorld(), HeadUpClass);
-			if (HUD)
-			{
-				HUD->AddToViewport();
-			}
+			EquipItemToSocket(ID);
 		}
+
+		InventoryComp->Inventory = GI->CurrentInventory;
+
+		GoodsComp->SetGold(GI->CurrentGold);
 	}
+
+	TargetValue1 = SpringArmComp->TargetArmLength;
 }
 
 void AHG_Player::Tick(float DeltaTime)
@@ -337,18 +323,20 @@ void AHG_Player::PopUpPurchaseWidget()
 		PurchaseWidget->SetItemInfo(TempData);
 		if (!bToggle)
 		{
-			PurchaseWidget->AddToViewport();
 			bCanMove = false;
 			PC->SetShowMouseCursor(true);
+			PC->SetInputMode(FInputModeGameAndUI());
+			PurchaseWidget->AddToViewport(); 
 			bToggle = !bToggle;
 		}
-		else
-		{
-			PurchaseWidget->RemoveFromParent();
-			bCanMove = true;
-			PC->SetShowMouseCursor(false);
-			bToggle = !bToggle;
-		}
+// 		else
+// 		{
+// 			PurchaseWidget->RemoveFromParent();
+// 			bCanMove = true;
+// 			PC->SetShowMouseCursor(false);
+// 			PC->SetInputMode(FInputModeGameOnly());
+// 			bToggle = !bToggle;
+// 		}
 	}
 }
 
@@ -510,6 +498,25 @@ void AHG_Player::ExitTheStore()
 	}
 }
 
+void AHG_Player::PopUpHUD()
+{
+	if (IsLocallyControlled())
+	{
+		if (HeadUpClass)
+		{
+			HUD = CreateWidget<UHG_HUD>(GetWorld(), HeadUpClass);
+			if (HUD)
+			{
+				if (PC)
+				{
+					HUD->SetOwningPlayer(PC);
+				}
+				HUD->AddToViewport();
+			}
+		}
+	}
+}
+
 void AHG_Player::ServerRPC_Emotion_Implementation(UAnimMontage* Montage)
 {
 	MulticastRPC_Emotion(Montage);
@@ -526,7 +533,7 @@ void AHG_Player::ServerRPCSpawnItem_Implementation(FItemData p_ItemInfo)
 	FRotator SpawnRotation;
 	if (p_ItemInfo.ItemCategory == EItemCategory::Category_Emoji)
 	{
-		SpawnLocation = GetActorLocation() + FVector(0.0f, 0.0f, 120.0f);
+		SpawnLocation = GetActorLocation() + FVector(0.0f, 0.0f, 150.0f);
 		SpawnRotation = GetActorRotation() + FRotator(90.0f, 0.0f, 0.0f);
 	}
 	else
@@ -600,31 +607,17 @@ void AHG_Player::ServerRPC_InitCharacter_Implementation(AHG_Player* Value)
 }
 void AHG_Player::Multicast_InitCharacter_Implementation(AHG_Player* Value)
 {
-	if (IsLocallyControlled())
+	if (GI->Gender != 0)
 	{
-		if (Value)
-		{
-			if (GI->Gender != 0)
-			{
-				Value->Gender = GI->Gender;
-			}
-			if (GI->Anim)
-			{
-				Value->GetMesh()->SetAnimInstanceClass(GI->Anim);
-			}
-			if (GI->SkeletalMesh)
-			{
-				Value->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
-				if (Gender == 1)
-				{
-					Value->GetMesh()->SetRelativeScale3D(FVector(1.3f, 1.3f, 1.3f));
-				}
-				else if (Gender == 2)
-				{
-					Value->GetMesh()->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
-				}
-			}
-		}
+		Gender = GI->Gender;
+	}
+	if (GI->Anim)
+	{
+		this->GetMesh()->SetAnimInstanceClass(GI->Anim);
+	}
+	if (GI->SkeletalMesh)
+	{
+		this->GetMesh()->SetSkeletalMesh(GI->SkeletalMesh);
 	}
 }
 
@@ -635,7 +628,7 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	DOREPLIFETIME(AHG_Player, EquipItemList);
 	DOREPLIFETIME(AHG_Player, bEquipItem);
 	DOREPLIFETIME(AHG_Player, HUD);
-	DOREPLIFETIME(AHG_Player, SkeletalMesh);
+
 }
 
 

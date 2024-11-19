@@ -14,28 +14,21 @@ void UHG_ItemPurchaseWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (!Btn_Purchase->OnClicked.IsBound())
-	{
-		Btn_Purchase->OnClicked.AddDynamic(this, &UHG_ItemPurchaseWidget::OnClickPurchaseButton);
-	}
-	if (!Btn_Exit->OnClicked.IsBound())
-	{
-		Btn_Exit->OnClicked.AddDynamic(this, &UHG_ItemPurchaseWidget::OnClickExitButton);
-	}
-
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
 }
 
-void UHG_ItemPurchaseWidget::OnClickPurchaseButton()
+void UHG_ItemPurchaseWidget::OnPressQ()
 {
-	if (GI->IsValidItem(LookingItemData.ItemName))
+	
+	if (GI && GI->IsValidItem(LookingItemData.ItemName))
 	{
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
+		if (Owner->PC)
 		{
-			pc->SetShowMouseCursor(false);
+			Owner->PC->SetShowMouseCursor(false);
 			Owner->bCanMove = true;
 			Owner->bToggle = !Owner->bToggle;
+			Owner->PC->SetInputMode(FInputModeGameOnly());
+			Owner->PurchaseWidget = nullptr;
 		}
 		if (Owner->GoodsComp->GetGold() <= 0)
 		{
@@ -53,24 +46,23 @@ void UHG_ItemPurchaseWidget::OnClickPurchaseButton()
 	}
 }
 
-void UHG_ItemPurchaseWidget::OnClickExitButton()
+void UHG_ItemPurchaseWidget::OnClickEmptySpace()
 {
 	RemoveFromParent();
-	auto* pc = Cast<APlayerController>(Owner->Controller);
-	if (pc)
+	if (Owner->PC)
 	{
-		pc->SetShowMouseCursor(false);
+		Owner->PC->SetShowMouseCursor(false);
 		Owner->bCanMove = true;
 		Owner->bToggle = !Owner->bToggle;
+		Owner->PC->SetInputMode(FInputModeGameOnly());
 	}
 }
 
 void UHG_ItemPurchaseWidget::SetItemInfo(FItemData ItemInfo)
 {
 	LookingItemData = ItemInfo;
-	Img_ItemImg->SetBrushFromTexture(ItemInfo.ItemIcon);
 	TB_ItemName->SetText(FText::FromString(ItemInfo.ItemName));
-	TB_ItemPrice->SetText(FText::FromString(FString::Printf(TEXT("%d Point"), ItemInfo.ItemPrice)));
+	TB_ItemPrice->SetText(FText::FromString(FString::Printf(TEXT("%d"), ItemInfo.ItemPrice)));
 }
 
 void UHG_ItemPurchaseWidget::SetOwner(AHG_Player* Value)

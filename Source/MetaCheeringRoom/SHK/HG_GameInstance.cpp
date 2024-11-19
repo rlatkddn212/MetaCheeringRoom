@@ -19,8 +19,10 @@ bool UHG_GameInstance::IsValidItem(FString ItemName)
 {
 	TArray<FItemData*> AllRows;
 	UE_LOG(LogTemp, Warning, TEXT("IsValidItem"));
-
-	ItemDataTable->GetAllRows(TEXT(""), AllRows);
+	if (ItemDataTable)
+	{
+		ItemDataTable->GetAllRows(TEXT(""), AllRows);
+	}
 	for (auto Row : AllRows)
 	{
 		if (Row->ItemName == ItemName)

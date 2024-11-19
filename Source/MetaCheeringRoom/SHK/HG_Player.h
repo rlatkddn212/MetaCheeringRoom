@@ -169,6 +169,7 @@ public:
 
 	FVector LookingPoint;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	class UHG_PlayerAnimInstance* Anim;
 
 	bool bPassed = false;
@@ -178,7 +179,7 @@ public:
 	class UHG_StoreWidget* StoreWidget;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UHG_StoreWidget> StoreWidgetFactory;
+	TSubclassOf<class UHG_StoreWidget> StoreWidgetFactory;  
 
 	UFUNCTION()
 	void CreateStoreWidget();
@@ -209,8 +210,10 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_InitCharacter(AHG_Player* Value);
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_InitCharacter(AHG_Player* Value);
+
 	float Timing = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -232,4 +235,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,Replicated)
 	class USkeletalMesh* SkeletalMesh;
+	
+	UFUNCTION(BlueprintCallable)
+	void PopUpHUD();
 };

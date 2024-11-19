@@ -19,14 +19,6 @@
 
 void UInventoryWidget::NativeConstruct()
 {
-	if (!Btn_ThrowAway->OnClicked.IsBound())
-	{
-		Btn_ThrowAway->OnClicked.AddDynamic(this, &UInventoryWidget::ThrowAwaySelectedItem);
-	}
-	if (!Btn_Use->OnClicked.IsBound())
-	{
-		Btn_Use->OnClicked.AddDynamic(this, &UInventoryWidget::UseItem);
-	}
 	if (!Btn_CostumeCategory->OnClicked.IsBound())
 	{
 		Btn_CostumeCategory->OnClicked.AddDynamic(this, &UInventoryWidget::SelectCategory_Costume);
@@ -67,7 +59,6 @@ void UInventoryWidget::InitInventoryUI()
 	WB_SlotList_Sound->ClearChildren();
 	// 선택 슬롯도 초기화 (UX 적으로 인벤토리를 껐다 켰을 때 선택된 슬롯도 없는 것이 맞다고 판단)
 	SelectedSlot = nullptr;
-	DIsplaySelectedItemInfo();
 	// 현재 이 인벤토리 위젯이 어떤 Pawn 에게 소유 되었는지 검사
 	if (this->GetOwningPlayer() != nullptr)
 	{
@@ -77,6 +68,10 @@ void UInventoryWidget::InitInventoryUI()
 		if (OwningPlayer)
 		{
 			// Cast 에 성공했다면
+			
+			// 마지막으로 선택했던 카테고리를 표시
+			WS_Category->SetActiveWidget(SelectedCategory);
+			
 			// 해당 Player 가 가진 Inventory 의 모든 요소를 접근 
 			for (auto slot : OwningPlayer->InventoryComp->Inventory)
 			{
@@ -121,10 +116,6 @@ void UInventoryWidget::InitInventoryUI()
  							{
 								// EquipList에 존재했었다면
 								
-								// 아이템이 현재 장착되었는지 보여주기 위한 표시
-								// HitTestInvisible => 클릭 등의 입력을 비활성화 하는 옵션, 그냥 Visible로 하면 Slot에 있는 Button 의 입력을 Img_Equip 이 가져감
- 								SlotWidget->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
-
 								// EquipList에서 기존에 장착했던 아이템을 다시 생성한 SlotWidget로 갱신해줌
  								EquipList[EquipList.Find(EquipSlot)] = SlotWidget;
  							}
@@ -152,7 +143,8 @@ void UInventoryWidget::SelectCategory_Active()
 {
 	SelectedCategory = WB_SlotList_Active;
 	WS_Category->SetActiveWidgetIndex(0);
-	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
+
+	CheckButtonClick(Btn_ActiveCategory);
 }
 
 // Costume 카테고리 버튼이 클릭 됐을 때 실행되는 함수
@@ -161,14 +153,7 @@ void UInventoryWidget::SelectCategory_Costume()
 	SelectedCategory = WB_SlotList_Costume;
 	WS_Category->SetActiveWidgetIndex(1);
 
-	if (SelectedSlot != nullptr && EquipList.Contains(SelectedSlot))
-	{
-		TB_Use->SetText(FText::FromString(TEXT("해제하기")));
-	}
-	else
-	{
-		TB_Use->SetText(FText::FromString(TEXT("장착하기")));
-	}
+	CheckButtonClick(Btn_CostumeCategory);
 }
 
 // Emotion 카테고리 버튼이 클릭 됐을 때 실행되는 함수
@@ -176,7 +161,8 @@ void UInventoryWidget::SelectCategory_Emotion()
 {
 	SelectedCategory = WB_SlotList_Emotion;
 	WS_Category->SetActiveWidgetIndex(2);
-	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
+
+	CheckButtonClick(Btn_EmotionCategory);
 }
 
 // Emoji 카테고리 버튼이 클릭 됐을 때 실행되는 함수
@@ -184,7 +170,9 @@ void UInventoryWidget::SelectCategory_Emoji()
 {
 	SelectedCategory = WB_SlotList_Emoji;
 	WS_Category->SetActiveWidgetIndex(3);
-	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
+
+
+	CheckButtonClick(Btn_EmojiCategory);
 }
 
 // Sound 카테고리 버튼이 클릭 됐을 때 실행되는 함수
@@ -192,28 +180,8 @@ void UInventoryWidget::SelectCategory_Sound()
 {
 	SelectedCategory = WB_SlotList_Sound;
 	WS_Category->SetActiveWidgetIndex(4);
-	TB_Use->SetText(FText::FromString(TEXT("사용하기")));
-}
 
-void UInventoryWidget::DIsplaySelectedItemInfo()
-{	
-	// 선택된 슬롯이 있는지 없는지 검사
-	if (SelectedSlot)
-	{
-		// 있다면 선택된 슬롯의 정보로 UI를 갱신
-		Img_SelectedItem->SetBrushFromTexture(SelectedSlot->SlotInfo.ItemInfo.ItemIcon);
-		TB_ItemName->SetText(FText::FromString(SelectedSlot->SlotInfo.ItemInfo.ItemName));
-		TB_Price->SetText(FText::AsNumber((SelectedSlot->SlotInfo.ItemInfo.ItemPrice)));
-		TB_Quantity->SetText(FText::AsNumber(SelectedSlot->SlotInfo.Quantity));   
-	}
-	else
-	{
-		// 없다면 아무것도 표시하지 않음
-		Img_SelectedItem->SetBrushFromMaterial(DefaultImage);
-		TB_ItemName->SetText(FText::FromString(TEXT("")));
-		TB_Price->SetText(FText::FromString(TEXT("")));
-		TB_Quantity->SetText(FText::FromString(TEXT("")));
-	}
+	CheckButtonClick(Btn_SoundCategory);
 }
 
 // 아이템 버리기
@@ -226,13 +194,7 @@ void UInventoryWidget::ThrowAwaySelectedItem()
 
 		// 선택된 슬롯이 장착된 아이템 슬롯 리스트에 있는지 확인
 		if (EquipList.Contains(SelectedSlot))
-		{
-			// 버튼의 텍스트를 장착하기로 바꿔줌
-			TB_Use->SetText(FText::FromString(TEXT("장착하기")));
-
-			// 선택된 슬롯의 장착 이미지를 보이지 않게 함
-			SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
-			
+		{			
 			// 장착된 아이템 슬롯 리스트에서 선택된 슬롯 제거
 			EquipList.Remove(SelectedSlot);
 			
@@ -269,9 +231,6 @@ void UInventoryWidget::ThrowAwaySelectedItem()
 					// SelectedSlot을 비워줌
 					SelectedSlot = nullptr;
 				}
-				// 현재의 슬롯 정보를 갱신
-				DIsplaySelectedItemInfo();
-
 				break;
 			}
 
@@ -316,13 +275,6 @@ void UInventoryWidget::UseItem()
 					// GameInstance의 EquipSlotIndexList에 내가 선택한 슬롯의 아이템의 인덱스가 포함되어 있는지 확인 ==> 장착한 아이템인지 확인
 					if (GI->EquipSlotIndexList.Contains(SelectedSlot->MyIndex))
 					{
-						// 장착한 아이템이라면
-
-						// 사용하는 버튼의 텍스트를 해제하기에서 장착하기로 변경
-						TB_Use->SetText(FText::FromString(TEXT("장착하기")));
-
-						// 선택한 슬롯의 장착 표시 이미지를 보이지 않게 함
-						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::Hidden);
 
 						// EquipList에서 선택한 슬롯을 제거
 						EquipList.Remove(SelectedSlot);
@@ -336,12 +288,6 @@ void UInventoryWidget::UseItem()
 					else
 					{
 						// 장착하지 않았다면 
-
-						// 사용하는 버튼의 텍스트를 장착하기에서 해제하기로 변경
-						TB_Use->SetText(FText::FromString(TEXT("해제하기")));
-
-						// 선택한 슬롯의 장착 표시 이미지를 보이게 함
-						SelectedSlot->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
 
 						// EquipList에서 선택한 슬롯을 추가
 						EquipList.Add(SelectedSlot);
@@ -394,7 +340,19 @@ void UInventoryWidget::CheckEquipitem()
 		UHG_SlotWidget* EquipSlot = Cast<UHG_SlotWidget>(WB_SlotList_Costume->GetChildAt(n));
 		if (EquipSlot)
 		{
-			EquipSlot->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
+		//	EquipSlot->Img_Equip->SetVisibility(ESlateVisibility::HitTestInvisible);
 		}
 	}
 }
+
+void UInventoryWidget::CheckButtonClick(UButton* p_Button)
+{
+	Btn_SoundCategory->SetBackgroundColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.5f));
+	Btn_ActiveCategory->SetBackgroundColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.5f));
+	Btn_CostumeCategory->SetBackgroundColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.5f));
+	Btn_EmotionCategory->SetBackgroundColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.5f));
+	Btn_EmojiCategory->SetBackgroundColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.5f));
+
+	p_Button->SetBackgroundColor(FLinearColor(0.0f,0.26f,0.15f,0.5f));
+}
+

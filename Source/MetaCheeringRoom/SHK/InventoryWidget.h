@@ -56,28 +56,6 @@ public:
 	UHG_SlotWidget* SelectedSlot;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	UImage* Img_SelectedItem;
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	UTextBlock* TB_ItemName;
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	UTextBlock* TB_Price;
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	UTextBlock* TB_Use;
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	UTextBlock* TB_Quantity;
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	UButton* Btn_Use;
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
-	UButton* Btn_ThrowAway;
-
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
 	UButton* Btn_ActiveCategory;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWIdget))
@@ -110,9 +88,6 @@ public:
 	UFUNCTION()
 	void SelectCategory_Sound();
 
-
-	void DIsplaySelectedItemInfo();
-
 	UFUNCTION()
 	void ThrowAwaySelectedItem();
 
@@ -128,4 +103,6 @@ public:
 	int32 GetSlotIndexInWB(UWidget* SlotWidget);
 
 	void CheckEquipitem();
+
+	void CheckButtonClick(UButton* p_Button);
 };
