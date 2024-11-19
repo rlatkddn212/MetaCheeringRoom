@@ -30,25 +30,27 @@ void ASW_CreatorPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	bShowMouseCursor = true;
-	SetInputMode(FInputModeGameAndUI());
+	if (IsLocalPlayerController())
+	{
+		bShowMouseCursor = true;
+		SetInputMode(FInputModeGameAndUI());
+		// 위젯 생성
+		CreatorWidget = CreateWidget<USW_CreatorWidget>(GetWorld(), CreatorWidgetFactory);
+		CreatorWidget->AddToViewport();
 
-    // 위젯 생성
-	CreatorWidget = CreateWidget<USW_CreatorWidget>(GetWorld(), CreatorWidgetFactory);
-	CreatorWidget->AddToViewport();
+		// PlayerController 가져오기
+		CreatorWidget->ControllerReference = this;
+		CreatorWidget->ModelToolbarWidget->SetCreatorToolState(ECreatorToolState::Selection);
 
-	// PlayerController 가져오기
-	CreatorWidget->ControllerReference = this;
-	CreatorWidget->ModelToolbarWidget->SetCreatorToolState(ECreatorToolState::Selection);
-
-	CreatorWidget->ModelToolbarWidget->OnCreatorToolStateChanged.BindLambda([this](ECreatorToolState NewState)
-		{
-			SetToolState(NewState);
-		});
+		CreatorWidget->ModelToolbarWidget->OnCreatorToolStateChanged.BindLambda([this](ECreatorToolState NewState)
+			{
+				SetToolState(NewState);
+			});
 
 
-	ReloadHierarchy();
-	ToolState = ECreatorToolState::Selection;
+		ReloadHierarchy();
+		ToolState = ECreatorToolState::Selection;
+	}
 }
 
 void ASW_CreatorPlayerController::Tick(float DeltaTime)

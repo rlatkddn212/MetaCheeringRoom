@@ -38,4 +38,7 @@ public:
 
 	UPROPERTY()
 	class UJS_SummaryResultWidget* SummaryResultWidget;
+
+	UFUNCTION(BlueprintCallable)
+	void ShowSummaryWidget();
 };

@@ -51,3 +51,25 @@ void AJS_VideoWidgetTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overl
 		}
 	}
 }
+
+void AJS_VideoWidgetTriggerBox::ShowVideoWidget()
+{
+	UVideoWidget* VideoWidget = ScreenActor->VideoWidget;
+	if (VideoWidget)
+	{
+		VideoWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		VideoWidget->PlayShowAnimation();
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
+		{
+			PC->SetShowMouseCursor(true);
+			PC->SetInputMode(FInputModeUIOnly());
+			AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+			if (Player)
+			{
+				Player->Direction = FVector::ZeroVector;
+				Player->bCanMove = false;
+			}
+		}
+	}
+}

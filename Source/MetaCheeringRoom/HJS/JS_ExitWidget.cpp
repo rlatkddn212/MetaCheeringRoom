@@ -23,7 +23,7 @@ void UJS_ExitWidget::OnClickQuitBtn()
 {	
 
 	// 현재 레벨 불러오기
-	if (GetWorld()->GetMapName() == TEXT("HG_LobbyLevel"))
+	if (GetWorld()->GetMapName() == TEXT("HG_LobbyLevel_New"))
 	{
 		UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 	}
