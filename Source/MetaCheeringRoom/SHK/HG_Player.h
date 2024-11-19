@@ -9,6 +9,7 @@
 #include "HG_Player.generated.h"
 
 class AHG_EquipItem;
+class UMaterialInstanceDynamic;
 
 UCLASS()
 class METACHEERINGROOM_API AHG_Player : public ACharacter
@@ -43,16 +44,24 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Move;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Jump;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Look;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Interaction;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Inventory;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Emotion;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Custom;
 
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
@@ -169,7 +178,7 @@ public:
 
 	FVector LookingPoint;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UHG_PlayerAnimInstance* Anim;
 
 	bool bPassed = false;
@@ -179,7 +188,7 @@ public:
 	class UHG_StoreWidget* StoreWidget;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UHG_StoreWidget> StoreWidgetFactory;  
+	TSubclassOf<class UHG_StoreWidget> StoreWidgetFactory;
 
 	UFUNCTION()
 	void CreateStoreWidget();
@@ -230,12 +239,26 @@ public:
 
 	class AHG_EquipItem* EItem;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 Gender = 1;
 
-	UPROPERTY(EditDefaultsOnly,Replicated)
+	UPROPERTY(EditDefaultsOnly, Replicated)
 	class USkeletalMesh* SkeletalMesh;
-	
+
 	UFUNCTION(BlueprintCallable)
 	void PopUpHUD();
+
+	UFUNCTION()
+	void ApplyCustomizing(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin);
+
+	UMaterialInstanceDynamic* DynamicMaterial_Cloth;
+	UMaterialInstanceDynamic* DynamicMaterial_HairPin;
+	UMaterialInstanceDynamic* DynamicMaterial_ClothColor;
+	UMaterialInstanceDynamic* DynamicMaterial_Eyes;
+	UMaterialInstanceDynamic* DynamicMaterial_Hair;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UHG_CustomUI> CustomUIClass;
+
+	void PopUpCustomUI();
 };

@@ -24,6 +24,8 @@
 #include "HG_RemoteCS.h"
 #include "HG_HUD.h"
 #include "HG_CheeringStick.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "HG_CustomUI.h"
 
 AHG_Player::AHG_Player()
 {
@@ -107,6 +109,57 @@ void AHG_Player::BeginPlay()
 	}
 
 	TargetValue1 = SpringArmComp->TargetArmLength;
+
+	// 커스텀 - 옷
+	UMaterialInterface* Mat_Cloth = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.MaterialInstanceConstant'/Game/LYJ/Characters/Mint/Materials/Custom/M_CUSTOM_Mint_Cloth.M_CUSTOM_Mint_Cloth'"));
+	if (Mat_Cloth)
+	{
+		DynamicMaterial_Cloth = UMaterialInstanceDynamic::Create(Mat_Cloth, this);
+		if (DynamicMaterial_Cloth)
+		{
+			GetMesh()->SetMaterial(2, DynamicMaterial_Cloth);
+		}
+	}
+	// 커스텀 - 옷색깔
+	UMaterialInterface* Mat_ClothColor = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.MaterialInstanceConstant'/Game/LYJ/Characters/Mint/Materials/Custom/M_CUSTOM_Mint_Cloth_PointColor.M_CUSTOM_Mint_Cloth_PointColor'"));
+	if (Mat_ClothColor)
+	{
+		DynamicMaterial_ClothColor = UMaterialInstanceDynamic::Create(Mat_ClothColor, this);
+		if (DynamicMaterial_ClothColor)
+		{
+			GetMesh()->SetMaterial(1, DynamicMaterial_ClothColor);
+		}
+	}
+	// 커스텀 - 머리
+	UMaterialInterface* Mat_Hair = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.MaterialInstanceConstant'/Game/LYJ/Characters/Mint/Materials/Custom/M_CUSTOM_Mint_Hair.M_CUSTOM_Mint_Hair'"));
+	if (Mat_Hair)
+	{
+		DynamicMaterial_Hair = UMaterialInstanceDynamic::Create(Mat_Hair, this);
+		if (DynamicMaterial_Hair)
+		{
+			GetMesh()->SetMaterial(8, DynamicMaterial_Hair);
+		}
+	}
+	// 커스텀 - 눈
+	UMaterialInterface* Mat_Eyes = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.MaterialInstanceConstant'/Game/LYJ/Characters/Mint/Materials/Custom/M_CUSTOM_Mint_Eye.M_CUSTOM_Mint_Eye'"));
+	if (Mat_ClothColor)
+	{
+		DynamicMaterial_Eyes = UMaterialInstanceDynamic::Create(Mat_Eyes, this);
+		if (DynamicMaterial_Eyes)
+		{
+			GetMesh()->SetMaterial(6, DynamicMaterial_Eyes);
+		}
+	}
+	// 커스텀 - 머리핀
+	UMaterialInterface* Mat_HairPin = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.MaterialInstanceConstant'/Game/LYJ/Characters/Mint/Materials/Custom/M_CUSTOM_Mint_Cloth_PointColor.M_CUSTOM_Mint_Cloth_PointColor'"));
+	if (Mat_ClothColor)
+	{
+		DynamicMaterial_HairPin = UMaterialInstanceDynamic::Create(Mat_HairPin, this);
+		if (DynamicMaterial_HairPin)
+		{
+			GetMesh()->SetMaterial(7, DynamicMaterial_HairPin);
+		}
+	}
 }
 
 void AHG_Player::Tick(float DeltaTime)
@@ -200,6 +253,8 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	input->BindAction(IA_Inventory, ETriggerEvent::Completed, this, &AHG_Player::PopUpInventory);
 
 	input->BindAction(IA_Emotion, ETriggerEvent::Completed, this, &AHG_Player::Emotion);
+
+	input->BindAction(IA_Custom, ETriggerEvent::Completed, this, &AHG_Player::PopUpCustomUI);
 }
 
 void AHG_Player::OnMyMove(const FInputActionValue& Value)
@@ -512,6 +567,50 @@ void AHG_Player::PopUpHUD()
 					HUD->SetOwningPlayer(PC);
 				}
 				HUD->AddToViewport();
+			}
+		}
+	}
+}
+
+void AHG_Player::ApplyCustomizing(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin)
+{
+	if (DynamicMaterial_Cloth)
+	{
+		DynamicMaterial_Cloth->SetVectorParameterValue("CustomColor", Cloth);
+		DynamicMaterial_Cloth->SetScalarParameterValue("UseCustomTexture",1.0f);
+		DynamicMaterial_Cloth->SetTextureParameterValue("CustomTexture", ClothTexture);
+	}
+	if (DynamicMaterial_ClothColor)
+	{
+		DynamicMaterial_ClothColor->SetVectorParameterValue("CustomColor", ClothHem);
+	}
+	if (DynamicMaterial_Eyes)
+	{
+		if(!(Eyes == FLinearColor(1.0f,1.0f,1.0f))) DynamicMaterial_Eyes->SetVectorParameterValue("CustomColor", Eyes);
+	}
+	if (DynamicMaterial_Hair)
+	{
+		DynamicMaterial_Hair->SetVectorParameterValue("CustomColor", Hair);
+	}
+	if (DynamicMaterial_HairPin)
+	{
+		DynamicMaterial_HairPin->SetVectorParameterValue("CustomColor", HairPin);
+	}
+}
+
+void AHG_Player::PopUpCustomUI()
+{
+	if (CustomUIClass)
+	{
+		auto* CustomUI = CreateWidget<UHG_CustomUI>(GetWorld(),CustomUIClass);
+		if (CustomUI)
+		{
+			CustomUI->AddToViewport();
+			CustomUI->SetOwningPlayer(PC);
+			if (PC)
+			{
+				PC->SetShowMouseCursor(true);
+				PC->SetInputMode(FInputModeUIOnly());
 			}
 		}
 	}

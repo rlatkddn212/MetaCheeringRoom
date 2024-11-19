@@ -41,12 +41,6 @@ void UInventoryWidget::NativeConstruct()
 	}
 
 	GI = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
-	SelectedCategory = WB_SlotList_Active;
-}
-
-void UInventoryWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
 }
 
 void UInventoryWidget::InitInventoryUI()
@@ -70,7 +64,7 @@ void UInventoryWidget::InitInventoryUI()
 			// Cast 에 성공했다면
 			
 			// 마지막으로 선택했던 카테고리를 표시
-			WS_Category->SetActiveWidget(SelectedCategory);
+			WS_Category->SetActiveWidgetIndex(memory);
 			
 			// 해당 Player 가 가진 Inventory 의 모든 요소를 접근 
 			for (auto slot : OwningPlayer->InventoryComp->Inventory)
@@ -125,9 +119,6 @@ void UInventoryWidget::InitInventoryUI()
 			}
 		}
 	}
-	// 인벤토리를 팝업하자마자 보이는 WrapBox 는 Active 로 설정
-	SelectedCategory = WB_SlotList_Active;
-	WS_Category->SetActiveWidgetIndex(0);
 }
 
 void UInventoryWidget::SetOwner(APawn* Player)
@@ -144,6 +135,8 @@ void UInventoryWidget::SelectCategory_Active()
 	SelectedCategory = WB_SlotList_Active;
 	WS_Category->SetActiveWidgetIndex(0);
 
+	memory = 0;
+
 	CheckButtonClick(Btn_ActiveCategory);
 }
 
@@ -152,6 +145,8 @@ void UInventoryWidget::SelectCategory_Costume()
 {
 	SelectedCategory = WB_SlotList_Costume;
 	WS_Category->SetActiveWidgetIndex(1);
+
+	memory = 1;
 
 	CheckButtonClick(Btn_CostumeCategory);
 }
@@ -162,6 +157,8 @@ void UInventoryWidget::SelectCategory_Emotion()
 	SelectedCategory = WB_SlotList_Emotion;
 	WS_Category->SetActiveWidgetIndex(2);
 
+	memory = 2;
+
 	CheckButtonClick(Btn_EmotionCategory);
 }
 
@@ -171,6 +168,7 @@ void UInventoryWidget::SelectCategory_Emoji()
 	SelectedCategory = WB_SlotList_Emoji;
 	WS_Category->SetActiveWidgetIndex(3);
 
+	memory = 3;
 
 	CheckButtonClick(Btn_EmojiCategory);
 }
@@ -180,6 +178,8 @@ void UInventoryWidget::SelectCategory_Sound()
 {
 	SelectedCategory = WB_SlotList_Sound;
 	WS_Category->SetActiveWidgetIndex(4);
+
+	memory = 4;
 
 	CheckButtonClick(Btn_SoundCategory);
 }

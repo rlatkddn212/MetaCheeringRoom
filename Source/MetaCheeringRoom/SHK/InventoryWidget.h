@@ -24,7 +24,6 @@ class METACHEERINGROOM_API UInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	virtual void NativeConstruct() override;
 
@@ -105,4 +104,6 @@ public:
 	void CheckEquipitem();
 
 	void CheckButtonClick(UButton* p_Button);
+
+	int32 memory = 0;
 };
