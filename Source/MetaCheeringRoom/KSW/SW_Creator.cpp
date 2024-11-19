@@ -10,6 +10,9 @@
 #include "SW_CreatorPlayerController.h"
 #include "UI/SW_CameraSpeedWidget.h"
 #include "Net/UnrealNetwork.h"
+#include "Components/SceneComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 ASW_Creator::ASW_Creator()
@@ -17,6 +20,26 @@ ASW_Creator::ASW_Creator()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	RootSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootSceneComponent"));
+	SetRootComponent(RootSceneComponent);
+
+	HandMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HandMeshComponent"));
+	HandMeshComponent->SetupAttachment(RootSceneComponent);
+	
+	// Skeletal Mesh 설정
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> HandMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Ksw/Assets/MannequinsXR/Meshes/SKM_MannyXR_right.SKM_MannyXR_right'"));
+
+	if (HandMesh.Succeeded())
+	{
+		HandMeshComponent->SetSkeletalMesh(HandMesh.Object);
+	}
+
+	// 카메라
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
+	CameraComponent->SetupAttachment(RootSceneComponent);
+
+	bReplicates = true; // Pawn이 네트워크에서 복제되도록 설정
+	SetReplicateMovement(true);
 }
 
 // Called when the game starts or when spawned
@@ -30,25 +53,18 @@ void ASW_Creator::BeginPlay()
 	{
 		CameraSpeedWidget->AddToViewport();
 	}
+
+	if (IsLocallyControlled())
+	{
+		// 매쉬를 숨긴다.
+		HandMeshComponent->SetVisibility(false);
+	}
 }
 
 // Called every frame
 void ASW_Creator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// p = p0 + v * t
-	if (HasAuthority())
-	{
-		FTransform t = FTransform(GetControlRotation());
-		Direction = t.TransformVector(Direction);
-
-		FVector p = GetActorLocation();
-		p += Direction * CameraSpeed * DeltaTime;
-		SetActorLocation(p);
-
-		Direction = FVector::ZeroVector;
-	}
 
 	if (PC && MouseState != ECreatorMouseState::GizmoDrag)
 	{
@@ -112,7 +128,15 @@ void ASW_Creator::OnMyMove(const FInputActionValue& Value)
 		Direction.Normalize();
 	}
 
-	Server_Movement(Direction);
+	FTransform t = FTransform(GetControlRotation());
+	Direction = t.TransformVector(Direction);
+
+	FVector p = GetActorLocation();
+	p += Direction * CameraSpeed * GetWorld()->DeltaTimeSeconds;
+	SetActorLocation(p);
+
+	Server_Movement(p);
+	Direction = FVector::ZeroVector;
 }
 
 void ASW_Creator::OnMyLook(const FInputActionValue& Value)
@@ -120,7 +144,12 @@ void ASW_Creator::OnMyLook(const FInputActionValue& Value)
 	if (MouseState == ECreatorMouseState::Clicked)
 	{
 		FVector2D v = Value.Get<FVector2D>();
-		Server_LookAt(v);
+
+		AddControllerYawInput(v.X);
+		AddControllerPitchInput(-v.Y);
+
+		FRotator r = GetControlRotation();
+		Server_Rotation(r);
 	}
 }
 
@@ -135,8 +164,15 @@ void ASW_Creator::OnMyQ(const FInputActionValue& Value)
 		if (PC)
 			PC->SetToolState(ECreatorToolState::Selection);
 	}
+	FTransform t = FTransform(GetControlRotation());
+	Direction = t.TransformVector(Direction);
 
-	Server_Movement(Direction);
+	FVector p = GetActorLocation();
+	p += Direction * CameraSpeed * GetWorld()->DeltaTimeSeconds;
+	SetActorLocation(p);
+
+	Server_Movement(p);
+	Direction = FVector::ZeroVector;
 }
 
 void ASW_Creator::OnMyW(const FInputActionValue& Value)
@@ -162,7 +198,15 @@ void ASW_Creator::OnMyE(const FInputActionValue& Value)
 			PC->SetToolState(ECreatorToolState::Rotation);
 	}
 
-	Server_Movement(Direction);
+	FTransform t = FTransform(GetControlRotation());
+	Direction = t.TransformVector(Direction);
+
+	FVector p = GetActorLocation();
+	p += Direction * CameraSpeed * GetWorld()->DeltaTimeSeconds;
+	SetActorLocation(p);
+
+	Server_Movement(p);
+	Direction = FVector::ZeroVector;
 }
 
 void ASW_Creator::OnMyR(const FInputActionValue& Value)
@@ -323,19 +367,15 @@ void ASW_Creator::SetMouseState(ECreatorMouseState NewState)
 	}
 }
 
-void ASW_Creator::Server_Movement_Implementation(FVector MoveDirection)
+void ASW_Creator::Server_Movement_Implementation(const FVector& NewLocation)
 {
-	Direction = MoveDirection;
+	SetActorLocation(NewLocation);
 }
 
-void ASW_Creator::Server_LookAt_Implementation(FVector2D LookVector)
+void ASW_Creator::Server_Rotation_Implementation(const FRotator& NewRotation)
 {
-	// 새로운 회전 값 계산
-	CurrentRotation.Pitch += LookVector.Y;
-	CurrentRotation.Yaw += LookVector.X;
-
-	// 클램프 처리
-	CurrentRotation.Pitch = FMath::Clamp(CurrentRotation.Pitch, -89.0f, 89.0f);
+	SetActorRotation(NewRotation);
+	CurrentRotation = NewRotation;
 
 	if (HasAuthority())
 	{
@@ -345,20 +385,12 @@ void ASW_Creator::Server_LookAt_Implementation(FVector2D LookVector)
 
 void ASW_Creator::OnRep_CurrentRotation()
 {
-	if (Controller)
-	{
-		Controller->SetControlRotation(CurrentRotation);
-	}
-
-	// 로그 출력
-	UE_LOG(LogTemp, Warning, TEXT("CurrentRotation : %s"), *CurrentRotation.ToString());
+	SetActorRotation(CurrentRotation);
 }
 
 void ASW_Creator::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ASW_Creator, Direction);
-	DOREPLIFETIME(ASW_Creator, CurrentLocation);
 	DOREPLIFETIME(ASW_Creator, CurrentRotation);
 }
