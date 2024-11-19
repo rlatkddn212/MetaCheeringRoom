@@ -53,4 +53,27 @@ void AJS_ToToMakeTrigger::ComponentBeginOverlap(UPrimitiveComponent* OverlappedC
 	}
 }
 
-
+void AJS_ToToMakeTrigger::ShowTotoMakeWidget()
+{
+	if (ToToActor)
+	{
+		UToToMakeWidget* TotoMakeWidget = ToToActor->TotoMakeWidget;
+		if (TotoMakeWidget && TotoMakeWidget->bOpen)
+		{
+			TotoMakeWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			TotoMakeWidget->PlayShowAnimation();
+			APlayerController* PC = GetWorld()->GetFirstPlayerController();
+			if (PC)
+			{
+				PC->SetShowMouseCursor(true);
+				PC->SetInputMode(FInputModeUIOnly());
+				AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+				if (Player)
+				{
+					Player->Direction = FVector::ZeroVector;
+					Player->bCanMove = false;
+				}
+			}
+		}
+	}
+}

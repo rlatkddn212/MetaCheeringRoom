@@ -54,3 +54,25 @@ void AJS_ToToWidgetTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overla
 		}
 	}
 }
+
+void AJS_ToToWidgetTriggerBox::ShowTotoWidget()
+{
+	UJS_ToToWidget* ToToWidget = ToToActor->ToToWidget;
+	if (ToToWidget)
+	{
+		ToToWidget->ToToInitSetting();
+		ToToWidget->PlayShowAnimation();
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
+		{
+			PC->SetShowMouseCursor(true);
+			PC->SetInputMode(FInputModeUIOnly());
+			AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+			if (Player)
+			{
+				Player->Direction = FVector::ZeroVector;
+				Player->bCanMove = false;
+			}
+		}
+	}
+}

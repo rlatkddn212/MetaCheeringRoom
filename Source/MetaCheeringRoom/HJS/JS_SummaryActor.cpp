@@ -63,4 +63,21 @@ void AJS_SummaryActor::ComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 	}
 }
 
+void AJS_SummaryActor::ShowSummaryWidget()
+{
+	SummaryReqWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	SummaryReqWidget->PlayShowAnimation();
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		PC->SetShowMouseCursor(true);
+		PC->SetInputMode(FInputModeUIOnly());
+		AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+		if (Player)
+		{
+			Player->Direction = FVector::ZeroVector;
+			Player->bCanMove = false;
+		}
+	}
+}
 
