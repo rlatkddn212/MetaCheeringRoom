@@ -337,6 +337,11 @@ void ASW_CreatorPlayerController::Server_SetOwnerObject_Implementation(class ASW
 	}
 }
 
+void ASW_CreatorPlayerController::Server_DeleteCreatingDummyObject_Implementation(class ASW_CreatorObject* DummyObject)
+{
+
+}
+
 void ASW_CreatorPlayerController::Server_DeleteObject_Implementation(class ASW_CreatorObject* DeleteObject)
 {
 
