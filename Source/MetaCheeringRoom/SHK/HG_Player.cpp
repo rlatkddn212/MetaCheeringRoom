@@ -107,18 +107,6 @@ void AHG_Player::BeginPlay()
 	}
 
 	TargetValue1 = SpringArmComp->TargetArmLength;
-
-	if (IsLocallyControlled())
-	{
-		if (HeadUpClass)
-		{
-			HUD = CreateWidget<UHG_HUD>(GetWorld(), HeadUpClass);
-			if (HUD)
-			{
-				HUD->AddToViewport();
-			}
-		}
-	}
 }
 
 void AHG_Player::Tick(float DeltaTime)
@@ -507,6 +495,25 @@ void AHG_Player::ExitTheStore()
 	{
 		StoreWidget->RemoveFromParent();
 		StoreWidget = nullptr;
+	}
+}
+
+void AHG_Player::PopUpHUD()
+{
+	if (IsLocallyControlled())
+	{
+		if (HeadUpClass)
+		{
+			HUD = CreateWidget<UHG_HUD>(GetWorld(), HeadUpClass);
+			if (HUD)
+			{
+				if (PC)
+				{
+					HUD->SetOwningPlayer(PC);
+				}
+				HUD->AddToViewport();
+			}
+		}
 	}
 }
 

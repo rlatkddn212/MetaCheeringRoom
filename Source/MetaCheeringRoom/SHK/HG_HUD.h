@@ -16,8 +16,16 @@ class METACHEERINGROOM_API UHG_HUD : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UTextBlock* TB_RemoteCS;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	class UTextBlock* TB_Point;
+	
+	void SetPointText();
 
 	void UpdateHUD(FString Value);
 };

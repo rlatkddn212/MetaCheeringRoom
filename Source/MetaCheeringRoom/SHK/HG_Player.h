@@ -235,4 +235,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,Replicated)
 	class USkeletalMesh* SkeletalMesh;
+	
+	UFUNCTION(BlueprintCallable)
+	void PopUpHUD();
 };
