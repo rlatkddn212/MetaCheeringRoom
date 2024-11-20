@@ -63,12 +63,57 @@ void USW_CreatorObjectWidget::NativeConstruct()
 
 	FBXScrollReload();
 
+	{
+		TMap<int32, FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects(6);
+		for (auto& CreatorObject : CreatorObjects)
+		{
+			USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
+			ChildWidget->SetObject(CreatorObject.Value);
+			CustomObjectScrollBox1->AddChild(ChildWidget);
+		}
+	}
+
+	{
+		TMap<int32, FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects(7);
+		for (auto& CreatorObject : CreatorObjects)
+		{
+			USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
+			ChildWidget->SetObject(CreatorObject.Value);
+			CustomObjectScrollBox2->AddChild(ChildWidget);
+		}
+	}
+
+	{
+		TMap<int32, FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects(8);
+		for (auto& CreatorObject : CreatorObjects)
+		{
+			USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
+			ChildWidget->SetObject(CreatorObject.Value);
+			CustomObjectScrollBox3->AddChild(ChildWidget);
+		}
+	}
+
+	{
+		TMap<int32, FCreatorObjectData*> CreatorObjects = system->GetCreatorObjects(9);
+		for (auto& CreatorObject : CreatorObjects)
+		{
+			USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
+			ChildWidget->SetObject(CreatorObject.Value);
+			CustomObjectScrollBox4->AddChild(ChildWidget);
+		}
+	}
+
 	// 버튼 클릭처리
 	ShapeObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnShapeObjectButtonClicked);
 	SportsObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnSportsObjectButtonClicked);
 	LightObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnLightObjectButtonClicked);
 	EffectObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnEffectObjectButtonClicked);
 	FBXObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnFBXObjectButtonClicked);
+	CustomObjectButton1->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnCustomObjectButton1Clicked);
+	CustomObjectButton2->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnCustomObjectButton2Clicked);
+	CustomObjectButton3->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnCustomObjectButton3Clicked);
+	CustomObjectButton4->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnCustomObjectButton4Clicked);
+	LRUObjectButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnLRUObjectButtonClicked);
 
 	ImportButton->OnClicked.AddDynamic(this, &USW_CreatorObjectWidget::OnImportButtonClicked);
 
@@ -112,6 +157,24 @@ void USW_CreatorObjectWidget::FBXScrollReload()
 				}
 			}
 
+		}
+	}
+}
+
+void USW_CreatorObjectWidget::LRUReload()
+{
+	LRUObjectScrollBox->ClearChildren();
+
+	UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+
+	{
+		TArray<FCreatorObjectData*> CreatorObjects = system->GetLRUList();
+
+		for (auto& CreatorObject : CreatorObjects)
+		{
+			USW_CreatorObjectSlotWidget* ChildWidget = CreateWidget<USW_CreatorObjectSlotWidget>(GetWorld(), SlotFactory);
+			ChildWidget->SetObject(CreatorObject);
+			LRUObjectScrollBox->AddChild(ChildWidget);
 		}
 	}
 }
@@ -220,6 +283,31 @@ void USW_CreatorObjectWidget::OnFBXObjectButtonClicked()
 	SetCreatorObjectTabState(ECreatorObjectTabState::FBXObject);
 }
 
+void USW_CreatorObjectWidget::OnCustomObjectButton1Clicked()
+{
+	SetCreatorObjectTabState(ECreatorObjectTabState::CustomObject1);
+}
+
+void USW_CreatorObjectWidget::OnCustomObjectButton2Clicked()
+{
+	SetCreatorObjectTabState(ECreatorObjectTabState::CustomObject2);
+}
+
+void USW_CreatorObjectWidget::OnCustomObjectButton3Clicked()
+{
+	SetCreatorObjectTabState(ECreatorObjectTabState::CustomObject3);
+}
+
+void USW_CreatorObjectWidget::OnCustomObjectButton4Clicked()
+{
+	SetCreatorObjectTabState(ECreatorObjectTabState::CustomObject4);
+}
+
+void USW_CreatorObjectWidget::OnLRUObjectButtonClicked()
+{
+	SetCreatorObjectTabState(ECreatorObjectTabState::LRUObject);
+}
+
 void USW_CreatorObjectWidget::SetCreatorObjectTabState(ECreatorObjectTabState state)
 {
 	ShapeObjectButton->SetStyle(DefaultButtonStyle);
@@ -227,12 +315,22 @@ void USW_CreatorObjectWidget::SetCreatorObjectTabState(ECreatorObjectTabState st
 	LightObjectButton->SetStyle(DefaultButtonStyle);
 	EffectObjectButton->SetStyle(DefaultButtonStyle);
 	FBXObjectButton->SetStyle(DefaultButtonStyle);
+	CustomObjectButton1->SetStyle(DefaultButtonStyle);
+	CustomObjectButton2->SetStyle(DefaultButtonStyle);
+	CustomObjectButton3->SetStyle(DefaultButtonStyle);
+	CustomObjectButton4->SetStyle(DefaultButtonStyle);
+	LRUObjectButton->SetStyle(DefaultButtonStyle);
 	
 	ShapeBorder->SetVisibility(ESlateVisibility::Hidden);
 	SportsBorder->SetVisibility(ESlateVisibility::Hidden);
 	LightBorder->SetVisibility(ESlateVisibility::Hidden);
 	EffectBorder->SetVisibility(ESlateVisibility::Hidden);
 	FBXBorder->SetVisibility(ESlateVisibility::Hidden);
+	CustomBorder1->SetVisibility(ESlateVisibility::Hidden);
+	CustomBorder2->SetVisibility(ESlateVisibility::Hidden);
+	CustomBorder3->SetVisibility(ESlateVisibility::Hidden);
+	CustomBorder4->SetVisibility(ESlateVisibility::Hidden);
+	LRUBorder->SetVisibility(ESlateVisibility::Hidden);
 
 	if (state == ECreatorObjectTabState::ShapeObject)
 	{
@@ -258,5 +356,31 @@ void USW_CreatorObjectWidget::SetCreatorObjectTabState(ECreatorObjectTabState st
 	{
 		FBXObjectButton->SetStyle(EnableButtonStyle);
 		FBXBorder->SetVisibility(ESlateVisibility::Visible);
+	}
+	else if (state == ECreatorObjectTabState::CustomObject1)
+	{
+		CustomObjectButton1->SetStyle(EnableButtonStyle);
+		CustomBorder1->SetVisibility(ESlateVisibility::Visible);
+	}
+	else if (state == ECreatorObjectTabState::CustomObject2)
+	{
+		CustomObjectButton2->SetStyle(EnableButtonStyle);
+		CustomBorder2->SetVisibility(ESlateVisibility::Visible);
+	}
+	else if (state == ECreatorObjectTabState::CustomObject3)
+	{
+		CustomObjectButton3->SetStyle(EnableButtonStyle);
+		CustomBorder3->SetVisibility(ESlateVisibility::Visible);
+	}
+	else if (state == ECreatorObjectTabState::CustomObject4)
+	{
+		CustomObjectButton4->SetStyle(EnableButtonStyle);
+		CustomBorder4->SetVisibility(ESlateVisibility::Visible);
+	}
+	else if (state == ECreatorObjectTabState::LRUObject)
+	{
+		LRUObjectButton->SetStyle(EnableButtonStyle);
+		LRUBorder->SetVisibility(ESlateVisibility::Visible);
+		LRUReload();
 	}
 }

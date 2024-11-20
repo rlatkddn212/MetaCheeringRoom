@@ -17,6 +17,9 @@ void ASW_CreatorGameState::Multicast_AddCreatingDummyObject_Implementation(class
 	if (PC)
 	{
 		PC->ReloadHierarchy();
+
+		PC->OnObjectChanged();
+		PC->DoSelectObject(NewCreatingObject);
 	}
 }
 

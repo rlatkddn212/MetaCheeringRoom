@@ -15,6 +15,11 @@ enum class ECreatorObjectTabState : uint8
 	LightObject,
 	EffectObject,
 	FBXObject,
+	CustomObject1,
+	CustomObject2,
+	CustomObject3,
+	CustomObject4,
+	LRUObject
 };
 
 DECLARE_DELEGATE_OneParam(FOnCreatorObjectTabStateChanged, enum ECreatorObjectTabState);
@@ -48,6 +53,21 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UBorder* FBXBorder;
+	
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UBorder* CustomBorder1;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UBorder* CustomBorder2;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UBorder* CustomBorder3;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UBorder* CustomBorder4;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UBorder* LRUBorder;
 
 	// ObjectScrollBox;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -66,6 +86,22 @@ public:
 	class UScrollBox* FBXObjectScrollBox;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UScrollBox* CustomObjectScrollBox1;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UScrollBox* CustomObjectScrollBox2;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UScrollBox* CustomObjectScrollBox3;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UScrollBox* CustomObjectScrollBox4;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UScrollBox* LRUObjectScrollBox;
+
+	// Button
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* ShapeObjectButton;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -79,6 +115,25 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* FBXObjectButton;
+	
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UButton* CustomObjectButton1;
+	
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UButton* CustomObjectButton2;
+	
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UButton* CustomObjectButton3;
+	
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UButton* CustomObjectButton4;
+	
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UButton* LRUObjectButton;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* ImportButton;
@@ -89,6 +144,8 @@ public:
 	FOnCreatorObjectTabStateChanged OnCreatorObjectTabStateChanged;
 	
 	void FBXScrollReload();
+
+	void LRUReload();
 
 	UFUNCTION()
 	void OnImportButtonClicked();
@@ -108,6 +165,18 @@ public:
 
 	UFUNCTION()
 	void OnFBXObjectButtonClicked();
+	
+	UFUNCTION()
+	void OnCustomObjectButton1Clicked();
+	UFUNCTION()
+	void OnCustomObjectButton2Clicked();
+	UFUNCTION()
+	void OnCustomObjectButton3Clicked();
+	UFUNCTION()
+	void OnCustomObjectButton4Clicked();
+	
+	UFUNCTION()
+	void OnLRUObjectButtonClicked();
 
 	void SetCreatorObjectTabState(ECreatorObjectTabState state);
 

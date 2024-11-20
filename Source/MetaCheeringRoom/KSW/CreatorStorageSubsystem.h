@@ -24,6 +24,19 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class ASW_CreatorObject> ItemClass;
+
+	// copy
+	FCreatorObjectData* Clone()
+	{
+		FCreatorObjectData* NewData = new FCreatorObjectData();
+		NewData->CObjectType = CObjectType;
+		NewData->CObjectId = CObjectId;
+		NewData->ItemName = ItemName;
+		NewData->ItemIcon = ItemIcon;
+		NewData->ItemClass = ItemClass;
+
+		return NewData;
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -99,12 +112,20 @@ public:
 	void AddMetaData(FCreatorMapMetaData* MetaData);
 	void RemoveMetaData(int32 idx);
 
+	void AddLRUCreatorObject(FCreatorObjectData* CreatorObject);
+	TArray<FCreatorObjectData*> GetLRUList();
+	void MoveToFront(int32 index);
+
 private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	class UDataTable* ItemDataTable;
 	// 크리에이터 툴에 사용할 수 있는 오브젝트
 	TMap<int32, TMap<int32, FCreatorObjectData*>> CreatorObjectMaps;
+
+	int32 MaxLRUCount = 15;
+	// LRU CreatorObject
+	TArray<FCreatorObjectData*> LRUCreatorObjectList;
 	
 	TArray<FCreatorMapMetaData*> CreatorMapMetaDatas;
 	FString MetaDataFile = "CreatorMapMetaDataList.json";

@@ -40,19 +40,10 @@ public:
 	// 지워지지 않는경우
 
 	UFUNCTION(Server, Reliable)
-	void Server_CreatingDummyObject(const struct FCreatorObjectData& ObjectData);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_CreatingDummyObject(class ASW_CreatorObject* NewDummyObject);
-
-	UFUNCTION(Server, Reliable)
 	void Server_SetOwnerObject(class ASW_CreatorObject* OwnerObject, bool isOnwer);
 
 	UFUNCTION(Server, Reliable)
-	void Server_DeleteCreatingDummyObject(class ASW_CreatorObject* DummyObject);
-
-	UFUNCTION(Server, Reliable)
-	void Server_AddCreatingDummyObject(class ASW_CreatorObject* NewCreatingObject);
+	void Server_AddCreatingDummyObject(const struct FCreatorObjectData& ObjectData, FVector Pos);
 
 	UFUNCTION(Server, Reliable)
 	void Server_DeleteObject(class ASW_CreatorObject* DeleteObject);

@@ -321,11 +321,32 @@ ASW_CreatorObject* UCreatorMapSubsystem::CreateObject(const FCreatorObjectData* 
 
     CreatingObject->SetActorLocation(FVector::ZeroVector);
     CreatingObject->SetActorRotation(FRotator::ZeroRotator);
-    CreatingObject->CreatingObjectData = ObjectData;
+    //CreatingObject->CreatingObjectData = ObjectData;
+
+    // 얕복으로 처리
+	CreatingObject->CreatingObjectData = new FCreatorObjectData(*ObjectData);
+
     CreatingObject->CreatorObjectType = ObjectData->CObjectType;
     CreatingObject->CreatorObjectId = ObjectData->CObjectId;
 
 	return CreatingObject;
+}
+
+ASW_CreatorObject* UCreatorMapSubsystem::CreateDummyObject(struct FCreatorObjectData* ObjectData)
+{
+    FActorSpawnParameters SpawnParams;
+    //SpawnParams.Owner = this;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+    ASW_CreatorObject* CreatingObject = GetWorld()->SpawnActor<ASW_CreatorObject>(ObjectData->ItemClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+    CreatingObject->SetActorLocation(FVector::ZeroVector);
+    CreatingObject->SetActorRotation(FRotator::ZeroRotator);
+    CreatingObject->CreatingObjectData = ObjectData;
+    CreatingObject->CreatorObjectType = ObjectData->CObjectType;
+    CreatingObject->CreatorObjectId = ObjectData->CObjectId;
+
+    return CreatingObject;
 }
 
 void UCreatorMapSubsystem::AddObject(ASW_CreatorObject* CreatingObject, ASW_CreatorObject* ParentObject /*= nullptr*/)

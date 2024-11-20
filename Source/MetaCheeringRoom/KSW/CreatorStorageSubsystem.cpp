@@ -208,3 +208,34 @@ void UCreatorStorageSubsystem::RemoveMetaData(int32 idx)
 	SaveMetaData();
 }
 
+void UCreatorStorageSubsystem::AddLRUCreatorObject(FCreatorObjectData* CreatorObject)
+{
+	int32 Index = LRUCreatorObjectList.IndexOfByKey(CreatorObject);
+	if (Index != INDEX_NONE)
+	{
+		// 이미 존재하면 순서만 갱신
+		MoveToFront(Index);
+	}
+	else
+	{
+		// 새로운 아이템 추가
+		if (LRUCreatorObjectList.Num() >= MaxLRUCount)
+		{
+			LRUCreatorObjectList.Pop(); // 가장 오래된 아이템 제거
+		}
+		LRUCreatorObjectList.Insert(CreatorObject, 0); // 맨 앞에 추가
+	}
+	
+}
+
+TArray<FCreatorObjectData*> UCreatorStorageSubsystem::GetLRUList()
+{
+	return LRUCreatorObjectList;
+}
+
+void UCreatorStorageSubsystem::MoveToFront(int32 index)
+{
+	FCreatorObjectData* Item = LRUCreatorObjectList[index];
+	LRUCreatorObjectList.RemoveAt(index);
+	LRUCreatorObjectList.Insert(Item, 0);
+}

@@ -53,7 +53,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SetScale(FVector Scale);
 
-	const struct FCreatorObjectData* CreatingObjectData;
+	struct FCreatorObjectData* CreatingObjectData;
 
 	int32 CreatorObjectType;
 	int32 CreatorObjectId;
