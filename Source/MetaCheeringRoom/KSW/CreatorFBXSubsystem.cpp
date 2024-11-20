@@ -20,6 +20,28 @@ void UCreatorFBXSubsystem::Deinitialize()
 {
 }
 
+void UCreatorFBXSubsystem::CopyFBX(const FString& FilePath, const FString& NewFileName)
+{
+	FString CopyPath = FPaths::ProjectSavedDir() + TEXT("FBX/") + NewFileName;
+
+	// FBX 폴더가 없다면 생성한다
+	if (!FPlatformFileManager::Get().GetPlatformFile().DirectoryExists(*(FPaths::ProjectSavedDir() + TEXT("FBX/")))) {
+		FPlatformFileManager::Get().GetPlatformFile().CreateDirectoryTree(*(FPaths::ProjectSavedDir() + TEXT("FBX/")));
+	}
+
+	FileUploadToFirebase(FilePath, NewFileName);
+	if (FPlatformFileManager::Get().GetPlatformFile().CopyFile(*CopyPath, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("File moved successfully!"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to move file. %s"), *CopyPath);
+	}
+
+	AddMetaData(NewFileName, FPaths::GetBaseFilename(FilePath));
+}
+
 AActor* UCreatorFBXSubsystem::OpenAndCopyFBX(const FString& FilePath, const FString& NewFileName, class URLFProgress* ProgressTracker)
 {
 	FString CopyPath = FPaths::ProjectSavedDir() + TEXT("FBX/") + NewFileName;

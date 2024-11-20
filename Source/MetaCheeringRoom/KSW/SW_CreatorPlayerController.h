@@ -39,6 +39,8 @@ public:
 	void CreatingDummyObject(struct FCreatorObjectData* ObjectData);
 	// 지워지지 않는경우
 
+	void ImportFBXObject(const FString& FilePath);
+
 	UFUNCTION(Server, Reliable)
 	void Server_SetOwnerObject(class ASW_CreatorObject* OwnerObject, bool isOnwer);
 

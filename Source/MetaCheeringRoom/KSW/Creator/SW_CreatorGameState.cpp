@@ -7,10 +7,11 @@
 #include "../CreatorObject/SW_CreatorObject.h"
 #include "../CreatorStorageSubsystem.h"
 
-void ASW_CreatorGameState::Multicast_AddCreatingDummyObject_Implementation(class ASW_CreatorObject* NewCreatingObject)
+void ASW_CreatorGameState::Multicast_AddCreatingDummyObject_Implementation(class ASW_CreatorObject* NewCreatingObject, const struct FCreatorObjectData& ObjectData)
 {
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-	NewCreatingObject->SetFileName(NewCreatingObject->CreatingObjectData->ItemName);
+	NewCreatingObject->CreatingObjectData = new FCreatorObjectData(ObjectData);
+	//NewCreatingObject->SetFileName(NewCreatingObject->CreatingObjectData->ItemName);
 	system->AddObject(NewCreatingObject);
 
 	ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
