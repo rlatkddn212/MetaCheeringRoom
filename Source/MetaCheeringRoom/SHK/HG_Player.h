@@ -261,4 +261,62 @@ public:
 	TSubclassOf<class UHG_CustomUI> CustomUIClass;
 
 	void PopUpCustomUI();
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_ApplyCustom(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin);
+	UFUNCTION(NetMulticast,Reliable)
+	void Multicast_ApplyCustom(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin);
+
+	UFUNCTION()
+	void UpdateClothColor();
+
+	UFUNCTION()
+	void UpdateHairColor();
+
+	UFUNCTION()
+	void UpdateHairPinColor();
+
+	UFUNCTION()
+	void UpdateEyesColor();
+
+	UFUNCTION()
+	void UpdateClothHemColor();
+
+	UFUNCTION()
+	void UpdateClothPrinting();
+	UPROPERTY(ReplicatedUsing = OnRep_ClothColor)
+	FLinearColor CurCloth = FLinearColor(1.0f, 1.0f, 1.0f);
+
+	UFUNCTION()
+	void OnRep_ClothColor();
+	
+	UPROPERTY(ReplicatedUsing = OnRep_ClothHemColor)
+	FLinearColor CurClothHem = FLinearColor(1.0f, 1.0f, 1.0f);
+	
+	UFUNCTION()
+	void OnRep_ClothHemColor();
+
+	UPROPERTY(ReplicatedUsing = OnRep_HairPinColor)
+	FLinearColor CurHairPin = FLinearColor(1.0f, 1.0f, 1.0f);
+	
+	UFUNCTION()
+	void OnRep_HairPinColor();
+
+	UPROPERTY(ReplicatedUsing = OnRep_HairColor)
+	FLinearColor CurHair = FLinearColor(1.0f, 1.0f, 1.0f);
+	
+	UFUNCTION()
+	void OnRep_HairColor();
+
+	UPROPERTY(ReplicatedUsing = OnRep_EyesColor)
+	FLinearColor CurEyes = FLinearColor(1.0f, 1.0f, 1.0f);
+
+	UFUNCTION()
+	void OnRep_EyesColor();
+
+	UPROPERTY(ReplicatedUsing = OnRep_Printing)
+	UTexture2D* CurPrinting = nullptr;
+	
+	UFUNCTION()
+	void OnRep_Printing();
 };
