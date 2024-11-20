@@ -19,4 +19,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UJS_ChattingWidget> ChatWidgetFactory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UJS_ChattingWidget* ChatWidget;
+
 };
