@@ -134,7 +134,7 @@ void UHG_CustomUI::SetCustomInfo()
 			auto* Player = Cast<AHG_Player>(PC->GetPawn());
 			if (Player)
 			{
-				Player->ApplyCustomizing(ClothColor, ClothPrinting, ClothHemColor, EyesColor, HairColor, HairPinColor);
+				Player->ServerRPC_ApplyCustom(ClothColor, ClothPrinting, ClothHemColor, EyesColor, HairColor, HairPinColor);
 			}
 		}
 	}

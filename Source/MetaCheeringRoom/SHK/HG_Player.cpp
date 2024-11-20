@@ -69,6 +69,7 @@ AHG_Player::AHG_Player()
 
 	bReplicates = true;
 	SetReplicateMovement(true);
+	SetReplicates(true);
 }
 
 void AHG_Player::BeginPlay()
@@ -95,18 +96,7 @@ void AHG_Player::BeginPlay()
 		PC->SetInputMode(FInputModeGameOnly());
 	}
 
-	if (GI)
-	{
-		InitEquipItemList = GI->EquipItemInfoList;
-		for (auto ID : InitEquipItemList)
-		{
-			EquipItemToSocket(ID);
-		}
 
-		InventoryComp->Inventory = GI->CurrentInventory;
-
-		GoodsComp->SetGold(GI->CurrentGold);
-	}
 
 	TargetValue1 = SpringArmComp->TargetArmLength;
 
@@ -158,6 +148,34 @@ void AHG_Player::BeginPlay()
 		if (DynamicMaterial_HairPin)
 		{
 			GetMesh()->SetMaterial(7, DynamicMaterial_HairPin);
+		}
+	}
+
+	if (GI)
+	{
+		if (IsLocallyControlled())
+		{
+			InitEquipItemList = GI->EquipItemInfoList;
+			for (auto ID : InitEquipItemList)
+			{
+				EquipItemToSocket(ID);
+			}
+			InventoryComp->Inventory = GI->CurrentInventory;
+
+			GoodsComp->SetGold(GI->CurrentGold);
+		}
+		if (HasAuthority())
+		{
+			CurCloth = GI->CurCloth;
+			CurPrinting = GI->CurPrinting;
+			CurClothHem = GI->CurClothHem;
+			CurEyes = GI->CurEyes;
+			CurHair = GI->CurHair;
+			CurHairPin = GI->CurHairPin;
+		}
+		if (IsLocallyControlled())
+		{
+			ServerRPC_ApplyCustom(GI->CurCloth, GI->CurPrinting, GI->CurClothHem, GI->CurEyes, GI->CurHair, GI->CurHairPin);
 		}
 	}
 }
@@ -381,28 +399,28 @@ void AHG_Player::PopUpPurchaseWidget()
 			bCanMove = false;
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeGameAndUI());
-			PurchaseWidget->AddToViewport(); 
+			PurchaseWidget->AddToViewport();
 			bToggle = !bToggle;
 		}
-// 		else
-// 		{
-// 			PurchaseWidget->RemoveFromParent();
-// 			bCanMove = true;
-// 			PC->SetShowMouseCursor(false);
-// 			PC->SetInputMode(FInputModeGameOnly());
-// 			bToggle = !bToggle;
-// 		}
+		// 		else
+		// 		{
+		// 			PurchaseWidget->RemoveFromParent();
+		// 			bCanMove = true;
+		// 			PC->SetShowMouseCursor(false);
+		// 			PC->SetInputMode(FInputModeGameOnly());
+		// 			bToggle = !bToggle;
+		// 		}
 	}
 }
 
 void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 {
 	if (ItemValue == nullptr) return;
-	EquipItemList.Add(ItemValue);
 	ItemValue->bEquiped = true;
 
 	if (IsLocallyControlled())
 	{
+		EquipItemList.Add(ItemValue);
 		GI->EquipItemInfoList.Add(ItemValue->GetItemData());
 	}
 
@@ -574,11 +592,26 @@ void AHG_Player::PopUpHUD()
 
 void AHG_Player::ApplyCustomizing(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin)
 {
+	GI->CurCloth = Cloth;
+	GI->CurClothHem = ClothHem;
+	if (ClothTexture) GI->CurPrinting = ClothTexture;
+	GI->CurHair = Hair;
+	GI->CurHairPin = HairPin;
+	GI->CurEyes = Eyes;
+
 	if (DynamicMaterial_Cloth)
 	{
 		DynamicMaterial_Cloth->SetVectorParameterValue("CustomColor", Cloth);
-		DynamicMaterial_Cloth->SetScalarParameterValue("UseCustomTexture",1.0f);
-		DynamicMaterial_Cloth->SetTextureParameterValue("CustomTexture", ClothTexture);
+
+		if (ClothTexture)
+		{
+			DynamicMaterial_Cloth->SetScalarParameterValue("UseCustomTexture", 1.0f);
+			DynamicMaterial_Cloth->SetTextureParameterValue("CustomTexture", ClothTexture);
+		}
+		else
+		{
+			DynamicMaterial_Cloth->SetScalarParameterValue("UseCustomTexture", 0.0f);
+		}
 	}
 	if (DynamicMaterial_ClothColor)
 	{
@@ -586,7 +619,7 @@ void AHG_Player::ApplyCustomizing(FLinearColor Cloth, UTexture2D* ClothTexture, 
 	}
 	if (DynamicMaterial_Eyes)
 	{
-		if(!(Eyes == FLinearColor(1.0f,1.0f,1.0f))) DynamicMaterial_Eyes->SetVectorParameterValue("CustomColor", Eyes);
+		if (!(Eyes == FLinearColor(1.0f, 1.0f, 1.0f))) DynamicMaterial_Eyes->SetVectorParameterValue("CustomColor", Eyes);
 	}
 	if (DynamicMaterial_Hair)
 	{
@@ -602,7 +635,7 @@ void AHG_Player::PopUpCustomUI()
 {
 	if (CustomUIClass)
 	{
-		auto* CustomUI = CreateWidget<UHG_CustomUI>(GetWorld(),CustomUIClass);
+		auto* CustomUI = CreateWidget<UHG_CustomUI>(GetWorld(), CustomUIClass);
 		if (CustomUI)
 		{
 			CustomUI->AddToViewport();
@@ -614,6 +647,102 @@ void AHG_Player::PopUpCustomUI()
 			}
 		}
 	}
+}
+
+void AHG_Player::UpdateClothColor()
+{
+	if (DynamicMaterial_Cloth)
+	{
+		DynamicMaterial_Cloth->SetVectorParameterValue("CustomColor", CurCloth);
+	}
+}
+
+void AHG_Player::UpdateHairColor()
+{
+	if (DynamicMaterial_Hair)
+	{
+		DynamicMaterial_Hair->SetVectorParameterValue("CustomColor", CurHair);
+	}
+}
+
+void AHG_Player::UpdateHairPinColor()
+{
+	if (DynamicMaterial_HairPin)
+	{
+		DynamicMaterial_HairPin->SetVectorParameterValue("CustomColor", CurHairPin);
+	}
+}
+
+void AHG_Player::UpdateEyesColor()
+{
+	if (DynamicMaterial_Eyes)
+	{
+		DynamicMaterial_Eyes->SetVectorParameterValue("CustomColor", CurEyes);
+	}
+}
+
+void AHG_Player::UpdateClothHemColor()
+{
+	if (DynamicMaterial_ClothColor)
+	{
+		DynamicMaterial_ClothColor->SetVectorParameterValue("CustomColor", CurClothHem);
+	}
+}
+
+void AHG_Player::UpdateClothPrinting()
+{
+	if (DynamicMaterial_Cloth)
+	{
+		if (CurPrinting)
+		{
+			DynamicMaterial_Cloth->SetScalarParameterValue("UseCustomTexture", 1.0f);
+			DynamicMaterial_Cloth->SetTextureParameterValue("CustomTexture", CurPrinting);
+		}
+		else
+		{
+			DynamicMaterial_Cloth->SetScalarParameterValue("UseCustomTexture", 0.0f);
+		}
+	}
+}
+
+void AHG_Player::OnRep_ClothColor()
+{
+	UpdateClothColor();
+}
+
+void AHG_Player::OnRep_ClothHemColor()
+{
+	UpdateClothHemColor();
+}
+
+void AHG_Player::OnRep_HairPinColor()
+{
+	UpdateHairPinColor();
+}
+
+void AHG_Player::OnRep_HairColor()
+{
+	UpdateHairColor();
+}
+
+void AHG_Player::OnRep_EyesColor()
+{
+	UpdateEyesColor();
+}
+
+void AHG_Player::OnRep_Printing()
+{
+	UpdateClothPrinting();
+}
+
+void AHG_Player::Multicast_ApplyCustom_Implementation(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin)
+{
+	ApplyCustomizing(Cloth, ClothTexture, ClothHem, Eyes, Hair, HairPin);
+}
+
+void AHG_Player::ServerRPC_ApplyCustom_Implementation(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin)
+{
+	Multicast_ApplyCustom(Cloth, ClothTexture, ClothHem, Eyes, Hair, HairPin);
 }
 
 void AHG_Player::ServerRPC_Emotion_Implementation(UAnimMontage* Montage)
@@ -727,7 +856,12 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	DOREPLIFETIME(AHG_Player, EquipItemList);
 	DOREPLIFETIME(AHG_Player, bEquipItem);
 	DOREPLIFETIME(AHG_Player, HUD);
-
+	// 	DOREPLIFETIME(AHG_Player, CurCloth);
+	// 	DOREPLIFETIME(AHG_Player, CurClothHem);
+	// 	DOREPLIFETIME(AHG_Player, CurEyes);
+	// 	DOREPLIFETIME(AHG_Player, CurHair);
+	// 	DOREPLIFETIME(AHG_Player, CurHairPin);
+	// 	DOREPLIFETIME(AHG_Player, CurPrinting);
 }
 
 

@@ -49,4 +49,11 @@ public:
 	int32 CurIdx = 0;
 
 	int32 Gender = 0;
+
+	FLinearColor CurCloth = FLinearColor(1.0f,1.0f,1.0f);
+	FLinearColor CurClothHem = FLinearColor(1.0f, 1.0f, 1.0f);
+	FLinearColor CurHairPin = FLinearColor(1.0f, 1.0f, 1.0f);
+	FLinearColor CurHair = FLinearColor(1.0f, 1.0f, 1.0f);
+	FLinearColor CurEyes = FLinearColor(1.0f, 1.0f, 1.0f);
+	UTexture2D* CurPrinting = nullptr;
 };
