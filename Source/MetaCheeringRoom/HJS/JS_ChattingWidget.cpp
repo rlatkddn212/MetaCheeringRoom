@@ -59,7 +59,7 @@ void UJS_ChattingWidget::OnCommitText(const FText& Text, ETextCommit::Type Commi
 		AJS_PlayerController* PC = Cast<AJS_PlayerController>(GetWorld()->GetFirstPlayerController());
 		if (PC)
 		{
-			AddChat(PC->MyUserNickName,Text,false);
+			PC->ServerAddChat(PC->MyUserNickName, Text, false);
 		}
 	}
 }
@@ -69,7 +69,6 @@ void UJS_ChattingWidget::AddChat(const FString& id, const FText& text, bool bAut
 	// Node를 생성해서 ID와 TEXT를 설정하고 띄워주기
 	if (ChatNodeFactory)
 	{
-		PRINTLOG(TEXT("%d"),bChat);
 		UJS_ChatNode* ChatNode = CreateWidget<UJS_ChatNode>(this,ChatNodeFactory);
 		SB_ChatBox->AddChild(ChatNode);
 		SB_ChatBox->ScrollToEnd();
