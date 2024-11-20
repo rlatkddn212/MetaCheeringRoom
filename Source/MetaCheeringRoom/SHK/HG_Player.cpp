@@ -26,6 +26,7 @@
 #include "HG_CheeringStick.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "HG_CustomUI.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AHG_Player::AHG_Player()
 {
@@ -349,7 +350,8 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 	{
 		if (!bToggle)
 		{
-			InventoryWidget->AddToViewport();
+			InventoryWidget->AddToViewport(); 
+			InventoryWidget->PlayAppearAnimation(true);
 			InventoryWidget->InitInventoryUI();
 			PC->SetShowMouseCursor(true);
 			bToggle = !bToggle;
@@ -357,12 +359,26 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 		}
 		else
 		{
-			InventoryWidget->RemoveFromParent();
+			InventoryWidget->PlayAppearAnimation(false);
+
+			FLatentActionInfo LatentInfo;
+			LatentInfo.Linkage = 0;
+			LatentInfo.UUID = GetUniqueID();
+			LatentInfo.ExecutionFunction = FName("RemoveInventory");
+			LatentInfo.CallbackTarget = this;
+
+			UKismetSystemLibrary::Delay(GetWorld(),0.2f, LatentInfo);
+
 			PC->SetShowMouseCursor(false);
 			bToggle = !bToggle;
 			bCanMove = true;
 		}
 	}
+}
+
+void AHG_Player::RemoveInventory()
+{
+	InventoryWidget->RemoveFromParent();
 }
 
 void AHG_Player::Emotion()
@@ -373,6 +389,7 @@ void AHG_Player::Emotion()
 		if (RCSWidget)
 		{
 			RCSWidget->AddToViewport();
+			RCSWidget->PlayAppearAnimation(true);
 			RCSWidget->SetOwner(this);
 			if (PC)
 			{
@@ -424,6 +441,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 		GI->EquipItemInfoList.Add(ItemValue->GetItemData());
 	}
 
+	ItemValue->SetActorHiddenInGame(false);
 	auto* mesh = ItemValue->GetComponentByClass<UStaticMeshComponent>();
 	check(mesh);
 	if (mesh)
@@ -639,6 +657,7 @@ void AHG_Player::PopUpCustomUI()
 		if (CustomUI)
 		{
 			CustomUI->AddToViewport();
+			CustomUI->PlayAppearAnimation(true);
 			CustomUI->SetOwningPlayer(PC);
 			if (PC)
 			{
@@ -803,6 +822,7 @@ void AHG_Player::ServerRPCEquipItemToSocket_Implementation(FItemData p_ItemInfo)
 
 	if (EItem)
 	{
+		EItem->SetActorHiddenInGame(true);
 		FTimerHandle handle;
 		GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_Player::SpawnedMulticast, 0.1f, false);
 	}

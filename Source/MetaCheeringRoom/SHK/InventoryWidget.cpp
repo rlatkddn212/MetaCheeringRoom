@@ -15,6 +15,8 @@
 #include "HG_GameInstance.h"
 #include "Net/UnrealNetwork.h"
 #include "HG_PlayerAnimInstance.h"
+#include "Animation/WidgetAnimation.h"
+#include "MovieScene.h"
 
 
 void UInventoryWidget::NativeConstruct()
@@ -358,13 +360,26 @@ void UInventoryWidget::CheckButtonClick(UButton* p_Button)
 
 void UInventoryWidget::PlayAppearAnimation(bool Play_Forward)
 {
+	if (IsAnimationPlaying(Appear))
+	{
+		StopAnimation(Appear);
+		StopAnimation(Disappear);
+	}
+
+	if(IsAnimationPlaying(Disappear))
+	{
+		StopAnimation(Disappear);
+	}
+
+	if(!Appear || !Disappear) return;
+
 	if (Play_Forward)
 	{
 		PlayAnimation(Appear);
 	}
 	else
-	{
-		PlayAnimation(Appear,0.2f,1,EUMGSequencePlayMode::Reverse);
+	{	
+		PlayAnimation(Disappear);
 	}
 }
 

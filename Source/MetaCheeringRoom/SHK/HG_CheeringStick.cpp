@@ -14,6 +14,7 @@ AHG_CheeringStick::AHG_CheeringStick()
 
 	this->bReplicates = true;
 	SetReplicates(true);
+	SetActorHiddenInGame(true);
 }
 
 void AHG_CheeringStick::BeginPlay()

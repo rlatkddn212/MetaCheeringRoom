@@ -266,7 +266,7 @@ public:
 	void ServerRPC_ApplyCustom(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin);
 	UFUNCTION(NetMulticast,Reliable)
 	void Multicast_ApplyCustom(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin);
-
+	
 	UFUNCTION()
 	void UpdateClothColor();
 
@@ -319,4 +319,6 @@ public:
 	
 	UFUNCTION()
 	void OnRep_Printing();
+
+	void RemoveInventory();
 };
