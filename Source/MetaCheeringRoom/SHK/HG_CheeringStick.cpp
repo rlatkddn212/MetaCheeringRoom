@@ -6,12 +6,14 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Components/StaticMeshComponent.h"
 #include "HG_Player.h"
+#include "Net/UnrealNetwork.h"
 
 AHG_CheeringStick::AHG_CheeringStick()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	this->bReplicates = true;
+	SetReplicates(true);
 }
 
 void AHG_CheeringStick::BeginPlay()
@@ -34,6 +36,8 @@ void AHG_CheeringStick::BeginPlay()
 		}
 	}
 }
+
+
 
 void AHG_CheeringStick::Tick(float DeltaTime)
 {
@@ -75,6 +79,10 @@ void AHG_CheeringStick::ChangeIntensity(float Value)
 
 void AHG_CheeringStick::ApplyChange(FLinearColor Color, bool Bling, float Intensity)
 {
+	if (HasAuthority())
+	{
+		MatColor = Color;
+	}
 	ServerRPC_ApplyChange(Color, Bling, Intensity);
 }
 
@@ -110,5 +118,17 @@ void AHG_CheeringStick::BlingBling(float DeltaSecond)
 			bToggle = false;
 		}
 	}
+}
+
+void AHG_CheeringStick::OnRep_ChangeMatColor()
+{
+	ChangeColor(MatColor);
+}
+
+void AHG_CheeringStick::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AHG_CheeringStick,MatColor);
 }
 

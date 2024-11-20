@@ -356,3 +356,15 @@ void UInventoryWidget::CheckButtonClick(UButton* p_Button)
 	p_Button->SetBackgroundColor(FLinearColor(0.0f,0.26f,0.15f,0.5f));
 }
 
+void UInventoryWidget::PlayAppearAnimation(bool Play_Forward)
+{
+	if (Play_Forward)
+	{
+		PlayAnimation(Appear);
+	}
+	else
+	{
+		PlayAnimation(Appear,0.2f,1,EUMGSequencePlayMode::Reverse);
+	}
+}
+

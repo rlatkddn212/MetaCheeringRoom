@@ -444,7 +444,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 			mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			if (HUD)
 			{
-				HUD->UpdateHUD(TEXT("E) 응원봉 조작하기"));
+				HUD->UpdateHUD(TEXT("E : 응원봉 커스텀"));
 			}
 			break;
 		case EItemCategory::Category_TwoHandGrab:
