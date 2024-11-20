@@ -274,6 +274,28 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	input->BindAction(IA_Emotion, ETriggerEvent::Completed, this, &AHG_Player::Emotion);
 
 	input->BindAction(IA_Custom, ETriggerEvent::Completed, this, &AHG_Player::PopUpCustomUI);
+
+	input->BindAction(IA_Teleport1, ETriggerEvent::Completed, this, &AHG_Player::TeleportToStore);
+	input->BindAction(IA_Teleport2, ETriggerEvent::Completed, this, &AHG_Player::TeleportToJoin);
+	input->BindAction(IA_Teleport3, ETriggerEvent::Completed, this, &AHG_Player::TeleportToCreate);
+}
+
+void AHG_Player::TeleportToStore()
+{
+	//(X=-867.240674,Y=927.178242,Z=-0.707882)
+	SetActorLocation(FVector(-867.240674f, 927.178242f, 0.707882f));
+}
+
+void AHG_Player::TeleportToJoin()
+{
+	//(X = -743.435962, Y = 2559.526662, Z = -18.354637)
+	SetActorLocation(FVector(-677.120918f, 2559.526662f, -18.354637f));
+}
+
+void AHG_Player::TeleportToCreate()
+{
+	//(X=1040.000000,Y=1230.000000,Z=0.000000)
+	SetActorLocation(FVector(1040.0f, 1230.0f, 0.0f));
 }
 
 void AHG_Player::OnMyMove(const FInputActionValue& Value)
@@ -460,6 +482,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 			break;
 		case EItemCategory::Category_OneHandGrab:
 			mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			mesh->SetHiddenInGame(false);
 			if (HUD)
 			{
 				HUD->UpdateHUD(TEXT("E : 응원봉 커스텀"));
