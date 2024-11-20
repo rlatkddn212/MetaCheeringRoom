@@ -23,7 +23,7 @@ void UHG_RemoteCS::NativeConstruct()
 	Btn_Black->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickBlack);
 	Btn_Grey->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickGrey);
 	Btn_Commit->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickCommit);
-	Btn_Close->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickClose);
+//	Btn_Close->OnClicked.AddDynamic(this, &UHG_RemoteCS::OnClickClose);
 
 	ET_Intesity->OnTextCommitted.AddDynamic(this, &UHG_RemoteCS::OnTextEnter);
 
@@ -108,17 +108,17 @@ void UHG_RemoteCS::OnClickCommit()
 	}
 }
 
-void UHG_RemoteCS::OnClickClose()
-{
-	RemoveFromParent();
-	if (Owner->PC)
-	{
-		Owner->PC->SetShowMouseCursor(false);
-
-		FInputModeGameOnly InputMode;
-		Owner->PC->SetInputMode(InputMode);
-	}
-}
+// void UHG_RemoteCS::OnClickClose()
+// {
+// 	RemoveFromParent();
+// 	if (Owner->PC)
+// 	{
+// 		Owner->PC->SetShowMouseCursor(false);
+// 
+// 		FInputModeGameOnly InputMode;
+// 		Owner->PC->SetInputMode(InputMode);
+// 	}
+// }
 
 void UHG_RemoteCS::OnTextEnter(const FText& Text, ETextCommit::Type CommitMethod)
 {
@@ -136,6 +136,14 @@ void UHG_RemoteCS::OnCheckBoxChanged(bool bIsChecked)
 void UHG_RemoteCS::SetOwner(AHG_Player* Value)
 {
 	Owner = Value;
+}
+
+void UHG_RemoteCS::PlayAppearAnimation(bool Play_Forward)
+{
+	if (Appear)
+	{
+		PlayAnimation(Appear);
+	}
 }
 
 

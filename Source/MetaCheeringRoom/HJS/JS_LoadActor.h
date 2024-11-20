@@ -19,4 +19,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UJS_ChattingWidget> ChatWidgetFactory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UJS_ChattingWidget* ChatWidget;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAddChat(const FString& id, const FText& text, bool bAuto);
+
 };

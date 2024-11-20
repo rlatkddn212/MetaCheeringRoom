@@ -14,9 +14,13 @@
 #include "JS_AtkActor.h"
 #include "JS_StarActor.h"
 #include "MetaCheeringRoom.h"
+#include "JS_LoadActor.h"
+#include "JS_ChattingWidget.h"
+#include "MetaCheeringRoom.h"
 
 AJS_PlayerController::AJS_PlayerController()
 {
+	bReplicates = true;
 }
 
 void AJS_PlayerController::BeginPlay()
@@ -41,6 +45,9 @@ void AJS_PlayerController::BeginPlay()
 			ExitWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+
+
+
 }
 
 void AJS_PlayerController::Tick(float Deltatime)
@@ -255,4 +262,29 @@ void AJS_PlayerController::SpawnStarActor()
 void AJS_PlayerController::SetMyUserID_Implementation(const FString& str)
 {
 	MyUserID = str;
+}
+
+void AJS_PlayerController::ServerAddChat_Implementation(const FString& id, const FText& text, bool bAuto)
+{
+	if (!LoadActor)
+	{
+		LoadActor = Cast<AJS_LoadActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AJS_LoadActor::StaticClass()));
+	}
+	if (LoadActor)
+	{
+		LoadActor->MulticastAddChat(id,text,bAuto);
+	}
+}
+
+
+void AJS_PlayerController::ClientAddChat_Implementation(const FString& id, const FText& text, bool bAuto)
+{
+	if (!LoadActor)
+	{
+		LoadActor = Cast<AJS_LoadActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AJS_LoadActor::StaticClass()));
+	}
+	if (LoadActor && LoadActor->ChatWidget)
+	{
+		LoadActor->ChatWidget->AddChat(id, text, bAuto);
+	}
 }

@@ -41,6 +41,8 @@ void UJS_CreateRoomWidget::NativeConstruct()
 	BTN_Delete->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedDelete);
 	BTN_DeleteCancel->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedDeleteCancel);
 	BTN_CreateRoom->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedCreateRoom);
+	BTN_ModifyCancel->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedModifyCancel);
+	BTN_Modify->OnClicked.AddDynamic(this, &UJS_CreateRoomWidget::OnClickedModify);
 	SetupMapData();
 }
 
@@ -155,18 +157,7 @@ void UJS_CreateRoomWidget::OnClickHosting()
 
 void UJS_CreateRoomWidget::OnClickModify()
 {
-	// 수정 팝업은 없음
-	UCreatorStorageSubsystem* storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
-	TArray<FCreatorMapMetaData*> meta = storage->GetCreatorMapMetaDatas();
-
-	FString path = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + meta[SelectIndex]->FileName;
-	FString JsonStr = storage->LoadCreatorMap(path);
-
-	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-	system->SetMapName(meta[SelectIndex]->CreatorMapName);
-	system->SetupJson(JsonStr);
-
-	UGameplayStatics::OpenLevel(GetWorld(), LevelName, true);
+	PlayAnimation(ModifyLevelPopup);
 }
 
 void UJS_CreateRoomWidget::OnClickRemove()
@@ -214,4 +205,25 @@ void UJS_CreateRoomWidget::OnClickedDelete()
 	system->RemoveMetaData(SelectIndex);
 	SetupMapData();
 	PlayAnimation(DeleteLevelPopup, 0.f, 1, EUMGSequencePlayMode::Reverse);
+}
+
+void UJS_CreateRoomWidget::OnClickedModifyCancel()
+{
+	PlayAnimation(ModifyLevelPopup, 0.f, 1, EUMGSequencePlayMode::Reverse);
+}
+
+void UJS_CreateRoomWidget::OnClickedModify()
+{
+	// 수정 팝업은 없음
+	UCreatorStorageSubsystem* storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+	TArray<FCreatorMapMetaData*> meta = storage->GetCreatorMapMetaDatas();
+
+	FString path = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + meta[SelectIndex]->FileName;
+	FString JsonStr = storage->LoadCreatorMap(path);
+
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	system->SetMapName(meta[SelectIndex]->CreatorMapName);
+	system->SetupJson(JsonStr);
+
+	UGameplayStatics::OpenLevel(GetWorld(), LevelName, true);
 }
