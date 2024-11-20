@@ -23,4 +23,10 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_DeleteObject(class ASW_CreatorObject* DeleteObject);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DetachObject(class ASW_CreatorObject* DetachObject);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_AttachObject(class ASW_CreatorObject* ParentObject, class ASW_CreatorObject* AttachObject);
 };

@@ -40,3 +40,40 @@ void ASW_CreatorGameState::Multicast_DeleteObject_Implementation(class ASW_Creat
 		PC->ReloadHierarchy();
 	}
 }
+
+void ASW_CreatorGameState::Multicast_DetachObject_Implementation(class ASW_CreatorObject* DetachObject)
+{
+	if (! HasAuthority())
+	{
+		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+		system->RemoveCreatorMapObject(DetachObject);
+		system->AttachObject(nullptr, DetachObject);
+	}
+
+	ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
+	{
+		PC->ReloadHierarchy();
+	}
+}
+
+void ASW_CreatorGameState::Multicast_AttachObject_Implementation(class ASW_CreatorObject* ParentObject, class ASW_CreatorObject* AttachObject)
+{
+	if (! HasAuthority())
+	{
+		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+		if (system->IsChildObject(AttachObject, ParentObject))
+		{
+			return;
+		}
+
+		system->RemoveCreatorMapObject(AttachObject);
+		system->AttachObject(ParentObject, AttachObject);
+	}
+
+	ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
+	{
+		PC->ReloadHierarchy();
+	}
+}

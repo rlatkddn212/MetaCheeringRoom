@@ -376,6 +376,62 @@ void ASW_CreatorPlayerController::Server_DeleteObject_Implementation(class ASW_C
 	}
 }
 
+void ASW_CreatorPlayerController::Server_DetachObject_Implementation(class ASW_CreatorObject* DetachObject)
+{
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	ASW_CreatorObject* PrevParent = system->FindParentObject(DetachObject);
+	system->DetechObject(PrevParent, DetachObject);
+	system->AttachObject(nullptr, DetachObject);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, DetachObject]()
+		{
+			// 게임스테이트
+			ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
+			if (GameState)
+			{
+				GameState->Multicast_DetachObject(DetachObject);
+			}
+		}, 0.1f, false);
+
+	/*ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
+	if (GameState)
+	{
+		GameState->Multicast_DetachObject(DetachObject);
+	}*/
+}
+
+void ASW_CreatorPlayerController::Server_AttachObject_Implementation(class ASW_CreatorObject* ParentObject, class ASW_CreatorObject* AttachObject)
+{
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	if (system->IsChildObject(AttachObject, ParentObject))
+	{
+		return;
+	}
+
+	ASW_CreatorObject* PrevParent = system->FindParentObject(AttachObject);
+	system->DetechObject(PrevParent, AttachObject);
+	system->AttachObject(ParentObject, AttachObject);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, ParentObject, AttachObject]()
+		{
+
+			ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
+			if (GameState)
+			{
+				GameState->Multicast_AttachObject(ParentObject, AttachObject);
+			}
+		}, 0.1f, false);
+
+
+	/*ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
+	if (GameState)
+	{
+		GameState->Multicast_AttachObject(ParentObject, AttachObject);
+	}*/
+}
+
 void ASW_CreatorPlayerController::DoSelectObject(class ASW_CreatorObject* NewSelectObject)
 {
 	if (SelectedObject)
@@ -464,6 +520,22 @@ void ASW_CreatorPlayerController::MoveDummyObject(FVector2D MousePosition)
 			FVector p = GetPawn()->GetActorLocation();
 			CreatingObject->SetActorLocation(p + WorldDirection * 1000);
 		}
+	}
+}
+
+void ASW_CreatorPlayerController::DetachHirearchyObject(class ASW_CreatorObject* DetachCreatorObject)
+{
+	if (DetachCreatorObject)
+	{
+		Server_DetachObject(DetachCreatorObject);
+	}
+}
+
+void ASW_CreatorPlayerController::AttachHirearchyObject(class ASW_CreatorObject* ParentCreatorObject, class ASW_CreatorObject* AttachCreatorObject)
+{
+	if (ParentCreatorObject && AttachCreatorObject)
+	{
+		Server_AttachObject(ParentCreatorObject, AttachCreatorObject);
 	}
 }
 

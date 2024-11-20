@@ -50,6 +50,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_DeleteObject(class ASW_CreatorObject* DeleteObject);
 
+	UFUNCTION(Server, Reliable)
+	void Server_DetachObject(class ASW_CreatorObject* DetachObject);
+
+	UFUNCTION(Server, Reliable)
+	void Server_AttachObject(class ASW_CreatorObject* ParentObject, class ASW_CreatorObject* AttachObject);
+
 	UFUNCTION()
 	void DoSelectObject(class ASW_CreatorObject* NewSelectObject);
 	
@@ -59,6 +65,9 @@ public:
 	UFUNCTION()
 	bool EndDragDummyObject();
 	void MoveDummyObject(FVector2D MousePosition);
+
+	void DetachHirearchyObject(class ASW_CreatorObject* DetachCreatorObject);
+	void AttachHirearchyObject(class ASW_CreatorObject* ParentCreatorObject, class ASW_CreatorObject* AttachCreatorObject);
 
 	void SetToolState(ECreatorToolState NewState);
 	ECreatorToolState GetToolState() { return ToolState; }

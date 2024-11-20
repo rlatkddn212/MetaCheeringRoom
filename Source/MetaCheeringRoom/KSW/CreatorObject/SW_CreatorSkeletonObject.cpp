@@ -23,3 +23,19 @@ void ASW_CreatorSkeletonObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+
+void ASW_CreatorSkeletonObject::OnSelected(bool isSelected)
+{
+	Super::OnSelected(isSelected);
+
+	if (isSelected)
+	{
+		Mesh->SetRenderCustomDepth(true);
+		UE_LOG(LogTemp, Warning, TEXT("Selected"));
+	}
+	else
+	{
+		Mesh->SetRenderCustomDepth(false);
+		UE_LOG(LogTemp, Warning, TEXT("Unselected"));
+	}
+}

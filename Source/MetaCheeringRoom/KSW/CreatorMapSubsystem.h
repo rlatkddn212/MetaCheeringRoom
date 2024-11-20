@@ -152,6 +152,9 @@ public:
 	void RemoveObject(ASW_CreatorObject* Object, bool isRecursive = false);
 
 
+	void AddCreatorMapObject(ASW_CreatorObject* Object);
+	void RemoveCreatorMapObject(ASW_CreatorObject* Object);
+
 	// 오브젝트 추가
 	void AttachObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject);
 

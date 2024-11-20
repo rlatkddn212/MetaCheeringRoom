@@ -44,15 +44,12 @@ bool USW_CreatorHierarchyWidget::NativeOnDrop(const FGeometry& InGeometry, const
 	{
 		if (dragOperation->bSameObject)
 			return true;
-		
-		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-		ASW_CreatorObject* PrevParent = system->FindParentObject(dragOperation->CreatorObject);
-		system->DetechObject(PrevParent, dragOperation->CreatorObject);
-		system->AttachObject(nullptr, dragOperation->CreatorObject);
 
 		ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
-		if (PC) 
-			PC->ReloadHierarchy();
+		if (PC)
+		{
+			PC->DetachHirearchyObject(dragOperation->CreatorObject);
+		}
 	}
 
 	return true;
