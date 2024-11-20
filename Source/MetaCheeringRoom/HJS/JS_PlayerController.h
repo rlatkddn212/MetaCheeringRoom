@@ -92,4 +92,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void SetMyUserID(const FString& str);
 
+	UFUNCTION(Server, Reliable)
+	void ServerAddChat(const FString& id, const FText& text, bool bAuto);
+	UFUNCTION(Client, Reliable)
+	void ClientAddChat(const FString& id, const FText& text, bool bAuto);
+
+
+	UPROPERTY()
+	class AJS_LoadActor* LoadActor;
 };

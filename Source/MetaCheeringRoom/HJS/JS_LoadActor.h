@@ -27,4 +27,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UJS_ChattingWidget* ChatWidget;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAddChat(const FString& id, const FText& text, bool bAuto);
+
 };

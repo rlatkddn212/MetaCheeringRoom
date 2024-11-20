@@ -7,6 +7,7 @@
 // Sets default values
 AJS_LoadActor::AJS_LoadActor()
 {
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -18,6 +19,7 @@ void AJS_LoadActor::BeginPlay()
 	{
 		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 		system->LoadMap();
+		SetOwner(PC);
 	}
 
 	if (ChatWidgetFactory)
@@ -30,3 +32,10 @@ void AJS_LoadActor::BeginPlay()
 	}
 }
 
+void AJS_LoadActor::MulticastAddChat_Implementation(const FString& id, const FText& text, bool bAuto)
+{
+	if (ChatWidget)
+	{
+		ChatWidget->AddChat(id, text, bAuto);
+	}
+}
