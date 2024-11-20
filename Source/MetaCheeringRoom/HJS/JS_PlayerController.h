@@ -54,6 +54,9 @@ public:
 	UPROPERTY(Replicated)
 	FString MyUserID;
 
+	UPROPERTY(BlueprintReadOnly)
+	FString MyUserNickName;
+
 	void PlayerModify();
 
 	void OnPlayerModify(float DeltaTime);
@@ -88,4 +91,5 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void SetMyUserID(const FString& str);
+
 };

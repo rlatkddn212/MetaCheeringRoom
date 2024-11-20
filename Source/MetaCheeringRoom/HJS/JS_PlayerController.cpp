@@ -41,6 +41,9 @@ void AJS_PlayerController::BeginPlay()
 			ExitWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+
+
+
 }
 
 void AJS_PlayerController::Tick(float Deltatime)

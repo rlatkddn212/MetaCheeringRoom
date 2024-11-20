@@ -83,6 +83,8 @@ void AJS_TotoActor::BeginPlay()
 				{
 					// Steam ID를 문자열로 변환
 					MyUserID = UserId->ToString();
+					PC->MyUserNickName = IdentityInterface->GetPlayerNickname(*UserId);
+					PRINTLOG(TEXT("%s"),*PC->MyUserNickName);
 					PC->SetMyUserID(MyUserID);
 				}
 			}

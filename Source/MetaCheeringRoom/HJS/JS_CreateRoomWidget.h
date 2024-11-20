@@ -71,6 +71,8 @@ public:
 	class UWidgetAnimation* CreateLevelPopup;
 	UPROPERTY(meta=(BindWidgetAnim), Transient)
 	class UWidgetAnimation* DeleteLevelPopup;
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	class UWidgetAnimation* ModifyLevelPopup;
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* ED_LevelName;
 	UPROPERTY(meta=(BindWidget))
@@ -83,6 +85,10 @@ public:
 	class UButton* BTN_Delete;
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BTN_CreateRoom;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BTN_Modify;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BTN_ModifyCancel;
 	UFUNCTION()
 	void OnClickedCreateRoom();
 	UFUNCTION()
@@ -93,6 +99,10 @@ public:
 	void OnClickedDeleteCancel();
 	UFUNCTION()
 	void OnClickedDelete();
+	UFUNCTION()
+	void OnClickedModifyCancel();
+	UFUNCTION()
+	void OnClickedModify();
 
 	UPROPERTY(EditAnywhere)
 	FName LevelName = TEXT("KswTestMap");
