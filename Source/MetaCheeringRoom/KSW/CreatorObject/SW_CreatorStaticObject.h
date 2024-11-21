@@ -39,9 +39,26 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_MeshColorChanged)
 	FLinearColor MeshColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+	UPROPERTY(ReplicatedUsing = OnRep_EmissiveColorChanged)
+	FLinearColor EmissiveColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	
+	UPROPERTY(ReplicatedUsing = OnRep_MeshMetallicChanged)
+	float Metallic = 0.0f;
+	UPROPERTY(ReplicatedUsing = OnRep_MeshRoughnessChanged)
+	float Roughness = 0.0f;
+
 	// ---------------------------------------------------------- server 동기화 부분
 	UFUNCTION()
 	void OnRep_MeshColorChanged();
+
+	UFUNCTION()
+	void OnRep_EmissiveColorChanged();
+
+	UFUNCTION()
+	void OnRep_MeshMetallicChanged();
+
+	UFUNCTION()
+	void OnRep_MeshRoughnessChanged();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

@@ -102,6 +102,8 @@ public:
 	void CopySelectedObject();
 	void PasteSelectedObject();
 
+	FVector GetSelectedObjectPos();
+
 	class ASW_CreatorObject* CopiedObject;
 
 };

@@ -67,6 +67,38 @@ void ASW_CreatorStaticObject::OnChangeProperty(int32 id, UCreatorPropertyBase* C
 		}
 	}
 
+	if (id == 2)
+	{
+		UCreatorFloatProperty* FloatProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
+		Metallic = FloatProperty->Value;
+
+		if (Mat)
+		{
+			Mat->SetScalarParameterValue("Metallic", Metallic);
+		}
+	}
+
+	if (id == 3)
+	{
+		UCreatorFloatProperty* FloatProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
+		Roughness = FloatProperty->Value;
+
+		if (Mat)
+		{
+			Mat->SetScalarParameterValue("Roughness", Roughness);
+		}
+	}
+
+	if (id == 4)
+	{
+		UCreatorColorProperty* ColorProperty = Cast<UCreatorColorProperty>(CreatorProperty);
+		EmissiveColor = ColorProperty->Value;
+
+		if (Mat)
+		{
+			Mat->SetVectorParameterValue("EmissiveColor", EmissiveColor);
+		}
+	}
 }
 
 TMap<int32, UCreatorPropertyBase*> ASW_CreatorStaticObject::GetPropertyMap()
@@ -75,6 +107,21 @@ TMap<int32, UCreatorPropertyBase*> ASW_CreatorStaticObject::GetPropertyMap()
 	Property->PropertyName = TEXT("Color");
 	Property->Value = MeshColor;
 	AddProperty(1, Property);
+
+	UCreatorFloatProperty* FloatProperty = NewObject<UCreatorFloatProperty>();
+	FloatProperty->PropertyName = TEXT("Metallic");
+	FloatProperty->Value = Metallic;
+	AddProperty(2, FloatProperty);
+
+	FloatProperty = NewObject<UCreatorFloatProperty>();
+	FloatProperty->PropertyName = TEXT("Roughness");
+	FloatProperty->Value = Roughness;
+	AddProperty(3, FloatProperty);
+
+	Property = NewObject<UCreatorColorProperty>();
+	Property->PropertyName = TEXT("EmissiveColor");
+	Property->Value = EmissiveColor;
+	AddProperty(4, Property);
 
 	return PropertyMap;
 }
@@ -86,6 +133,14 @@ void ASW_CreatorStaticObject::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& 
 	RecordJsonObject->SetNumberField(TEXT("ColorG"), MeshColor.G);
 	RecordJsonObject->SetNumberField(TEXT("ColorB"), MeshColor.B);
 	RecordJsonObject->SetNumberField(TEXT("ColorA"), MeshColor.A);
+
+	RecordJsonObject->SetNumberField(TEXT("EmissiveColorR"), EmissiveColor.R);
+	RecordJsonObject->SetNumberField(TEXT("EmissiveColorG"), EmissiveColor.G);
+	RecordJsonObject->SetNumberField(TEXT("EmissiveColorB"), EmissiveColor.B);
+	RecordJsonObject->SetNumberField(TEXT("EmissiveColorA"), EmissiveColor.A);
+
+	RecordJsonObject->SetNumberField(TEXT("Metallic"), Metallic);
+	RecordJsonObject->SetNumberField(TEXT("Roughness"), Roughness);
 }
 
 void ASW_CreatorStaticObject::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject)
@@ -97,9 +152,20 @@ void ASW_CreatorStaticObject::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObje
 	MeshColor.B = SetupJsonObject->GetNumberField(TEXT("ColorB"));
 	MeshColor.A = SetupJsonObject->GetNumberField(TEXT("ColorA"));
 
+	EmissiveColor.R = SetupJsonObject->GetNumberField(TEXT("EmissiveColorR"));
+	EmissiveColor.G = SetupJsonObject->GetNumberField(TEXT("EmissiveColorG"));
+	EmissiveColor.B = SetupJsonObject->GetNumberField(TEXT("EmissiveColorB"));
+	EmissiveColor.A = SetupJsonObject->GetNumberField(TEXT("EmissiveColorA"));
+
+	Metallic = SetupJsonObject->GetNumberField(TEXT("Metallic"));
+	Roughness = SetupJsonObject->GetNumberField(TEXT("Roughness"));
+
 	if (Mat)
 	{
 		Mat->SetVectorParameterValue("Color", MeshColor);
+		Mat->SetVectorParameterValue("EmissiveColor", EmissiveColor);
+		Mat->SetScalarParameterValue("Metallic", Metallic);
+		Mat->SetScalarParameterValue("Roughness", Roughness);
 	}
 }
 
@@ -111,8 +177,35 @@ void ASW_CreatorStaticObject::OnRep_MeshColorChanged()
 	}
 }
 
+void ASW_CreatorStaticObject::OnRep_EmissiveColorChanged()
+{
+	if (Mat)
+	{
+		Mat->SetVectorParameterValue("EmissiveColor", EmissiveColor);
+	}
+}
+
+void ASW_CreatorStaticObject::OnRep_MeshMetallicChanged()
+{
+	if (Mat)
+	{
+		Mat->SetScalarParameterValue("Metallic", Metallic);
+	}
+}
+
+void ASW_CreatorStaticObject::OnRep_MeshRoughnessChanged()
+{
+	if (Mat)
+	{
+		Mat->SetScalarParameterValue("Roughness", Roughness);
+	}
+}
+
 void ASW_CreatorStaticObject::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASW_CreatorStaticObject, MeshColor);
+	DOREPLIFETIME(ASW_CreatorStaticObject, EmissiveColor);
+	DOREPLIFETIME(ASW_CreatorStaticObject, Metallic);
+	DOREPLIFETIME(ASW_CreatorStaticObject, Roughness);
 }

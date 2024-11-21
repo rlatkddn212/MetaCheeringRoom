@@ -73,6 +73,16 @@ void ASW_Creator::Tick(float DeltaTime)
 	{
 		PC->OnMouseOver();
 	}
+
+	if (PC && MouseState == ECreatorMouseState::GizmoDrag)
+	{
+		FVector Pos = PC->GetSelectedObjectPos();
+		HandMeshComponent->SetWorldLocation(Pos);
+	}
+	else
+	{
+		HandMeshComponent->SetWorldLocation(GetActorLocation());
+	}
 }
 
 // Called to bind functionality to input
