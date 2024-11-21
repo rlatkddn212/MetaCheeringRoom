@@ -27,6 +27,7 @@ protected:
 
 public:	
 	// Called every frame
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void Tick(float DeltaTime) override;
 
@@ -58,4 +59,10 @@ public:
 	float time = 0.1;
 
 	class UMaterialInstanceDynamic* DynamicMaterial;
+
+	UPROPERTY(ReplicatedUsing = OnRep_ChangeMatColor)
+	FLinearColor MatColor;
+
+	UFUNCTION()
+	void OnRep_ChangeMatColor();
 };

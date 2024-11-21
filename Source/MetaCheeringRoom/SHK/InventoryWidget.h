@@ -105,5 +105,12 @@ public:
 
 	void CheckButtonClick(UButton* p_Button);
 
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* Appear;	
+	
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* Disappear;
+
+	void PlayAppearAnimation(bool Play_Forward);
 	int32 memory = 0;
 };

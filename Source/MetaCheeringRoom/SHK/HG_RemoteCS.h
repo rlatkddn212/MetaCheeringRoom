@@ -36,8 +36,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UButton* Btn_Green;
-	
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget)) 
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UButton* Btn_Blue;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
@@ -71,7 +71,7 @@ public:
 	UFUNCTION()
 	void OnClickRed();
 
-	UFUNCTION() 
+	UFUNCTION()
 	void OnClickOrange();
 
 	UFUNCTION()
@@ -101,8 +101,8 @@ public:
 	UFUNCTION()
 	void OnClickCommit();
 
-	UFUNCTION()
-	void OnClickClose();
+// 	UFUNCTION()
+// 	void OnClickClose();
 
 	UFUNCTION()
 	void OnTextEnter(const FText& Text, ETextCommit::Type CommitMethod);
@@ -120,11 +120,17 @@ public:
 
 	float Intensity;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	AHG_Player* Owner;
 
 	void SetOwner(AHG_Player* Value);
 
 	bool bChecked = false;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* Appear;
+
+
+	void PlayAppearAnimation(bool Play_Forward);
 };
 

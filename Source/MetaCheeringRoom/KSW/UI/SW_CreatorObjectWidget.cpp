@@ -216,44 +216,22 @@ void USW_CreatorObjectWidget::OnImportButtonClicked()
 			// FBX 파일 로드
 			// LoadFileAsync2StaticMeshActor(SelectedFilePath);
 
-			UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
 			UCreatorMapSubsystem* CreatorMapSubsystem = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 
-			int32 CreatorObjectType = 5;
-			int32 CreatorObjectId = 1;
-			TMap<int32, FCreatorObjectData*> CreatorObjectsStruct = system->GetCreatorObjects(CreatorObjectType);
-			if (CreatorObjectsStruct.Contains(CreatorObjectId))
+			FString FileName = FPaths::GetBaseFilename(SelectedFilePath) + "_" + FGuid::NewGuid().ToString() + ".fbx";
+			// FBX 파일을 로드한다.
+			UCreatorFBXSubsystem* CreatorFBXSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
+			CreatorFBXSubsystem->CopyFBX(SelectedFilePath, FileName);
+
+			ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+			if (PC)
 			{
-				// CreatorObject를 생성
-				ASW_CreatorObject* CreatorObject = CreatorMapSubsystem->CreateObject(CreatorObjectsStruct[CreatorObjectId]);
-
-				// 파일이름을 저장해둔다.
-				ASW_CreatorFBX* CreatorFBX = Cast<ASW_CreatorFBX>(CreatorObject);
-
-				URLFProgress* ProgressTracker = CreatorFBX->GetProgressTracker();
-				FString FileName = FPaths::GetBaseFilename(SelectedFilePath) + "_" + FGuid::NewGuid().ToString() + ".fbx";
-				// FBX 파일을 로드한다.
-				UCreatorFBXSubsystem* CreatorFBXSubsystem = GetGameInstance()->GetSubsystem<UCreatorFBXSubsystem>();
-				AActor* actor = CreatorFBXSubsystem->OpenAndCopyFBX(SelectedFilePath, FileName, ProgressTracker);
-				if (actor)
-					actor->AttachToActor(CreatorObject, FAttachmentTransformRules::KeepWorldTransform);
-				CreatorMapSubsystem->AddObject(CreatorObject);
-
-				ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
-				if (PC)
-				{
-					PC->ReloadHierarchy();
-					PC->DoSelectObject(CreatorObject);
-				}
-
-				// 리플리케이트
-				if (CreatorFBX)
-				{
-					CreatorFBX->FBXFileName = FileName;
-				}
-
-				FBXScrollReload();
+				PC->ImportFBXObject(FileName);
+				/*PC->ReloadHierarchy();
+				PC->DoSelectObject(CreatorObject);*/
 			}
+
+			FBXScrollReload();
 		}
 	}
 }

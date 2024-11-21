@@ -437,15 +437,35 @@ void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecurs
 	}
 }
 
+void UCreatorMapSubsystem::AddCreatorMapObject(ASW_CreatorObject* Object)
+{
+    if (!CreatorMap.Objects.Contains(Object))
+    {
+	    CreatorMap.Objects.Add(Object);
+    }
+}
+
+void UCreatorMapSubsystem::RemoveCreatorMapObject(ASW_CreatorObject* Object)
+{
+	if (CreatorMap.Objects.Contains(Object))
+	{
+		CreatorMap.Objects.Remove(Object);
+	}
+}
+
 void UCreatorMapSubsystem::AttachObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
 {
 	if (ParentObject == nullptr)
 	{
-		CreatorMap.Objects.Add(ChildObject);
+        if (! CreatorMap.Objects.Contains(ChildObject))
+        {
+		    CreatorMap.Objects.Add(ChildObject);
+        }
 	}
 	else
 	{
-		ChildObject->AttachToActor(ParentObject, FAttachmentTransformRules::KeepWorldTransform);
+        if (GetWorld()->GetAuthGameMode())
+		    ChildObject->AttachToActor(ParentObject, FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
 
@@ -460,7 +480,8 @@ void UCreatorMapSubsystem::DetechObject(ASW_CreatorObject* ParentObject, ASW_Cre
 	}
     else
     {
-	    ChildObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+        if (GetWorld()->GetAuthGameMode())
+	        ChildObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
     }
 }
 

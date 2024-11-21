@@ -29,6 +29,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void RecursiveDestroy(AActor* Actor);
+	virtual void Destroyed() override;
+
 	virtual void OnSelected(bool isSelected);
 
 	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);

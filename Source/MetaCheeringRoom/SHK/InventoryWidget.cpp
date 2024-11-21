@@ -15,6 +15,8 @@
 #include "HG_GameInstance.h"
 #include "Net/UnrealNetwork.h"
 #include "HG_PlayerAnimInstance.h"
+#include "Animation/WidgetAnimation.h"
+#include "MovieScene.h"
 
 
 void UInventoryWidget::NativeConstruct()
@@ -354,5 +356,30 @@ void UInventoryWidget::CheckButtonClick(UButton* p_Button)
 	Btn_EmojiCategory->SetBackgroundColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.5f));
 
 	p_Button->SetBackgroundColor(FLinearColor(0.0f,0.26f,0.15f,0.5f));
+}
+
+void UInventoryWidget::PlayAppearAnimation(bool Play_Forward)
+{
+	if (IsAnimationPlaying(Appear))
+	{
+		StopAnimation(Appear);
+		StopAnimation(Disappear);
+	}
+
+	if(IsAnimationPlaying(Disappear))
+	{
+		StopAnimation(Disappear);
+	}
+
+	if(!Appear || !Disappear) return;
+
+	if (Play_Forward)
+	{
+		PlayAnimation(Appear);
+	}
+	else
+	{	
+		PlayAnimation(Disappear);
+	}
 }
 

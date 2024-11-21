@@ -189,3 +189,11 @@ void UHG_CustomUI::OnClickGrey()
 {
 	SelectedColor = FLinearColor(0.5f, 0.5f, 0.5f);
 }
+
+void UHG_CustomUI::PlayAppearAnimation(bool Play_Forward)
+{
+	if (Appear)
+	{
+		PlayAnimation(Appear);
+	}
+}

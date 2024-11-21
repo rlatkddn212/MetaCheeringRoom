@@ -63,6 +63,36 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Custom;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Teleport1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Teleport2;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Teleport3;	
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_FullScreen;
+
+	UFUNCTION()
+	void ConversionFullScreen();
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> FullScreenClass;
+	
+	UUserWidget* FullScreenWidget;
+
+	UFUNCTION()
+	void TeleportToStore();
+
+	UFUNCTION()
+	void TeleportToJoin();
+
+	UFUNCTION()
+	void TeleportToCreate();
+
+
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
 	UFUNCTION()
@@ -262,9 +292,9 @@ public:
 
 	void PopUpCustomUI();
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server, Reliable)
 	void ServerRPC_ApplyCustom(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin);
-	UFUNCTION(NetMulticast,Reliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ApplyCustom(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin);
 
 	UFUNCTION()
@@ -289,22 +319,22 @@ public:
 
 	UFUNCTION()
 	void OnRep_ClothColor();
-	
+
 	UPROPERTY(ReplicatedUsing = OnRep_ClothHemColor)
 	FLinearColor CurClothHem = FLinearColor(1.0f, 1.0f, 1.0f);
-	
+
 	UFUNCTION()
 	void OnRep_ClothHemColor();
 
 	UPROPERTY(ReplicatedUsing = OnRep_HairPinColor)
 	FLinearColor CurHairPin = FLinearColor(1.0f, 1.0f, 1.0f);
-	
+
 	UFUNCTION()
 	void OnRep_HairPinColor();
 
 	UPROPERTY(ReplicatedUsing = OnRep_HairColor)
 	FLinearColor CurHair = FLinearColor(1.0f, 1.0f, 1.0f);
-	
+
 	UFUNCTION()
 	void OnRep_HairColor();
 
@@ -316,7 +346,9 @@ public:
 
 	UPROPERTY(ReplicatedUsing = OnRep_Printing)
 	UTexture2D* CurPrinting = nullptr;
-	
+
 	UFUNCTION()
 	void OnRep_Printing();
+
+	void RemoveInventory();
 };
