@@ -176,6 +176,22 @@ public:
 	UFUNCTION()
 	void OnRep_CurrentRotation();
 
+	// 플레이어컨트롤에서 해줘도 되지만 UI 업데이트가 안되는 관계로 Player에서 처리
+	// 멀티 케스트
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_AddCreatingDummyObject(class ASW_CreatorObject* NewCreatingObject, const struct FCreatorObjectData& ObjectData);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DeleteObject(class ASW_CreatorObject* DeleteObject);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DetachObject(class ASW_CreatorObject* DetachObject);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_AttachObject(class ASW_CreatorObject* ParentObject, class ASW_CreatorObject* AttachObject);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_CopyPasteObject(class ASW_CreatorObject* CopyObject);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

@@ -56,6 +56,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_AttachObject(class ASW_CreatorObject* ParentObject, class ASW_CreatorObject* AttachObject);
 
+	UFUNCTION(Server, Reliable)
+	void Server_CopyPasteObject(class ASW_CreatorObject* CopyObject);
+
 	UFUNCTION()
 	void DoSelectObject(class ASW_CreatorObject* NewSelectObject);
 	

@@ -13,6 +13,9 @@
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Camera/CameraComponent.h"
+#include "CreatorMapSubsystem.h"
+#include "CreatorStorageSubsystem.h"
+#include "CreatorObject/SW_CreatorObject.h"
 
 // Sets default values
 ASW_Creator::ASW_Creator()
@@ -393,4 +396,114 @@ void ASW_Creator::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASW_Creator, CurrentRotation);
+}
+
+// PC로 멀티케스트
+void ASW_Creator::Multicast_AddCreatingDummyObject_Implementation(ASW_CreatorObject* NewCreatingObject, const struct FCreatorObjectData& ObjectData)
+{
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	NewCreatingObject->CreatingObjectData = new FCreatorObjectData(ObjectData);
+	//NewCreatingObject->SetFileName(NewCreatingObject->CreatingObjectData->ItemName);
+	system->AddObject(NewCreatingObject);
+
+	// Creator에 붙어있는 PC를 가져옴
+	if (PC)
+	{
+		PC->OnObjectChanged();
+		PC->DoSelectObject(NewCreatingObject);
+	}
+
+	// 로컬 PC
+	ASW_CreatorPlayerController* LocalPC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+
+	if (LocalPC)
+	{
+		LocalPC->ReloadHierarchy();
+	}
+}
+
+void ASW_Creator::Multicast_DeleteObject_Implementation(ASW_CreatorObject* DeleteObject)
+{
+	if (PC)
+	{
+		PC->UnSelectServerDeleteObject(DeleteObject);
+	}
+
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	system->RemoveObject(DeleteObject, true);
+
+	// 로컬 PC
+	ASW_CreatorPlayerController* LocalPC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+
+	if (LocalPC)
+	{
+		LocalPC->ReloadHierarchy();
+	}
+}
+
+void ASW_Creator::Multicast_DetachObject_Implementation(ASW_CreatorObject* DetachObject)
+{
+	if (!HasAuthority())
+	{
+		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+		system->RemoveCreatorMapObject(DetachObject);
+		system->AttachObject(nullptr, DetachObject);
+	}
+
+	// 로컬 PC
+	ASW_CreatorPlayerController* LocalPC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+
+	if (LocalPC)
+	{
+		LocalPC->ReloadHierarchy();
+	}
+}
+
+void ASW_Creator::Multicast_AttachObject_Implementation(ASW_CreatorObject* ParentObject, ASW_CreatorObject* AttachObject)
+{
+	if (!HasAuthority())
+	{
+		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+		if (system->IsChildObject(AttachObject, ParentObject))
+		{
+			return;
+		}
+
+		system->RemoveCreatorMapObject(AttachObject);
+		system->AttachObject(ParentObject, AttachObject);
+	}
+
+	// 로컬 PC
+	ASW_CreatorPlayerController* LocalPC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+
+	if (LocalPC)
+	{
+		LocalPC->ReloadHierarchy();
+	}
+}
+
+void ASW_Creator::Multicast_CopyPasteObject_Implementation(ASW_CreatorObject* CopyObject)
+{
+	if (PC)
+	{
+		PC->DoSelectObject(CopyObject);
+	}
+
+	if (!HasAuthority())
+	{
+		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+		ASW_CreatorObject* PrevParent = system->FindParentObject(CopyObject);
+
+		if (PrevParent == nullptr)
+		{
+			system->AddCreatorMapObject(CopyObject);
+		}
+	}
+
+	// 로컬 PC
+	ASW_CreatorPlayerController* LocalPC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (LocalPC)
+	{
+		LocalPC->ReloadHierarchy();
+	}
 }

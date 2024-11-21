@@ -21,6 +21,9 @@
 #include "Blueprint/UserWidget.h"
 #include "Engine/TimerHandle.h"
 #include "Creator/SW_CreatorGameState.h"
+#include "SW_Creator.h"
+#include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
 {
@@ -49,8 +52,31 @@ void ASW_CreatorPlayerController::BeginPlay()
 				SetToolState(NewState);
 			});
 
+		// 타이머
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+			{
+				// 월드에 있는 ASW_CreatorObject를 mapsystem에 등록
+				UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 
-		ReloadHierarchy();
+				TArray<AActor*> FoundActors;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASW_CreatorObject::StaticClass(), FoundActors);
+
+				for (AActor* Actor : FoundActors)
+				{
+					if (Actor->GetAttachParentActor() == nullptr)
+					{
+						ASW_CreatorObject* CreatorObject = Cast<ASW_CreatorObject>(Actor);
+						if (CreatorObject)
+						{
+							system->AddCreatorMapObject(CreatorObject);
+						}
+					}
+				}
+
+				ReloadHierarchy();
+			}, 0.1f, false);
+		
 		ToolState = ECreatorToolState::Selection;
 	}
 }
@@ -350,10 +376,10 @@ void ASW_CreatorPlayerController::Server_AddCreatingDummyObject_Implementation(c
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, NewCreatingObject, ObjectData]()
 			{
 				// 게임스테이트
-				ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
-				if (GameState)
+				ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+				if (Creator)
 				{
-					GameState->Multicast_AddCreatingDummyObject(NewCreatingObject, ObjectData);
+					Creator->Multicast_AddCreatingDummyObject(NewCreatingObject, ObjectData);
 				}
 			}, 0.1f, false);
 
@@ -368,11 +394,10 @@ void ASW_CreatorPlayerController::Server_AddCreatingDummyObject_Implementation(c
 
 void ASW_CreatorPlayerController::Server_DeleteObject_Implementation(class ASW_CreatorObject* DeleteObject)
 {
-	// 게임스테이트
-	ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
-	if (GameState)
+	ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+	if (Creator)
 	{
-		GameState->Multicast_DeleteObject(DeleteObject);
+		Creator->Multicast_DeleteObject(DeleteObject);
 	}
 }
 
@@ -386,11 +411,10 @@ void ASW_CreatorPlayerController::Server_DetachObject_Implementation(class ASW_C
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, DetachObject]()
 		{
-			// 게임스테이트
-			ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
-			if (GameState)
+			ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+			if (Creator)
 			{
-				GameState->Multicast_DetachObject(DetachObject);
+				Creator->Multicast_DetachObject(DetachObject);
 			}
 		}, 0.1f, false);
 
@@ -416,20 +440,31 @@ void ASW_CreatorPlayerController::Server_AttachObject_Implementation(class ASW_C
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, ParentObject, AttachObject]()
 		{
-
-			ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
-			if (GameState)
+			// ASW_Creator를 가져옴
+			ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+			if (Creator)
 			{
-				GameState->Multicast_AttachObject(ParentObject, AttachObject);
+				Creator->Multicast_AttachObject(ParentObject, AttachObject);
 			}
 		}, 0.1f, false);
+}
 
-
-	/*ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
-	if (GameState)
-	{
-		GameState->Multicast_AttachObject(ParentObject, AttachObject);
-	}*/
+void ASW_CreatorPlayerController::Server_CopyPasteObject_Implementation(class ASW_CreatorObject* CopyObject)
+{
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	ASW_CreatorObject* NewCopyObject = system->CopyObject(CopyObject);
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, NewCopyObject]()
+		{
+			// ASW_Creator를 가져옴
+			ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+			if (Creator)
+			{
+				Creator->Multicast_CopyPasteObject(NewCopyObject);
+			}
+		}, 0.1f, false);
+	
 }
 
 void ASW_CreatorPlayerController::DoSelectObject(class ASW_CreatorObject* NewSelectObject)
@@ -605,11 +640,7 @@ void ASW_CreatorPlayerController::PasteSelectedObject()
 {
 	if (CopiedObject)
 	{
-		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-		ASW_CreatorObject* NewSelectedObject = system->CopyObject(CopiedObject);
-		DoSelectObject(NewSelectedObject);
-
-		ReloadHierarchy();
+		Server_CopyPasteObject(CopiedObject);
 	}
 }
 
