@@ -21,6 +21,9 @@
 #include "Blueprint/UserWidget.h"
 #include "Engine/TimerHandle.h"
 #include "Creator/SW_CreatorGameState.h"
+#include "SW_Creator.h"
+#include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
 {
@@ -49,8 +52,31 @@ void ASW_CreatorPlayerController::BeginPlay()
 				SetToolState(NewState);
 			});
 
+		// 타이머
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+			{
+				// 월드에 있는 ASW_CreatorObject를 mapsystem에 등록
+				UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 
-		ReloadHierarchy();
+				TArray<AActor*> FoundActors;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASW_CreatorObject::StaticClass(), FoundActors);
+
+				for (AActor* Actor : FoundActors)
+				{
+					if (Actor->GetAttachParentActor() == nullptr)
+					{
+						ASW_CreatorObject* CreatorObject = Cast<ASW_CreatorObject>(Actor);
+						if (CreatorObject)
+						{
+							system->AddCreatorMapObject(CreatorObject);
+						}
+					}
+				}
+
+				ReloadHierarchy();
+			}, 0.1f, false);
+		
 		ToolState = ECreatorToolState::Selection;
 	}
 }
@@ -297,6 +323,29 @@ void ASW_CreatorPlayerController::CreatingDummyObject(struct FCreatorObjectData*
 	CreatorWidget->OnDragged(true);
 }
 
+void ASW_CreatorPlayerController::ImportFBXObject(const FString& FilePath)
+{
+	// server 작업
+	int32 CreatorObjectType = 5;
+	int32 CreatorObjectId = 1; 
+	UCreatorStorageSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
+
+	TMap<int32, FCreatorObjectData*> CreatorObjectsStruct = system->GetCreatorObjects(CreatorObjectType);
+	if (CreatorObjectsStruct.Contains(CreatorObjectId))
+	{
+		// CreatorObject를 생성
+		// CreatorObjectsStruct[CreatorObjectId]
+
+		// 복사해서 생성
+		FCreatorObjectData* CreatorObjectData = new FCreatorObjectData(*CreatorObjectsStruct[CreatorObjectId]);
+
+		CreatorObjectData->ItemName = FilePath;
+
+		Server_AddCreatingDummyObject(*CreatorObjectData, FVector::ZeroVector);
+		// OpenAndCopyFBX(SelectedFilePath, FileName, ProgressTracker);
+	}
+}
+
 void ASW_CreatorPlayerController::Server_SetOwnerObject_Implementation(class ASW_CreatorObject* OwnerObject, bool isOnwer)
 {
 	if (OwnerObject == nullptr)
@@ -322,35 +371,100 @@ void ASW_CreatorPlayerController::Server_AddCreatingDummyObject_Implementation(c
 		// Timer
 		// PC를 가져옴
 		NewCreatingObject->SetOwner(this);
-
-		//FTimerHandle TimerHandle;
-		//GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, NewCreatingObject]()
-		//	{
-		//		// 게임스테이트
-		//		ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
-		//		if (GameState)
-		//		{
-		//			GameState->Multicast_AddCreatingDummyObject(NewCreatingObject);
-		//		}
-		//	}, 0.1f, false);
+		NewCreatingObject->SetFileName(ObjectData.ItemName);
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, NewCreatingObject, ObjectData]()
+			{
+				// 게임스테이트
+				ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+				if (Creator)
+				{
+					Creator->Multicast_AddCreatingDummyObject(NewCreatingObject, ObjectData);
+				}
+			}, 0.1f, false);
 
 		// 게임스테이트
-		ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
+		/*ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
 		if (GameState)
 		{
 			GameState->Multicast_AddCreatingDummyObject(NewCreatingObject);
-		}
+		}*/
 	}
 }
 
 void ASW_CreatorPlayerController::Server_DeleteObject_Implementation(class ASW_CreatorObject* DeleteObject)
 {
-	// 게임스테이트
-	ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
+	ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+	if (Creator)
+	{
+		Creator->Multicast_DeleteObject(DeleteObject);
+	}
+}
+
+void ASW_CreatorPlayerController::Server_DetachObject_Implementation(class ASW_CreatorObject* DetachObject)
+{
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	ASW_CreatorObject* PrevParent = system->FindParentObject(DetachObject);
+	system->DetechObject(PrevParent, DetachObject);
+	system->AttachObject(nullptr, DetachObject);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, DetachObject]()
+		{
+			ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+			if (Creator)
+			{
+				Creator->Multicast_DetachObject(DetachObject);
+			}
+		}, 0.1f, false);
+
+	/*ASW_CreatorGameState* GameState = GetWorld()->GetGameState<ASW_CreatorGameState>();
 	if (GameState)
 	{
-		GameState->Multicast_DeleteObject(DeleteObject);
+		GameState->Multicast_DetachObject(DetachObject);
+	}*/
+}
+
+void ASW_CreatorPlayerController::Server_AttachObject_Implementation(class ASW_CreatorObject* ParentObject, class ASW_CreatorObject* AttachObject)
+{
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	if (system->IsChildObject(AttachObject, ParentObject))
+	{
+		return;
 	}
+
+	ASW_CreatorObject* PrevParent = system->FindParentObject(AttachObject);
+	system->DetechObject(PrevParent, AttachObject);
+	system->AttachObject(ParentObject, AttachObject);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, ParentObject, AttachObject]()
+		{
+			// ASW_Creator를 가져옴
+			ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+			if (Creator)
+			{
+				Creator->Multicast_AttachObject(ParentObject, AttachObject);
+			}
+		}, 0.1f, false);
+}
+
+void ASW_CreatorPlayerController::Server_CopyPasteObject_Implementation(class ASW_CreatorObject* CopyObject)
+{
+	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+	ASW_CreatorObject* NewCopyObject = system->CopyObject(CopyObject);
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, NewCopyObject]()
+		{
+			// ASW_Creator를 가져옴
+			ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+			if (Creator)
+			{
+				Creator->Multicast_CopyPasteObject(NewCopyObject);
+			}
+		}, 0.1f, false);
+	
 }
 
 void ASW_CreatorPlayerController::DoSelectObject(class ASW_CreatorObject* NewSelectObject)
@@ -376,7 +490,7 @@ void ASW_CreatorPlayerController::UnSelectServerDeleteObject(class ASW_CreatorOb
 {
 	if (SelectedObject == ServerDeleteObject)
 	{
-		SelectedObject->OnSelected(false);
+		//if (SelectedObject) SelectedObject->OnSelected(false);
 		Server_SetOwnerObject(SelectedObject, false);
 		SelectedObject = nullptr;
 		CreatorWidget->CreatorInspectorWidget->SetObject(nullptr);
@@ -441,6 +555,22 @@ void ASW_CreatorPlayerController::MoveDummyObject(FVector2D MousePosition)
 			FVector p = GetPawn()->GetActorLocation();
 			CreatingObject->SetActorLocation(p + WorldDirection * 1000);
 		}
+	}
+}
+
+void ASW_CreatorPlayerController::DetachHirearchyObject(class ASW_CreatorObject* DetachCreatorObject)
+{
+	if (DetachCreatorObject)
+	{
+		Server_DetachObject(DetachCreatorObject);
+	}
+}
+
+void ASW_CreatorPlayerController::AttachHirearchyObject(class ASW_CreatorObject* ParentCreatorObject, class ASW_CreatorObject* AttachCreatorObject)
+{
+	if (ParentCreatorObject && AttachCreatorObject)
+	{
+		Server_AttachObject(ParentCreatorObject, AttachCreatorObject);
 	}
 }
 
@@ -510,11 +640,7 @@ void ASW_CreatorPlayerController::PasteSelectedObject()
 {
 	if (CopiedObject)
 	{
-		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-		ASW_CreatorObject* NewSelectedObject = system->CopyObject(CopiedObject);
-		DoSelectObject(NewSelectedObject);
-
-		ReloadHierarchy();
+		Server_CopyPasteObject(CopiedObject);
 	}
 }
 

@@ -91,7 +91,6 @@ void USW_CreatorObjectSlotWidget::NativeOnDragDetected(const FGeometry& InGeomet
 		controller->CreatingDummyObject(ObjectData);
 		//controller->Server_CreatingDummyObject(*ObjectData);
 		controller->MoveDummyObject(LocalPixelMousePos);
-		// 마우스 모드 변경
 	}
 
 	bIsDragging = true;

@@ -135,17 +135,12 @@ bool USW_CreatorHierarchyItemWidget::NativeOnDrop(const FGeometry& InGeometry, c
 	if (dragOperation)
 	{
 		UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-		const FCreatorMap& CMap = system->GetCreatorMap();
 		if (system->IsChildObject(dragOperation->CreatorObject, HierarchyCreatorObject))
 		{
 			return false;
 		}
 
-		ASW_CreatorObject* PrevParent = system->FindParentObject(dragOperation->CreatorObject);
-		system->DetechObject(PrevParent, dragOperation->CreatorObject);
-
-		system->AttachObject(HierarchyCreatorObject, dragOperation->CreatorObject);
-		PC->ReloadHierarchy();
+		PC->AttachHirearchyObject(HierarchyCreatorObject, dragOperation->CreatorObject);
 	}
 
 	return true;

@@ -39,6 +39,7 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
+	void CopyFBX(const FString& FilePath, const FString& NewFileName);
 	AActor* OpenAndCopyFBX(const FString& FilePath, const FString& NewFileName, class URLFProgress* ProgressTracker);
 	AActor* LoadFBX(FString FileName, class URLFProgress* Progress);
 

@@ -287,6 +287,39 @@ void ASW_CreatorObject::Tick(float DeltaTime)
 	}
 }
 
+void ASW_CreatorObject::RecursiveDestroy(AActor* Actor)
+{
+	TArray<AActor*> AttachedActors;
+	Actor->GetAttachedActors(AttachedActors);
+
+	for (AActor* AttachedActor : AttachedActors)
+	{
+		if (AttachedActor && !AttachedActor->IsPendingKillPending())
+		{
+			RecursiveDestroy(AttachedActor);
+		}
+	}
+
+	Actor->Destroy();
+}
+
+void ASW_CreatorObject::Destroyed()
+{
+	Super::Destroyed();
+	
+	// Attach된 Actor 삭제
+	TArray<AActor*> AttachedActors;
+	GetAttachedActors(AttachedActors);
+
+	for (AActor* AttachedActor : AttachedActors)
+	{
+		if (AttachedActor && !AttachedActor->IsPendingKillPending())
+		{
+			RecursiveDestroy(AttachedActor);
+		}
+	}
+}	
+
 void ASW_CreatorObject::OnSelected(bool isSelected)
 {
 	IsSelectedObject = isSelected;
