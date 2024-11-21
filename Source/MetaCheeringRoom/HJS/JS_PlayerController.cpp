@@ -45,9 +45,6 @@ void AJS_PlayerController::BeginPlay()
 			ExitWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
-
-
-
 }
 
 void AJS_PlayerController::Tick(float Deltatime)
@@ -275,7 +272,6 @@ void AJS_PlayerController::ServerAddChat_Implementation(const FString& id, const
 		LoadActor->MulticastAddChat(id,text,bAuto);
 	}
 }
-
 
 void AJS_PlayerController::ClientAddChat_Implementation(const FString& id, const FText& text, bool bAuto)
 {
