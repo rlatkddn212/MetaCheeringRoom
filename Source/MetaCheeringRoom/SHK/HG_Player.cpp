@@ -192,7 +192,7 @@ void AHG_Player::Tick(float DeltaTime)
 	Direction = FVector::ZeroVector;
 
 	FHitResult OutHit;
-	int32 BoneIndex = GetMesh()->GetBoneIndex(TEXT("head"));
+	int32 BoneIndex = GetMesh()->GetBoneIndex(TEXT("Chest"));
 	FVector Start = this->GetMesh()->GetBoneTransform(BoneIndex).GetLocation();
 	FVector End = Start + CameraComp->GetForwardVector() * 200.0f;
 
@@ -249,11 +249,6 @@ void AHG_Player::Tick(float DeltaTime)
 		{
 			SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
 		}
-	}
-	// 상점 UI 업데이트
-	if (StoreWidget)
-	{
-		StoreWidget->SetPointText(this->GoodsComp->GetGold());
 	}
 }
 
@@ -403,6 +398,8 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 		{
 			InventoryWidget->AddToViewport(); 
 			InventoryWidget->PlayAppearAnimation(true);
+			HUD->PlayAppearAnimation(false);
+			HUD->StopInventoryAnimation();
 			InventoryWidget->InitInventoryUI();
 
 			PC->SetShowMouseCursor(true);
@@ -412,6 +409,7 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 		else
 		{
 			InventoryWidget->PlayAppearAnimation(false);
+			HUD->PlayAppearAnimation(true);
 
 			FLatentActionInfo LatentInfo;
 			LatentInfo.Linkage = 0;
@@ -435,6 +433,7 @@ void AHG_Player::RemoveInventory()
 
 void AHG_Player::Emotion()
 {
+	HUD->UpdateHUD(1);
 	if (bEquipItem)
 	{
 		auto* RCSWidget = CreateWidget<UHG_RemoteCS>(GetWorld(), RCSClass);
@@ -513,10 +512,6 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 		case EItemCategory::Category_OneHandGrab:
 			mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			mesh->SetHiddenInGame(false);
-			if (HUD)
-			{
-				HUD->UpdateHUD(TEXT("E : 응원봉 커스텀"));
-			}
 			break;
 		case EItemCategory::Category_TwoHandGrab:
 			if (!bPassed)
@@ -528,10 +523,6 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 			else
 			{
 				mesh->AttachToComponent(HandLComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-				if (HUD)
-				{
-					HUD->UpdateHUD(TEXT("E) 응원봉 조작하기"));
-				}
 				bPassed = false;
 			}
 			break;
@@ -656,6 +647,8 @@ void AHG_Player::PopUpHUD()
 					HUD->SetOwningPlayer(PC);
 				}
 				HUD->AddToViewport();
+				HUD->UpdateHUD(0);
+				HUD->SetPointText();
 			}
 		}
 	}
@@ -928,7 +921,6 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 	DOREPLIFETIME(AHG_Player, EquipItemList);
 	DOREPLIFETIME(AHG_Player, bEquipItem);
-	DOREPLIFETIME(AHG_Player, HUD);
 	// 	DOREPLIFETIME(AHG_Player, CurCloth);
 	// 	DOREPLIFETIME(AHG_Player, CurClothHem);
 	// 	DOREPLIFETIME(AHG_Player, CurEyes);

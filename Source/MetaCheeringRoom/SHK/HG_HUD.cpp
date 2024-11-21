@@ -5,18 +5,13 @@
 #include "Components/TextBlock.h"
 #include "HG_Player.h"
 #include "HG_PlayerGoodsComponent.h"
+#include "Components/WidgetSwitcher.h"
 
 void UHG_HUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 }
 
-void UHG_HUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry,InDeltaTime);
-
-	SetPointText();
-}
 
 void UHG_HUD::SetPointText()
 {
@@ -27,7 +22,55 @@ void UHG_HUD::SetPointText()
 	}
 }
 
-void UHG_HUD::UpdateHUD(FString Value)
+void UHG_HUD::UpdateHUD(int32 Value)
 {
-	TB_RemoteCS->SetText(FText::FromString(Value));
+	if (Value == 0)
+	{
+		WS_Border->SetActiveWidgetIndex(0);
+	}
+	else
+	{
+		WS_Border->SetActiveWidgetIndex(1);
+	}
+}
+
+void UHG_HUD::PlayAppearAnimation(bool Play_Forward)
+{
+	if (IsAnimationPlaying(Appear))
+	{
+		StopAnimation(Appear);
+		StopAnimation(Disappear);
+	}
+
+	if (IsAnimationPlaying(Disappear))
+	{
+		StopAnimation(Disappear);
+	}
+
+	if (!Appear || !Disappear) return;
+
+	if (Play_Forward)
+	{
+		PlayAnimation(Appear);
+	}
+	else
+	{
+		PlayAnimation(Disappear);
+	}
+}
+
+void UHG_HUD::PlayInventoryAnimation()
+{
+	if(NewItem)
+	{
+		PlayAnimation(NewItem,0.0f,0);
+	}
+}
+
+void UHG_HUD::StopInventoryAnimation()
+{
+	if (IsAnimationPlaying(NewItem))
+	{
+		StopAnimation(NewItem);
+	}
 }

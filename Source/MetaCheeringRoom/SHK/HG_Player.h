@@ -264,7 +264,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UHG_HUD> HeadUpClass;
 
-	UPROPERTY(EditDefaultsOnly, Replicated)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UHG_HUD* HUD;
 
 	class AHG_EquipItem* EItem;

@@ -32,8 +32,30 @@ public:
 	void AnimNotify_PrayEnd();
 	
 	UFUNCTION()
-	void AnimNotify_MLTEnd();
+	void AnimNotify_MLTEnd(); 
 
+	UFUNCTION()
+	void AnimNotify_CheeringEnd();
+	
+	UFUNCTION()
+	void AnimNotify_CartWheelEnd();
+	
+	UFUNCTION()
+	void AnimNotify_ClappingEnd();
+	
+	UFUNCTION()
+	void AnimNotify_DefeatEnd();
+	
+	UFUNCTION()
+	void AnimNotify_FlyKickEnd();
+	
+	UFUNCTION()
+	void AnimNotify_WavingEnd();
+	
+	UFUNCTION()
+	void AnimNotify_PushUpEnd();
+	UFUNCTION()
+	void AnimNotify_KTTGEnd();
 
 	class AHG_Player* Owner;
 
