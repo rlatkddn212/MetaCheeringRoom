@@ -73,15 +73,20 @@ void ASW_Creator::Tick(float DeltaTime)
 	{
 		PC->OnMouseOver();
 	}
-
-	if (PC && MouseState == ECreatorMouseState::GizmoDrag)
+	if (IsLocallyControlled())
 	{
-		FVector Pos = PC->GetSelectedObjectPos();
-		HandMeshComponent->SetWorldLocation(Pos);
-	}
-	else
-	{
-		HandMeshComponent->SetWorldLocation(GetActorLocation());
+		if (PC && MouseState == ECreatorMouseState::GizmoDrag)
+		{
+			FTransform ObjectTransform = PC->GetSelectedObjectPos();
+			Server_HandMovement(ObjectTransform.GetLocation());
+			FRotator rot = ObjectTransform.GetRotation().Rotator();
+			Server_HandRotation(rot);
+		}
+		else
+		{
+			Server_HandMovement(GetActorLocation());
+			Server_HandRotation(FRotator(0, -90, 0));
+		}
 	}
 }
 
@@ -396,6 +401,34 @@ void ASW_Creator::Server_Rotation_Implementation(const FRotator& NewRotation)
 	}
 }
 
+void ASW_Creator::Server_HandMovement_Implementation(const FVector& NewLocation)
+{
+	// 로그 NewLoc
+	UE_LOG(LogTemp, Warning, TEXT("NewLoc : %s"), *NewLocation.ToString());
+	
+	HandMeshComponent->SetWorldLocation(NewLocation);
+	CurrentHandLocation = NewLocation;
+}
+
+void ASW_Creator::Server_HandRotation_Implementation(const FRotator& NewRotation)
+{
+	// 로그 NewRot
+	UE_LOG(LogTemp, Warning, TEXT("NewRot : %s"), *NewRotation.ToString());
+
+	HandMeshComponent->SetRelativeRotation(NewRotation);
+	CurrentHandRotation = NewRotation;
+}
+
+void ASW_Creator::OnRep_CurrentHandLocation()
+{
+	HandMeshComponent->SetWorldLocation(CurrentHandLocation);
+}
+
+void ASW_Creator::OnRep_CurrentHandRotation()
+{
+	HandMeshComponent->SetRelativeRotation(CurrentHandRotation);
+}
+
 void ASW_Creator::OnRep_CurrentRotation()
 {
 	SetActorRotation(CurrentRotation);
@@ -406,6 +439,8 @@ void ASW_Creator::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASW_Creator, CurrentRotation);
+	DOREPLIFETIME(ASW_Creator, CurrentHandLocation);
+	DOREPLIFETIME(ASW_Creator, CurrentHandRotation);
 }
 
 // PC로 멀티케스트
