@@ -278,6 +278,35 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	input->BindAction(IA_Teleport1, ETriggerEvent::Completed, this, &AHG_Player::TeleportToStore);
 	input->BindAction(IA_Teleport2, ETriggerEvent::Completed, this, &AHG_Player::TeleportToJoin);
 	input->BindAction(IA_Teleport3, ETriggerEvent::Completed, this, &AHG_Player::TeleportToCreate);
+
+	input->BindAction(IA_FullScreen, ETriggerEvent::Completed, this, &AHG_Player::ConversionFullScreen);
+}
+
+void AHG_Player::ConversionFullScreen()
+{
+	if(!FullScreenWidget)
+	{
+		FullScreenWidget = CreateWidget<UUserWidget>(GetWorld(),FullScreenClass);
+	}
+	if (FullScreenWidget)
+	{
+		if (!bToggle)
+		{
+			FullScreenWidget->AddToViewport();
+			PC->SetShowMouseCursor(true);
+			bCanMove = false;
+			bToggle = !bToggle;
+		}
+		else
+		{
+			FullScreenWidget->RemoveFromParent();
+			PC->SetShowMouseCursor(false);
+			PC->SetInputMode(FInputModeGameOnly());
+			bToggle = !bToggle;
+			bCanMove = true;
+		}
+	}
+
 }
 
 void AHG_Player::TeleportToStore()
@@ -375,6 +404,7 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 			InventoryWidget->AddToViewport(); 
 			InventoryWidget->PlayAppearAnimation(true);
 			InventoryWidget->InitInventoryUI();
+
 			PC->SetShowMouseCursor(true);
 			bToggle = !bToggle;
 			bCanMove = false;

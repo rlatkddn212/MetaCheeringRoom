@@ -70,7 +70,18 @@ public:
 	class UInputAction* IA_Teleport2;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* IA_Teleport3;
+	class UInputAction* IA_Teleport3;	
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_FullScreen;
+
+	UFUNCTION()
+	void ConversionFullScreen();
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> FullScreenClass;
+	
+	UUserWidget* FullScreenWidget;
 
 	UFUNCTION()
 	void TeleportToStore();
