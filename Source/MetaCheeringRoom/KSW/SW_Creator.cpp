@@ -37,6 +37,9 @@ ASW_Creator::ASW_Creator()
 		HandMeshComponent->SetSkeletalMesh(HandMesh.Object);
 	}
 
+	CameraMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CameraMeshComponent"));
+	CameraMeshComponent->SetupAttachment(RootSceneComponent);
+
 	// 카메라
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(RootSceneComponent);
@@ -60,6 +63,7 @@ void ASW_Creator::BeginPlay()
 	if (IsLocallyControlled())
 	{
 		// 매쉬를 숨긴다.
+		CameraMeshComponent->SetVisibility(false);
 		HandMeshComponent->SetVisibility(false);
 	}
 }
@@ -75,18 +79,36 @@ void ASW_Creator::Tick(float DeltaTime)
 	}
 	if (IsLocallyControlled())
 	{
-		if (PC && MouseState == ECreatorMouseState::GizmoDrag)
+		if (PC && bHandTargetObject)
 		{
-			FTransform ObjectTransform = PC->GetSelectedObjectPos();
-			Server_HandMovement(ObjectTransform.GetLocation());
-			FRotator rot = ObjectTransform.GetRotation().Rotator();
-			Server_HandRotation(rot);
+			ASW_CreatorObject* Object = PC->GetSelectedObject();
+			if (Object)
+			{
+				Server_HandMovement(Object->GetActorLocation());
+				FRotator rot = Object->GetActorRotation();
+				Server_HandRotation(rot);
+			}
+			else
+			{
+				bHandTargetObject = false;
+			}
 		}
 		else
 		{
 			Server_HandMovement(GetActorLocation());
 			Server_HandRotation(FRotator(0, -90, 0));
 		}
+	}
+
+	if (FVector::Dist(HandMeshComponent->GetComponentLocation(), TargetLocation) > 300.0f)
+	{
+		FVector SmoothedLocation = FMath::VInterpTo(HandMeshComponent->GetComponentLocation(), TargetLocation, DeltaTime, 10.0f);
+		HandMeshComponent->SetWorldLocation(SmoothedLocation);
+		// Smooth 거리와 TargetLocation 거리가 0.1보다 작으면 false
+	}
+	else
+	{
+		HandMeshComponent->SetWorldLocation(TargetLocation);
 	}
 }
 
@@ -155,6 +177,7 @@ void ASW_Creator::OnMyMove(const FInputActionValue& Value)
 
 	Server_Movement(p);
 	Direction = FVector::ZeroVector;
+	bHandTargetObject = false;
 }
 
 void ASW_Creator::OnMyLook(const FInputActionValue& Value)
@@ -176,21 +199,22 @@ void ASW_Creator::OnMyQ(const FInputActionValue& Value)
 	if (MouseState == ECreatorMouseState::Clicked)
 	{
 		Direction.Z = -1;
+		FTransform t = FTransform(GetControlRotation());
+		Direction = t.TransformVector(Direction);
+
+		FVector p = GetActorLocation();
+		p += Direction * CameraSpeed * GetWorld()->DeltaTimeSeconds;
+		SetActorLocation(p);
+
+		Server_Movement(p);
+		Direction = FVector::ZeroVector;
 	}
 	else
 	{
 		if (PC)
 			PC->SetToolState(ECreatorToolState::Selection);
 	}
-	FTransform t = FTransform(GetControlRotation());
-	Direction = t.TransformVector(Direction);
-
-	FVector p = GetActorLocation();
-	p += Direction * CameraSpeed * GetWorld()->DeltaTimeSeconds;
-	SetActorLocation(p);
-
-	Server_Movement(p);
-	Direction = FVector::ZeroVector;
+	bHandTargetObject = false;
 }
 
 void ASW_Creator::OnMyW(const FInputActionValue& Value)
@@ -209,6 +233,15 @@ void ASW_Creator::OnMyE(const FInputActionValue& Value)
 	if (MouseState == ECreatorMouseState::Clicked)
 	{
 		Direction.Z = 1;
+		FTransform t = FTransform(GetControlRotation());
+		Direction = t.TransformVector(Direction);
+
+		FVector p = GetActorLocation();
+		p += Direction * CameraSpeed * GetWorld()->DeltaTimeSeconds;
+		SetActorLocation(p);
+
+		Server_Movement(p);
+		Direction = FVector::ZeroVector;
 	}
 	else
 	{
@@ -216,15 +249,7 @@ void ASW_Creator::OnMyE(const FInputActionValue& Value)
 			PC->SetToolState(ECreatorToolState::Rotation);
 	}
 
-	FTransform t = FTransform(GetControlRotation());
-	Direction = t.TransformVector(Direction);
-
-	FVector p = GetActorLocation();
-	p += Direction * CameraSpeed * GetWorld()->DeltaTimeSeconds;
-	SetActorLocation(p);
-
-	Server_Movement(p);
-	Direction = FVector::ZeroVector;
+	bHandTargetObject = false;
 }
 
 void ASW_Creator::OnMyR(const FInputActionValue& Value)
@@ -378,8 +403,11 @@ void ASW_Creator::SetMouseState(ECreatorMouseState NewState)
 	}
 
 	MouseState = NewState;
+
+	bHandTargetObject = false;
 	if (MouseState == ECreatorMouseState::GizmoDrag)
 	{
+		bHandTargetObject = true;
 		PC->SetInputMode(FInputModeGameAndUI());
 		PC->SetShowMouseCursor(true);
 	}
@@ -406,7 +434,8 @@ void ASW_Creator::Server_HandMovement_Implementation(const FVector& NewLocation)
 	// 로그 NewLoc
 	UE_LOG(LogTemp, Warning, TEXT("NewLoc : %s"), *NewLocation.ToString());
 	
-	HandMeshComponent->SetWorldLocation(NewLocation);
+	TargetLocation = NewLocation;
+	//HandMeshComponent->SetWorldLocation(NewLocation);
 	CurrentHandLocation = NewLocation;
 }
 
@@ -421,7 +450,8 @@ void ASW_Creator::Server_HandRotation_Implementation(const FRotator& NewRotation
 
 void ASW_Creator::OnRep_CurrentHandLocation()
 {
-	HandMeshComponent->SetWorldLocation(CurrentHandLocation);
+	TargetLocation = CurrentHandLocation;
+	//HandMeshComponent->SetWorldLocation(CurrentHandLocation);
 }
 
 void ASW_Creator::OnRep_CurrentHandRotation()
@@ -456,6 +486,7 @@ void ASW_Creator::Multicast_AddCreatingDummyObject_Implementation(ASW_CreatorObj
 	{
 		PC->OnObjectChanged();
 		PC->DoSelectObject(NewCreatingObject);
+		bHandTargetObject = true;
 	}
 
 	// 로컬 PC

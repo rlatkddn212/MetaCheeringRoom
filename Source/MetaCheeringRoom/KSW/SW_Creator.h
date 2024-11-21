@@ -186,6 +186,10 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHandRotation)
 	FRotator CurrentHandRotation; 
 
+	FVector TargetLocation;
+
+	bool bHandTargetObject = false;
+
 	UFUNCTION()
 	void OnRep_CurrentHandLocation();
 
@@ -224,6 +228,10 @@ public:
 	// ½ºÄÌ·¹Å» ¸Þ½¬
 	UPROPERTY(EditAnywhere)
 	class USkeletalMeshComponent* HandMeshComponent;
+	
+	// ½ºÄÌ·¹Å» ¸Þ½¬
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* CameraMeshComponent;
 
 	// Ä«¸Þ¶ó
 	UPROPERTY(EditAnywhere)

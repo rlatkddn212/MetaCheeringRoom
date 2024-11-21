@@ -665,13 +665,8 @@ void ASW_CreatorPlayerController::PasteSelectedObject()
 	}
 }
 
-FTransform ASW_CreatorPlayerController::GetSelectedObjectPos()
+ASW_CreatorObject* ASW_CreatorPlayerController::GetSelectedObject()
 {
-	if (SelectedObject)
-	{
-		return SelectedObject->GetActorTransform();
-	}
-
-	return FTransform();
+	return SelectedObject;
 }
 
