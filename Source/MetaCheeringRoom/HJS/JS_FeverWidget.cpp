@@ -12,6 +12,18 @@ void UJS_FeverWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	DownPercent(InDeltaTime);
 	UpdateGradientColor(InDeltaTime);
 	FeverStart();
+	if(bFeverStart || bFeverTime)
+	{ 
+		CurrentTime += InDeltaTime;
+		if (CurrentTime >= FeverEndTime)
+		{
+			PB_FeverBar->SetVisibility(ESlateVisibility::Visible);
+			bFeverTime = false;
+			bFeverStart = false;
+			SetVisibility(ESlateVisibility::Hidden);
+			CurrentTime = 0.f;
+		}
+	}
 }
 
 void UJS_FeverWidget::SetPercent(float value)
@@ -57,5 +69,6 @@ void UJS_FeverWidget::FeverStart()
 		PB_FeverBar->SetVisibility(ESlateVisibility::Hidden);
 		bFeverTime = true;
 		bFeverStart = false;
+		CurrentTime = 0.f;
 	}
 }
