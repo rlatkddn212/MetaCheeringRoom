@@ -159,4 +159,7 @@ public:
 public:
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject);
+
+	// 하이라키 기능
+	bool IsExpandedHierarchy = true;
 };

@@ -19,6 +19,8 @@ void USW_CreatorHierarchyItemWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+	ExpandedButton->SetClickMethod(EButtonClickMethod::PreciseClick);
+	ExpandedButton->OnClicked.AddDynamic(this, &USW_CreatorHierarchyItemWidget::OnClickExpandedButton);
 }
 
 void USW_CreatorHierarchyItemWidget::SetItem(ASW_CreatorObject* CreatorObject, int32 depth)
@@ -156,4 +158,18 @@ void USW_CreatorHierarchyItemWidget::OnSelected(bool isSelected)
 	{
 		HierarchyItemButton->SetStyle(DefaultButtonStyle);
 	}
+}
+
+void USW_CreatorHierarchyItemWidget::OnClickExpandedButton()
+{
+	// 아이템을 펼친다.
+	if (HierarchyCreatorObject)
+	{
+		HierarchyCreatorObject->IsExpandedHierarchy = !HierarchyCreatorObject->IsExpandedHierarchy;
+		if (PC)
+		{
+			PC->ReloadHierarchy();
+		}
+	}
+	
 }

@@ -39,6 +39,9 @@ public:
 	UFUNCTION()
 	void OnSelected(bool isSelected);
 
+	UFUNCTION()
+	void OnClickExpandedButton();
+
 	FOnHierarchyItemClicked OnHierarchyItemClicked;
 
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
@@ -47,6 +50,9 @@ public:
 	// spacer
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	class USpacer* HierarchySpacer;
+
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class UButton* ExpandedButton;
 
 	// ¿ÃπÃ¡ˆ
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
@@ -62,6 +68,13 @@ public:
 	FButtonStyle ClickedButtonStyle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ButtonStyle")
 	FButtonStyle HoveredButtonStyle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExpandedButton")
+	FButtonStyle DefaultExpandedButtonStyle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExpandedButton")
+	FButtonStyle ClickedExpandedButtonStyle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExpandedButton")
+	FButtonStyle HoveredExpandedButtonStyle;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class USW_HierarchyDragOperation> DragOperationFactory;
