@@ -53,4 +53,3 @@ void AJS_CreateRoomWidgetTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* 
 		}
 	}
 }
-

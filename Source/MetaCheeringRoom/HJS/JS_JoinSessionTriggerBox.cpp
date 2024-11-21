@@ -9,6 +9,7 @@
 #include "../SHK/HG_Player.h"
 #include "../SHK/HG_GameInstance.h"
 #include "JS_SessionGameInstanceSubSystem.h"
+#include "JS_PopupWidget.h"
 
 // Sets default values
 AJS_JoinSessionTriggerBox::AJS_JoinSessionTriggerBox()
@@ -54,6 +55,52 @@ void AJS_JoinSessionTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* Overl
 				Player->Direction = FVector::ZeroVector;
 				Player->bCanMove = false;
 			}
+		}
+	}
+}
+
+void AJS_JoinSessionTriggerBox::ShowJoinWidget()
+{
+	AHG_GameModeBase* GM = Cast<AHG_GameModeBase>(GetWorld()->GetAuthGameMode());
+
+	if (GM)
+	{
+		UJS_SessionJoinWidget* UI = GM->SessionWidget;
+
+		UI->SetVisibility(ESlateVisibility::Visible);
+		UI->MenuSwitching(1);
+		UI->PlayAnimation(UI->ShowWidget);
+		UI->OnClickedRefresh();
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+		if (PC)
+		{
+			PC->SetShowMouseCursor(true);
+			PC->SetInputMode(FInputModeUIOnly());
+			AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
+			if (Player)
+			{
+				Player->Direction = FVector::ZeroVector;
+				Player->bCanMove = false;
+			}
+		}
+	}
+}
+
+void AJS_JoinSessionTriggerBox::ShowWidget()
+{
+	if (!bFirst)
+	{
+		return;
+	}
+	bFirst = false;
+	if (PopupWidgetFactory)
+	{
+		PopupWidget = CreateWidget<UJS_PopupWidget>(GetWorld(), PopupWidgetFactory);
+		if (PopupWidget)
+		{
+			PopupWidget->AddToViewport();
+			PopupWidget->Init();
 		}
 	}
 }
