@@ -19,6 +19,11 @@ void UJS_FeverWidget::SetPercent(float value)
 	PB_FeverBar->SetPercent(value);
 }
 
+float UJS_FeverWidget::GetPercent()
+{
+	return PB_FeverBar->GetPercent();
+}
+
 void UJS_FeverWidget::DownPercent(float InDeltaTime)
 {
 	if (PB_FeverBar->GetPercent() <= 0)

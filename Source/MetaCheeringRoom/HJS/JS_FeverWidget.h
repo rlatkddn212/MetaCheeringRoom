@@ -25,8 +25,11 @@ public:
 	class UTextBlock* TEXT_Fever;
 	UPROPERTY(meta=(BindWidget))
 	class UProgressBar* PB_FeverBar;
-
+	UFUNCTION(BlueprintCallable)
 	void SetPercent(float value);
+
+	UFUNCTION(BlueprintCallable)
+	float GetPercent();
 
 	void DownPercent(float InDeltaTime);
 

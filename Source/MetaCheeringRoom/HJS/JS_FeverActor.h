@@ -26,7 +26,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UJS_FeverWidget> FeverWidgetFactory;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UJS_FeverWidget* FeverWidget;
 
 	UFUNCTION(BlueprintCallable)
