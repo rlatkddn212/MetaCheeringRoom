@@ -180,10 +180,13 @@ public:
 	// 멀티 케스트
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_AddCreatingDummyObject(class ASW_CreatorObject* NewCreatingObject, const struct FCreatorObjectData& ObjectData);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DeleteObjectInfo(class ASW_CreatorObject* DeleteObject);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_DeleteObject(class ASW_CreatorObject* DeleteObject);
-	
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_DetachObject(class ASW_CreatorObject* DetachObject);
 

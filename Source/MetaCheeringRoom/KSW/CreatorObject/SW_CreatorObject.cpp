@@ -20,6 +20,7 @@
 #include "UObject/NoExportTypes.h"
 #include "MeshDescription.h"
 #include "StaticMeshAttributes.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASW_CreatorObject::ASW_CreatorObject()
@@ -567,6 +568,16 @@ void ASW_CreatorObject::SetFileName(const FString& FileName)
 	// FBX에서 사용한다.
 }
 
+void ASW_CreatorObject::SetCreatorObjectName(const FString& Name)
+{
+	CreatorObjectName = FName(Name);
+}
+
+FString ASW_CreatorObject::GetCreatorObjectName() const
+{
+	return CreatorObjectName.ToString();
+}
+
 void ASW_CreatorObject::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const
 {
 	
@@ -574,4 +585,10 @@ void ASW_CreatorObject::RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& Record
 
 void ASW_CreatorObject::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject)
 {
+}
+
+void ASW_CreatorObject::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASW_CreatorObject, CreatorObjectName);
 }

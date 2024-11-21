@@ -422,7 +422,7 @@ void ASW_Creator::Multicast_AddCreatingDummyObject_Implementation(ASW_CreatorObj
 	}
 }
 
-void ASW_Creator::Multicast_DeleteObject_Implementation(ASW_CreatorObject* DeleteObject)
+void ASW_Creator::Multicast_DeleteObjectInfo_Implementation(class ASW_CreatorObject* DeleteObject)
 {
 	if (PC)
 	{
@@ -430,8 +430,11 @@ void ASW_Creator::Multicast_DeleteObject_Implementation(ASW_CreatorObject* Delet
 	}
 
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-	system->RemoveObject(DeleteObject, true);
+	system->RemoveCreatorMapObject(DeleteObject);
+}
 
+void ASW_Creator::Multicast_DeleteObject_Implementation(ASW_CreatorObject* DeleteObject)
+{
 	// ╥ндц PC
 	ASW_CreatorPlayerController* LocalPC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
 

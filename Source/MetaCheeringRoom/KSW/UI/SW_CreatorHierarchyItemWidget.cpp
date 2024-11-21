@@ -49,7 +49,13 @@ void USW_CreatorHierarchyItemWidget::SetItem(ASW_CreatorObject* CreatorObject, i
 	}
 
 	// InCreatorObject->ObjectName;
-	NameText->SetText(FText::FromString(HierarchyCreatorObject->GetName()));
+	FString NameStr = HierarchyCreatorObject->GetCreatorObjectName();
+	if (NameStr.Len() > 20)
+	{
+		NameStr = NameStr.Left(20);
+	}
+
+	NameText->SetText(FText::FromString(NameStr));
 }
 
 void USW_CreatorHierarchyItemWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent, UDragDropOperation*& OutOperation)

@@ -86,7 +86,7 @@ void USW_CreatorInspectorWidget::SetObject(ASW_CreatorObject* Obj)
 	{
 		CreatorObject = Obj;
 		InspectorScrollBox->SetVisibility(ESlateVisibility::Visible);
-		ObjectName->SetText(FText::FromString(Obj->GetName()));
+		ObjectName->SetText(FText::FromString(Obj->GetCreatorObjectName()));
 		ChangePosition.BindDynamic(Obj, &ASW_CreatorObject::OnChangePosition);
 		ChangeRotation.BindDynamic(Obj, &ASW_CreatorObject::OnChangeRotation);
 		ChangeScale.BindDynamic(Obj, &ASW_CreatorObject::OnChangeScale);
@@ -160,7 +160,18 @@ void USW_CreatorInspectorWidget::SetObject(ASW_CreatorObject* Obj)
 void USW_CreatorInspectorWidget::OnObjectNameChanged(const FText& Text, ETextCommit::Type CommitMethod)
 {
 	// 이름 변경
+	if (CreatorObject)
+	{
+		CreatorObject->SetCreatorObjectName(Text.ToString());
 
+		// player controller에 하이어라키
+		ASW_CreatorPlayerController* PC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+
+		if (PC)
+		{
+			PC->ReloadHierarchy();
+		}
+	}
 }
 
 void USW_CreatorInspectorWidget::OnPositionXChanged(const FText& Text, ETextCommit::Type CommitMethod)

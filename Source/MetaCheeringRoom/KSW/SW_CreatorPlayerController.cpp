@@ -394,11 +394,32 @@ void ASW_CreatorPlayerController::Server_AddCreatingDummyObject_Implementation(c
 
 void ASW_CreatorPlayerController::Server_DeleteObject_Implementation(class ASW_CreatorObject* DeleteObject)
 {
-	ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
-	if (Creator)
 	{
-		Creator->Multicast_DeleteObject(DeleteObject);
+		ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+		if (Creator)
+		{
+			Creator->Multicast_DeleteObjectInfo(DeleteObject);
+		}
 	}
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, DeleteObject]()
+		{
+			UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
+			system->RemoveObject(DeleteObject, true);
+
+		}, 0.1f, false);
+
+	FTimerHandle TimerHandle2;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle2, [this, DeleteObject]()
+		{
+			ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+			if (Creator)
+			{
+				Creator->Multicast_DeleteObject(DeleteObject);
+			}
+
+		}, 0.2f, false);
 }
 
 void ASW_CreatorPlayerController::Server_DetachObject_Implementation(class ASW_CreatorObject* DetachObject)
