@@ -134,9 +134,9 @@ TSharedPtr<FJsonObject> UCreatorMapSubsystem::SerializeCreatorObject(const ASW_C
         UE_LOG(LogTemp, Warning, TEXT("Invalid CreatorObject provided."));
         return JsonObject;  // 빈 객체 반환
     }
-
+    
     // CreatorObject의 이름과 변환 정보를 JSON에 직렬화
-    JsonObject->SetStringField(TEXT("ObjectName"), CreatorObject->GetName());
+    JsonObject->SetStringField(TEXT("ObjectName"), CreatorObject->GetCreatorObjectName());
 
     JsonObject->SetNumberField(TEXT("CreatorObjectType"), CreatorObject->CreatorObjectType);
     JsonObject->SetNumberField(TEXT("CreatorObjectId"), CreatorObject->CreatorObjectId);
@@ -211,6 +211,8 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
 
     // JSON에서 이름과 변환 정보를 가져오기
     //CreatorObject->SetActorLabel(JsonObject->GetStringField(TEXT("ObjectName")));
+
+    CreatorObject->SetCreatorObjectName(JsonObject->GetStringField(TEXT("ObjectName")));
 
     // 변환 정보 역직렬화
     FVector Translation(
@@ -319,6 +321,7 @@ ASW_CreatorObject* UCreatorMapSubsystem::CreateObject(const FCreatorObjectData* 
     CreatingObject->SetReplicates(true);
     CreatingObject->SetReplicateMovement(true);
 
+    CreatingObject->SetCreatorObjectName(CreatingObject->GetName());
     CreatingObject->SetActorLocation(FVector::ZeroVector);
     CreatingObject->SetActorRotation(FRotator::ZeroRotator);
     //CreatingObject->CreatingObjectData = ObjectData;

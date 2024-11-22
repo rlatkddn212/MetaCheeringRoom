@@ -58,6 +58,9 @@ public:
 
 	struct FCreatorObjectData* CreatingObjectData;
 
+	UPROPERTY(Replicated)
+	FName CreatorObjectName;
+
 	int32 CreatorObjectType;
 	int32 CreatorObjectId;
 	int32 CreatorObjectUId;
@@ -155,8 +158,16 @@ public:
 
 	virtual void SetFileName(const FString& FileName);
 
+	void SetCreatorObjectName(const FString& Name);
+	FString GetCreatorObjectName() const;
+
 	bool IsSelectedObject;
 public:
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject);
+
+	// 하이라키 기능
+	bool IsExpandedHierarchy = true;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

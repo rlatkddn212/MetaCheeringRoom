@@ -39,9 +39,9 @@ public:
     float ColorChangeSpeed = 1.f;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool bFeverStart = false;
-	float FeverFailTime = 5.f;
 	bool bFeverTime = false;
 	float FeverEndTime = 5.f;
+	float CurrentTime = 0.f;
 	void UpdateGradientColor(float InDeltaTime);
 
 	void FeverStart();

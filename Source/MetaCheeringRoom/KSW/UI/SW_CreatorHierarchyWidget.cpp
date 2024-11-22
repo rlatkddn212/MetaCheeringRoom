@@ -9,6 +9,7 @@
 #include "../CreatorObject/SW_CreatorObject.h"
 #include "Components/Widget.h"
 #include "SW_HierarchyDragOperation.h"
+#include "Components/Button.h"
 
 
 void USW_CreatorHierarchyWidget::NativeConstruct()
@@ -67,16 +68,35 @@ void USW_CreatorHierarchyWidget::ReloadWidget(const TArray<ASW_CreatorObject*>& 
 		TArray<AActor*> ChildActors;
 		InCreatorObjects[i]->GetAttachedActors(ChildActors);
 		TArray<ASW_CreatorObject*> ChildCreatorObject;
-
-		for (int j = 0; j < ChildActors.Num(); j++)
+		int32 ChildCount = 0;
+		for (int32 j = 0; j < ChildActors.Num(); j++)
 		{
 			ASW_CreatorObject* CreatorObject = Cast<ASW_CreatorObject>(ChildActors[j]);
 			if (CreatorObject)
 			{
+				ChildCount++;
 				ChildCreatorObject.Add(CreatorObject);
 			}
 		}
 
-		ReloadWidget(ChildCreatorObject, depth + 1);
+		if (ChildCount > 0)
+		{
+			ChildWidget->ExpandedButton->SetVisibility(ESlateVisibility::Visible);
+			if (InCreatorObjects[i]->IsExpandedHierarchy)
+			{
+				
+				ReloadWidget(ChildCreatorObject, depth + 1);
+				ChildWidget->ExpandedButton->SetStyle(ChildWidget->ClickedExpandedButtonStyle);
+			}
+			else
+			{
+				ChildWidget->ExpandedButton->SetStyle(ChildWidget->DefaultExpandedButtonStyle);
+			}
+		}
+		else
+		{
+			ChildWidget->ExpandedButton->SetVisibility(ESlateVisibility::Hidden);
+		}
+
 	}
 }
