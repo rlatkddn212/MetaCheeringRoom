@@ -299,17 +299,3 @@ void AJS_PlayerController::ClientAddChat_Implementation(const FString& id, const
 		LoadActor->ChatWidget->AddChat(id, text, bAuto);
 	}
 }
-
-void AJS_PlayerController::ClientSessionExit_Implementation()
-{
-	PRINTLOG(TEXT("ClientSessionExit Called!!"));
-	UHG_GameInstance* gi = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
-	if (gi)
-	{
-		UJS_SessionGameInstanceSubSystem* si = gi->GetSubsystem<UJS_SessionGameInstanceSubSystem>();
-		if (si)
-		{
-			si->ExitSession();
-		}
-	}
-}

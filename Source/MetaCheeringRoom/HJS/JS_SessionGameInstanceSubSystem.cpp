@@ -166,7 +166,7 @@ void UJS_SessionGameInstanceSubSystem::LoadServerWidgetMap()
 	if (PC && PC->IsLocalController()) // 컨트롤러가 있으면,
 	{
 		// ServerUI가 있는 맵으로 이동시킨다.
-		PC->ClientTravel("/Game/JJH/MAP_Reallobby_SHN", ETravelType::TRAVEL_Absolute);
+		PC->ClientTravel("/Game/SHK/Level/HG_LobbyLevel_New", ETravelType::TRAVEL_Absolute);
 		UE_LOG(LogTemp, Error, TEXT("Session Destroy Network Failure"));
 	}
 }
@@ -283,22 +283,11 @@ void UJS_SessionGameInstanceSubSystem::ExitSession()
 void UJS_SessionGameInstanceSubSystem::ServerRPCExitSession_Implementation()
 {
 	MulticastRPCExitSession(PlayerName);
-	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-	{
-		AJS_PlayerController* PC = Cast<AJS_PlayerController>(It->Get());
-		PRINTLOG(TEXT("0123456789"));
-		if (PC)
-		{
-			PRINTLOG(TEXT("9876543210"));
-			PC->ClientSessionExit();
-		}
-	}
-	GetWorld()->GetTimerManager().SetTimer(ExitTimerHandle,this,&UJS_SessionGameInstanceSubSystem::ServerExit,1.f,false);
+	SessionInterface->DestroySession(PlayerName);
 }
 
 void UJS_SessionGameInstanceSubSystem::MulticastRPCExitSession_Implementation(const FName& playerName)
 {
-	PRINTLOG(TEXT("GameInstance Multicast Called!!!"));
 	if (nullptr != GEngine)
 	{
 		GEngine->OnNetworkFailure().AddUObject(this, &UJS_SessionGameInstanceSubSystem::OnNetworkFailure);
@@ -338,7 +327,9 @@ void UJS_SessionGameInstanceSubSystem::ServerExit()
 
 void UJS_SessionGameInstanceSubSystem::MySessionDestroy()
 {
-	PRINTLOG(TEXT("DESTROY!!!!!!!!!"));
-	SessionInterface->DestroySession(PlayerName);
+	if (SessionInterface.IsValid())
+	{
+		SessionInterface->DestroySession(PlayerName);
+	}
 }
 
