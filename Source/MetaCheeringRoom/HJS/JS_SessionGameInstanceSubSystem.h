@@ -100,4 +100,7 @@ public:
 	FTimerHandle ExitTimerHandle;
 
 	void ServerExit();
+
+	UFUNCTION(BlueprintCallable)
+	void MySessionDestroy();
 };

@@ -12,6 +12,7 @@
 #include "MetaCheeringRoom.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "OnlineSubsystemUtils.h"
+#include "JS_PlayerController.h"
 //세션 이름
 
 void UJS_SessionGameInstanceSubSystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -282,11 +283,22 @@ void UJS_SessionGameInstanceSubSystem::ExitSession()
 void UJS_SessionGameInstanceSubSystem::ServerRPCExitSession_Implementation()
 {
 	MulticastRPCExitSession(PlayerName);
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		AJS_PlayerController* PC = Cast<AJS_PlayerController>(It->Get());
+		PRINTLOG(TEXT("0123456789"));
+		if (PC)
+		{
+			PRINTLOG(TEXT("9876543210"));
+			PC->ClientSessionExit();
+		}
+	}
 	GetWorld()->GetTimerManager().SetTimer(ExitTimerHandle,this,&UJS_SessionGameInstanceSubSystem::ServerExit,1.f,false);
 }
 
 void UJS_SessionGameInstanceSubSystem::MulticastRPCExitSession_Implementation(const FName& playerName)
 {
+	PRINTLOG(TEXT("GameInstance Multicast Called!!!"));
 	if (nullptr != GEngine)
 	{
 		GEngine->OnNetworkFailure().AddUObject(this, &UJS_SessionGameInstanceSubSystem::OnNetworkFailure);
@@ -302,8 +314,6 @@ void UJS_SessionGameInstanceSubSystem::MulticastRPCExitSession_Implementation(co
 		SessionInterface->DestroySession(playerName);
 		ClientLeaveSession();
 	}
-
-	UE_LOG(LogTemp, Error, TEXT("Session Destroy"));
 }
 
 void UJS_SessionGameInstanceSubSystem::ClientLeaveSession_Implementation()
@@ -317,12 +327,18 @@ void UJS_SessionGameInstanceSubSystem::ClientLeaveSession_Implementation()
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if (PC)
 	{
-		PC->ClientTravel("/Game/SHK/Level/HG_LobbyLevel", TRAVEL_Absolute);
+		PC->ClientTravel("/Game/SHK/Level/HG_LobbyLevel_New", TRAVEL_Absolute);
 	}
 }
 
 void UJS_SessionGameInstanceSubSystem::ServerExit()
 {
+	SessionInterface->DestroySession(PlayerName);
+}
+
+void UJS_SessionGameInstanceSubSystem::MySessionDestroy()
+{
+	PRINTLOG(TEXT("DESTROY!!!!!!!!!"));
 	SessionInterface->DestroySession(PlayerName);
 }
 
