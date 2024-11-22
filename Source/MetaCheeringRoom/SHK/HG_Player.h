@@ -365,15 +365,28 @@ public:
 	class USoundWave* UIPopUpSound;
 
 	void StartFeverTime();
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_StartFeverTime();	
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_StartFeverTime();
+
 	void EndFeverTime();
 
-	void BlingBling(float p_DeltaTime);
+		UFUNCTION(Server,Reliable)
+	void ServerRPC_EndFeverTime();
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_EndFeverTime();
+
+	void BlingBling();
 
 	bool bFeverTime = false;
 
 	bool bToggle3 = false;
 	float Intensity = 1.0f;
 
-
+	
 	FTimerHandle FeverTimeHandle;
 };

@@ -251,11 +251,6 @@ void AHG_Player::Tick(float DeltaTime)
 			SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
 		}
 	}
-
-	if (bFeverTime)
-	{
-		BlingBling(DeltaTime);
-	}
 }
 
 void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -446,61 +441,72 @@ void AHG_Player::RemoveInventory()
 
 void AHG_Player::StartFeverTime()
 {
-	// bFeverTime = true;
-	if (DynamicMaterial_HairPin)
-	{
-		DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", 9.9 * FLinearColor(1.0f, 0.0f, 0.0f));
-	}
-	if (DynamicMaterial_ClothColor)
-	{
-		DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", 9.9 * FLinearColor(1.0f, 0.0f, 0.0f));
-	}
+	ServerRPC_StartFeverTime();
+}
+
+void AHG_Player::ServerRPC_StartFeverTime_Implementation()
+{
+	Multicast_StartFeverTime();
+}
+
+void AHG_Player::Multicast_StartFeverTime_Implementation()
+{
+	GetWorld()->GetTimerManager().SetTimer(FeverTimeHandle, this, &AHG_Player::BlingBling, 0.1f, true);
 }
 
 void AHG_Player::EndFeverTime()
 {
 	// bFeverTime = false;
+	ServerRPC_EndFeverTime();
 }
 
-void AHG_Player::BlingBling(float p_DeltaTime)
+void AHG_Player::ServerRPC_EndFeverTime_Implementation()
 {
+	Multicast_EndFeverTime();
+}
+
+void AHG_Player::Multicast_EndFeverTime_Implementation()
+{
+	GetWorld()->GetTimerManager().ClearTimer(FeverTimeHandle);
+
+	if (DynamicMaterial_HairPin)
+	{
+		DynamicMaterial_HairPin->SetVectorParameterValue("CustomColor", GI->CurHairPin);
+		DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", 0 * GI->CurHairPin);
+	}
+	if (DynamicMaterial_ClothColor)
+	{
+		DynamicMaterial_ClothColor->SetVectorParameterValue("CustomColor", GI->CurClothHem);
+		DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", 0 * GI->CurClothHem);
+	}
+}
+
+void AHG_Player::BlingBling()
+{
+	FLinearColor RandColor;
 	if (!bToggle3)
 	{
-		Intensity += p_DeltaTime;
-		if (DynamicMaterial_HairPin)
-		{
-			DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor(1.0f, 0.0f, 0.0f));
-		}
-		if (DynamicMaterial_ClothColor)
-		{
-			DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor(1.0f, 0.0f, 0.0f));
-		}
-		if (Intensity > 10)
-		{
-			bToggle3 = true;
-		}
+		RandColor = FLinearColor::Red;
 	}
 	else
 	{
-		Intensity -= p_DeltaTime;
-		if (DynamicMaterial_HairPin)
-		{
-			DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor::Red);
-		}
-		if (DynamicMaterial_ClothColor)
-		{
-			DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor::Red);
-		}
-		if (Intensity < 1)
-		{
-			bToggle3 = false;
-		}
+		RandColor = FLinearColor::Yellow;
 	}
+	bToggle3 = !bToggle3;
+
+	if (DynamicMaterial_HairPin)
+	{
+		DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", 9.9 * RandColor);
+	}
+	if (DynamicMaterial_ClothColor)
+	{
+		DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", 9.9 * RandColor);
+	}
+
 }
 
 void AHG_Player::Emotion()
 {
-	StartFeverTime();
 	if (bEquipItem)
 	{
 		auto* RCSWidget = CreateWidget<UHG_RemoteCS>(GetWorld(), RCSClass);
