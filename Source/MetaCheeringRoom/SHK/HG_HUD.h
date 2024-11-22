@@ -22,6 +22,7 @@ public:
 
 	void SetPointText();
 
+	UFUNCTION(BlueprintCallable)
 	void UpdateHUD(int32 Value);
 
 	void PlayAppearAnimation(bool Play_Forward);

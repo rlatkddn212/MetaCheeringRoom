@@ -85,7 +85,6 @@ void AJS_Screen::BeginPlay()
 	{
 		if (Player->IsLocallyControlled())
 		{
-			Player->EnterTheStore();
 			GetWorldTimerManager().SetTimer(AddPointTImerHandle, this, &AJS_Screen::AddPoint, 5.f, false);
 		}
 	}
@@ -179,10 +178,6 @@ void AJS_Screen::AddPoint()
 	{
 		if (Player->IsLocallyControlled())
 		{
-			if (!Player->StoreWidget || !Player->bStoreWidget)
-			{
-				Player->EnterTheStore();
-			}
 			UHG_PlayerGoodsComponent* PG = Player->GoodsComp;
 			int32 GoldWeight = PointArr[FMath::RandRange(0,PointArr.Num()-1)];
 			PG->AddGold(GoldWeight);
