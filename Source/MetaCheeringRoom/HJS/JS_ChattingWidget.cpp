@@ -55,7 +55,8 @@ void UJS_ChattingWidget::OnCommitText(const FText& Text, ETextCommit::Type Commi
 			ED_Chatting->SetKeyboardFocus();
 			return;
 		}
-
+		ED_Chatting->SetText(FText::FromString(TEXT("")));
+		ED_Chatting->SetKeyboardFocus();
 		AJS_PlayerController* PC = Cast<AJS_PlayerController>(GetWorld()->GetFirstPlayerController());
 		if (PC)
 		{
@@ -76,11 +77,6 @@ void UJS_ChattingWidget::AddChat(const FString& id, const FText& text, bool bAut
 		ChatNode->TEXT_Chat->SetText(text);
 		ChatNode->SetRandomColorText();
 		ChatNode->PlayAnimation(ChatNode->ShowChat);
-		if (!bAuto)
-		{
-			ED_Chatting->SetText(FText::FromString(TEXT("")));
-			ED_Chatting->SetKeyboardFocus();
-		}
 	}
 }
 
