@@ -264,7 +264,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UHG_HUD> HeadUpClass;
 
-	UPROPERTY(EditDefaultsOnly, Replicated)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UHG_HUD* HUD;
 
 	class AHG_EquipItem* EItem;
@@ -351,4 +351,29 @@ public:
 	void OnRep_Printing();
 
 	void RemoveInventory();
+
+	UPROPERTY(EditDefaultsOnly)
+	class USoundWave* PurchaseSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	class USoundWave* GetPointSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	class USoundWave* TeleportSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	class USoundWave* UIPopUpSound;
+
+	void StartFeverTime();
+	void EndFeverTime();
+
+	void BlingBling(float p_DeltaTime);
+
+	bool bFeverTime = false;
+
+	bool bToggle3 = false;
+	float Intensity = 1.0f;
+
+
+	FTimerHandle FeverTimeHandle;
 };

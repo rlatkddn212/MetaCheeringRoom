@@ -9,6 +9,7 @@
 #include "HG_PlayerInventoryComponent.h"
 #include "HG_PlayerGoodsComponent.h"
 #include "HG_GameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 void UHG_ItemPurchaseWidget::NativeConstruct()
 {
@@ -41,6 +42,9 @@ void UHG_ItemPurchaseWidget::OnPressQ()
 			Owner->GoodsComp->SubGold(LookingItemData.ItemPrice);
 			UE_LOG(LogTemp, Warning, TEXT("%d"), Owner->GoodsComp->GetGold());
 			Owner->InventoryComp->AddtoInventory(LookingItemData, 1);
+
+			UGameplayStatics::PlaySound2D(GetWorld(), Owner->PurchaseSound);
+
 			RemoveFromParent();
 		}
 	}

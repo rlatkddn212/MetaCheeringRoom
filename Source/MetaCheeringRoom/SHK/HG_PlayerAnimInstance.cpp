@@ -56,7 +56,7 @@ void UHG_PlayerAnimInstance::AnimNotify_PrayEnd()
 		Owner->bCanMove = true;
 		Owner->CameraComp->FieldOfView = 90.0f;
 		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if(pc)
+		if (pc)
 		{
 			pc->bShowMouseCursor = false;
 		}
@@ -77,16 +77,126 @@ void UHG_PlayerAnimInstance::AnimNotify_MLTEnd()
 	}
 }
 
+void UHG_PlayerAnimInstance::AnimNotify_CheeringEnd()
+{
+	if (Owner)
+	{
+		Owner->bCanMove = true;
+		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
+	}
+}
+
+void UHG_PlayerAnimInstance::AnimNotify_CartWheelEnd()
+{
+	if (Owner)
+	{
+		Owner->bCanMove = true;
+		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
+	}
+}
+
+void UHG_PlayerAnimInstance::AnimNotify_ClappingEnd()
+{
+	if (Owner)
+	{
+		Owner->bCanMove = true;
+		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
+	}
+}
+
+void UHG_PlayerAnimInstance::AnimNotify_DefeatEnd()
+{
+	if (Owner)
+	{
+		Owner->bCanMove = true;
+		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
+	}
+}
+
+void UHG_PlayerAnimInstance::AnimNotify_FlyKickEnd()
+{
+	if (Owner)
+	{
+		Owner->SetActorLocation(Owner->GetMesh()->GetRelativeLocation());
+		Owner->bCanMove = true;
+		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
+	}
+}
+
+void UHG_PlayerAnimInstance::AnimNotify_WavingEnd()
+{
+	if (Owner)
+	{
+		Owner->bCanMove = true;
+		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
+	}
+}
+
+void UHG_PlayerAnimInstance::AnimNotify_PushUpEnd()
+{
+	if (Owner)
+	{
+		Owner->bCanMove = true;
+		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
+	}
+}
+
+void UHG_PlayerAnimInstance::AnimNotify_KTTGEnd()
+{
+	if (Owner)
+	{
+		Owner->bCanMove = true;
+		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
+	}
+}
+
 void UHG_PlayerAnimInstance::PlaySelectedMontage(UAnimMontage* p_Montage)
 {
 	if (p_Montage)
 	{
 		Montage_Play(p_Montage);
 
-		if (Owner->IsLocallyControlled())
-		{
-			Owner->bCanMove = false;
-			Owner->CameraComp->FieldOfView = 120.0f;
-		}
+		Owner->bCanMove = false;
+		Owner->CameraComp->FieldOfView = 120.0f;
 	}
 }

@@ -27,6 +27,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "HG_CustomUI.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 AHG_Player::AHG_Player()
 {
@@ -192,7 +193,7 @@ void AHG_Player::Tick(float DeltaTime)
 	Direction = FVector::ZeroVector;
 
 	FHitResult OutHit;
-	int32 BoneIndex = GetMesh()->GetBoneIndex(TEXT("head"));
+	int32 BoneIndex = GetMesh()->GetBoneIndex(TEXT("Chest"));
 	FVector Start = this->GetMesh()->GetBoneTransform(BoneIndex).GetLocation();
 	FVector End = Start + CameraComp->GetForwardVector() * 200.0f;
 
@@ -250,10 +251,10 @@ void AHG_Player::Tick(float DeltaTime)
 			SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
 		}
 	}
-	// 상점 UI 업데이트
-	if (StoreWidget)
+
+	if (bFeverTime)
 	{
-		StoreWidget->SetPointText(this->GoodsComp->GetGold());
+		BlingBling(DeltaTime);
 	}
 }
 
@@ -284,9 +285,9 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AHG_Player::ConversionFullScreen()
 {
-	if(!FullScreenWidget)
+	if (!FullScreenWidget)
 	{
-		FullScreenWidget = CreateWidget<UUserWidget>(GetWorld(),FullScreenClass);
+		FullScreenWidget = CreateWidget<UUserWidget>(GetWorld(), FullScreenClass);
 	}
 	if (FullScreenWidget)
 	{
@@ -312,18 +313,21 @@ void AHG_Player::ConversionFullScreen()
 void AHG_Player::TeleportToStore()
 {
 	//(X=-867.240674,Y=927.178242,Z=-0.707882)
+	UGameplayStatics::PlaySound2D(GetWorld(), TeleportSound);
 	SetActorLocation(FVector(-867.240674f, 927.178242f, 0.707882f));
 }
 
 void AHG_Player::TeleportToJoin()
 {
 	//(X = -743.435962, Y = 2559.526662, Z = -18.354637)
+	UGameplayStatics::PlaySound2D(GetWorld(), TeleportSound);
 	SetActorLocation(FVector(-677.120918f, 2559.526662f, -18.354637f));
 }
 
 void AHG_Player::TeleportToCreate()
 {
 	//(X=1040.000000,Y=1230.000000,Z=0.000000)
+	UGameplayStatics::PlaySound2D(GetWorld(), TeleportSound);
 	SetActorLocation(FVector(1040.0f, 1230.0f, 0.0f));
 }
 
@@ -401,8 +405,13 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 	{
 		if (!bToggle)
 		{
-			InventoryWidget->AddToViewport(); 
+			InventoryWidget->AddToViewport();
+
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
+
 			InventoryWidget->PlayAppearAnimation(true);
+			HUD->PlayAppearAnimation(false);
+			HUD->StopInventoryAnimation();
 			InventoryWidget->InitInventoryUI();
 
 			PC->SetShowMouseCursor(true);
@@ -411,7 +420,9 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 		}
 		else
 		{
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
 			InventoryWidget->PlayAppearAnimation(false);
+			HUD->PlayAppearAnimation(true);
 
 			FLatentActionInfo LatentInfo;
 			LatentInfo.Linkage = 0;
@@ -419,7 +430,7 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 			LatentInfo.ExecutionFunction = FName("RemoveInventory");
 			LatentInfo.CallbackTarget = this;
 
-			UKismetSystemLibrary::Delay(GetWorld(),0.2f, LatentInfo);
+			UKismetSystemLibrary::Delay(GetWorld(), 0.2f, LatentInfo);
 
 			PC->SetShowMouseCursor(false);
 			bToggle = !bToggle;
@@ -433,8 +444,63 @@ void AHG_Player::RemoveInventory()
 	InventoryWidget->RemoveFromParent();
 }
 
+void AHG_Player::StartFeverTime()
+{
+	// bFeverTime = true;
+	if (DynamicMaterial_HairPin)
+	{
+		DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", 9.9 * FLinearColor(1.0f, 0.0f, 0.0f));
+	}
+	if (DynamicMaterial_ClothColor)
+	{
+		DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", 9.9 * FLinearColor(1.0f, 0.0f, 0.0f));
+	}
+}
+
+void AHG_Player::EndFeverTime()
+{
+	// bFeverTime = false;
+}
+
+void AHG_Player::BlingBling(float p_DeltaTime)
+{
+	if (!bToggle3)
+	{
+		Intensity += p_DeltaTime;
+		if (DynamicMaterial_HairPin)
+		{
+			DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor(1.0f, 0.0f, 0.0f));
+		}
+		if (DynamicMaterial_ClothColor)
+		{
+			DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor(1.0f, 0.0f, 0.0f));
+		}
+		if (Intensity > 10)
+		{
+			bToggle3 = true;
+		}
+	}
+	else
+	{
+		Intensity -= p_DeltaTime;
+		if (DynamicMaterial_HairPin)
+		{
+			DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor::Red);
+		}
+		if (DynamicMaterial_ClothColor)
+		{
+			DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor::Red);
+		}
+		if (Intensity < 1)
+		{
+			bToggle3 = false;
+		}
+	}
+}
+
 void AHG_Player::Emotion()
 {
+	StartFeverTime();
 	if (bEquipItem)
 	{
 		auto* RCSWidget = CreateWidget<UHG_RemoteCS>(GetWorld(), RCSClass);
@@ -469,6 +535,9 @@ void AHG_Player::PopUpPurchaseWidget()
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeGameAndUI());
 			PurchaseWidget->AddToViewport();
+
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
+
 			bToggle = !bToggle;
 		}
 		// 		else
@@ -513,10 +582,6 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 		case EItemCategory::Category_OneHandGrab:
 			mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			mesh->SetHiddenInGame(false);
-			if (HUD)
-			{
-				HUD->UpdateHUD(TEXT("E : 응원봉 커스텀"));
-			}
 			break;
 		case EItemCategory::Category_TwoHandGrab:
 			if (!bPassed)
@@ -528,10 +593,6 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 			else
 			{
 				mesh->AttachToComponent(HandLComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-				if (HUD)
-				{
-					HUD->UpdateHUD(TEXT("E) 응원봉 조작하기"));
-				}
 				bPassed = false;
 			}
 			break;
@@ -656,6 +717,8 @@ void AHG_Player::PopUpHUD()
 					HUD->SetOwningPlayer(PC);
 				}
 				HUD->AddToViewport();
+				HUD->UpdateHUD(0);
+				HUD->SetPointText();
 			}
 		}
 	}
@@ -687,6 +750,7 @@ void AHG_Player::ApplyCustomizing(FLinearColor Cloth, UTexture2D* ClothTexture, 
 	if (DynamicMaterial_ClothColor)
 	{
 		DynamicMaterial_ClothColor->SetVectorParameterValue("CustomColor", ClothHem);
+		DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", 0 * ClothHem);
 	}
 	if (DynamicMaterial_Eyes)
 	{
@@ -699,6 +763,7 @@ void AHG_Player::ApplyCustomizing(FLinearColor Cloth, UTexture2D* ClothTexture, 
 	if (DynamicMaterial_HairPin)
 	{
 		DynamicMaterial_HairPin->SetVectorParameterValue("CustomColor", HairPin);
+		DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", 0 * HairPin);
 	}
 }
 
@@ -710,6 +775,9 @@ void AHG_Player::PopUpCustomUI()
 		if (CustomUI)
 		{
 			CustomUI->AddToViewport();
+
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
+
 			CustomUI->PlayAppearAnimation(true);
 			CustomUI->SetOwningPlayer(PC);
 			if (PC)
@@ -928,7 +996,6 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 	DOREPLIFETIME(AHG_Player, EquipItemList);
 	DOREPLIFETIME(AHG_Player, bEquipItem);
-	DOREPLIFETIME(AHG_Player, HUD);
 	// 	DOREPLIFETIME(AHG_Player, CurCloth);
 	// 	DOREPLIFETIME(AHG_Player, CurClothHem);
 	// 	DOREPLIFETIME(AHG_Player, CurEyes);

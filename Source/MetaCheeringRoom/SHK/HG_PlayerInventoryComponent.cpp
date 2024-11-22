@@ -5,6 +5,7 @@
 #include "HG_ItemBase.h"
 #include "HG_GameInstance.h"
 #include "HG_Player.h"
+#include "HG_HUD.h"
 
 // Sets default values for this component's properties
 UHG_PlayerInventoryComponent::UHG_PlayerInventoryComponent()
@@ -56,6 +57,7 @@ void UHG_PlayerInventoryComponent::AddtoInventory(FItemData Item, int32 Quantity
 		}
 	}
 	CompOwner->GI->CurrentInventory = Inventory;
+	CompOwner->HUD->PlayInventoryAnimation();
 }
 
 int32 UHG_PlayerInventoryComponent::FindSlot(FString ItemName)

@@ -17,15 +17,27 @@ class METACHEERINGROOM_API UHG_HUD : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	class UTextBlock* TB_RemoteCS;
-
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UTextBlock* TB_Point;
-	
+
 	void SetPointText();
 
-	void UpdateHUD(FString Value);
+	UFUNCTION(BlueprintCallable)
+	void UpdateHUD(int32 Value);
+
+	void PlayAppearAnimation(bool Play_Forward);
+	void PlayInventoryAnimation();
+	void StopInventoryAnimation();
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* Appear;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* Disappear;
+	
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* NewItem;
+
+	UPROPERTY(EditDefaultsOnly,meta = (BindWidget))
+	class UWidgetSwitcher* WS_Border;
 };

@@ -4,6 +4,8 @@
 #include "HG_PlayerGoodsComponent.h"
 #include "HG_Player.h"
 #include "HG_GameInstance.h"
+#include "HG_HUD.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UHG_PlayerGoodsComponent::UHG_PlayerGoodsComponent()
@@ -48,6 +50,10 @@ int32 UHG_PlayerGoodsComponent::AddGold(int32 Value)
 {
 	SetGold(FMath::Clamp(Gold + Value, 0, MAX_GOLD));
 	CompOwner->GI->CurrentGold = Gold;
+	CompOwner->HUD->SetPointText();
+
+	UGameplayStatics::PlaySound2D(GetWorld(), CompOwner->GetPointSound);
+
 	return Gold;
 }
 
@@ -55,6 +61,7 @@ int32 UHG_PlayerGoodsComponent::SubGold(int32 Value)
 {
 	SetGold(FMath::Clamp(Gold - Value, 0, MAX_GOLD));	
 	CompOwner->GI->CurrentGold = Gold;
+	CompOwner->HUD->SetPointText();
 	return Gold;
 }
 
