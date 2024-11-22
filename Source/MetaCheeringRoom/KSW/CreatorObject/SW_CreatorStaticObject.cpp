@@ -29,6 +29,18 @@ void ASW_CreatorStaticObject::BeginPlay()
 	UCreatorColorProperty* Property = NewObject<UCreatorColorProperty>();
 	Property->Value = MeshColor;
 	OnRep_MeshColorChanged();
+
+	Property = NewObject<UCreatorColorProperty>();
+	Property->Value = EmissiveColor;
+	OnRep_EmissiveColorChanged();
+
+	UCreatorFloatProperty* FloatProperty = NewObject<UCreatorFloatProperty>();
+	FloatProperty->Value = Metallic;
+	OnRep_MeshMetallicChanged();
+
+	FloatProperty = NewObject<UCreatorFloatProperty>();
+	FloatProperty->Value = Roughness;
+	OnRep_MeshRoughnessChanged();
 }
 
 void ASW_CreatorStaticObject::Tick(float DeltaTime)
