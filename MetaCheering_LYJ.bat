@@ -1,0 +1,1 @@
+"C:\Program Files\Epic Games\UE_5.4\Engine\Binaries\Win64\UnrealEditor.exe" "C:\Projects\MetaCheeringRoom\MetaCheeringRoom.uproject" -game -ResX=1280 -ResY=720 -WinX=200 -WinY=300 -windowed -log
