@@ -96,7 +96,7 @@ void ASW_Creator::Tick(float DeltaTime)
 		else
 		{
 			Server_HandMovement(GetActorLocation());
-			Server_HandRotation(FRotator(0, -90, 0));
+			Server_HandRotation(FRotator(0, 0, 0));
 		}
 	}
 
@@ -432,7 +432,7 @@ void ASW_Creator::Server_Rotation_Implementation(const FRotator& NewRotation)
 void ASW_Creator::Server_HandMovement_Implementation(const FVector& NewLocation)
 {
 	// 로그 NewLoc
-	UE_LOG(LogTemp, Warning, TEXT("NewLoc : %s"), *NewLocation.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("NewLoc : %s"), *NewLocation.ToString());
 	
 	TargetLocation = NewLocation;
 	//HandMeshComponent->SetWorldLocation(NewLocation);
@@ -442,7 +442,7 @@ void ASW_Creator::Server_HandMovement_Implementation(const FVector& NewLocation)
 void ASW_Creator::Server_HandRotation_Implementation(const FRotator& NewRotation)
 {
 	// 로그 NewRot
-	UE_LOG(LogTemp, Warning, TEXT("NewRot : %s"), *NewRotation.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("NewRot : %s"), *NewRotation.ToString());
 
 	HandMeshComponent->SetRelativeRotation(NewRotation);
 	CurrentHandRotation = NewRotation;

@@ -92,7 +92,7 @@ void UJS_SessionJoinWidget::CreateSession()
 		category = TEXT("Idol");
 		break;
 	case 3:
-		category = TEXT("Talk");
+		category = TEXT("Creator");
 		break;
 	}
 	UCreatorStorageSubsystem* storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
@@ -222,7 +222,7 @@ void UJS_SessionJoinWidget::AddSessionSlotWidget(const FRoomInfo& info)
 		SB_Soccer->AddChild(cateslot);
 	}
 
-	if (info.RoomCategory == ERoomCategory::CT_Talk)
+	if (info.RoomCategory == ERoomCategory::CT_Creator)
 	{
 		SB_Talk->AddChild(cateslot);
 	}

@@ -123,8 +123,20 @@ void UJS_SessionGameInstanceSubSystem::OnMyCreateSessionComplete(FName SessionNa
 		return;
 	}
 	// 서버 트래블하기 ( 영상 맵으로 )
+	FOnlineSessionSettings* SessionSettings = SessionInterface->GetSessionSettings(SessionName);
+	
+	if (CategoryValue == "Creator")
+	{
+		PRINTLOG(TEXT("Creator"));
+		GetWorld()->ServerTravel("/Game/Ksw/Maps/KswTestMap?listen");
+	}
+	else
+	{
+		PRINTLOG(TEXT("No Creator"));
+		GetWorld()->ServerTravel("/Game/HJS/Maps/HJSTestMap?listen");
+	}
+
 	PRINTLOG(TEXT("Success"));
-	GetWorld()->ServerTravel("/Game/HJS/Maps/HJSTestMap?listen");
 	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Hosting"));
 
 }
@@ -201,10 +213,10 @@ void UJS_SessionGameInstanceSubSystem::OnMyFindSessionComplete(bool Success)
 						roomInfo.RoomCategory = ERoomCategory::CT_ESports;
 					else if (categoryString == "Soccer")
 						roomInfo.RoomCategory = ERoomCategory::CT_Soccer;
-					else if (categoryString == "Talk")
-						roomInfo.RoomCategory = ERoomCategory::CT_Talk;
 					else if (categoryString == "Idol")
 						roomInfo.RoomCategory = ERoomCategory::CT_Idol;
+					else if (categoryString == "Creator")
+						roomInfo.RoomCategory = ERoomCategory::CT_Creator;
 				}
 
 				roomInfo.Index = i;

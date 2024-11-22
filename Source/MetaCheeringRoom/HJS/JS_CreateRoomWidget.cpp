@@ -97,7 +97,7 @@ void UJS_CreateRoomWidget::CreateSession()
 		category = TEXT("Idol");
 		break;
 	case 3:
-		category = TEXT("Talk");
+		category = TEXT("Creator");
 		break;
 	}
 	UCreatorStorageSubsystem* storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
@@ -191,7 +191,9 @@ void UJS_CreateRoomWidget::OnClickedCreateLevel()
 	system->SetupJson("[]");
 	system->SetMapName(NewLevelName);
 
-	UGameplayStatics::OpenLevel(GetWorld(), LevelName, true);
+	int32 PlayerCount = 30;
+	si->CreateSession(LevelName.ToString(), PlayerCount, "Creator");
+	//UGameplayStatics::OpenLevel(GetWorld(), LevelName, true);
 }
 
 void UJS_CreateRoomWidget::OnClickedDeleteCancel()
@@ -225,5 +227,7 @@ void UJS_CreateRoomWidget::OnClickedModify()
 	system->SetMapName(meta[SelectIndex]->CreatorMapName);
 	system->SetupJson(JsonStr);
 
-	UGameplayStatics::OpenLevel(GetWorld(), LevelName, true);
+	int32 PlayerCount = 30;
+	si->CreateSession(LevelName.ToString(), PlayerCount, "Creator");
+	//UGameplayStatics::OpenLevel(GetWorld(), LevelName, true);
 }

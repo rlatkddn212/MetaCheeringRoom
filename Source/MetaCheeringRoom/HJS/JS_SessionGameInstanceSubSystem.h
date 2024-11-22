@@ -13,7 +13,7 @@ enum class ERoomCategory : uint8
 	CT_ESports UMETA(DisplayName = "ESports"),
 	CT_Soccer UMETA(DisplayName = "Soccer"),
 	CT_Idol UMETA(DisplayName = "Idol"),
-	CT_Talk UMETA(DisplayName = "Talk"),
+	CT_Creator UMETA(DisplayName = "Creator"),
 };
 
 USTRUCT(BlueprintType)

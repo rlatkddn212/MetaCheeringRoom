@@ -7,6 +7,7 @@
 #include "../CreatorStorageSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/Border.h"
+#include "HJS/JS_SessionGameInstanceSubSystem.h"
 
 void USW_CreatorMenuWidget::NativeConstruct()
 {
@@ -32,5 +33,8 @@ void USW_CreatorMenuWidget::SaveCreatorMap()
 
 void USW_CreatorMenuWidget::Quit()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), "HG_LobbyLevel_New", true);
+	// Å»Ãâ 
+	UJS_SessionGameInstanceSubSystem* si = GetGameInstance()->GetSubsystem<UJS_SessionGameInstanceSubSystem>();
+	si->ExitSession();
+	// UGameplayStatics::OpenLevel(GetWorld(), "HG_LobbyLevel_New", true);
 }
