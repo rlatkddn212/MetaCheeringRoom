@@ -28,6 +28,7 @@
 #include "HG_CustomUI.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "HG_KomanoDummy.h"
 
 AHG_Player::AHG_Player()
 {
@@ -502,11 +503,17 @@ void AHG_Player::BlingBling()
 	{
 		DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", 9.9 * RandColor);
 	}
-
 }
 
 void AHG_Player::Emotion()
 {
+	auto* Dummy = UGameplayStatics::GetActorOfClass(GetWorld(), KomanoDummyClass);
+	if (auto* K_Dummy = Cast<AHG_KomanoDummy>(Dummy))
+	{
+		K_Dummy->ServerRPC_SetStateShake(true);
+		K_Dummy->ChangeCheeringStickColor();
+	}
+
 	if (bEquipItem)
 	{
 		auto* RCSWidget = CreateWidget<UHG_RemoteCS>(GetWorld(), RCSClass);
@@ -1002,12 +1009,6 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 	DOREPLIFETIME(AHG_Player, EquipItemList);
 	DOREPLIFETIME(AHG_Player, bEquipItem);
-	// 	DOREPLIFETIME(AHG_Player, CurCloth);
-	// 	DOREPLIFETIME(AHG_Player, CurClothHem);
-	// 	DOREPLIFETIME(AHG_Player, CurEyes);
-	// 	DOREPLIFETIME(AHG_Player, CurHair);
-	// 	DOREPLIFETIME(AHG_Player, CurHairPin);
-	// 	DOREPLIFETIME(AHG_Player, CurPrinting);
 }
 
 
