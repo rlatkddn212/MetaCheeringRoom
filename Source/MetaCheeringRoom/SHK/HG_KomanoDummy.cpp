@@ -26,13 +26,13 @@ void AHG_KomanoDummy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-// Called to bind functionality to input
-void AHG_KomanoDummy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
+//
+//// Called to bind functionality to input
+//void AHG_KomanoDummy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+//{
+//	Super::SetupPlayerInputComponent(PlayerInputComponent);
+//
+//}
 
 void AHG_KomanoDummy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

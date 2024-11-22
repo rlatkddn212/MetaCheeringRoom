@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "../KSW/CreatorObject/SW_CreatorSkeletonObject.h"
 #include "HG_KomanoDummy.generated.h"
 
 UCLASS()
-class METACHEERINGROOM_API AHG_KomanoDummy : public ACharacter
+class METACHEERINGROOM_API AHG_KomanoDummy : public ASW_CreatorSkeletonObject
 {
 	GENERATED_BODY()
 
@@ -24,7 +24,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
