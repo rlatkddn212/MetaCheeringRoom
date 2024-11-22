@@ -96,8 +96,6 @@ public:
 	void ServerAddChat(const FString& id, const FText& text, bool bAuto);
 	UFUNCTION(Client, Reliable)
 	void ClientAddChat(const FString& id, const FText& text, bool bAuto);
-
-
 	UPROPERTY()
 	class AJS_LoadActor* LoadActor;
 };

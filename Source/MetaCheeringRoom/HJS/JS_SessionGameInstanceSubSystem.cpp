@@ -12,6 +12,7 @@
 #include "MetaCheeringRoom.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "OnlineSubsystemUtils.h"
+#include "JS_PlayerController.h"
 //세션 이름
 
 void UJS_SessionGameInstanceSubSystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -165,7 +166,7 @@ void UJS_SessionGameInstanceSubSystem::LoadServerWidgetMap()
 	if (PC && PC->IsLocalController()) // 컨트롤러가 있으면,
 	{
 		// ServerUI가 있는 맵으로 이동시킨다.
-		PC->ClientTravel("/Game/JJH/MAP_Reallobby_SHN", ETravelType::TRAVEL_Absolute);
+		PC->ClientTravel("/Game/SHK/Level/HG_LobbyLevel_New", ETravelType::TRAVEL_Absolute);
 		UE_LOG(LogTemp, Error, TEXT("Session Destroy Network Failure"));
 	}
 }
@@ -281,11 +282,11 @@ void UJS_SessionGameInstanceSubSystem::ExitSession()
 
 void UJS_SessionGameInstanceSubSystem::ServerRPCExitSession_Implementation()
 {
+	MulticastRPCExitSession(PlayerName);
 	SessionInterface->DestroySession(PlayerName);
-	MulticastRPCExitSession();
 }
 
-void UJS_SessionGameInstanceSubSystem::MulticastRPCExitSession_Implementation()
+void UJS_SessionGameInstanceSubSystem::MulticastRPCExitSession_Implementation(const FName& playerName)
 {
 	if (nullptr != GEngine)
 	{
@@ -299,10 +300,9 @@ void UJS_SessionGameInstanceSubSystem::MulticastRPCExitSession_Implementation()
 	if (GetWorld()->IsNetMode(NM_Client))
 	{
 		// 클라이언트에서 로컬 정리 작업
+		SessionInterface->DestroySession(playerName);
 		ClientLeaveSession();
 	}
-
-	UE_LOG(LogTemp, Error, TEXT("Session Destroy"));
 }
 
 void UJS_SessionGameInstanceSubSystem::ClientLeaveSession_Implementation()
@@ -316,6 +316,20 @@ void UJS_SessionGameInstanceSubSystem::ClientLeaveSession_Implementation()
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if (PC)
 	{
-		PC->ClientTravel("/Game/SHK/Level/HG_LobbyLevel", TRAVEL_Absolute);
+		PC->ClientTravel("/Game/SHK/Level/HG_LobbyLevel_New", TRAVEL_Absolute);
 	}
 }
+
+void UJS_SessionGameInstanceSubSystem::ServerExit()
+{
+	SessionInterface->DestroySession(PlayerName);
+}
+
+void UJS_SessionGameInstanceSubSystem::MySessionDestroy()
+{
+	if (SessionInterface.IsValid())
+	{
+		SessionInterface->DestroySession(PlayerName);
+	}
+}
+

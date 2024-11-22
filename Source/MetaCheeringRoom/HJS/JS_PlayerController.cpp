@@ -17,6 +17,8 @@
 #include "JS_LoadActor.h"
 #include "JS_ChattingWidget.h"
 #include "MetaCheeringRoom.h"
+#include "../SHK/HG_GameInstance.h"
+#include "JS_SessionGameInstanceSubSystem.h"
 
 AJS_PlayerController::AJS_PlayerController()
 {
@@ -45,6 +47,19 @@ void AJS_PlayerController::BeginPlay()
 			ExitWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+	if (GetWorld()->GetMapName() == TEXT("HG_LobbyLevel_New"))
+	{
+		UHG_GameInstance* gi = Cast<UHG_GameInstance>(GetWorld()->GetGameInstance());
+		if (gi)
+		{
+			UJS_SessionGameInstanceSubSystem* si = gi->GetSubsystem<UJS_SessionGameInstanceSubSystem>();
+			if (si)
+			{
+				si->MySessionDestroy();
+			}
+		}
+	}
+
 }
 
 void AJS_PlayerController::Tick(float Deltatime)
