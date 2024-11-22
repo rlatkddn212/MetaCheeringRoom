@@ -364,5 +364,16 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class USoundWave* UIPopUpSound;
 
-	void FeverTime();
+	void StartFeverTime();
+	void EndFeverTime();
+
+	void BlingBling(float p_DeltaTime);
+
+	bool bFeverTime = false;
+
+	bool bToggle3 = false;
+	float Intensity = 1.0f;
+
+
+	FTimerHandle FeverTimeHandle;
 };

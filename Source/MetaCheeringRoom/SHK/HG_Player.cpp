@@ -251,6 +251,11 @@ void AHG_Player::Tick(float DeltaTime)
 			SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
 		}
 	}
+
+	if (bFeverTime)
+	{
+		BlingBling(DeltaTime);
+	}
 }
 
 void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -280,9 +285,9 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AHG_Player::ConversionFullScreen()
 {
-	if(!FullScreenWidget)
+	if (!FullScreenWidget)
 	{
-		FullScreenWidget = CreateWidget<UUserWidget>(GetWorld(),FullScreenClass);
+		FullScreenWidget = CreateWidget<UUserWidget>(GetWorld(), FullScreenClass);
 	}
 	if (FullScreenWidget)
 	{
@@ -400,9 +405,9 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 	{
 		if (!bToggle)
 		{
-			InventoryWidget->AddToViewport(); 
+			InventoryWidget->AddToViewport();
 
-			UGameplayStatics::PlaySound2D(GetWorld(),UIPopUpSound);
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
 
 			InventoryWidget->PlayAppearAnimation(true);
 			HUD->PlayAppearAnimation(false);
@@ -425,7 +430,7 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 			LatentInfo.ExecutionFunction = FName("RemoveInventory");
 			LatentInfo.CallbackTarget = this;
 
-			UKismetSystemLibrary::Delay(GetWorld(),0.2f, LatentInfo);
+			UKismetSystemLibrary::Delay(GetWorld(), 0.2f, LatentInfo);
 
 			PC->SetShowMouseCursor(false);
 			bToggle = !bToggle;
@@ -439,18 +444,63 @@ void AHG_Player::RemoveInventory()
 	InventoryWidget->RemoveFromParent();
 }
 
-void AHG_Player::FeverTime()
+void AHG_Player::StartFeverTime()
 {
+	// bFeverTime = true;
 	if (DynamicMaterial_HairPin)
 	{
-		DynamicMaterial_HairPin->SetVectorParameterValue("CustomColor", FLinearColor::Red);
-		DynamicMaterial_HairPin->SetVectorParameterValue("CustomColor", FLinearColor::Red);
+		DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", 9.9 * FLinearColor(1.0f, 0.0f, 0.0f));
+	}
+	if (DynamicMaterial_ClothColor)
+	{
+		DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", 9.9 * FLinearColor(1.0f, 0.0f, 0.0f));
+	}
+}
+
+void AHG_Player::EndFeverTime()
+{
+	// bFeverTime = false;
+}
+
+void AHG_Player::BlingBling(float p_DeltaTime)
+{
+	if (!bToggle3)
+	{
+		Intensity += p_DeltaTime;
+		if (DynamicMaterial_HairPin)
+		{
+			DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor(1.0f, 0.0f, 0.0f));
+		}
+		if (DynamicMaterial_ClothColor)
+		{
+			DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor(1.0f, 0.0f, 0.0f));
+		}
+		if (Intensity > 10)
+		{
+			bToggle3 = true;
+		}
+	}
+	else
+	{
+		Intensity -= p_DeltaTime;
+		if (DynamicMaterial_HairPin)
+		{
+			DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor::Red);
+		}
+		if (DynamicMaterial_ClothColor)
+		{
+			DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", Intensity * FLinearColor::Red);
+		}
+		if (Intensity < 1)
+		{
+			bToggle3 = false;
+		}
 	}
 }
 
 void AHG_Player::Emotion()
 {
-	HUD->UpdateHUD(1);
+	StartFeverTime();
 	if (bEquipItem)
 	{
 		auto* RCSWidget = CreateWidget<UHG_RemoteCS>(GetWorld(), RCSClass);
@@ -700,6 +750,7 @@ void AHG_Player::ApplyCustomizing(FLinearColor Cloth, UTexture2D* ClothTexture, 
 	if (DynamicMaterial_ClothColor)
 	{
 		DynamicMaterial_ClothColor->SetVectorParameterValue("CustomColor", ClothHem);
+		DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", 0 * ClothHem);
 	}
 	if (DynamicMaterial_Eyes)
 	{
@@ -712,6 +763,7 @@ void AHG_Player::ApplyCustomizing(FLinearColor Cloth, UTexture2D* ClothTexture, 
 	if (DynamicMaterial_HairPin)
 	{
 		DynamicMaterial_HairPin->SetVectorParameterValue("CustomColor", HairPin);
+		DynamicMaterial_HairPin->SetVectorParameterValue("EmissiveColor", 0 * HairPin);
 	}
 }
 
