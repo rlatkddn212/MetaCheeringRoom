@@ -80,10 +80,6 @@ void AHG_CheeringStick::ChangeIntensity(float Value)
 
 void AHG_CheeringStick::ApplyChange(FLinearColor Color, bool Bling, float Intensity)
 {
-	if (HasAuthority())
-	{
-		MatColor = Color;
-	}
 	ServerRPC_ApplyChange(Color, Bling, Intensity);
 }
 

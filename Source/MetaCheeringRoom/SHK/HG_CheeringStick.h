@@ -37,6 +37,7 @@ public:
 
 	void ChangeIntensity(float Value);
 
+	UFUNCTION(BlueprintCallable)
 	void ApplyChange(FLinearColor Color,bool Bling,float Intensity);
 	
 	UFUNCTION(Server,Reliable)

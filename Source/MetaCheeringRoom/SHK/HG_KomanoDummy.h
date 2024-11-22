@@ -19,11 +19,33 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UAnimSequence* Sit;
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_SetStateSit(bool Value);	
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_SetStateIdle(bool Value);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetStateShake(bool Value);
+
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Replicated)
+	bool bSit = true;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Replicated)
+	bool bShake = false;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Replicated)
+	bool bIdle = false;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ChangeCheeringStickColor();
 };

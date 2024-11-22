@@ -70,8 +70,8 @@ public:
 	class UInputAction* IA_Teleport2;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* IA_Teleport3;	
-	
+	class UInputAction* IA_Teleport3;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_FullScreen;
 
@@ -80,7 +80,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> FullScreenClass;
-	
+
 	UUserWidget* FullScreenWidget;
 
 	UFUNCTION()
@@ -366,17 +366,17 @@ public:
 
 	void StartFeverTime();
 
-	UFUNCTION(Server,Reliable)
-	void ServerRPC_StartFeverTime();	
-	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_StartFeverTime();
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_StartFeverTime();
 
 	void EndFeverTime();
 
-		UFUNCTION(Server,Reliable)
+	UFUNCTION(Server, Reliable)
 	void ServerRPC_EndFeverTime();
-	
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_EndFeverTime();
 
@@ -387,6 +387,9 @@ public:
 	bool bToggle3 = false;
 	float Intensity = 1.0f;
 
-	
+
 	FTimerHandle FeverTimeHandle;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AHG_KomanoDummy> KomanoDummyClass;
 };

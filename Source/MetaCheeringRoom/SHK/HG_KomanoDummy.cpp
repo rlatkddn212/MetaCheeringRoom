@@ -2,11 +2,13 @@
 
 
 #include "SHK/HG_KomanoDummy.h"
+#include "Net/UnrealNetwork.h"
+#include "Components/ChildActorComponent.h"
 
 // Sets default values
 AHG_KomanoDummy::AHG_KomanoDummy()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
@@ -15,7 +17,7 @@ AHG_KomanoDummy::AHG_KomanoDummy()
 void AHG_KomanoDummy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -30,5 +32,31 @@ void AHG_KomanoDummy::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AHG_KomanoDummy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AHG_KomanoDummy, bShake);
+	DOREPLIFETIME(AHG_KomanoDummy, bSit);
+	DOREPLIFETIME(AHG_KomanoDummy, bIdle);
+}
+
+
+
+void AHG_KomanoDummy::ServerRPC_SetStateSit_Implementation(bool Value)
+{
+	bSit = Value;
+}
+
+void AHG_KomanoDummy::ServerRPC_SetStateIdle_Implementation(bool Value)
+{
+	bIdle = Value;
+}
+
+void AHG_KomanoDummy::ServerRPC_SetStateShake_Implementation(bool Value)
+{
+	bShake = Value;
 }
 
