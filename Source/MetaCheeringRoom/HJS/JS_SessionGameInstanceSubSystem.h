@@ -93,7 +93,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerRPCExitSession();
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPCExitSession(const FName& playerName);
+	void MulticastRPCExitSession();
 	UFUNCTION(Client, Reliable)
 	void ClientLeaveSession();
+	UFUNCTION(BlueprintCallable)
+	void MySessionDestroy();
 };

@@ -282,10 +282,10 @@ void UJS_SessionGameInstanceSubSystem::ExitSession()
 void UJS_SessionGameInstanceSubSystem::ServerRPCExitSession_Implementation()
 {
 	SessionInterface->DestroySession(PlayerName);
-	MulticastRPCExitSession(PlayerName);
+	MulticastRPCExitSession();
 }
 
-void UJS_SessionGameInstanceSubSystem::MulticastRPCExitSession_Implementation(const FName& playerName)
+void UJS_SessionGameInstanceSubSystem::MulticastRPCExitSession_Implementation()
 {
 	if (nullptr != GEngine)
 	{
@@ -299,7 +299,6 @@ void UJS_SessionGameInstanceSubSystem::MulticastRPCExitSession_Implementation(co
 	if (GetWorld()->IsNetMode(NM_Client))
 	{
 		// 클라이언트에서 로컬 정리 작업
-		SessionInterface->DestroySession(playerName);
 		ClientLeaveSession();
 	}
 
@@ -317,6 +316,14 @@ void UJS_SessionGameInstanceSubSystem::ClientLeaveSession_Implementation()
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if (PC)
 	{
-		PC->ClientTravel("/Game/SHK/Level/HG_LobbyLevel", TRAVEL_Absolute);
+		PC->ClientTravel("/Game/SHK/Level/HG_NewLobbyLevel", TRAVEL_Absolute);
+	}
+}
+
+void UJS_SessionGameInstanceSubSystem::MySessionDestroy()
+{
+	if (SessionInterface.IsValid())
+	{
+		SessionInterface->DestroySession(PlayerName);
 	}
 }
