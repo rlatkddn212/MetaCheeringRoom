@@ -665,13 +665,8 @@ void ASW_CreatorPlayerController::PasteSelectedObject()
 	}
 }
 
-FVector ASW_CreatorPlayerController::GetSelectedObjectPos()
+ASW_CreatorObject* ASW_CreatorPlayerController::GetSelectedObject()
 {
-	if (SelectedObject)
-	{
-		return SelectedObject->GetActorLocation();
-	}
-
-	return FVector::ZeroVector;
+	return SelectedObject;
 }
 

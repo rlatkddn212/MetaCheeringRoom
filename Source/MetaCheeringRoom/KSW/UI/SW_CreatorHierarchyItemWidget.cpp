@@ -75,6 +75,12 @@ void USW_CreatorHierarchyItemWidget::NativeOnDragDetected(const FGeometry& InGeo
 FReply USW_CreatorHierarchyItemWidget::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnPreviewMouseButtonDown(InGeometry, InMouseEvent);
+	if (ExpandedButton->IsHovered())
+	{
+		ExpandedButton->OnClicked.Broadcast();
+		return FReply::Handled();
+	}
+
 	FEventReply ret = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
 	HierarchyItemButton->SetStyle(ClickedButtonStyle);
 	// 아이템 셀렉트를 바꾼다.

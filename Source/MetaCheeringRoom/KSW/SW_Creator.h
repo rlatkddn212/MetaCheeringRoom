@@ -173,6 +173,29 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void Server_Rotation(const FRotator& NewRotation);
 
+	UFUNCTION(Server, Unreliable)
+	void Server_HandMovement(const FVector& NewLocation);
+
+	UFUNCTION(Server, Unreliable)
+	void Server_HandRotation(const FRotator& NewRotation);
+
+	// 서버에서 동기화할 회전 값
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentHandLocation)
+	FVector CurrentHandLocation; 
+// 서버에서 동기화할 회전 값
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentHandRotation)
+	FRotator CurrentHandRotation; 
+
+	FVector TargetLocation;
+
+	bool bHandTargetObject = false;
+
+	UFUNCTION()
+	void OnRep_CurrentHandLocation();
+
+	UFUNCTION()
+	void OnRep_CurrentHandRotation();
+
 	UFUNCTION()
 	void OnRep_CurrentRotation();
 
@@ -205,6 +228,10 @@ public:
 	// 스켈레탈 메쉬
 	UPROPERTY(EditAnywhere)
 	class USkeletalMeshComponent* HandMeshComponent;
+	
+	// 스켈레탈 메쉬
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* CameraMeshComponent;
 
 	// 카메라
 	UPROPERTY(EditAnywhere)
