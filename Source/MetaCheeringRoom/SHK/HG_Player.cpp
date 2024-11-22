@@ -27,6 +27,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "HG_CustomUI.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 AHG_Player::AHG_Player()
 {
@@ -307,18 +308,21 @@ void AHG_Player::ConversionFullScreen()
 void AHG_Player::TeleportToStore()
 {
 	//(X=-867.240674,Y=927.178242,Z=-0.707882)
+	UGameplayStatics::PlaySound2D(GetWorld(), TeleportSound);
 	SetActorLocation(FVector(-867.240674f, 927.178242f, 0.707882f));
 }
 
 void AHG_Player::TeleportToJoin()
 {
 	//(X = -743.435962, Y = 2559.526662, Z = -18.354637)
+	UGameplayStatics::PlaySound2D(GetWorld(), TeleportSound);
 	SetActorLocation(FVector(-677.120918f, 2559.526662f, -18.354637f));
 }
 
 void AHG_Player::TeleportToCreate()
 {
 	//(X=1040.000000,Y=1230.000000,Z=0.000000)
+	UGameplayStatics::PlaySound2D(GetWorld(), TeleportSound);
 	SetActorLocation(FVector(1040.0f, 1230.0f, 0.0f));
 }
 
@@ -397,6 +401,9 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 		if (!bToggle)
 		{
 			InventoryWidget->AddToViewport(); 
+
+			UGameplayStatics::PlaySound2D(GetWorld(),UIPopUpSound);
+
 			InventoryWidget->PlayAppearAnimation(true);
 			HUD->PlayAppearAnimation(false);
 			HUD->StopInventoryAnimation();
@@ -408,6 +415,7 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 		}
 		else
 		{
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
 			InventoryWidget->PlayAppearAnimation(false);
 			HUD->PlayAppearAnimation(true);
 
@@ -429,6 +437,15 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 void AHG_Player::RemoveInventory()
 {
 	InventoryWidget->RemoveFromParent();
+}
+
+void AHG_Player::FeverTime()
+{
+	if (DynamicMaterial_HairPin)
+	{
+		DynamicMaterial_HairPin->SetVectorParameterValue("CustomColor", FLinearColor::Red);
+		DynamicMaterial_HairPin->SetVectorParameterValue("CustomColor", FLinearColor::Red);
+	}
 }
 
 void AHG_Player::Emotion()
@@ -468,6 +485,9 @@ void AHG_Player::PopUpPurchaseWidget()
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeGameAndUI());
 			PurchaseWidget->AddToViewport();
+
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
+
 			bToggle = !bToggle;
 		}
 		// 		else
@@ -703,6 +723,9 @@ void AHG_Player::PopUpCustomUI()
 		if (CustomUI)
 		{
 			CustomUI->AddToViewport();
+
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
+
 			CustomUI->PlayAppearAnimation(true);
 			CustomUI->SetOwningPlayer(PC);
 			if (PC)

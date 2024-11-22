@@ -7,6 +7,7 @@
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerController.h"
 #include "HG_Player.h"
+#include "Kismet/GameplayStatics.h"
 
 void UHG_CustomUI::NativeConstruct()
 {
@@ -46,18 +47,6 @@ void UHG_CustomUI::NativeConstruct()
 	Img_Printing->SetBrushFromTexture(PNGS[0]);
 	CurIdx = 0;
 	Count = 0;
-}
-
-void UHG_CustomUI::BeginDestroy()
-{
-	Super::BeginDestroy();
-
-	auto* PC = Cast<APlayerController>(GetOwningPlayer());
-	if (PC)
-	{
-		PC->SetShowMouseCursor(false);
-		PC->SetInputMode(FInputModeGameOnly());
-	}
 }
 
 void UHG_CustomUI::SetNextImage()
@@ -194,6 +183,11 @@ void UHG_CustomUI::PlayAppearAnimation(bool Play_Forward)
 {
 	if (Appear)
 	{
+
+		auto* Owner = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+
+		UGameplayStatics::PlaySound2D(GetWorld(), Owner->UIPopUpSound);
+
 		PlayAnimation(Appear);
 	}
 }

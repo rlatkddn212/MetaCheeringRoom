@@ -10,6 +10,7 @@
 #include "Components/TextBlock.h"
 #include "HG_GameInstance.h"
 #include "HG_Player.h"
+#include "HG_HUD.h"
 
 void UHG_SlotWidget::NativeConstruct()
 {
@@ -48,12 +49,12 @@ void UHG_SlotWidget::OnButtonClicked()
 
 	FSlateBrush PressedBrush;
 	PressedBrush.SetResourceObject(LoadObject<UTexture2D>(nullptr, TEXT("/Script/Engine.Texture2D'/Game/SHK/Texture/Inventory/slot.slot'")));
-	PressedBrush.ImageSize = FVector2D(78.0f, 78.0f); 
+	PressedBrush.ImageSize = FVector2D(78.0f, 78.0f);
 	PressedBrush.TintColor = FSlateColor::UseForeground();
 	PressedBrush.DrawAs = ESlateBrushDrawType::RoundedBox;
-	
+
 	PressedBrush.OutlineSettings.CornerRadii = FVector4(4.0f, 4.0f, 4.0f, 4.0f);
-	PressedBrush.OutlineSettings.Color = FLinearColor(0.72f,0.72f,0.72f,1.0f);
+	PressedBrush.OutlineSettings.Color = FLinearColor(0.72f, 0.72f, 0.72f, 1.0f);
 	PressedBrush.OutlineSettings.Width = 1.0f;
 	PressedBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
 	PressedBrush.OutlineSettings.bUseBrushTransparency = true;
@@ -63,7 +64,7 @@ void UHG_SlotWidget::OnButtonClicked()
 	Pressed.SetPressed(PressedBrush);
 
 	Button_InventorySlot->SetStyle(Pressed);
-	
+
 	Owner->RemoveFromParent();
 
 	if (auto OwningPlayer = Cast<AHG_Player>(Owner->GetOwningPlayer()->GetPawn()))
@@ -72,6 +73,7 @@ void UHG_SlotWidget::OnButtonClicked()
 		OwningPlayer->PC->SetInputMode(FInputModeGameOnly());
 		OwningPlayer->bCanMove = true;
 		OwningPlayer->bToggle = !OwningPlayer->bToggle;
+		OwningPlayer->HUD->PlayAppearAnimation(true);
 	}
 }
 

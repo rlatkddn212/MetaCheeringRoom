@@ -351,4 +351,18 @@ public:
 	void OnRep_Printing();
 
 	void RemoveInventory();
+
+	UPROPERTY(EditDefaultsOnly)
+	class USoundWave* PurchaseSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	class USoundWave* GetPointSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	class USoundWave* TeleportSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	class USoundWave* UIPopUpSound;
+
+	void FeverTime();
 };

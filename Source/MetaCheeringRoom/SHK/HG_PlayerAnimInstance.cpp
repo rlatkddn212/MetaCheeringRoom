@@ -56,7 +56,7 @@ void UHG_PlayerAnimInstance::AnimNotify_PrayEnd()
 		Owner->bCanMove = true;
 		Owner->CameraComp->FieldOfView = 90.0f;
 		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if(pc)
+		if (pc)
 		{
 			pc->bShowMouseCursor = false;
 		}
@@ -196,10 +196,7 @@ void UHG_PlayerAnimInstance::PlaySelectedMontage(UAnimMontage* p_Montage)
 	{
 		Montage_Play(p_Montage);
 
-		if (Owner->IsLocallyControlled())
-		{
-			Owner->bCanMove = false;
-			Owner->CameraComp->FieldOfView = 120.0f;
-		}
+		Owner->bCanMove = false;
+		Owner->CameraComp->FieldOfView = 120.0f;
 	}
 }

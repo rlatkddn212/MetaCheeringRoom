@@ -20,7 +20,6 @@ class METACHEERINGROOM_API UHG_CustomUI : public UUserWidget
 
 public:
 	void virtual NativeConstruct() override;
-	void virtual BeginDestroy() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<UTexture2D*> PNGS;
@@ -119,7 +118,6 @@ public:
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	class UWidgetAnimation* Appear;
-
 
 	void PlayAppearAnimation(bool Play_Forward);
 };
