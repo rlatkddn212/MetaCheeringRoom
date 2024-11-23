@@ -75,6 +75,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_FullScreen;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Shake;
+
+	UFUNCTION()
+	void ShakeHand();	
+
+	UFUNCTION()
+	void StopHand();
+
 	UFUNCTION()
 	void ConversionFullScreen();
 
@@ -392,4 +401,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AHG_KomanoDummy> KomanoDummyClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool bIsShaking = false;
 };

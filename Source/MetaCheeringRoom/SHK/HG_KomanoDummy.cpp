@@ -4,6 +4,7 @@
 #include "SHK/HG_KomanoDummy.h"
 #include "Net/UnrealNetwork.h"
 #include "Components/ChildActorComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AHG_KomanoDummy::AHG_KomanoDummy()
@@ -41,6 +42,25 @@ void AHG_KomanoDummy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(AHG_KomanoDummy, bShake);
 	DOREPLIFETIME(AHG_KomanoDummy, bSit);
 	DOREPLIFETIME(AHG_KomanoDummy, bIdle);
+}
+
+void AHG_KomanoDummy::ReturnOriginCondition()
+{
+	ServerRPC_SetStateSit(true);
+	ServerRPC_SetStateIdle(false);
+	ServerRPC_SetStateShake(false);
+	ChangeCSOrigin();
+}
+
+void AHG_KomanoDummy::CheerSurfing()
+{
+	ServerRPC_SetStateSit(false);
+	ServerRPC_SetStateIdle(true);
+	ServerRPC_SetStateShake(true);
+	ChangeCheeringStickColor();
+
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_KomanoDummy::ReturnOriginCondition,5.0f, false);
 }
 
 
