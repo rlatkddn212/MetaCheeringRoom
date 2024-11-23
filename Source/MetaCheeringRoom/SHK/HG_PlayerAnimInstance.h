@@ -55,7 +55,8 @@ public:
 	UFUNCTION()
 	void AnimNotify_PushUpEnd();
 	UFUNCTION()
-	void AnimNotify_KTTGEnd();
+	void AnimNotify_KTTGEnd();	
+
 
 	class AHG_Player* Owner;
 

@@ -28,9 +28,6 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(EditDefaultsOnly)
-	class UAnimSequence* Sit;
-
 	UFUNCTION(Server,Reliable)
 	void ServerRPC_SetStateSit(bool Value);	
 	UFUNCTION(Server,Reliable)
@@ -47,5 +44,13 @@ public:
 	bool bIdle = false;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void ChangeCheeringStickColor();
+	void ChangeCheeringStickColor();	
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ChangeCSOrigin();
+
+	void ReturnOriginCondition();
+
+	void CheerSurfing();
+
 };

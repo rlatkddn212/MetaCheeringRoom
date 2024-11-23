@@ -277,6 +277,22 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	input->BindAction(IA_Teleport3, ETriggerEvent::Completed, this, &AHG_Player::TeleportToCreate);
 
 	input->BindAction(IA_FullScreen, ETriggerEvent::Completed, this, &AHG_Player::ConversionFullScreen);
+
+	input->BindAction(IA_Shake, ETriggerEvent::Started, this, &AHG_Player::ShakeHand);
+	input->BindAction(IA_Shake, ETriggerEvent::Completed, this, &AHG_Player::StopHand);
+
+}
+
+void AHG_Player::ShakeHand()
+{
+	bIsShaking = true;
+	bCanMove = false;
+}
+
+void AHG_Player::StopHand()
+{
+	bIsShaking = false;
+	bCanMove = true;
 }
 
 void AHG_Player::ConversionFullScreen()
@@ -510,8 +526,7 @@ void AHG_Player::Emotion()
 	auto* Dummy = UGameplayStatics::GetActorOfClass(GetWorld(), KomanoDummyClass);
 	if (auto* K_Dummy = Cast<AHG_KomanoDummy>(Dummy))
 	{
-		K_Dummy->ServerRPC_SetStateShake(true);
-		K_Dummy->ChangeCheeringStickColor();
+		K_Dummy->CheerSurfing();
 	}
 
 	if (bEquipItem)
