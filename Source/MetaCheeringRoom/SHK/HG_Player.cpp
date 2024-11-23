@@ -534,7 +534,11 @@ void AHG_Player::Emotion()
 		auto* RCSWidget = CreateWidget<UHG_RemoteCS>(GetWorld(), RCSClass);
 		if (RCSWidget)
 		{
+
 			RCSWidget->AddToViewport();
+
+
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound2);
 			RCSWidget->PlayAppearAnimation(true);
 			RCSWidget->SetOwner(this);
 			if (PC)
@@ -564,7 +568,7 @@ void AHG_Player::PopUpPurchaseWidget()
 			PC->SetInputMode(FInputModeGameAndUI());
 			PurchaseWidget->AddToViewport();
 
-			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound2);
 
 			bToggle = !bToggle;
 		}
@@ -804,7 +808,7 @@ void AHG_Player::PopUpCustomUI()
 		{
 			CustomUI->AddToViewport();
 
-			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound2);
 
 			CustomUI->PlayAppearAnimation(true);
 			CustomUI->SetOwningPlayer(PC);

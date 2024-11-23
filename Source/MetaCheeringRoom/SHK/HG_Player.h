@@ -372,6 +372,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class USoundWave* UIPopUpSound;
+	UPROPERTY(EditDefaultsOnly)
+	class USoundWave* UIPopUpSound2;
 
 	void StartFeverTime();
 
