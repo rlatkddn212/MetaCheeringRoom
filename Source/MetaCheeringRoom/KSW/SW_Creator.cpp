@@ -86,7 +86,7 @@ void ASW_Creator::Tick(float DeltaTime)
 			{
 				Server_HandMovement(Object->GetActorLocation());
 				FRotator rot = Object->GetActorRotation();
-				Server_HandRotation(rot);
+				//Server_HandRotation(rot);
 			}
 			else
 			{
@@ -96,7 +96,7 @@ void ASW_Creator::Tick(float DeltaTime)
 		else
 		{
 			Server_HandMovement(GetActorLocation());
-			Server_HandRotation(FRotator(0, 0, 0));
+			//Server_HandRotation(FRotator(0, 0, 0));
 		}
 	}
 
@@ -109,6 +109,28 @@ void ASW_Creator::Tick(float DeltaTime)
 	else
 	{
 		HandMeshComponent->SetWorldLocation(TargetLocation);
+	}
+
+	if (IsLocallyControlled())
+	{
+		if (bHandTargetObject)
+		{
+			if (PC->GetToolState() == ECreatorToolState::Rotation)
+			{
+				RotAnim(true);
+				GrapAnim(false);
+			}
+			else
+			{
+				RotAnim(false);
+				GrapAnim(true);
+			}
+		}
+		else
+		{
+			RotAnim(false);
+			GrapAnim(false);
+		}
 	}
 }
 
@@ -156,6 +178,10 @@ void ASW_Creator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	input->BindAction(IA_V, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyV);
 	input->BindAction(IA_CameraSpeedUp, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyCameraSpeedUp);
 	input->BindAction(IA_CameraSpeedDown, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyCameraSpeedDown);
+
+	input->BindAction(IA_Action1, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyAction1);
+	input->BindAction(IA_Action2, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyAction2);
+	input->BindAction(IA_Action3, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyAction3);
 }
 
 void ASW_Creator::OnMyMove(const FInputActionValue& Value)
@@ -394,6 +420,21 @@ void ASW_Creator::OnMyCameraSpeedDown(const FInputActionValue& Value)
 	CameraSpeedWidget->SetCameraSpeed(CameraSpeed / 1000.0f);
 }
 
+void ASW_Creator::OnMyAction1(const FInputActionValue& Value)
+{
+	Server_PlayMontage(ThumbMontage);
+}
+
+void ASW_Creator::OnMyAction2(const FInputActionValue& Value)
+{
+	Server_PlayMontage(ThumbMontage);
+}
+
+void ASW_Creator::OnMyAction3(const FInputActionValue& Value)
+{
+	Server_PlayMontage(ThumbMontage);
+}
+
 void ASW_Creator::SetMouseState(ECreatorMouseState NewState)
 {
 	if (MouseState == ECreatorMouseState::GizmoDrag && MouseState != NewState)
@@ -471,6 +512,55 @@ void ASW_Creator::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ASW_Creator, CurrentRotation);
 	DOREPLIFETIME(ASW_Creator, CurrentHandLocation);
 	DOREPLIFETIME(ASW_Creator, CurrentHandRotation);
+	DOREPLIFETIME(ASW_Creator, bGrap);
+	DOREPLIFETIME(ASW_Creator, bRot);
+}
+
+void ASW_Creator::GrapAnim(bool isGrap)
+{
+	if (bGrap == isGrap)
+	{
+		return;
+	}
+
+	Server_GrapAnim(isGrap);
+}
+
+void ASW_Creator::RotAnim(bool isRot)
+{
+	if (bRot == isRot)
+	{
+		return;
+	}
+
+	Server_RotAnim(isRot);
+}
+
+void ASW_Creator::Server_GrapAnim_Implementation(bool isGrap)
+{
+	bGrap = isGrap;
+}
+
+void ASW_Creator::Server_RotAnim_Implementation(bool isRot)
+{
+	bRot = isRot;
+}
+
+void ASW_Creator::Server_PlayMontage_Implementation(UAnimMontage* MontageToPlay, float InPlayRate /*= 1.0f*/, FName StartSectionName /*= NAME_None*/)
+{
+	if (HandMeshComponent && MontageToPlay)
+	{
+		Multicast_PlayMontage(MontageToPlay);
+	}
+
+}
+
+void ASW_Creator::Multicast_PlayMontage_Implementation(UAnimMontage* MontageToPlay, float InPlayRate /*= 1.0f*/, FName StartSectionName /*= NAME_None*/)
+{
+	if (HandMeshComponent && MontageToPlay)
+	{
+		HandMeshComponent->GetAnimInstance()->Montage_Play(MontageToPlay);
+	}
 }
 
 // PC로 멀티케스트

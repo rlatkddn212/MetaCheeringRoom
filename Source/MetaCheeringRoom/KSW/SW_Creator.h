@@ -86,6 +86,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_CameraSpeedDown;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Action1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Action2;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Action3;
+
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
 	UFUNCTION()
@@ -139,6 +148,13 @@ public:
 	void OnMyCameraSpeedUp(const FInputActionValue& Value);
 	UFUNCTION()
 	void OnMyCameraSpeedDown(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void OnMyAction1(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyAction2(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyAction3(const FInputActionValue& Value);
 	
 	FVector Direction;
 
@@ -237,4 +253,28 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* CameraComponent;
 
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
+	bool bGrap;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
+	bool bRot;
+
+	void GrapAnim(bool isGrap);
+
+	void RotAnim(bool isRot);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_GrapAnim(bool isGrap);
+
+	UFUNCTION(Server, Reliable)
+	void Server_RotAnim(bool isRot);
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayMontage(class UAnimMontage* MontageToPlay, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayMontage(class UAnimMontage* MontageToPlay, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
+
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* ThumbMontage;
 };

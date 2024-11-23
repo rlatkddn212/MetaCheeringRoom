@@ -75,7 +75,7 @@ void ASW_CreatorPlayerController::BeginPlay()
 				}
 
 				ReloadHierarchy();
-			}, 0.1f, false);
+			}, 5.0f, false);
 		
 		ToolState = ECreatorToolState::Selection;
 	}
@@ -394,6 +394,7 @@ void ASW_CreatorPlayerController::Server_AddCreatingDummyObject_Implementation(c
 
 void ASW_CreatorPlayerController::Server_DeleteObject_Implementation(class ASW_CreatorObject* DeleteObject)
 {
+	if (DeleteObject)
 	{
 		ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
 		if (Creator)
