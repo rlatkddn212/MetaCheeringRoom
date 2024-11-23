@@ -4,6 +4,7 @@
 #include "HJS/JS_StadiumWave.h"
 #include "Components/BoxComponent.h"
 #include "MetaCheeringRoom.h"
+#include "../SHK/HG_KomanoDummy.h"
 // Sets default values
 AJS_StadiumWave::AJS_StadiumWave()
 {
@@ -27,7 +28,7 @@ void AJS_StadiumWave::BeginPlay()
     if (HasAuthority())
     {
         SetOwner(GetWorld()->GetFirstPlayerController()->GetPawn());
-        //TurnStart();
+        TurnStart();
     }
 }
 
@@ -73,6 +74,12 @@ void AJS_StadiumWave::OnTurn(float DeltaTime)
 
 void AJS_StadiumWave::ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    i++;
+    AHG_KomanoDummy* Dummy = Cast<AHG_KomanoDummy>(OtherActor);
+    PRINTLOG(TEXT("54321"));
+    if (Dummy)
+    {   
+        PRINTLOG(TEXT("12345"));
+        Dummy->CheerSurfing();
+    }
 }
 
