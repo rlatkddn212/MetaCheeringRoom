@@ -78,8 +78,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Shake;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Sit;
+
 	UFUNCTION()
-	void ShakeHand();	
+	void Sit();
+
+	UFUNCTION()
+	void ShakeHand();
 
 	UFUNCTION()
 	void StopHand();
@@ -406,4 +412,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool bIsShaking = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool bIsSitting = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	AActor* DetectChair;
+
+	bool bSitToggle = false;
 };

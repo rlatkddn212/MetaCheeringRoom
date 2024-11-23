@@ -238,18 +238,20 @@ void AHG_Player::Tick(float DeltaTime)
 	}
 
 	Anim = Cast<UHG_PlayerAnimInstance>(GetMesh()->GetAnimInstance());
-
-	if (bDetectStand)
+	if (!bIsSitting)
 	{
-		Timing = 1.0f;
-		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 3.5f);
-	}
-	else
-	{
-		Timing -= DeltaTime;
-		if (Timing <= 0)
+		if (bDetectStand)
 		{
-			SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
+			Timing = 1.0f;
+			SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 3.5f);
+		}
+		else
+		{
+			Timing -= DeltaTime;
+			if (Timing <= 0)
+			{
+				SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
+			}
 		}
 	}
 }
@@ -281,6 +283,35 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	input->BindAction(IA_Shake, ETriggerEvent::Started, this, &AHG_Player::ShakeHand);
 	input->BindAction(IA_Shake, ETriggerEvent::Completed, this, &AHG_Player::StopHand);
 
+	input->BindAction(IA_Sit, ETriggerEvent::Completed, this, &AHG_Player::Sit);
+
+}
+
+void AHG_Player::Sit()
+{
+	if (!bIsSitting)
+	{
+		if (DetectChair)
+		{
+			bIsSitting = true;
+			UE_LOG(LogTemp, Warning, TEXT("Sit"));
+			FVector ChairLoc = DetectChair->GetActorLocation();
+			SetActorLocation(ChairLoc);
+			FVector ChairDir = DetectChair->GetActorForwardVector();
+			SetActorRotation(ChairDir.ToOrientationRotator());
+			SpringArmComp->TargetArmLength = 0.0f;
+			SpringArmComp->SetRelativeLocation(FVector(10.0f,0.0f,10.0f));
+			bIsSitting = true;
+		}
+	}
+	else
+	{
+		bIsSitting = false;
+		SpringArmComp->TargetArmLength = 300.0f;
+		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+		DetectChair = nullptr; 
+	}
+	bCanMove = !bCanMove;
 }
 
 void AHG_Player::ShakeHand()
@@ -361,11 +392,21 @@ void AHG_Player::OnMyJump(const FInputActionValue& Value)
 
 void AHG_Player::OnMyLook(const FInputActionValue& Value)
 {
-	if (!bCanMove) return;
+	if (bIsSitting)
+	{
+		FVector2D v = Value.Get<FVector2D>();
+		AddControllerPitchInput(-v.Y);
+		AddControllerYawInput(v.X);
+	}
+	else
+	{
+		if (!bCanMove) return;	
 
-	FVector2D v = Value.Get<FVector2D>();
-	AddControllerPitchInput(-v.Y);
-	AddControllerYawInput(v.X);
+		FVector2D v = Value.Get<FVector2D>();
+		AddControllerPitchInput(-v.Y);
+		AddControllerYawInput(v.X);
+	}
+
 }
 
 void AHG_Player::OnMyInteraction(const FInputActionValue& Value)
