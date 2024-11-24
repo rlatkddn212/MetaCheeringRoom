@@ -34,7 +34,7 @@ public:
     
     // 회전 속도 (초당 각도)
     UPROPERTY(EditAnywhere, Category = "Rotation")
-    float RotationSpeed = 90.0f; // 90도/초 (4초 동안 360도 회전)
+    float RotationSpeed = 45.0f; // 90도/초 (4초 동안 360도 회전)
 
 	// 특정 시점을 기준으로 360도 돈다.
 	UFUNCTION(BlueprintCallable)

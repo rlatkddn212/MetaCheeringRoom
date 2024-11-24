@@ -114,7 +114,7 @@ public:
 	UFUNCTION()
 	void ToToInitSetting();
 
-	void InitWidget();
+	void InitWidget(bool value);
 
 	UFUNCTION()
 	void OnClickBettingWeightBtn();
@@ -140,5 +140,7 @@ public:
 	float TargetOffset = 200.f;
 	void PlayShowAnimation();
 	void OnAnimation(float DeltaTime);
+
+	int32 PointLog = 0;
 
 };

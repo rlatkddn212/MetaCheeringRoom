@@ -30,6 +30,7 @@ void UJS_ToToWidget::NativeConstruct()
 	ET_BettingWeight2->OnTextChanged.AddDynamic(this, &UJS_ToToWidget::OnBetting2Changed);
 	BTN_WeightBetting1->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickWeightBtn1);
 	BTN_WeightBetting2->OnClicked.AddDynamic(this, &UJS_ToToWidget::OnClickWeightBtn2);
+	InitWidget(false);
 }
 
 void UJS_ToToWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
@@ -56,6 +57,9 @@ void UJS_ToToWidget::OnClickBetting1Btn()
 				return;
 			}
 			PG->AddGold(-BettingPoint);
+			PointLog += BettingPoint;
+			FString PointLogMsg = FString::Printf(TEXT("%d 포인트로 \"%s\"을(를) 선택했습니다."), PointLog, *TEXT_Select1->GetText().ToString());
+			TEXT_ToToLog->SetText(FText::FromString(PointLogMsg));
 		}
 	}
 	TotoActor->BettingToto(BettingPoint,1);
@@ -165,6 +169,7 @@ void UJS_ToToWidget::SetTimerText(FString TimerText)
 
 void UJS_ToToWidget::SetBettingStopUI()
 {
+	
 	WS_Betting->SetActiveWidgetIndex(2);
 }
 
@@ -175,13 +180,13 @@ void UJS_ToToWidget::ToToInitSetting()
 }
 
 
-void UJS_ToToWidget::InitWidget()
+void UJS_ToToWidget::InitWidget(bool value)
 {
-	TEXT_ToToName->SetText(FText::FromString(TEXT("")));
-	TEXT_TimeLimit->SetText(FText::FromString(TEXT("시작 대기중입니다.")));
 	WS_Betting->SetActiveWidgetIndex(0);
-	BTN_Betting1->SetIsEnabled(true);
-	BTN_Betting2->SetIsEnabled(true);
+	BTN_Betting1->SetIsEnabled(value);
+	BTN_Betting2->SetIsEnabled(value);
+	BTN_WeightBetting1->SetIsEnabled(value);
+	BTN_WeightBetting2->SetIsEnabled(value);
 }
 
 void UJS_ToToWidget::OnClickBettingWeightBtn()
