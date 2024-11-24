@@ -80,7 +80,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Sit;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_CheerSurfing;
 
+	UFUNCTION()
+	void CheerSurfing();
 	UFUNCTION()
 	void Sit();
 
@@ -435,5 +440,11 @@ public:
 
 	bool bSitToggle = false;
 
-	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Replicated)
+	bool bIsCheerSurfing = false;
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_SetCheerSurfingState();	
+
+	void SetCheerSurfingState();
 };

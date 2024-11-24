@@ -288,6 +288,13 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	input->BindAction(IA_Sit, ETriggerEvent::Completed, this, &AHG_Player::Sit);
 
+	input->BindAction(IA_CheerSurfing, ETriggerEvent::Completed, this, &AHG_Player::CheerSurfing);
+
+}
+
+void AHG_Player::CheerSurfing()
+{
+	ServerRPC_SetCheerSurfingState();
 }
 
 void AHG_Player::Sit()
@@ -345,22 +352,6 @@ void AHG_Player::ShakeHand()
 {
 	ServerRPC_Shake(true);
 
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), CSClass, CheerSticks);
-
-	for (auto* CheerStick : CheerSticks)
-	{
-		auto* C_CheerStick = Cast<AHG_CheeringStick>(CheerStick);
-		if (C_CheerStick->ItemOwner == Controller->GetPawn())
-		{
-			if (C_CheerStick)
-			{
-				My_CheeringStick = C_CheerStick;
-				UE_LOG(LogTemp,Warning,TEXT("123"));
-				C_CheerStick->ApplyChange(FLinearColor::Red, false, 100);
-			}
-		}
-	}
-
 	bCanMove = false;
 }
 
@@ -368,11 +359,6 @@ void AHG_Player::StopHand()
 {
 	ServerRPC_Shake(false);
 
-	if (My_CheeringStick)
-	{
-		My_CheeringStick->ApplyChange(FLinearColor::Black, false, 0.1f);
-	}
-	
 	if (bIsSitting)
 	{
 		bCanMove = false;
@@ -614,6 +600,42 @@ void AHG_Player::BlingBling()
 	if (DynamicMaterial_ClothColor)
 	{
 		DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", 9.9 * RandColor);
+	}
+}
+
+void AHG_Player::SetCheerSurfingState()
+{
+	bIsCheerSurfing = false;
+
+	if (My_CheeringStick)
+	{
+		My_CheeringStick->ApplyChange(FLinearColor::Black, false, 0.1f);
+	}
+}
+
+void AHG_Player::ServerRPC_SetCheerSurfingState_Implementation()
+{
+	if (bIsSitting)
+	{
+		bIsCheerSurfing = true;
+
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), CSClass, CheerSticks);
+
+		for (auto* CheerStick : CheerSticks)
+		{
+			auto* C_CheerStick = Cast<AHG_CheeringStick>(CheerStick);
+			if (C_CheerStick->ItemOwner == Controller->GetPawn())
+			{
+				if (C_CheerStick)
+				{
+					My_CheeringStick = C_CheerStick;
+					C_CheerStick->ApplyChange(FLinearColor::Red, false, 100);
+				}
+			}
+		}
+
+		FTimerHandle handle;
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_Player::SetCheerSurfingState, 0.5f, false);
 	}
 }
 
@@ -1126,6 +1148,7 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	DOREPLIFETIME(AHG_Player, bEquipItem);
 	DOREPLIFETIME(AHG_Player, bIsSitting);
 	DOREPLIFETIME(AHG_Player, bIsShaking);
+	DOREPLIFETIME(AHG_Player, bIsCheerSurfing);
 }
 
 
