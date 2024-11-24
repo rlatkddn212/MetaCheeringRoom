@@ -36,28 +36,19 @@ void USW_CreatorInspectorWidget::NativeConstruct()
 void USW_CreatorInspectorWidget::OnChangePosition(FVector Pos)
 {
 	ChangePosition.ExecuteIfBound(Pos);
-
-	PosX->SetText(FText::FromString(FString::SanitizeFloat(Pos.X)));
-	PosY->SetText(FText::FromString(FString::SanitizeFloat(Pos.Y)));
-	PosZ->SetText(FText::FromString(FString::SanitizeFloat(Pos.Z)));
+	ChangePositionWidget(Pos);	
 }
 
 void USW_CreatorInspectorWidget::OnChangeRotation(FRotator Rot)
 {
 	ChangeRotation.ExecuteIfBound(Rot);
-
-	RotX->SetText(FText::FromString(FString::SanitizeFloat(Rot.Roll)));
-	RotY->SetText(FText::FromString(FString::SanitizeFloat(Rot.Pitch)));
-	RotZ->SetText(FText::FromString(FString::SanitizeFloat(Rot.Yaw)));
+	ChangeRotationWidget(Rot);
 }
 
 void USW_CreatorInspectorWidget::OnChangeScale(FVector Scale)
 {
 	ChangeScale.ExecuteIfBound(Scale);
-
-	ScaleX->SetText(FText::FromString(FString::SanitizeFloat(Scale.X)));
-	ScaleY->SetText(FText::FromString(FString::SanitizeFloat(Scale.Y)));
-	ScaleZ->SetText(FText::FromString(FString::SanitizeFloat(Scale.Z)));
+	ChangeScaleWidget(Scale);
 }
 
 void USW_CreatorInspectorWidget::OnColorChanged(FLinearColor Color)
@@ -70,9 +61,9 @@ void USW_CreatorInspectorWidget::OnChanged()
 {
 	if (CreatorObject)
 	{
-		OnChangePosition(CreatorObject->GetActorLocation());
-		OnChangeRotation(CreatorObject->GetActorRotation());
-		OnChangeScale(CreatorObject->GetActorScale3D());
+		ChangePositionWidget(CreatorObject->GetActorLocation());
+		ChangeRotationWidget(CreatorObject->GetActorRotation());
+		ChangeScaleWidget(CreatorObject->GetActorScale3D());
 	}
 }
 
@@ -256,4 +247,25 @@ void USW_CreatorInspectorWidget::OnScaleZChanged(const FText& Text, ETextCommit:
 	float z = FCString::Atof(*Text.ToString());
 
 	OnChangeScale(FVector(x, y, z));
+}
+
+void USW_CreatorInspectorWidget::ChangePositionWidget(FVector Pos)
+{
+	PosX->SetText(FText::FromString(FString::SanitizeFloat(Pos.X)));
+	PosY->SetText(FText::FromString(FString::SanitizeFloat(Pos.Y)));
+	PosZ->SetText(FText::FromString(FString::SanitizeFloat(Pos.Z)));
+}
+
+void USW_CreatorInspectorWidget::ChangeRotationWidget(FRotator Rot)
+{
+	RotX->SetText(FText::FromString(FString::SanitizeFloat(Rot.Roll)));
+	RotY->SetText(FText::FromString(FString::SanitizeFloat(Rot.Pitch)));
+	RotZ->SetText(FText::FromString(FString::SanitizeFloat(Rot.Yaw)));
+}
+
+void USW_CreatorInspectorWidget::ChangeScaleWidget(FVector Scale)
+{
+	ScaleX->SetText(FText::FromString(FString::SanitizeFloat(Scale.X)));
+	ScaleY->SetText(FText::FromString(FString::SanitizeFloat(Scale.Y)));
+	ScaleZ->SetText(FText::FromString(FString::SanitizeFloat(Scale.Z)));
 }

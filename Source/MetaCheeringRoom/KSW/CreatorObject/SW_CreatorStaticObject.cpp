@@ -72,7 +72,7 @@ void ASW_CreatorStaticObject::OnChangeProperty(int32 id, UCreatorPropertyBase* C
 	{
 		UCreatorColorProperty* ColorProperty = Cast<UCreatorColorProperty>(CreatorProperty);
 		MeshColor = ColorProperty->Value;
-
+		Server_SetMeshColor(MeshColor);
 		if (Mat)
 		{
 			Mat->SetVectorParameterValue("Color", MeshColor);
@@ -83,7 +83,7 @@ void ASW_CreatorStaticObject::OnChangeProperty(int32 id, UCreatorPropertyBase* C
 	{
 		UCreatorFloatProperty* FloatProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
 		Metallic = FloatProperty->Value;
-
+		Server_SetMetallic(Metallic);
 		if (Mat)
 		{
 			Mat->SetScalarParameterValue("Metallic", Metallic);
@@ -94,7 +94,7 @@ void ASW_CreatorStaticObject::OnChangeProperty(int32 id, UCreatorPropertyBase* C
 	{
 		UCreatorFloatProperty* FloatProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
 		Roughness = FloatProperty->Value;
-
+		Server_SetRoughness(Roughness);
 		if (Mat)
 		{
 			Mat->SetScalarParameterValue("Roughness", Roughness);
@@ -105,7 +105,7 @@ void ASW_CreatorStaticObject::OnChangeProperty(int32 id, UCreatorPropertyBase* C
 	{
 		UCreatorColorProperty* ColorProperty = Cast<UCreatorColorProperty>(CreatorProperty);
 		EmissiveColor = ColorProperty->Value;
-
+		Server_SetEmissiveColor(EmissiveColor);
 		if (Mat)
 		{
 			Mat->SetVectorParameterValue("EmissiveColor", EmissiveColor);
@@ -179,6 +179,30 @@ void ASW_CreatorStaticObject::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObje
 		Mat->SetScalarParameterValue("Metallic", Metallic);
 		Mat->SetScalarParameterValue("Roughness", Roughness);
 	}
+}
+
+void ASW_CreatorStaticObject::Server_SetMeshColor_Implementation(FLinearColor Color)
+{
+	MeshColor = Color;
+	OnRep_MeshColorChanged();
+}
+
+void ASW_CreatorStaticObject::Server_SetMetallic_Implementation(float InMetallic)
+{
+	Metallic = InMetallic;
+	OnRep_MeshMetallicChanged();
+}
+
+void ASW_CreatorStaticObject::Server_SetRoughness_Implementation(float InRoughness)
+{
+	Roughness = InRoughness;
+	OnRep_MeshRoughnessChanged();
+}
+
+void ASW_CreatorStaticObject::Server_SetEmissiveColor_Implementation(FLinearColor Color)
+{
+	EmissiveColor = Color;
+	OnRep_EmissiveColorChanged();
 }
 
 void ASW_CreatorStaticObject::OnRep_MeshColorChanged()

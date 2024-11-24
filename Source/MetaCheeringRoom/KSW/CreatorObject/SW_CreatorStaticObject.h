@@ -33,6 +33,18 @@ public:
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
 
+	UFUNCTION(Server, Reliable)
+	void Server_SetMeshColor(FLinearColor Color);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_SetMetallic(float InMetallic);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetRoughness(float InRoughness);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetEmissiveColor(FLinearColor Color);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* Mesh;
 	

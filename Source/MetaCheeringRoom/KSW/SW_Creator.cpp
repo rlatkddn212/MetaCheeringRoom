@@ -392,32 +392,38 @@ void ASW_Creator::OnMyV(const FInputActionValue& Value)
 
 void ASW_Creator::OnMyCameraSpeedUp(const FInputActionValue& Value)
 {
-	if (10000.0f <= CameraSpeed) return;
-	if (2000.0f <= CameraSpeed)
+	if (MouseState == ECreatorMouseState::Clicked)
 	{
-		CameraSpeed += 500;
-	}
-	else
-	{
-		CameraSpeed += 100;
-	}
+		if (10000.0f <= CameraSpeed) return;
+		if (2000.0f <= CameraSpeed)
+		{
+			CameraSpeed += 500;
+		}
+		else
+		{
+			CameraSpeed += 100;
+		}
 	
-	CameraSpeedWidget->SetCameraSpeed(CameraSpeed / 1000.0f);
+		CameraSpeedWidget->SetCameraSpeed(CameraSpeed / 1000.0f);
+	}
 }
 
 void ASW_Creator::OnMyCameraSpeedDown(const FInputActionValue& Value)
 {
-	if (CameraSpeed <= 100) return;
-	if (2000.0f < CameraSpeed)
+	if (MouseState == ECreatorMouseState::Clicked)
 	{
-		CameraSpeed -= 500;
-	}
-	else
-	{
-		CameraSpeed -= 100;
-	}
+		if (CameraSpeed <= 100) return;
+		if (2000.0f < CameraSpeed)
+		{
+			CameraSpeed -= 500;
+		}
+		else
+		{
+			CameraSpeed -= 100;
+		}
 
-	CameraSpeedWidget->SetCameraSpeed(CameraSpeed / 1000.0f);
+		CameraSpeedWidget->SetCameraSpeed(CameraSpeed / 1000.0f);
+	}
 }
 
 void ASW_Creator::OnMyAction1(const FInputActionValue& Value)

@@ -91,6 +91,10 @@ public:
 	UFUNCTION()
 	void OnScaleZChanged(const FText& Text, ETextCommit::Type CommitMethod);
 
+	void ChangePositionWidget(FVector Pos);
+	void ChangeRotationWidget(FRotator Rot);
+	void ChangeScaleWidget(FVector Scale);
+
 	// Change Pos
 	UFUNCTION()
 	void OnChangePosition(FVector Pos);

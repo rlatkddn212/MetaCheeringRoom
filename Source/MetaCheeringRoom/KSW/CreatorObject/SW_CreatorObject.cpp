@@ -550,17 +550,17 @@ void ASW_CreatorObject::DragEnd(ECreatorToolState ToolState)
 
 void ASW_CreatorObject::OnChangePosition(FVector Pos)
 {
-	SetActorLocation(Pos);
+	Server_SetLocation(Pos);
 }
 
 void ASW_CreatorObject::OnChangeRotation(FRotator Rot)
 {
-	SetActorRotation(Rot);
+	Server_SetRotation(Rot.Quaternion());
 }
 
 void ASW_CreatorObject::OnChangeScale(FVector Scale)
 {
-	SetActorScale3D(Scale);
+	Server_SetScale(Scale);
 }
 
 void ASW_CreatorObject::SetFileName(const FString& FileName)
