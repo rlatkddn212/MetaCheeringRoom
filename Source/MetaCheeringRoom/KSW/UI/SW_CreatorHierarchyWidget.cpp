@@ -10,6 +10,7 @@
 #include "Components/Widget.h"
 #include "SW_HierarchyDragOperation.h"
 #include "Components/Button.h"
+#include "../Creator/CreatorObjectRootActor.h"
 
 
 void USW_CreatorHierarchyWidget::NativeConstruct()
@@ -31,9 +32,27 @@ void USW_CreatorHierarchyWidget::ReloadItem()
 
 	// 모든 아이템 다시 생성
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
-	const FCreatorMap& CMap = system->GetCreatorMap();
+	//const FCreatorMap& CMap = system->GetCreatorMap();
 
-	ReloadWidget(CMap.Objects, 0);
+	//ReloadWidget(CMap.Objects, 0);
+	ACreatorObjectRootActor* RootActor = system->GetRootActor();
+	if (RootActor == nullptr)
+		return;
+	TArray<ASW_CreatorObject*> InCreatorObjects;
+	TArray<AActor*> ChildActors;
+	RootActor->GetAttachedActors(ChildActors);
+
+	// RootActor의 자식들을 InCreatorObjects에 넣어준다.
+	for (int32 i = 0; i < ChildActors.Num(); i++)
+	{
+		ASW_CreatorObject* CreatorObject = Cast<ASW_CreatorObject>(ChildActors[i]);
+		if (CreatorObject)
+		{
+			InCreatorObjects.Add(CreatorObject);
+		}
+	}
+
+	ReloadWidget(InCreatorObjects, 0);
 }
 
 bool USW_CreatorHierarchyWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -60,6 +79,9 @@ void USW_CreatorHierarchyWidget::ReloadWidget(const TArray<ASW_CreatorObject*>& 
 {
 	for (int i = 0; i < InCreatorObjects.Num(); i++)
 	{
+		if (InCreatorObjects[i] == nullptr)
+			continue;
+
 		USW_CreatorHierarchyItemWidget* ChildWidget = CreateWidget<USW_CreatorHierarchyItemWidget>(GetWorld(), SlotFactory);
 		ChildWidget->SetItem(InCreatorObjects[i], depth);
 		ObjectScrollBox->AddChild(ChildWidget);

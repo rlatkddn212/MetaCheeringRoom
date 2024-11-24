@@ -13,6 +13,8 @@
 #include "Engine/EngineTypes.h"
 #include "EngineUtils.h"
 #include "CreatorFBXSubsystem.h"
+#include "Creator/SW_CreatorGameState.h"
+#include "Creator/CreatorObjectRootActor.h"
 
 void UCreatorMapSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -29,8 +31,15 @@ void UCreatorMapSubsystem::Deinitialize()
 
 void UCreatorMapSubsystem::InitMap()
 {
-    CreatorMap.Objects.Empty();
 	UniqueCreatorItemId = 1;
+
+    if (GetWorld() && GetWorld()->GetAuthGameMode())
+    {
+        // RootActor 생성
+        ACreatorObjectRootActor* NewRootActor = GetWorld()->SpawnActor<ACreatorObjectRootActor>(ACreatorObjectRootActor::StaticClass(), FTransform());
+		NewRootActor->SetReplicates(true);
+		SetRootActor(NewRootActor);
+    }
 
     // 월드에 있는 ASW_CreatorObject 모두 제거
     for (TActorIterator<ASW_CreatorObject> It(GetWorld()); It; ++It)
@@ -42,17 +51,17 @@ void UCreatorMapSubsystem::InitMap()
 
 void UCreatorMapSubsystem::SetMapName(const FString& Name)
 {
-    CreatorMap.MapName = Name;
+    MapName = Name;
 }
 
 FString UCreatorMapSubsystem::GetMapName()
 {
-    return CreatorMap.MapName;
+    return MapName;
 }
 
 FString UCreatorMapSubsystem::SaveCreatorMapToJson()
 {
-    FString JsonString = SerializeCreatorMapToJson(CreatorMap);
+    FString JsonString = SerializeCreatorMapToJson();
 
     return JsonString;
 }
@@ -77,10 +86,30 @@ bool UCreatorMapSubsystem::LoadCreatorMapFromJson(FString JsonString)
     return false;
 }
 
-FString UCreatorMapSubsystem::SerializeCreatorMapToJson(const FCreatorMap& Map)
+FString UCreatorMapSubsystem::SerializeCreatorMapToJson()
 {
     TArray<TSharedPtr<FJsonValue>> JsonRootArray;
-    for (const ASW_CreatorObject* RootObject : Map.Objects)
+
+	if (RootActor == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("RootActor is not set."));
+		return FString();
+	}
+    TArray<ASW_CreatorObject*> InCreatorObjects;
+    TArray<AActor*> ChildActors;
+    RootActor->GetAttachedActors(ChildActors);
+
+    // RootActor의 자식들을 InCreatorObjects에 넣어준다.
+    for (int32 i = 0; i < ChildActors.Num(); i++)
+    {
+        ASW_CreatorObject* CreatorObject = Cast<ASW_CreatorObject>(ChildActors[i]);
+        if (CreatorObject)
+        {
+            InCreatorObjects.Add(CreatorObject);
+        }
+    }
+
+    for (const ASW_CreatorObject* RootObject : InCreatorObjects)
     {
         JsonRootArray.Add(MakeShareable(new FJsonValueObject(SerializeCreatorObject(RootObject))));
     }
@@ -356,7 +385,7 @@ void UCreatorMapSubsystem::AddObject(ASW_CreatorObject* CreatingObject, ASW_Crea
 {
     int32 CreatorItemId = UniqueCreatorItemId++;
     CreatingObject->CreatorObjectUId = CreatorItemId;
-    CreatorItemMap.Add(CreatorItemId, CreatingObject);
+    //CreatorItemMap.Add(CreatorItemId, CreatingObject);
 
 	if (ParentObject != nullptr)
 	{
@@ -365,7 +394,7 @@ void UCreatorMapSubsystem::AddObject(ASW_CreatorObject* CreatingObject, ASW_Crea
 	}
 	else
 	{
-		CreatorMap.Objects.Add(CreatingObject);
+        CreatingObject->AttachToActor(RootActor, FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
 
@@ -384,7 +413,7 @@ void UCreatorMapSubsystem::RemoveObjectRecursive(ASW_CreatorObject* Object)
 			}
 		}
 
-		CreatorItemMap.Remove(Object->CreatorObjectId);
+		//CreatorItemMap.Remove(Object->CreatorObjectId);
         if (GetWorld()->GetAuthGameMode())
 		    Object->Destroy();
 	}
@@ -410,11 +439,6 @@ void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecurs
 {
 	if (Object != nullptr)
 	{
-        if (CreatorMap.Objects.Contains(Object))
-        {
-            CreatorMap.Objects.Remove(Object);
-        }
-
 		if (isRecursive)
 		{
 			TArray<AActor*> AttachedActors;
@@ -434,7 +458,7 @@ void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecurs
 			}
 		}
 
-		CreatorItemMap.Remove(Object->CreatorObjectId);
+		//CreatorItemMap.Remove(Object->CreatorObjectId);
 		if (GetWorld()->GetAuthGameMode())
 		    Object->Destroy();
 	}
@@ -442,28 +466,14 @@ void UCreatorMapSubsystem::RemoveObject(ASW_CreatorObject* Object, bool isRecurs
 
 void UCreatorMapSubsystem::AddCreatorMapObject(ASW_CreatorObject* Object)
 {
-    if (!CreatorMap.Objects.Contains(Object))
-    {
-	    CreatorMap.Objects.Add(Object);
-    }
-}
-
-void UCreatorMapSubsystem::RemoveCreatorMapObject(ASW_CreatorObject* Object)
-{
-	if (CreatorMap.Objects.Contains(Object))
-	{
-		CreatorMap.Objects.Remove(Object);
-	}
+    Object->AttachToActor(RootActor, FAttachmentTransformRules::KeepWorldTransform);
 }
 
 void UCreatorMapSubsystem::AttachObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
 {
 	if (ParentObject == nullptr)
-	{
-        if (! CreatorMap.Objects.Contains(ChildObject))
-        {
-		    CreatorMap.Objects.Add(ChildObject);
-        }
+	{  
+		ChildObject->AttachToActor(RootActor, FAttachmentTransformRules::KeepWorldTransform);
 	}
 	else
 	{
@@ -472,20 +482,10 @@ void UCreatorMapSubsystem::AttachObject(ASW_CreatorObject* ParentObject, ASW_Cre
 	}
 }
 
-void UCreatorMapSubsystem::DetechObject(ASW_CreatorObject* ParentObject, ASW_CreatorObject* ChildObject)
+void UCreatorMapSubsystem::DetechObject(ASW_CreatorObject* ChildObject)
 {
-	if (ParentObject == nullptr)
-	{
-        if (CreatorMap.Objects.Contains(ChildObject))
-        {
-            CreatorMap.Objects.Remove(ChildObject);
-        }
-	}
-    else
-    {
-        if (GetWorld()->GetAuthGameMode())
-	        ChildObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-    }
+    if (GetWorld()->GetAuthGameMode())
+	    ChildObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
 
 ASW_CreatorObject* UCreatorMapSubsystem::FindParentObject(ASW_CreatorObject* ChildObject)
@@ -533,4 +533,14 @@ bool UCreatorMapSubsystem::IsChildObject(ASW_CreatorObject* ParentObject, ASW_Cr
 	}
     
 	return false;
+}
+
+void UCreatorMapSubsystem::SetRootActor(ACreatorObjectRootActor* InRootActor)
+{
+	RootActor = InRootActor;
+}
+
+ACreatorObjectRootActor* UCreatorMapSubsystem::GetRootActor()
+{
+	return RootActor;
 }

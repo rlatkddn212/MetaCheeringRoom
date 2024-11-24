@@ -52,7 +52,6 @@ void USW_PropertyColorWidget::SetPropertyValue(int32 id, class UCreatorColorProp
 void USW_PropertyColorWidget::SetInspectorWidget(USW_CreatorInspectorWidget* InInspectorWidget)
 {
 	InspectorWidget = InInspectorWidget;
-	
 }
 
 void USW_PropertyColorWidget::OnColorChanged(FLinearColor Color)
