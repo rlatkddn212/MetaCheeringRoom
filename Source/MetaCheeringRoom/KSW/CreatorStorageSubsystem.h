@@ -12,9 +12,9 @@ struct FCreatorObjectData : public FTableRowBase
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CObjectType;
+	int32 CObjectType = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CObjectId;
+	int32 CObjectId = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ItemName;
@@ -67,9 +67,9 @@ struct FCreatorFBXData
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CObjectType;
+	int32 CObjectType = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CObjectId;
+	int32 CObjectId = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ItemName;

@@ -136,7 +136,7 @@ void UCreatorFBXSubsystem::OnAnonymousLoginComplete(FHttpRequestPtr Request, FHt
 		TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<TCHAR>::Create(ResponseBody);
 		if (FJsonSerializer::Deserialize(JsonReader, JsonObject))
 		{
-			Token = JsonObject->GetStringField("idToken");
+			Token = JsonObject->GetStringField(TEXT("idToken"));
 			UE_LOG(LogTemp, Log, TEXT("Token: %s"), *Token);
 		}
 	}
@@ -244,8 +244,8 @@ TMap<FString, FCreatorFBXMetaData> UCreatorFBXSubsystem::LoadMetaData()
 
 		TSharedPtr<FJsonObject> MetaDataObject = Elem.Value->AsObject();
 
-		NewMetaData.FileName = MetaDataObject->GetStringField("FileName");
-		NewMetaData.FBXName = MetaDataObject->GetStringField("FBXName");
+		NewMetaData.FileName = MetaDataObject->GetStringField(TEXT("FileName"));
+		NewMetaData.FBXName = MetaDataObject->GetStringField(TEXT("FBXName"));
 
 		this->MetaDataMap.Add(NewMetaData.FileName, NewMetaData);
 	}

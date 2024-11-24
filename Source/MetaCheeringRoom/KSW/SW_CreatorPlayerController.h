@@ -27,6 +27,7 @@ class METACHEERINGROOM_API ASW_CreatorPlayerController : public APlayerControlle
 public:
 	ASW_CreatorPlayerController();
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void Tick(float DeltaTime) override;
 
@@ -40,24 +41,6 @@ public:
 	// 지워지지 않는경우
 
 	void ImportFBXObject(const FString& FilePath);
-
-	UFUNCTION(Server, Reliable)
-	void Server_SetOwnerObject(class ASW_CreatorObject* OwnerObject, bool isOnwer);
-
-	UFUNCTION(Server, Reliable)
-	void Server_AddCreatingDummyObject(const struct FCreatorObjectData& ObjectData, FVector Pos);
-
-	UFUNCTION(Server, Reliable)
-	void Server_DeleteObject(class ASW_CreatorObject* DeleteObject);
-
-	UFUNCTION(Server, Reliable)
-	void Server_DetachObject(class ASW_CreatorObject* DetachObject);
-
-	UFUNCTION(Server, Reliable)
-	void Server_AttachObject(class ASW_CreatorObject* ParentObject, class ASW_CreatorObject* AttachObject);
-
-	UFUNCTION(Server, Reliable)
-	void Server_CopyPasteObject(class ASW_CreatorObject* CopyObject);
 
 	UFUNCTION()
 	void DoSelectObject(class ASW_CreatorObject* NewSelectObject);
@@ -82,7 +65,7 @@ public:
 	class ASW_CreatorObject* SelectedObject;
 	
 	UPROPERTY()
-	class ASW_CreatorObject* CreatingObject;
+	class ASW_CreatorObject* DummyObject;
 	
 	// 위젯
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
@@ -106,4 +89,24 @@ public:
 
 	class ASW_CreatorObject* CopiedObject;
 
+	
+	UFUNCTION(Server, Reliable)
+	void Server_SetOwnerObject(class ASW_CreatorObject* OwnerObject, bool isOnwer);
+
+	UFUNCTION(Server, Reliable)
+	void Server_AddCreatingDummyObject(const struct FCreatorObjectData& ObjectData, FVector Pos);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DeleteObject(class ASW_CreatorObject* DeleteObject);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DetachObject(class ASW_CreatorObject* DetachObject);
+
+	UFUNCTION(Server, Reliable)
+	void Server_AttachObject(class ASW_CreatorObject* ParentObject, class ASW_CreatorObject* AttachObject);
+
+	UFUNCTION(Server, Reliable)
+	void Server_CopyPasteObject(class ASW_CreatorObject* CopyObject);
+
+	FTimerHandle ReloadTimerHandle;
 };

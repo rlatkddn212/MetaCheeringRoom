@@ -14,7 +14,4 @@ class METACHEERINGROOM_API ASW_CreatorGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 	
-
-public:
-	
 };
