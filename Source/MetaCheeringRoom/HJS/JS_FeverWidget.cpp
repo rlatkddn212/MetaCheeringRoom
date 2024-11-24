@@ -5,6 +5,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/Image.h"
 #include "Styling/SlateColor.h"
+#include "Kismet/GameplayStatics.h"
 
 void UJS_FeverWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -18,6 +19,7 @@ void UJS_FeverWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		if (CurrentTime >= FeverEndTime)
 		{
 			PB_FeverBar->SetVisibility(ESlateVisibility::Visible);
+			UGameplayStatics::PlaySound2D(GetWorld(),DrumHitSound);
 			bFeverTime = false;
 			bFeverStart = false;
 			SetVisibility(ESlateVisibility::Hidden);
@@ -69,6 +71,8 @@ void UJS_FeverWidget::FeverStart()
 		PB_FeverBar->SetVisibility(ESlateVisibility::Hidden);
 		bFeverTime = true;
 		bFeverStart = false;
-		CurrentTime = 0.f;
+		CurrentTime = 2.f;
+		UGameplayStatics::PlaySound2D(GetWorld(), DrumHitSound);
+		UGameplayStatics::PlaySound2D(GetWorld(), FeverSound);
 	}
 }

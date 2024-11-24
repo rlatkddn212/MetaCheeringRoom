@@ -45,4 +45,11 @@ public:
 	void UpdateGradientColor(float InDeltaTime);
 
 	void FeverStart();
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* DrumRollSound;
+	UPROPERTY(EditAnywhere)
+	USoundBase* DrumHitSound;
+	UPROPERTY(EditAnywhere)
+	USoundBase* FeverSound;
 };

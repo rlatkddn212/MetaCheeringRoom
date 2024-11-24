@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "JS_JoinSessionTriggerBox.h"
 #include "../SHK/HG_Player.h"
+#include "JS_PlayerController.h"
 
 void UJS_PopupWidget::NativeConstruct()
 {
@@ -43,10 +44,12 @@ void UJS_PopupWidget::ClosePopupUI()
 
 void UJS_PopupWidget::Init()
 {
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	AJS_PlayerController* PC = Cast<AJS_PlayerController>(GetWorld()->GetFirstPlayerController());
+	
 	PlayAnimation(ShowWidget);
 	if (PC)
 	{
+		PC->PlayUISound();
 		PC->SetShowMouseCursor(true);
 		PC->SetInputMode(FInputModeUIOnly());
 		AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());

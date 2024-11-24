@@ -299,3 +299,11 @@ void AJS_PlayerController::ClientAddChat_Implementation(const FString& id, const
 		LoadActor->ChatWidget->AddChat(id, text, bAuto);
 	}
 }
+
+void AJS_PlayerController::PlayUISound()
+{
+	if (UIShowAndHideSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(),UIShowAndHideSound);
+	}
+}

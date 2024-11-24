@@ -9,6 +9,7 @@
 #include "../MetaCheeringRoom.h"
 #include "GameFramework/Character.h"
 #include "../SHK/HG_Player.h"
+#include "JS_PlayerController.h"
 
 // Sets default values
 AJS_ToToWidgetTriggerBox::AJS_ToToWidgetTriggerBox()
@@ -62,9 +63,10 @@ void AJS_ToToWidgetTriggerBox::ShowTotoWidget()
 	{
 		ToToWidget->ToToInitSetting();
 		ToToWidget->PlayShowAnimation();
-		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		AJS_PlayerController* PC = Cast<AJS_PlayerController>(GetWorld()->GetFirstPlayerController());
 		if (PC)
 		{
+			PC->PlayUISound();
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeUIOnly());
 			AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());

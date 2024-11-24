@@ -5,6 +5,7 @@
 #include "JS_FeverWidget.h"
 #include "../SHK/HG_Player.h"
 #include "MetaCheeringRoom.h"
+#include "Kismet/GameplayStatics.h"
 // Sets default values
 AJS_FeverActor::AJS_FeverActor()
 {
@@ -50,10 +51,15 @@ void AJS_FeverActor::FeverTimeStart()
 
 void AJS_FeverActor::MulticastFeverTimeStart_Implementation()
 {
-	PRINTLOG(TEXT("0000"));
-
-	FeverWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-	FeverWidget->bFeverStart = true;
-	FeverWidget->CurrentTime = 0.f;
-	FeverWidget->SetPercent(0.1f);
+	if (FeverWidget)
+	{
+		FeverWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		FeverWidget->bFeverStart = true;
+		FeverWidget->CurrentTime = 0.f;
+		FeverWidget->SetPercent(0.1f);
+		if (FeverWidget->DrumRollSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(),FeverWidget->DrumRollSound);
+		}
+	}
 }

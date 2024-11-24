@@ -98,4 +98,12 @@ public:
 	void ClientAddChat(const FString& id, const FText& text, bool bAuto);
 	UPROPERTY()
 	class AJS_LoadActor* LoadActor;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* UIShowAndHideSound;
+
+	UFUNCTION()
+	void PlayUISound();
+
+
 };

@@ -7,6 +7,7 @@
 #include "JS_SessionJoinWidget.h"
 #include "../SHK/HG_Player.h"
 #include "JS_CreateRoomWidget.h"
+#include "JS_PlayerController.h"
 
 // Sets default values
 AJS_CreateRoomWidgetTriggerBox::AJS_CreateRoomWidgetTriggerBox()
@@ -38,10 +39,11 @@ void AJS_CreateRoomWidgetTriggerBox::ComponentBeginOverlap(UPrimitiveComponent* 
 
 		UI->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		UI->PlayShowWidgetAnimation();
-		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		AJS_PlayerController* PC = Cast<AJS_PlayerController>(GetWorld()->GetFirstPlayerController());
 
 		if (PC)
 		{
+			PC->PlayUISound();
 			PC->SetShowMouseCursor(true);
 			PC->SetInputMode(FInputModeUIOnly());
 			AHG_Player* Player = Cast<AHG_Player>(PC->GetCharacter());
