@@ -65,5 +65,5 @@ void USW_PropertyColorWidget::OnColorChanged(FLinearColor Color)
 void USW_PropertyColorWidget::OnColorButtonClicked()
 {
 	InspectorWidget->ChangeColorPicker.BindDynamic(this, &USW_PropertyColorWidget::OnColorChanged);
-	InspectorWidget->OnColorButtonClicked();
+	InspectorWidget->OnColorButtonClicked(ColorProperty->Value);
 }

@@ -107,8 +107,11 @@ public:
 	void OnColorChanged(FLinearColor Color);
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnColorButtonClicked();
+	void OnColorButtonClicked(FLinearColor Color);
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void CloseColorPicker();
+
 	UFUNCTION()
 	void OnChanged();
 

@@ -40,12 +40,12 @@ public:
 	FLinearColor MeshColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	UPROPERTY(ReplicatedUsing = OnRep_EmissiveColorChanged)
-	FLinearColor EmissiveColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	FLinearColor EmissiveColor = FLinearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	
 	UPROPERTY(ReplicatedUsing = OnRep_MeshMetallicChanged)
 	float Metallic = 0.0f;
 	UPROPERTY(ReplicatedUsing = OnRep_MeshRoughnessChanged)
-	float Roughness = 0.0f;
+	float Roughness = 0.6f;
 
 	// ---------------------------------------------------------- server 동기화 부분
 	UFUNCTION()

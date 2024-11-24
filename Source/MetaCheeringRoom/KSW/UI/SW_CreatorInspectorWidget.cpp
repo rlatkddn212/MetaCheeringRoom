@@ -78,6 +78,7 @@ void USW_CreatorInspectorWidget::OnChanged()
 
 void USW_CreatorInspectorWidget::SetObject(ASW_CreatorObject* Obj)
 {
+	CloseColorPicker();
 	if (Obj == nullptr)
 	{
 		InspectorScrollBox->SetVisibility(ESlateVisibility::Hidden);
