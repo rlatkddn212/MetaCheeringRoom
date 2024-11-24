@@ -4,6 +4,7 @@
 #include "HJS/JS_StadiumWave.h"
 #include "Components/BoxComponent.h"
 #include "MetaCheeringRoom.h"
+#include "../SHK/HG_KomanoDummy.h"
 // Sets default values
 AJS_StadiumWave::AJS_StadiumWave()
 {
@@ -27,7 +28,6 @@ void AJS_StadiumWave::BeginPlay()
     if (HasAuthority())
     {
         SetOwner(GetWorld()->GetFirstPlayerController()->GetPawn());
-        //TurnStart();
     }
 }
 
@@ -46,7 +46,7 @@ void AJS_StadiumWave::TurnStart()
 void AJS_StadiumWave::MulticastTurnStart_Implementation()
 {
     bTurn = true;
-    CurrentRotation = 0.0f;
+    CurrentRotation = 270.f;
     BoxComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
@@ -54,7 +54,7 @@ void AJS_StadiumWave::OnTurn(float DeltaTime)
 {
     if (!bTurn) return;
 
-    // 현재 회전 각도 업데이트
+    // 현재 회전 각도 업데이트s
     CurrentRotation += RotationSpeed * DeltaTime;
 
     // 새로운 회전값 설정
@@ -63,16 +63,19 @@ void AJS_StadiumWave::OnTurn(float DeltaTime)
     SetActorRotation(NewRotation);
 
     // 360도 회전 완료 체크
-    if (CurrentRotation >= 360.0f)
+    if (CurrentRotation >= 630.0f)
     {
         bTurn = false;
-        CurrentRotation = 0.0f;
+        CurrentRotation = 270.f;
         BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     }
 }
 
 void AJS_StadiumWave::ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    i++;
+    AHG_KomanoDummy* Dummy = Cast<AHG_KomanoDummy>(OtherActor);
+    if (Dummy)
+    {   
+        Dummy->CheerSurfing();
+    }
 }
-

@@ -106,7 +106,7 @@ void AJS_TotoActor::MakeToto(FString totoName, FString select1, FString select2,
 	Betting1.Empty();
 	Betting2.Empty();
 	ServerSetTimerLimit();
-	MulticastInitToto();
+	MulticastInitToto(true);
 	MulticastAlarmToto(TEXT("승부예측이 시작되었습니다!"));
 	MulticastSetToToUI(totoName,select1,select2);
 }
@@ -232,7 +232,10 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 
 void AJS_TotoActor::MulticastAdjustPoint_Implementation(class AHG_Player* player, int32 bettingpoint, float odd)
 {
-	player->GoodsComp->AddGold(bettingpoint*odd);
+	if (player->IsLocallyControlled())
+	{
+		player->GoodsComp->AddGold((int32)bettingpoint*odd);
+	}
 	AdjustWin(player);
 }
 
@@ -351,7 +354,7 @@ void AJS_TotoActor::MulticastSetTimeUI_Implementation(const FString& TimeText, c
 
 }
 
-void AJS_TotoActor::MulticastInitToto_Implementation()
+void AJS_TotoActor::MulticastInitToto_Implementation(bool value)
 {
 	// 전체 포인트
 	TotalSelect1 = 0;
@@ -367,7 +370,7 @@ void AJS_TotoActor::MulticastInitToto_Implementation()
 
 	if (ToToWidget)
 	{
-		ToToWidget->InitWidget();
+		ToToWidget->InitWidget(value);
 	}
 }
 

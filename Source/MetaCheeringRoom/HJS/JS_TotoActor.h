@@ -108,7 +108,7 @@ public:
 	void MulticastSetTimeUI(const FString& TimeText, const int32& Time);
 
 	UFUNCTION(NetMulticast,Reliable)
-	void MulticastInitToto();
+	void MulticastInitToto(bool value);
 
 	void LoseAnimationPlay(AHG_Player* player);
 
