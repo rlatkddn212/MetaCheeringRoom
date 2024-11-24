@@ -20,12 +20,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(Server,Reliable)
@@ -34,6 +28,13 @@ public:
 	void ServerRPC_SetStateIdle(bool Value);
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SetStateShake(bool Value);
+
+	UFUNCTION(NetMulticast,Reliable)
+	void Multicast_SetStateSit(bool Value);
+	UFUNCTION(NetMulticast,Reliable)
+	void Multicast_SetStateIdle(bool Value);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetStateShake(bool Value);
 
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Replicated)

@@ -24,6 +24,7 @@ void UHG_HUD::SetPointText()
 
 void UHG_HUD::UpdateHUD(int32 Value)
 {
+	SetPointText();
 	if (Value == 0)
 	{
 		WS_Border->SetActiveWidgetIndex(0);

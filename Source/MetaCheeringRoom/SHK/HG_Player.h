@@ -78,11 +78,32 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Shake;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Sit;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_CheerSurfing;
+
 	UFUNCTION()
-	void ShakeHand();	
+	void CheerSurfing();
+	UFUNCTION()
+	void Sit();
+
+	UFUNCTION()
+	void ShakeHand();
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AHG_CheeringStick> CSClass;
+
+	AHG_CheeringStick* My_CheeringStick;
+
+	TArray<AActor*> CheerSticks;
 
 	UFUNCTION()
 	void StopHand();
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_Shake(bool Value);
 
 	UFUNCTION()
 	void ConversionFullScreen();
@@ -404,6 +425,26 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AHG_KomanoDummy> KomanoDummyClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Replicated)
 	bool bIsShaking = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Replicated)
+	bool bIsSitting = false;
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_SetSitState();	
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class AHG_ChairCollision* DetectChair;
+
+	bool bSitToggle = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Replicated)
+	bool bIsCheerSurfing = false;
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_SetCheerSurfingState();	
+
+	void SetCheerSurfingState();
 };

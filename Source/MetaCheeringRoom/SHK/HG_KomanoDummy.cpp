@@ -13,6 +13,10 @@ AHG_KomanoDummy::AHG_KomanoDummy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Mesh->SetGenerateOverlapEvents(true);
+	
+	bReplicates = true;
+	SetReplicateMovement(true);
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
@@ -22,20 +26,6 @@ void AHG_KomanoDummy::BeginPlay()
 
 }
 
-// Called every frame
-void AHG_KomanoDummy::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-//
-//// Called to bind functionality to input
-//void AHG_KomanoDummy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-//{
-//	Super::SetupPlayerInputComponent(PlayerInputComponent);
-//
-//}
-
 void AHG_KomanoDummy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -43,6 +33,21 @@ void AHG_KomanoDummy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(AHG_KomanoDummy, bShake);
 	DOREPLIFETIME(AHG_KomanoDummy, bSit);
 	DOREPLIFETIME(AHG_KomanoDummy, bIdle);
+}
+
+void AHG_KomanoDummy::Multicast_SetStateSit_Implementation(bool Value)
+{
+	bSit = Value;
+}
+
+void AHG_KomanoDummy::Multicast_SetStateIdle_Implementation(bool Value)
+{
+	bIdle = Value;
+}
+
+void AHG_KomanoDummy::Multicast_SetStateShake_Implementation(bool Value)
+{
+	bShake = Value;
 }
 
 void AHG_KomanoDummy::ReturnOriginCondition()
@@ -58,10 +63,11 @@ void AHG_KomanoDummy::CheerSurfing()
 	ServerRPC_SetStateSit(false);
 	ServerRPC_SetStateIdle(true);
 	ServerRPC_SetStateShake(true);
+
 	ChangeCheeringStickColor();
 
 	FTimerHandle handle;
-	GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_KomanoDummy::ReturnOriginCondition,5.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_KomanoDummy::ReturnOriginCondition, 0.5f, false);
 }
 
 
@@ -69,15 +75,18 @@ void AHG_KomanoDummy::CheerSurfing()
 void AHG_KomanoDummy::ServerRPC_SetStateSit_Implementation(bool Value)
 {
 	bSit = Value;
+	//Multicast_SetStateSit(Value);
 }
 
 void AHG_KomanoDummy::ServerRPC_SetStateIdle_Implementation(bool Value)
 {
 	bIdle = Value;
+	//Multicast_SetStateIdle(Value);
 }
 
 void AHG_KomanoDummy::ServerRPC_SetStateShake_Implementation(bool Value)
 {
 	bShake = Value;
+	//Multicast_SetStateShake(Value);
 }
 

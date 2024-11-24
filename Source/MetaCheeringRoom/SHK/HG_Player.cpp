@@ -29,6 +29,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "HG_KomanoDummy.h"
+#include "HG_ChairCollision.h"
+#include "Components/ArrowComponent.h"
 
 AHG_Player::AHG_Player()
 {
@@ -239,17 +241,20 @@ void AHG_Player::Tick(float DeltaTime)
 
 	Anim = Cast<UHG_PlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
-	if (bDetectStand)
+	if (!bIsSitting)
 	{
-		Timing = 1.0f;
-		SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 3.5f);
-	}
-	else
-	{
-		Timing -= DeltaTime;
-		if (Timing <= 0)
+		if (bDetectStand)
 		{
-			SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
+			Timing = 1.0f;
+			SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue2, DeltaTime, 3.5f);
+		}
+		else
+		{
+			Timing -= DeltaTime;
+			if (Timing <= 0)
+			{
+				SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetValue1, DeltaTime, 2.0f);
+			}
 		}
 	}
 }
@@ -281,23 +286,100 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	input->BindAction(IA_Shake, ETriggerEvent::Started, this, &AHG_Player::ShakeHand);
 	input->BindAction(IA_Shake, ETriggerEvent::Completed, this, &AHG_Player::StopHand);
 
+	input->BindAction(IA_Sit, ETriggerEvent::Completed, this, &AHG_Player::Sit);
+
+	input->BindAction(IA_CheerSurfing, ETriggerEvent::Completed, this, &AHG_Player::CheerSurfing);
+
+}
+
+void AHG_Player::CheerSurfing()
+{
+	ServerRPC_SetCheerSurfingState();
+}
+
+void AHG_Player::Sit()
+{
+	if (!bIsSitting)
+	{
+		if (DetectChair)
+		{
+			FVector ChairLoc = DetectChair->GetActorLocation();
+			SetActorLocation(ChairLoc);
+			FVector ChairDir = DetectChair->GetActorRightVector();
+			SetActorRotation(ChairDir.Rotation());
+			SpringArmComp->TargetArmLength = 0.0f;
+			SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+			CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
+		}
+	}
+	else
+	{
+		SpringArmComp->TargetArmLength = 300.0f;
+		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	}
+	bCanMove = !bCanMove;
+	ServerRPC_SetSitState();
+}
+
+void AHG_Player::ServerRPC_SetSitState_Implementation()
+{
+	if (!bIsSitting)
+	{
+		if (DetectChair)
+		{
+			FVector ChairLoc = DetectChair->GetActorLocation();
+			SetActorLocation(ChairLoc);
+			FVector ChairDir = DetectChair->GetActorRightVector();
+			SetActorRotation(ChairDir.Rotation());
+			SpringArmComp->TargetArmLength = 0.0f;
+			SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+			CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
+			bIsSitting = true;
+		}
+	}
+	else
+	{
+		bIsSitting = false;
+		SpringArmComp->TargetArmLength = 300.0f;
+		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+		DetectChair = nullptr;
+	}
 }
 
 void AHG_Player::ShakeHand()
 {
-	bIsShaking = true;
+	ServerRPC_Shake(true);
+
 	bCanMove = false;
 }
 
 void AHG_Player::StopHand()
 {
-	bIsShaking = false;
-	bCanMove = true;
+	ServerRPC_Shake(false);
+
+	if (bIsSitting)
+	{
+		bCanMove = false;
+	}
+	else
+	{
+		bCanMove = true;
+	}
+}
+
+void AHG_Player::ServerRPC_Shake_Implementation(bool Value)
+{
+	if (HasAuthority())
+	{
+		bIsShaking = Value;
+	}
 }
 
 void AHG_Player::ConversionFullScreen()
 {
-	if (!FullScreenWidget)
+	if (nullptr == FullScreenWidget)
 	{
 		FullScreenWidget = CreateWidget<UUserWidget>(GetWorld(), FullScreenClass);
 	}
@@ -361,7 +443,7 @@ void AHG_Player::OnMyJump(const FInputActionValue& Value)
 
 void AHG_Player::OnMyLook(const FInputActionValue& Value)
 {
-	if (!bCanMove) return;
+	if (!bIsSitting && !bCanMove) return;
 
 	FVector2D v = Value.Get<FVector2D>();
 	AddControllerPitchInput(-v.Y);
@@ -518,6 +600,42 @@ void AHG_Player::BlingBling()
 	if (DynamicMaterial_ClothColor)
 	{
 		DynamicMaterial_ClothColor->SetVectorParameterValue("EmissiveColor", 9.9 * RandColor);
+	}
+}
+
+void AHG_Player::SetCheerSurfingState()
+{
+	bIsCheerSurfing = false;
+
+	if (My_CheeringStick)
+	{
+		My_CheeringStick->ApplyChange(FLinearColor::Black, false, 0.1f);
+	}
+}
+
+void AHG_Player::ServerRPC_SetCheerSurfingState_Implementation()
+{
+	if (bIsSitting)
+	{
+		bIsCheerSurfing = true;
+
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), CSClass, CheerSticks);
+
+		for (auto* CheerStick : CheerSticks)
+		{
+			auto* C_CheerStick = Cast<AHG_CheeringStick>(CheerStick);
+			if (C_CheerStick->ItemOwner == Controller->GetPawn())
+			{
+				if (C_CheerStick)
+				{
+					My_CheeringStick = C_CheerStick;
+					C_CheerStick->ApplyChange(FLinearColor::Red, false, 100);
+				}
+			}
+		}
+
+		FTimerHandle handle;
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_Player::SetCheerSurfingState, 0.5f, false);
 	}
 }
 
@@ -1028,6 +1146,9 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 	DOREPLIFETIME(AHG_Player, EquipItemList);
 	DOREPLIFETIME(AHG_Player, bEquipItem);
+	DOREPLIFETIME(AHG_Player, bIsSitting);
+	DOREPLIFETIME(AHG_Player, bIsShaking);
+	DOREPLIFETIME(AHG_Player, bIsCheerSurfing);
 }
 
 
