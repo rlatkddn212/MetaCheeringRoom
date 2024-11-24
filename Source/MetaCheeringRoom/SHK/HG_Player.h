@@ -87,8 +87,18 @@ public:
 	UFUNCTION()
 	void ShakeHand();
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AHG_CheeringStick> CSClass;
+
+	AHG_CheeringStick* My_CheeringStick;
+
+	TArray<AActor*> CheerSticks;
+
 	UFUNCTION()
 	void StopHand();
+
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_Shake(bool Value);
 
 	UFUNCTION()
 	void ConversionFullScreen();
@@ -424,4 +434,6 @@ public:
 	class AHG_ChairCollision* DetectChair;
 
 	bool bSitToggle = false;
+
+	
 };

@@ -20,7 +20,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(Server,Reliable)

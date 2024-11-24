@@ -67,7 +67,7 @@ void AHG_KomanoDummy::CheerSurfing()
 	ChangeCheeringStickColor();
 
 	FTimerHandle handle;
-	GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_KomanoDummy::ReturnOriginCondition,5.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_KomanoDummy::ReturnOriginCondition, 0.5f, false);
 }
 
 
@@ -75,18 +75,18 @@ void AHG_KomanoDummy::CheerSurfing()
 void AHG_KomanoDummy::ServerRPC_SetStateSit_Implementation(bool Value)
 {
 	bSit = Value;
-	Multicast_SetStateSit(Value);
+	//Multicast_SetStateSit(Value);
 }
 
 void AHG_KomanoDummy::ServerRPC_SetStateIdle_Implementation(bool Value)
 {
 	bIdle = Value;
-	Multicast_SetStateIdle(Value);
+	//Multicast_SetStateIdle(Value);
 }
 
 void AHG_KomanoDummy::ServerRPC_SetStateShake_Implementation(bool Value)
 {
 	bShake = Value;
-	Multicast_SetStateShake(Value);
+	//Multicast_SetStateShake(Value);
 }
 

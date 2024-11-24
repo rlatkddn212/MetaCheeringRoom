@@ -321,7 +321,6 @@ void AHG_Player::ServerRPC_SetSitState_Implementation()
 	{
 		if (DetectChair)
 		{
-
 			FVector ChairLoc = DetectChair->GetActorLocation();
 			SetActorLocation(ChairLoc);
 			FVector ChairDir = DetectChair->GetActorRightVector();
@@ -344,14 +343,52 @@ void AHG_Player::ServerRPC_SetSitState_Implementation()
 
 void AHG_Player::ShakeHand()
 {
-	bIsShaking = true;
+	ServerRPC_Shake(true);
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), CSClass, CheerSticks);
+
+	for (auto* CheerStick : CheerSticks)
+	{
+		auto* C_CheerStick = Cast<AHG_CheeringStick>(CheerStick);
+		if (C_CheerStick->ItemOwner == Controller->GetPawn())
+		{
+			if (C_CheerStick)
+			{
+				My_CheeringStick = C_CheerStick;
+				UE_LOG(LogTemp,Warning,TEXT("123"));
+				C_CheerStick->ApplyChange(FLinearColor::Red, false, 100);
+			}
+		}
+	}
+
 	bCanMove = false;
 }
 
 void AHG_Player::StopHand()
 {
-	bIsShaking = false;
-	bCanMove = true;
+	ServerRPC_Shake(false);
+
+	if (My_CheeringStick)
+	{
+		My_CheeringStick->ApplyChange(FLinearColor::Black, false, 0.1f);
+	}
+	
+	if (bIsSitting)
+	{
+		bCanMove = false;
+	}
+	else
+	{
+		bCanMove = true;
+	}
+}
+
+void AHG_Player::ServerRPC_Shake_Implementation(bool Value)
+{
+	if (HasAuthority())
+	{
+		bIsShaking = Value;
+	}
 }
 
 void AHG_Player::ConversionFullScreen()
