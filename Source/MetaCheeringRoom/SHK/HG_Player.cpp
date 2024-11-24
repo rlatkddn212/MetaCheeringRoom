@@ -29,6 +29,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "HG_KomanoDummy.h"
+#include "HG_ChairCollision.h"
+#include "Components/ArrowComponent.h"
 
 AHG_Player::AHG_Player()
 {
@@ -238,6 +240,7 @@ void AHG_Player::Tick(float DeltaTime)
 	}
 
 	Anim = Cast<UHG_PlayerAnimInstance>(GetMesh()->GetAnimInstance());
+
 	if (!bIsSitting)
 	{
 		if (bDetectStand)
@@ -293,14 +296,39 @@ void AHG_Player::Sit()
 	{
 		if (DetectChair)
 		{
-			bIsSitting = true;
-			UE_LOG(LogTemp, Warning, TEXT("Sit"));
 			FVector ChairLoc = DetectChair->GetActorLocation();
 			SetActorLocation(ChairLoc);
-			FVector ChairDir = DetectChair->GetActorForwardVector();
-			SetActorRotation(ChairDir.ToOrientationRotator());
+			FVector ChairDir = DetectChair->GetActorRightVector();
+			SetActorRotation(ChairDir.Rotation());
 			SpringArmComp->TargetArmLength = 0.0f;
-			SpringArmComp->SetRelativeLocation(FVector(10.0f,0.0f,10.0f));
+			SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+			CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
+		}
+	}
+	else
+	{
+		SpringArmComp->TargetArmLength = 300.0f;
+		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	}
+	bCanMove = !bCanMove;
+	ServerRPC_SetSitState();
+}
+
+void AHG_Player::ServerRPC_SetSitState_Implementation()
+{
+	if (!bIsSitting)
+	{
+		if (DetectChair)
+		{
+
+			FVector ChairLoc = DetectChair->GetActorLocation();
+			SetActorLocation(ChairLoc);
+			FVector ChairDir = DetectChair->GetActorRightVector();
+			SetActorRotation(ChairDir.Rotation());
+			SpringArmComp->TargetArmLength = 0.0f;
+			SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+			CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
 			bIsSitting = true;
 		}
 	}
@@ -309,9 +337,9 @@ void AHG_Player::Sit()
 		bIsSitting = false;
 		SpringArmComp->TargetArmLength = 300.0f;
 		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
-		DetectChair = nullptr; 
+		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+		DetectChair = nullptr;
 	}
-	bCanMove = !bCanMove;
 }
 
 void AHG_Player::ShakeHand()
@@ -328,7 +356,7 @@ void AHG_Player::StopHand()
 
 void AHG_Player::ConversionFullScreen()
 {
-	if (!FullScreenWidget)
+	if (nullptr == FullScreenWidget)
 	{
 		FullScreenWidget = CreateWidget<UUserWidget>(GetWorld(), FullScreenClass);
 	}
@@ -392,21 +420,11 @@ void AHG_Player::OnMyJump(const FInputActionValue& Value)
 
 void AHG_Player::OnMyLook(const FInputActionValue& Value)
 {
-	if (bIsSitting)
-	{
-		FVector2D v = Value.Get<FVector2D>();
-		AddControllerPitchInput(-v.Y);
-		AddControllerYawInput(v.X);
-	}
-	else
-	{
-		if (!bCanMove) return;	
+	if (!bIsSitting && !bCanMove) return;
 
-		FVector2D v = Value.Get<FVector2D>();
-		AddControllerPitchInput(-v.Y);
-		AddControllerYawInput(v.X);
-	}
-
+	FVector2D v = Value.Get<FVector2D>();
+	AddControllerPitchInput(-v.Y);
+	AddControllerYawInput(v.X);
 }
 
 void AHG_Player::OnMyInteraction(const FInputActionValue& Value)
@@ -1069,6 +1087,8 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 	DOREPLIFETIME(AHG_Player, EquipItemList);
 	DOREPLIFETIME(AHG_Player, bEquipItem);
+	DOREPLIFETIME(AHG_Player, bIsSitting);
+	DOREPLIFETIME(AHG_Player, bIsShaking);
 }
 
 

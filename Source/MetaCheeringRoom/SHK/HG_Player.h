@@ -410,14 +410,18 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AHG_KomanoDummy> KomanoDummyClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Replicated)
 	bool bIsShaking = false;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Replicated)
 	bool bIsSitting = false;
 
+	UFUNCTION(Server,Reliable)
+	void ServerRPC_SetSitState();	
+
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	AActor* DetectChair;
+	class AHG_ChairCollision* DetectChair;
 
 	bool bSitToggle = false;
 };
