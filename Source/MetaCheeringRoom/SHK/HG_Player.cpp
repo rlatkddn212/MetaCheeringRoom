@@ -288,13 +288,20 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	input->BindAction(IA_Sit, ETriggerEvent::Completed, this, &AHG_Player::Sit);
 
-	input->BindAction(IA_CheerSurfing, ETriggerEvent::Completed, this, &AHG_Player::CheerSurfing);
-
+	input->BindAction(IA_CheerSurfing, ETriggerEvent::Started, this, &AHG_Player::CheerSurfing);
 }
 
 void AHG_Player::CheerSurfing()
 {
-	ServerRPC_SetCheerSurfingState();
+	if (bIsSitting)
+	{
+		SpringArmComp->TargetArmLength = 300.0f;
+		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+
+		ServerRPC_SetCheerSurfingState();
+	}
+
 }
 
 void AHG_Player::Sit()
@@ -310,6 +317,7 @@ void AHG_Player::Sit()
 			SpringArmComp->TargetArmLength = 0.0f;
 			SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
 			CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
+			Controller->SetControlRotation(GetActorRotation());
 		}
 	}
 	else
@@ -318,8 +326,8 @@ void AHG_Player::Sit()
 		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
 		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	}
-	bCanMove = !bCanMove;
 	ServerRPC_SetSitState();
+	bCanMove = !bIsSitting;
 }
 
 void AHG_Player::ServerRPC_SetSitState_Implementation()
@@ -335,6 +343,8 @@ void AHG_Player::ServerRPC_SetSitState_Implementation()
 			SpringArmComp->TargetArmLength = 0.0f;
 			SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
 			CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
+			CameraComp->SetRelativeRotation(ChairDir.Rotation());
+			Controller->SetControlRotation(GetActorRotation());
 			bIsSitting = true;
 		}
 	}
@@ -344,7 +354,6 @@ void AHG_Player::ServerRPC_SetSitState_Implementation()
 		SpringArmComp->TargetArmLength = 300.0f;
 		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
 		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-		//DetectChair = nullptr;
 	}
 }
 
@@ -427,7 +436,7 @@ void AHG_Player::TeleportToCreate()
 
 void AHG_Player::OnMyMove(const FInputActionValue& Value)
 {
-	if (!bCanMove) return;
+	if (bIsSitting || !bCanMove) return;
 
 	FVector2D v = Value.Get<FVector2D>();
 	Direction.X = v.X;
@@ -606,37 +615,52 @@ void AHG_Player::BlingBling()
 void AHG_Player::SetCheerSurfingState()
 {
 	bIsCheerSurfing = false;
+	if (DetectChair)
+	{
+		FTimerHandle handle;
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_Player::CameraDelay, 0.5f, false);
+	}
+}
+
+void AHG_Player::CameraDelay()
+{
+	FVector ChairLoc = DetectChair->GetActorLocation();
+	SetActorLocation(ChairLoc);
+	FVector ChairDir = DetectChair->GetActorRightVector();
+	SetActorRotation(ChairDir.Rotation());
+	SpringArmComp->TargetArmLength = 0.0f;
+	SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+	CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
 
 	if (My_CheeringStick)
 	{
-		My_CheeringStick->ApplyChange(FLinearColor::Black, false, 0.1f);
+		My_CheeringStick->ApplyChange(FLinearColor::Black, false, 1.0f);
 	}
 }
 
 void AHG_Player::ServerRPC_SetCheerSurfingState_Implementation()
 {
-	if (bIsSitting)
+
+	bIsCheerSurfing = true;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), CSClass, CheerSticks);
+
+	for (auto* CheerStick : CheerSticks)
 	{
-		bIsCheerSurfing = true;
-
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), CSClass, CheerSticks);
-
-		for (auto* CheerStick : CheerSticks)
+		auto* C_CheerStick = Cast<AHG_CheeringStick>(CheerStick);
+		if (C_CheerStick->ItemOwner == Controller->GetPawn())
 		{
-			auto* C_CheerStick = Cast<AHG_CheeringStick>(CheerStick);
-			if (C_CheerStick->ItemOwner == Controller->GetPawn())
+			if (C_CheerStick)
 			{
-				if (C_CheerStick)
-				{
-					My_CheeringStick = C_CheerStick;
-					C_CheerStick->ApplyChange(FLinearColor::Red, false, 100);
-				}
+				My_CheeringStick = C_CheerStick;
+				C_CheerStick->ApplyChange(FLinearColor::Red, false, 100);
 			}
 		}
-
-		FTimerHandle handle;
-		GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_Player::SetCheerSurfingState, 0.5f, false);
 	}
+
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_Player::SetCheerSurfingState, 1.0f, false);
+
 }
 
 void AHG_Player::Emotion()

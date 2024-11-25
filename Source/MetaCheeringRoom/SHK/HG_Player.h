@@ -454,4 +454,6 @@ public:
 	void ServerRPC_SetCheerSurfingState();	
 
 	void SetCheerSurfingState();
+
+	void CameraDelay();
 };
