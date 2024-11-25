@@ -110,7 +110,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> FullScreenClass;
-
+	
+	UPROPERTY()
 	UUserWidget* FullScreenWidget;
 
 	UFUNCTION()
