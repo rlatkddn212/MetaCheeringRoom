@@ -24,6 +24,7 @@ public:
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
 
+	UPROPERTY()
 	class UExponentialHeightFogComponent* ExponentialHeightFogComp;
 	float FogDensity;
 	float FogHeightFalloff;

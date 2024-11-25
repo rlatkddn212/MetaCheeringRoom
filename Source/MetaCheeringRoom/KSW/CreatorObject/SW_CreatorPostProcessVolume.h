@@ -22,7 +22,7 @@ class METACHEERINGROOM_API ASW_CreatorPostProcessVolume : public ASW_CreatorObje
 
 	virtual void RecordJsonAdditionalInfo(TSharedPtr<FJsonObject>& RecordJsonObject) const override;
 	virtual void SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject>& SetupJsonObject) override;
-	
+	UPROPERTY()
 	class APostProcessVolume* PostProcessActor;
 	
 	bool bOverride_BloomMethod = true;

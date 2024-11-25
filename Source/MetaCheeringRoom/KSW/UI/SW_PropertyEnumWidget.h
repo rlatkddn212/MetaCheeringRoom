@@ -30,6 +30,7 @@ public:
 	class UComboBoxString* ComboValueString;
 
 	int32 PropertyId;
+	UPROPERTY()
 	class UCreatorEnumProperty* EnumProperty;
 
 	void SetPropertyValue(int32 id, class UCreatorEnumProperty* Property);
@@ -40,5 +41,6 @@ public:
 	void SetInspectorWidget(class USW_CreatorInspectorWidget* InInspectorWidget) { InspectorWidget = InInspectorWidget; }
 
 	// 인스펙터 저장
+	UPROPERTY()
 	class USW_CreatorInspectorWidget* InspectorWidget;
 };

@@ -3,6 +3,7 @@
 
 #include "KSW/CreatorObject/SW_CreatorPointLight.h"
 #include "Components/PointLightComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ASW_CreatorPointLight::ASW_CreatorPointLight()
 {
@@ -12,6 +13,20 @@ ASW_CreatorPointLight::ASW_CreatorPointLight()
 	LightComp->SetupAttachment(Root);
 
 	LightColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+}
+
+void ASW_CreatorPointLight::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (!HasAuthority())
+	{
+		OnRep_LightColorChanged();
+		OnRep_LightIntensityChanged();
+		OnRep_LightAttenuationRadiusChanged();
+		OnRep_LightSourceRadiusChanged();
+		OnRep_LightCastShadowChanged();
+	}
 }
 
 void ASW_CreatorPointLight::OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty)
@@ -28,24 +43,28 @@ void ASW_CreatorPointLight::OnChangeProperty(int32 id, UCreatorPropertyBase* Cre
 	if (id == 2)
 	{
 		UCreatorFloatProperty* IntensityProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
+		LightIntensity = IntensityProperty->Value;
 		LightComp->SetIntensity(IntensityProperty->Value);
 	}
 
 	if (id == 3)
 	{
 		UCreatorFloatProperty* AttenuationRadiusProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
+		LightAttenuationRadius = AttenuationRadiusProperty->Value;
 		LightComp->SetAttenuationRadius(AttenuationRadiusProperty->Value);
 	}
 
 	if (id == 4)
 	{
 		UCreatorFloatProperty* SourceRadiusProperty = Cast<UCreatorFloatProperty>(CreatorProperty);
+		LightSourceRadius = SourceRadiusProperty->Value;
 		LightComp->SetSourceRadius(SourceRadiusProperty->Value);
 	}
 
 	if (id == 5)
 	{
 		UCreatorBoolProperty* CastShadowProperty = Cast<UCreatorBoolProperty>(CreatorProperty);
+		CastShadow = CastShadowProperty->Value;
 		LightComp->SetCastShadows(CastShadowProperty->Value);
 	}
 }
@@ -115,4 +134,40 @@ void ASW_CreatorPointLight::SetupJsonAdditionalInfo(const TSharedPtr<FJsonObject
 
 	CastShadow = SetupJsonObject->GetBoolField(TEXT("CastShadow"));
 	LightComp->SetCastShadows(CastShadow);
+}
+
+void ASW_CreatorPointLight::OnRep_LightColorChanged()
+{
+	LightComp->SetLightColor(LightColor);
+}
+
+void ASW_CreatorPointLight::OnRep_LightIntensityChanged()
+{
+	LightComp->SetIntensity(LightIntensity);
+}
+
+void ASW_CreatorPointLight::OnRep_LightAttenuationRadiusChanged()
+{
+	LightComp->SetAttenuationRadius(LightAttenuationRadius);
+}
+
+void ASW_CreatorPointLight::OnRep_LightSourceRadiusChanged()
+{
+	LightComp->SetSourceRadius(LightSourceRadius);
+}
+
+void ASW_CreatorPointLight::OnRep_LightCastShadowChanged()
+{
+	LightComp->SetCastShadows(CastShadow);
+}
+
+void ASW_CreatorPointLight::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASW_CreatorPointLight, LightColor);
+	DOREPLIFETIME(ASW_CreatorPointLight, LightIntensity);
+	DOREPLIFETIME(ASW_CreatorPointLight, LightAttenuationRadius);
+	DOREPLIFETIME(ASW_CreatorPointLight, LightSourceRadius);
+	DOREPLIFETIME(ASW_CreatorPointLight, CastShadow);
 }
