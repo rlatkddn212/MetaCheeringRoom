@@ -37,6 +37,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerHandleVideoPlay();
 
+	UFUNCTION(Server, Reliable)
+	void ServerVODDataReq();
+
+	UFUNCTION(Client, Reliable)
+	void ClientVodJump(FTimespan Time);
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UJS_ExitWidget> ExitWidgetFactory;
 	
