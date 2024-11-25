@@ -15,10 +15,13 @@ void UHG_HUD::NativeConstruct()
 
 void UHG_HUD::SetPointText()
 {
-	auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
-	if (Player)
+	if (GetOwningPlayer())
 	{
-		TB_Point->SetText(FText::AsNumber(Player->GoodsComp->GetGold()));
+		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+		if (Player)
+		{
+			TB_Point->SetText(FText::AsNumber(Player->GoodsComp->GetGold()));
+		}
 	}
 }
 

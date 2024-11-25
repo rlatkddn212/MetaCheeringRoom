@@ -39,6 +39,10 @@ void UHG_PlayerGoodsComponent::SetGold(int32 Value)
 {
 	Gold = Value;
 	CompOwner->GI->CurrentGold = Gold;
+	if (CompOwner->HUD)
+	{
+		CompOwner->HUD->SetPointText();
+	}
 }
 
 int32 UHG_PlayerGoodsComponent::GetGold() const
