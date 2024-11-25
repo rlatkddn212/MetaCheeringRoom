@@ -30,7 +30,8 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class USW_ObjectDragOperation> DragOperationFactory;
-
+	
+	UPROPERTY()
 	class USW_ObjectDragOperation* DragOp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
