@@ -47,6 +47,7 @@ public:
 
 	FItemData ItemData;
 
+	UPROPERTY()
 	class UHG_GameInstance* GI;
 
 	void InitItemData();

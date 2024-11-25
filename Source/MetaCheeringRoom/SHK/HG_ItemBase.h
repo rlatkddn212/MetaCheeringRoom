@@ -52,6 +52,10 @@ public:
 	{
 		return ItemName == Other.ItemName;
 	}
+
+	FItemData() : ItemName(TEXT("")), ItemIcon(nullptr), ItemPrice(0),ItemClass(nullptr), Woman_Montage(nullptr), Man_Montage(nullptr){}
+
+	FItemData(const FString& Name): ItemName(Name), ItemIcon(nullptr), ItemPrice(0),ItemClass(nullptr), Woman_Montage(nullptr), Man_Montage(nullptr){}
 };
 
 
@@ -101,6 +105,7 @@ public:
 
 	virtual void InitItemData();
 
+	UPROPERTY()
 	class UHG_GameInstance* GI;
 
 	UPROPERTY()

@@ -137,9 +137,9 @@ void UHG_PlayerAnimInstance::AnimNotify_FlyKickEnd()
 {
 	if (Owner)
 	{
-		Owner->SetActorLocation(Owner->GetMesh()->GetRelativeLocation());
 		Owner->bCanMove = true;
 		Owner->CameraComp->FieldOfView = 90.0f;
+
 		auto* pc = Cast<APlayerController>(Owner->Controller);
 		if (pc)
 		{

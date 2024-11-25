@@ -97,6 +97,7 @@ public:
 
 	TArray<UHG_SlotWidget*> EquipList;
 
+	UPROPERTY()
 	class UHG_GameInstance* GI;
 
 	int32 GetSlotIndexInWB(UWidget* SlotWidget);
@@ -106,8 +107,8 @@ public:
 	void CheckButtonClick(UButton* p_Button);
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	class UWidgetAnimation* Appear;	
-	
+	class UWidgetAnimation* Appear;
+
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	class UWidgetAnimation* Disappear;
 

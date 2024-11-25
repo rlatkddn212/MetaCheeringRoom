@@ -52,4 +52,6 @@ public:
 	class UDataTable* ItemDataTable;
 	UPROPERTY()
 	class AHG_Player* CompOwner;
+
+	void InitItemData(FItemData& ItemData);
 };

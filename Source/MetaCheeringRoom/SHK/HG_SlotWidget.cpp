@@ -67,11 +67,17 @@ void UHG_SlotWidget::OnButtonClicked()
 
 	Owner->RemoveFromParent();
 
+	
+
 	if (auto OwningPlayer = Cast<AHG_Player>(Owner->GetOwningPlayer()->GetPawn()))
 	{
 		OwningPlayer->PC->SetShowMouseCursor(false);
 		OwningPlayer->PC->SetInputMode(FInputModeGameOnly());
-		OwningPlayer->bCanMove = true;
+		if (SlotInfo.ItemInfo.ItemCategory != EItemCategory::Category_Emotion)
+		{
+			OwningPlayer->bCanMove = true;
+		}
+		OwningPlayer->bOnInventory = false;
 		OwningPlayer->bToggle = !OwningPlayer->bToggle;
 		OwningPlayer->HUD->PlayAppearAnimation(true);
 	}

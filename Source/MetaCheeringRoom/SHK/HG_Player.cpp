@@ -169,20 +169,25 @@ void AHG_Player::BeginPlay()
 
 			GoodsComp->SetGold(GI->CurrentGold);
 		}
-		if (HasAuthority())
-		{
-			CurCloth = GI->CurCloth;
-			CurPrinting = GI->CurPrinting;
-			CurClothHem = GI->CurClothHem;
-			CurEyes = GI->CurEyes;
-			CurHair = GI->CurHair;
-			CurHairPin = GI->CurHairPin;
-		}
-		if (IsLocallyControlled())
-		{
-			ServerRPC_ApplyCustom(GI->CurCloth, GI->CurPrinting, GI->CurClothHem, GI->CurEyes, GI->CurHair, GI->CurHairPin);
-		}
+
+		CurCloth = GI->CurCloth;
+		CurPrinting = GI->CurPrinting;
+		CurClothHem = GI->CurClothHem;
+		CurEyes = GI->CurEyes;
+		CurHair = GI->CurHair;
+		CurHairPin = GI->CurHairPin;
+
+		ServerRPC_ApplyCustom(CurCloth, CurPrinting, CurClothHem, CurEyes, CurHair, CurHairPin);
 	}
+
+	InventoryComp->AddtoInventory(FItemData(TEXT("CheeringStick")), 1);
+	InventoryComp->AddtoInventory(FItemData(TEXT("마라탕후루")), 1);
+	InventoryComp->AddtoInventory(FItemData(TEXT("Teemo")), 1);
+	InventoryComp->AddtoInventory(FItemData(TEXT("TeemoThumb")), 1);
+	InventoryComp->AddtoInventory(FItemData(TEXT("날라차기")), 1);
+	InventoryComp->AddtoInventory(FItemData(TEXT("SadBee")), 1);
+	InventoryComp->AddtoInventory(FItemData(TEXT("T1Logo")), 1);
+	InventoryComp->AddtoInventory(FItemData(TEXT("SiuSound")), 1);
 }
 
 void AHG_Player::Tick(float DeltaTime)
@@ -327,7 +332,6 @@ void AHG_Player::Sit()
 		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	}
 	ServerRPC_SetSitState();
-	bCanMove = !bIsSitting;
 }
 
 void AHG_Player::ServerRPC_SetSitState_Implementation()
@@ -336,24 +340,36 @@ void AHG_Player::ServerRPC_SetSitState_Implementation()
 	{
 		if (DetectChair)
 		{
-			FVector ChairLoc = DetectChair->GetActorLocation();
-			SetActorLocation(ChairLoc);
-			FVector ChairDir = DetectChair->GetActorRightVector();
-			SetActorRotation(ChairDir.Rotation());
-			SpringArmComp->TargetArmLength = 0.0f;
-			SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
-			CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
-			CameraComp->SetRelativeRotation(ChairDir.Rotation());
-			Controller->SetControlRotation(GetActorRotation());
-			bIsSitting = true;
+			if (!DetectChair->IsSeatTaken)
+			{
+				FVector ChairLoc = DetectChair->GetActorLocation();
+				SetActorLocation(ChairLoc);
+				FVector ChairDir = DetectChair->GetActorRightVector();
+				SetActorRotation(ChairDir.Rotation());
+				SpringArmComp->TargetArmLength = 0.0f;
+				SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
+				CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
+				CameraComp->SetRelativeRotation(ChairDir.Rotation());
+				Controller->SetControlRotation(GetActorRotation());
+				bIsSitting = true;
+				DetectChair->IsSeatTaken = true;
+			}
 		}
 	}
 	else
 	{
+		if (DetectChair)
+		{
+			DetectChair->IsSeatTaken = false;
+		}
 		bIsSitting = false;
 		SpringArmComp->TargetArmLength = 300.0f;
 		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
 		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	}
+	if (IsLocallyControlled())
+	{
+		bCanMove = !bIsSitting;
 	}
 }
 
@@ -417,6 +433,8 @@ void AHG_Player::TeleportToStore()
 	//(X=-867.240674,Y=927.178242,Z=-0.707882)
 	UGameplayStatics::PlaySound2D(GetWorld(), TeleportSound);
 	SetActorLocation(FVector(-867.240674f, 927.178242f, 0.707882f));
+	SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
+	Controller->SetControlRotation(GetActorRotation());
 }
 
 void AHG_Player::TeleportToJoin()
@@ -424,13 +442,17 @@ void AHG_Player::TeleportToJoin()
 	//(X = -743.435962, Y = 2559.526662, Z = -18.354637)
 	UGameplayStatics::PlaySound2D(GetWorld(), TeleportSound);
 	SetActorLocation(FVector(-677.120918f, 2559.526662f, -18.354637f));
+	SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
+	Controller->SetControlRotation(GetActorRotation());
 }
 
 void AHG_Player::TeleportToCreate()
 {
 	//(X=1040.000000,Y=1230.000000,Z=0.000000)
 	UGameplayStatics::PlaySound2D(GetWorld(), TeleportSound);
-	SetActorLocation(FVector(1040.0f, 1230.0f, 0.0f));
+	SetActorLocation(FVector(1040.0f, 1230.0f, 0.0f)); 
+	SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+	Controller->SetControlRotation(GetActorRotation());
 }
 
 void AHG_Player::OnMyMove(const FInputActionValue& Value)
@@ -452,9 +474,17 @@ void AHG_Player::OnMyJump(const FInputActionValue& Value)
 
 void AHG_Player::OnMyLook(const FInputActionValue& Value)
 {
-	if (bOnFullScreen || bOnInventory) return;
+	if (bOnFullScreen || bOnInventory)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("11"));
+		return;
+	}
 
-	if (bIsShaking || (!bIsSitting && !bCanMove)) return;
+	if (bIsShaking || (!bIsSitting && !bCanMove))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("22"));
+		return;
+	}
 
 	FVector2D v = Value.Get<FVector2D>();
 	AddControllerPitchInput(-v.Y);
@@ -649,17 +679,9 @@ void AHG_Player::ServerRPC_SetCheerSurfingState_Implementation()
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), CSClass, CheerSticks);
 
-	for (auto* CheerStick : CheerSticks)
+	if (My_CheeringStick)
 	{
-		auto* C_CheerStick = Cast<AHG_CheeringStick>(CheerStick);
-		if (C_CheerStick->ItemOwner == Controller->GetPawn())
-		{
-			if (C_CheerStick)
-			{
-				My_CheeringStick = C_CheerStick;
-				C_CheerStick->ApplyChange(FLinearColor::Red, false, 100);
-			}
-		}
+		My_CheeringStick->ApplyChange(FLinearColor::Red, false, 100.0f);
 	}
 
 	FTimerHandle handle;
@@ -759,6 +781,7 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 			break;
 		case EItemCategory::Category_OneHandGrab:
 			mesh->AttachToComponent(HandRComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			My_CheeringStick = Cast<AHG_CheeringStick>(ItemValue);
 			mesh->SetHiddenInGame(false);
 			break;
 		case EItemCategory::Category_TwoHandGrab:
@@ -904,12 +927,15 @@ void AHG_Player::PopUpHUD()
 
 void AHG_Player::ApplyCustomizing(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin)
 {
-	GI->CurCloth = Cloth;
-	GI->CurClothHem = ClothHem;
-	if (ClothTexture) GI->CurPrinting = ClothTexture;
-	GI->CurHair = Hair;
-	GI->CurHairPin = HairPin;
-	GI->CurEyes = Eyes;
+	if (IsLocallyControlled())
+	{
+		GI->CurCloth = Cloth;
+		GI->CurClothHem = ClothHem;
+		if (ClothTexture) GI->CurPrinting = ClothTexture;
+		GI->CurHair = Hair;
+		GI->CurHairPin = HairPin;
+		GI->CurEyes = Eyes;
+	}
 
 	if (DynamicMaterial_Cloth)
 	{
@@ -1060,7 +1086,10 @@ void AHG_Player::Multicast_ApplyCustom_Implementation(FLinearColor Cloth, UTextu
 
 void AHG_Player::ServerRPC_ApplyCustom_Implementation(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin)
 {
-	Multicast_ApplyCustom(Cloth, ClothTexture, ClothHem, Eyes, Hair, HairPin);
+	if (HasAuthority())
+	{
+		Multicast_ApplyCustom(Cloth, ClothTexture, ClothHem, Eyes, Hair, HairPin);
+	}
 }
 
 void AHG_Player::ServerRPC_Emotion_Implementation(UAnimMontage* Montage)
@@ -1176,7 +1205,12 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	DOREPLIFETIME(AHG_Player, bEquipItem);
 	DOREPLIFETIME(AHG_Player, bIsSitting);
 	DOREPLIFETIME(AHG_Player, bIsShaking);
-	DOREPLIFETIME(AHG_Player, bIsCheerSurfing);
+	DOREPLIFETIME(AHG_Player, CurCloth);
+	DOREPLIFETIME(AHG_Player, CurClothHem);
+	DOREPLIFETIME(AHG_Player, CurEyes);
+	DOREPLIFETIME(AHG_Player, CurHair);
+	DOREPLIFETIME(AHG_Player, CurPrinting);
+	DOREPLIFETIME(AHG_Player, CurHairPin);
 }
 
 
