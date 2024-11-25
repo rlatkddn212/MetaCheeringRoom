@@ -312,10 +312,15 @@ public:
 	UFUNCTION()
 	void ApplyCustomizing(FLinearColor Cloth, UTexture2D* ClothTexture, FLinearColor ClothHem, FLinearColor Eyes, FLinearColor Hair, FLinearColor HairPin);
 
+	UPROPERTY()
 	UMaterialInstanceDynamic* DynamicMaterial_Cloth;
+	UPROPERTY()
 	UMaterialInstanceDynamic* DynamicMaterial_HairPin;
+	UPROPERTY()
 	UMaterialInstanceDynamic* DynamicMaterial_ClothColor;
+	UPROPERTY()
 	UMaterialInstanceDynamic* DynamicMaterial_Eyes;
+	UPROPERTY()
 	UMaterialInstanceDynamic* DynamicMaterial_Hair;
 
 	UPROPERTY(EditDefaultsOnly)

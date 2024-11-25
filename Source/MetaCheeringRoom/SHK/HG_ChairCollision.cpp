@@ -45,7 +45,7 @@ void AHG_ChairCollision::OnMyEndOverlap(UPrimitiveComponent* OverlappedComponent
 {
 	if (auto* Player = Cast<AHG_Player>(OtherActor))
 	{
-		Player->DetectChair = nullptr;
+		//Player->DetectChair = nullptr;
 	}
 }
 

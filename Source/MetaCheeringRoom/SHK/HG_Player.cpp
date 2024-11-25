@@ -301,7 +301,7 @@ void AHG_Player::Sit()
 {
 	if (!bIsSitting)
 	{
-		if (DetectChair)
+		if (DetectChair != nullptr)
 		{
 			FVector ChairLoc = DetectChair->GetActorLocation();
 			SetActorLocation(ChairLoc);
@@ -344,7 +344,7 @@ void AHG_Player::ServerRPC_SetSitState_Implementation()
 		SpringArmComp->TargetArmLength = 300.0f;
 		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
 		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-		DetectChair = nullptr;
+		//DetectChair = nullptr;
 	}
 }
 
