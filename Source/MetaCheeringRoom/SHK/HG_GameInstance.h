@@ -55,5 +55,6 @@ public:
 	FLinearColor CurHairPin = FLinearColor(1.0f, 1.0f, 1.0f);
 	FLinearColor CurHair = FLinearColor(1.0f, 1.0f, 1.0f);
 	FLinearColor CurEyes = FLinearColor(1.0f, 1.0f, 1.0f);
+	UPROPERTY()
 	UTexture2D* CurPrinting = nullptr;
 };
