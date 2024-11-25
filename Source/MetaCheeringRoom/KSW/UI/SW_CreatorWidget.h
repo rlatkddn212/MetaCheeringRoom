@@ -16,7 +16,7 @@ class METACHEERINGROOM_API USW_CreatorWidget : public UUserWidget
 	
 public:
 	virtual void NativeConstruct() override;
-
+	UPROPERTY()
 	class ASW_CreatorPlayerController* ControllerReference;
 
 	void OnDragged(bool isDrag) { bIsDrag = isDrag; }

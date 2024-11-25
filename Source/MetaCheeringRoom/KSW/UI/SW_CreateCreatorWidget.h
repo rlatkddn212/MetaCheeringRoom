@@ -89,7 +89,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class USW_CreateCreatorSlotWidget> SlotFactory;
-
+	
+	UPROPERTY()
 	TArray<class USW_CreateCreatorSlotWidget*> SlotWidgets;
 	int32 SelectSlotIdx;
 };

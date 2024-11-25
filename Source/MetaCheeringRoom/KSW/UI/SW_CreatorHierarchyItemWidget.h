@@ -83,6 +83,8 @@ public:
 	TSubclassOf<class USW_DragHierarchyItemWidget> DragFactory;
 
 	bool bIsDragging = false;
+	UPROPERTY()
 	class ASW_CreatorPlayerController* PC;
+	UPROPERTY()
 	class ASW_CreatorObject* HierarchyCreatorObject;
 };

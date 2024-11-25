@@ -30,6 +30,7 @@ public:
 	class UCheckBox* CheckBoxValue;
 	
 	int32 PropertyId;
+	UPROPERTY()
 	class UCreatorBoolProperty* BoolProperty;
 
 	void SetPropertyValue(int32 id, class UCreatorBoolProperty* Property);
@@ -40,5 +41,6 @@ public:
 	void SetInspectorWidget(class USW_CreatorInspectorWidget* InInspectorWidget) { InspectorWidget = InInspectorWidget; }
 
 	// 인스펙터 저장
+	UPROPERTY()
 	class USW_CreatorInspectorWidget* InspectorWidget;
 };

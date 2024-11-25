@@ -61,7 +61,8 @@ public:
 	// ป๓ลย
 	UPROPERTY()
 	ECreatorToolState ToolState;
-
+	
+	UPROPERTY()
 	class ASW_CreatorObject* SelectedObject;
 	
 	UPROPERTY()
@@ -86,7 +87,7 @@ public:
 	void PasteSelectedObject();
 
 	ASW_CreatorObject* GetSelectedObject();
-
+	UPROPERTY()
 	class ASW_CreatorObject* CopiedObject;
 
 	
