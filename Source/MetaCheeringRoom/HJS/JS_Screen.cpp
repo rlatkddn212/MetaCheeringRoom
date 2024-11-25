@@ -14,6 +14,7 @@
 #include "JS_ExitWidget.h"
 #include "Net/UnrealNetwork.h"
 #include "JS_PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AJS_Screen::AJS_Screen()
@@ -76,7 +77,6 @@ void AJS_Screen::BeginPlay()
 			NetComp->GetInfoFromAIServer();
 			// 유튜브 정보 가져오기
 			// VOD 정보 가져오기
-
 			// 다 가져와서 어딘가에 리스트로 저장해야 함. 구조체를 하나 만들기
 		}
 	}
@@ -327,6 +327,14 @@ void AJS_Screen::MulticastPlayVOD_Implementation(const FString& VideoURL)
 			bUsingFirstPlayer = true;
 		}
 	}
+
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(),TEXT("ControlLight"),Actors);
+	for (AActor* Actor : Actors)
+	{
+		Actor->SetActorHiddenInGame(true);
+	}
+
 }
 
 void AJS_Screen::PlayVideoRepURL(const FString& VideoURL)
@@ -400,6 +408,13 @@ void AJS_Screen::MultiCastPlayMedia_Implementation(const FString& VideoURL)
 		{
 			PRINTLOG(TEXT("%d"),MediaPlayer2->OpenSource(MediaSource2));
 		}
+	}
+
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("ControlLight"), Actors);
+	for (AActor* Actor : Actors)
+	{
+		Actor->SetActorHiddenInGame(true);
 	}
 }
 
