@@ -231,6 +231,11 @@ ASW_CreatorObject* UCreatorMapSubsystem::DeserializeCreatorObject(const TSharedP
 
     // CreatorObject甫 积己
     ASW_CreatorObject* CreatorObject = CreateObject(CreatorObjectsStruct[CreatorObjectId]);
+    if (CreatorObject == nullptr)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to create object."));
+		return nullptr;
+	}
 
     CreatorObject->CreatorObjectId = CreatorObjectId;
     CreatorObject->CreatorObjectType = CreatorObjectType;
@@ -300,6 +305,11 @@ ASW_CreatorObject* UCreatorMapSubsystem::CopyObjectRecursive(ASW_CreatorObject* 
 
     // CreatorObject甫 积己
     ASW_CreatorObject* CreatorObject = CreateObject(CreatorObjectsStruct[CreatorObjectId]);
+    if (CreatorObject == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create object."));
+		return nullptr;
+	}
 
     CreatorObject->CreatorObjectId = CreatorObjectId;
     CreatorObject->CreatorObjectType = CreatorObjectType;
@@ -347,6 +357,13 @@ ASW_CreatorObject* UCreatorMapSubsystem::CreateObject(const FCreatorObjectData* 
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
     ASW_CreatorObject* CreatingObject = GetWorld()->SpawnActor<ASW_CreatorObject>(ObjectData->ItemClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+    if (CreatingObject == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create object."));
+		return nullptr;
+	}
+
     CreatingObject->SetReplicates(true);
     CreatingObject->SetReplicateMovement(true);
 

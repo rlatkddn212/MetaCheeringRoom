@@ -41,7 +41,6 @@ void USW_CreatorHierarchyWidget::ReloadItem()
 	TArray<ASW_CreatorObject*> InCreatorObjects;
 	TArray<AActor*> ChildActors;
 	RootActor->GetAttachedActors(ChildActors);
-
 	// RootActor의 자식들을 InCreatorObjects에 넣어준다.
 	for (int32 i = 0; i < ChildActors.Num(); i++)
 	{
