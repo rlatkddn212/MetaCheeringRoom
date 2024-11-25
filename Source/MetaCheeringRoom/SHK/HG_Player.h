@@ -297,7 +297,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UHG_HUD* HUD;
-
+	
+	UPROPERTY()
 	class AHG_EquipItem* EItem;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)

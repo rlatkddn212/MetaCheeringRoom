@@ -50,6 +50,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	class UDataTable* ItemDataTable;
-
+	UPROPERTY()
 	class AHG_Player* CompOwner;
 };

@@ -58,7 +58,7 @@ public:
 	bool bToggle = false;
 
 	float time = 0.1;
-
+	UPROPERTY()
 	class UMaterialInstanceDynamic* DynamicMaterial;
 
 	UPROPERTY(ReplicatedUsing = OnRep_ChangeMatColor)

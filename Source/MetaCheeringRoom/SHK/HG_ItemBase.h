@@ -103,6 +103,7 @@ public:
 
 	class UHG_GameInstance* GI;
 
+	UPROPERTY()
 	class APawn* ItemOwner;
 
 	bool bEquiped = false;
