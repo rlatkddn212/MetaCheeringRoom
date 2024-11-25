@@ -598,6 +598,7 @@ void ASW_CreatorPlayerController::Server_DetachObject_Implementation(class ASW_C
 		return;
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 	system->DetechObject(DetachObject);
+	system->AttachObject(nullptr, DetachObject);
 
 	ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
 	if (Creator)
