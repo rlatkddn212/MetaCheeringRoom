@@ -397,17 +397,16 @@ void AHG_Player::ConversionFullScreen()
 		if (!bToggle)
 		{
 			FullScreenWidget->AddToViewport();
-			PC->SetShowMouseCursor(true);
 			bCanMove = false;
 			bToggle = !bToggle;
+			bOnFullScreen = true;
 		}
 		else
 		{
 			FullScreenWidget->RemoveFromParent();
-			PC->SetShowMouseCursor(false);
-			PC->SetInputMode(FInputModeGameOnly());
 			bToggle = !bToggle;
 			bCanMove = true;
+			bOnFullScreen = false;
 		}
 	}
 
@@ -446,13 +445,16 @@ void AHG_Player::OnMyMove(const FInputActionValue& Value)
 
 void AHG_Player::OnMyJump(const FInputActionValue& Value)
 {
-	if (!bCanMove) return;
+	if (bIsSitting || !bCanMove) return;
+
 	Jump();
 }
 
 void AHG_Player::OnMyLook(const FInputActionValue& Value)
 {
-	if (!bIsSitting && !bCanMove) return;
+	if (bOnFullScreen || bOnInventory) return;
+
+	if (bIsShaking || (!bIsSitting && !bCanMove)) return;
 
 	FVector2D v = Value.Get<FVector2D>();
 	AddControllerPitchInput(-v.Y);
@@ -516,6 +518,7 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 			HUD->PlayAppearAnimation(false);
 			HUD->StopInventoryAnimation();
 			InventoryWidget->InitInventoryUI();
+			bOnInventory = true;
 
 			PC->SetShowMouseCursor(true);
 			bToggle = !bToggle;
@@ -537,6 +540,7 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 
 			PC->SetShowMouseCursor(false);
 			bToggle = !bToggle;
+			bOnInventory = false;
 			bCanMove = true;
 		}
 	}

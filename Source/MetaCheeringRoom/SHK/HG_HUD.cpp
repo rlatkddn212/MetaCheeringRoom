@@ -6,10 +6,16 @@
 #include "HG_Player.h"
 #include "HG_PlayerGoodsComponent.h"
 #include "Components/WidgetSwitcher.h"
+#include "Components/Button.h"
 
 void UHG_HUD::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	if (!(Btn_SoundOff->OnClicked.IsBound()))
+	{
+		Btn_SoundOff->OnClicked.AddDynamic(this, &UHG_HUD::SoundOff);
+	}
 }
 
 
@@ -65,9 +71,9 @@ void UHG_HUD::PlayAppearAnimation(bool Play_Forward)
 
 void UHG_HUD::PlayInventoryAnimation()
 {
-	if(NewItem)
+	if (NewItem)
 	{
-		PlayAnimation(NewItem,0.0f,0);
+		PlayAnimation(NewItem, 0.0f, 0);
 	}
 }
 
@@ -76,5 +82,14 @@ void UHG_HUD::StopInventoryAnimation()
 	if (IsAnimationPlaying(NewItem))
 	{
 		StopAnimation(NewItem);
+	}
+}
+
+void UHG_HUD::SoundOff()
+{
+	if (GetOwningPlayer())
+	{
+		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+		Player->bGetCoinSound = !Player->bGetCoinSound;
 	}
 }

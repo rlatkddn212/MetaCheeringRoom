@@ -25,7 +25,7 @@ void USW_CreatorHierarchyItemWidget::NativeConstruct()
 
 void USW_CreatorHierarchyItemWidget::SetItem(ASW_CreatorObject* CreatorObject, int32 depth)
 {
-	// depth¿¡ µû¶ó Å©±â¸¦ ´Ã¸°´Ù.
+	// depthï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å©ï¿½â¸¦ ï¿½Ã¸ï¿½ï¿½ï¿½.
 	HierarchySpacer->SetSize(FVector2D(20 * depth, 1));
 
 	// Set the item
@@ -83,7 +83,7 @@ FReply USW_CreatorHierarchyItemWidget::NativeOnPreviewMouseButtonDown(const FGeo
 
 	FEventReply ret = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
 	HierarchyItemButton->SetStyle(ClickedButtonStyle);
-	// ¾ÆÀÌÅÛ ¼¿·ºÆ®¸¦ ¹Ù²Û´Ù.
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ù²Û´ï¿½.
 	//PC->DoSelectObject(CreatorObject);
 	if (OnHierarchyItemClicked.IsBound())
 		OnHierarchyItemClicked.Execute(HierarchyCreatorObject);
@@ -105,11 +105,11 @@ void USW_CreatorHierarchyItemWidget::NativeOnDragEnter(const FGeometry& InGeomet
 {
 	Super::NativeOnDragEnter(InGeometry, InDragDropEvent, InOperation);
 
-	// È£¹ö½ºÅ¸ÀÏ·Î º¯°æÇÑ´Ù.
+	// È£ï¿½ï¿½ï¿½ï¿½Å¸ï¿½Ï·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
 	if (!bIsDragging)
 		HierarchyItemButton->SetStyle(HoveredButtonStyle);
 
-	// ÀÚ±â ÀÚ½ÅÀÎÁö °Ë»ç
+	// ï¿½Ú±ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½
 	USW_HierarchyDragOperation* dragOperation = Cast<USW_HierarchyDragOperation>(InOperation);
 	if (dragOperation)
 	{
@@ -126,7 +126,7 @@ void USW_CreatorHierarchyItemWidget::NativeOnDragLeave(const FDragDropEvent& InD
 	if (!bIsDragging)
 		HierarchyItemButton->SetStyle(DefaultButtonStyle);
 
-	// ÀÚ±â ÀÚ½ÅÀÎÁö °Ë»ç
+	// ï¿½Ú±ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½
 	USW_HierarchyDragOperation* dragOperation = Cast<USW_HierarchyDragOperation>(InOperation);
 	if (dragOperation)
 	{
@@ -174,7 +174,7 @@ void USW_CreatorHierarchyItemWidget::OnSelected(bool isSelected)
 
 void USW_CreatorHierarchyItemWidget::OnClickExpandedButton()
 {
-	// ¾ÆÀÌÅÛÀ» ÆîÄ£´Ù.
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä£ï¿½ï¿½.
 	if (HierarchyCreatorObject)
 	{
 		HierarchyCreatorObject->IsExpandedHierarchy = !HierarchyCreatorObject->IsExpandedHierarchy;

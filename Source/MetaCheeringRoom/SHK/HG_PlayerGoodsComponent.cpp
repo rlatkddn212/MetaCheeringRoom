@@ -22,7 +22,7 @@ UHG_PlayerGoodsComponent::UHG_PlayerGoodsComponent()
 void UHG_PlayerGoodsComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	CompOwner = Cast<AHG_Player>(GetOwner());
 }
 
@@ -56,14 +56,17 @@ int32 UHG_PlayerGoodsComponent::AddGold(int32 Value)
 	CompOwner->GI->CurrentGold = Gold;
 	CompOwner->HUD->SetPointText();
 
-	UGameplayStatics::PlaySound2D(GetWorld(), CompOwner->GetPointSound);
+	if (CompOwner->bOnFullScreen == false)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), CompOwner->GetPointSound);
+	}
 
 	return Gold;
 }
 
 int32 UHG_PlayerGoodsComponent::SubGold(int32 Value)
 {
-	SetGold(FMath::Clamp(Gold - Value, 0, MAX_GOLD));	
+	SetGold(FMath::Clamp(Gold - Value, 0, MAX_GOLD));
 	CompOwner->GI->CurrentGold = Gold;
 	CompOwner->HUD->SetPointText();
 	return Gold;

@@ -33,7 +33,7 @@ void USW_PropertyColorWidget::SetPropertyValue(int32 id, class UCreatorColorProp
 {
 	PropertyId = id;
 	ColorProperty = Property;
-	// ÇöÀç°ª Property->Value;
+	// ï¿½ï¿½ï¿½ç°ª Property->Value;
 	if (Property->bCheckBox)
 	{
 		bCheckBox->SetVisibility(ESlateVisibility::Visible);
@@ -56,7 +56,7 @@ void USW_PropertyColorWidget::SetInspectorWidget(USW_CreatorInspectorWidget* InI
 
 void USW_PropertyColorWidget::OnColorChanged(FLinearColor Color)
 {
-	// ¹öÆ° »ö±ò º¯°æ
+	// ï¿½ï¿½Æ° ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	ColorImageButton->WidgetStyle.Normal.TintColor = FSlateColor(Color);
 	ColorProperty->Value = Color;
 	InspectorWidget->CreatorObject->OnChangeProperty(PropertyId, ColorProperty);

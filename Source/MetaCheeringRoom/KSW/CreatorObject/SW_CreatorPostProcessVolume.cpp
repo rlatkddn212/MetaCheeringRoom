@@ -15,7 +15,7 @@ void ASW_CreatorPostProcessVolume::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// ¿ùµå¿¡¼­ PostProcessVolumeÀ» °¡Á®¿Â´Ù.
+	// ï¿½ï¿½ï¿½å¿¡ï¿½ï¿½ PostProcessVolumeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Â´ï¿½.
 	for (TActorIterator<APostProcessVolume> It(GetWorld()); It; ++It)
 	{
 		PostProcessActor = *It;
@@ -24,7 +24,7 @@ void ASW_CreatorPostProcessVolume::BeginPlay()
 
 	if (PostProcessActor)
 	{
-		// PostProcessComponentÀÇ ¼³Á¤°ªÀ» °¡Á®¿Â´Ù.
+		// PostProcessComponentï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Â´ï¿½.
 		bOverride_BloomMethod = PostProcessActor->Settings.bOverride_BloomMethod;
 		BloomMethod = PostProcessActor->Settings.BloomMethod;
 		bOverride_BloomIntensity = PostProcessActor->Settings.bOverride_BloomIntensity;
@@ -364,7 +364,7 @@ void ASW_CreatorPostProcessVolume::SetupJsonAdditionalInfo(const TSharedPtr<FJso
 	SetupJsonObject->TryGetBoolField("bOverride_LensFlareThreshold", bOverride_LensFlareThreshold);
 	SetupJsonObject->TryGetNumberField("LensFlareThreshold", LensFlareThreshold);
 
-	// Àû¿ë
+	// ï¿½ï¿½ï¿½ï¿½
 	if (PostProcessActor)
 	{
 		PostProcessActor->Settings.bOverride_BloomMethod = bOverride_BloomMethod;

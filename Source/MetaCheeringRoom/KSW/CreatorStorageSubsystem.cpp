@@ -95,13 +95,13 @@ FString UCreatorStorageSubsystem::LoadCreatorMap(FString FilePath)
 bool UCreatorStorageSubsystem::SaveCreatorMap(FString JsonStr, FString MapName)
 {
 	FString FileName = TEXT("CreatorMap") + FDateTime::Now().ToString() + TEXT(".json");
-	// ³¯Â¥ Ãß°¡
+	// ï¿½ï¿½Â¥ ï¿½ß°ï¿½
 	FString FilePath = FPaths::ProjectSavedDir() + TEXT("/CreatorMap/") + FileName;
 
-	// ÆÄÀÏÀÌ ÀÌ¹Ì ÀÖ´ÂÁö °Ë»ç
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½
 	if (FPaths::FileExists(FilePath))
 	{
-		// TODO : ÆÄÀÏ »ý¼º ½ÇÆÐ ÆË¾÷
+		// TODO : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¾ï¿½
 		UE_LOG(LogTemp, Error, TEXT("Failed to save CreatorMap to %s"), *FilePath);
 		return false;
 	}
@@ -213,17 +213,17 @@ void UCreatorStorageSubsystem::AddLRUCreatorObject(FCreatorObjectData* CreatorOb
 	int32 Index = LRUCreatorObjectList.IndexOfByKey(CreatorObject);
 	if (Index != INDEX_NONE)
 	{
-		// ÀÌ¹Ì Á¸ÀçÇÏ¸é ¼ø¼­¸¸ °»½Å
+		// ï¿½Ì¹ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		MoveToFront(Index);
 	}
 	else
 	{
-		// »õ·Î¿î ¾ÆÀÌÅÛ Ãß°¡
+		// ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
 		if (LRUCreatorObjectList.Num() >= MaxLRUCount)
 		{
-			LRUCreatorObjectList.Pop(); // °¡Àå ¿À·¡µÈ ¾ÆÀÌÅÛ Á¦°Å
+			LRUCreatorObjectList.Pop(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		}
-		LRUCreatorObjectList.Insert(CreatorObject, 0); // ¸Ç ¾Õ¿¡ Ãß°¡
+		LRUCreatorObjectList.Insert(CreatorObject, 0); // ï¿½ï¿½ ï¿½Õ¿ï¿½ ï¿½ß°ï¿½
 	}
 	
 }

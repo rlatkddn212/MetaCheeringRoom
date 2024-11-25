@@ -82,24 +82,7 @@ void UJS_CreateRoomWidget::CreateSession()
 	}
 
 	int32 PlayerCount = 30;
-	PRINTLOG(TEXT("%s"), *CB_Category->GetSelectedOption());
-
-	FString category;
-	switch (CB_Category->GetSelectedIndex())
-	{
-	case 0:
-		category = TEXT("ESports");
-		break;
-	case 1:
-		category = TEXT("Soccer");
-		break;
-	case 2:
-		category = TEXT("Idol");
-		break;
-	case 3:
-		category = TEXT("Creator");
-		break;
-	}
+	PRINTLOG(TEXT("%s"), *CB_Category->GetSelectedOption());FString category;switch (CB_Category->GetSelectedIndex()){case 0:	category = TEXT("ESports");	break;case 1:		category = TEXT("Soccer");		break;case 2:	category = TEXT("Idol");	break;case 3:	category = TEXT("Creator");		break;	}
 	UCreatorStorageSubsystem* storage = GetGameInstance()->GetSubsystem<UCreatorStorageSubsystem>();
 	TArray<FCreatorMapMetaData*> meta = storage->GetCreatorMapMetaDatas();
 

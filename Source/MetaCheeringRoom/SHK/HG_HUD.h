@@ -34,10 +34,15 @@ public:
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	class UWidgetAnimation* Disappear;
-	
+
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	class UWidgetAnimation* NewItem;
 
-	UPROPERTY(EditDefaultsOnly,meta = (BindWidget))
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UWidgetSwitcher* WS_Border;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	class UButton* Btn_SoundOff;
+
+	void SoundOff();
 };
