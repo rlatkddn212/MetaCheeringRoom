@@ -110,6 +110,9 @@ public:
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastInitToto(bool value);
 
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastShowToto();
+
 	void LoseAnimationPlay(AHG_Player* player);
 
 	UPROPERTY(EditAnywhere)
@@ -122,6 +125,8 @@ public:
 	class USoundBase* PoofSound;
 	UPROPERTY(EditAnywhere)
 	class USoundBase* TadaSound;
+	UPROPERTY(EditAnywhere)
+	class USoundBase* StartSound;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> FanfareFactory;

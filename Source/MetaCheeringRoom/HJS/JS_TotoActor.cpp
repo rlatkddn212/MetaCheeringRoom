@@ -18,6 +18,7 @@
 #include "Components/TimelineComponent.h"
 #include "JS_StarActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "JS_ToToWidgetTriggerBox.h"
 
 // Sets default values
 AJS_TotoActor::AJS_TotoActor()
@@ -109,6 +110,7 @@ void AJS_TotoActor::MakeToto(FString totoName, FString select1, FString select2,
 	MulticastInitToto(true);
 	MulticastAlarmToto(TEXT("승부예측이 시작되었습니다!"));
 	MulticastSetToToUI(totoName,select1,select2);
+	MulticastShowToto();
 }
 
 void AJS_TotoActor::MulticastSetToToUI_Implementation(const FString& totoName, const FString& select1, const FString& select2, int32 second, int32 totalSelect1 /*= 0*/, int32 totalSelect2 /*= 0*/, int32 totalBettor1 /*= 0*/, int32 totalBettor2 /*= 0*/, float totalOdds1 /*= 1.f*/, float totalOdds2 /*= 1.f*/)
@@ -121,7 +123,7 @@ void AJS_TotoActor::MulticastSetToToUI_Implementation(const FString& totoName, c
 }
 
 void AJS_TotoActor::MulticastAlarmToto_Implementation(const FString& AlarmText)
-{
+{	
 	if (ToToWidget)
 	{
 		ToToWidget->AlarmToto(AlarmText);
@@ -200,8 +202,10 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 	TArray<int32> Values;
 	TArray<FString> LoseKeys;
 	TArray<int32> LoseValues;
+	float odd;
 	if (ResultNum == 1)
 	{
+		odd = TotalOdds1;
 		for (auto& Elem : Betting1)
 		{
 			Keys.Add(Elem.Key);
@@ -215,6 +219,7 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 	}
 	else
 	{
+		odd = TotalOdds2;
 		for (auto& Elem : Betting2)
 		{
 			Keys.Add(Elem.Key);
@@ -226,7 +231,7 @@ void AJS_TotoActor::AdjustPoint(int32 ResultNum)
 			LoseValues.Add(Elem.Value);
 		}
 	}
-	ServerAdjustPoint(Keys, Values, TotalOdds1);
+	ServerAdjustPoint(Keys, Values, odd);
 	ServerAdjustLose(LoseKeys, LoseValues);
 }
 
@@ -371,6 +376,22 @@ void AJS_TotoActor::MulticastInitToto_Implementation(bool value)
 	if (ToToWidget)
 	{
 		ToToWidget->InitWidget(value);
+	}
+}
+
+void AJS_TotoActor::MulticastShowToto_Implementation()
+{
+	if (!HasAuthority())
+	{
+		AJS_ToToWidgetTriggerBox* TotoTriger = Cast<AJS_ToToWidgetTriggerBox>(UGameplayStatics::GetActorOfClass(GetWorld(), AJS_ToToWidgetTriggerBox::StaticClass()));
+		if (TotoTriger)
+		{
+			TotoTriger->ShowTotoWidget();
+		}
+	}
+	if (StartSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), StartSound);
 	}
 }
 

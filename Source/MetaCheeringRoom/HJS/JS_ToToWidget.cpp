@@ -85,6 +85,9 @@ void UJS_ToToWidget::OnClickBetting2Btn()
 				return;
 			}
 			PG->AddGold(-BettingPoint);
+			PointLog += BettingPoint;
+			FString PointLogMsg = FString::Printf(TEXT("%d 포인트로 \"%s\"을(를) 선택했습니다."), PointLog, *TEXT_Select2->GetText().ToString());
+			TEXT_ToToLog->SetText(FText::FromString(PointLogMsg));
 		}
 	}
 	TotoActor->BettingToto(BettingPoint, 2);
@@ -187,6 +190,7 @@ void UJS_ToToWidget::InitWidget(bool value)
 	BTN_Betting2->SetIsEnabled(value);
 	BTN_WeightBetting1->SetIsEnabled(value);
 	BTN_WeightBetting2->SetIsEnabled(value);
+	PointLog = 0;
 }
 
 void UJS_ToToWidget::OnClickBettingWeightBtn()
