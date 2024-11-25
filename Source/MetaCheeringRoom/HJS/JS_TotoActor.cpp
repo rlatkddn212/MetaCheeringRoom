@@ -298,6 +298,7 @@ void AJS_TotoActor::ServerAdjustPoint(const TArray<FString>& Keys, const TArray<
 	int32 BettingPoint = 0;
 	TArray<AActor*> Actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHG_Player::StaticClass(), Actors);
+	MulticastPlayResultSound();
 	for (int32 i = 0; i < Keys.Num(); i++)
 	{
 		for (AActor* actor : Actors)
@@ -348,6 +349,7 @@ void AJS_TotoActor::MulticastSetTimeUI_Implementation(const FString& TimeText, c
 			TotoMakeWidget->SetWidgetSwitcher(1);
 			TotoMakeWidget->bOpen = true;
 		}
+		UGameplayStatics::PlaySound2D(GetWorld(),TotEnd);
 	}
 	else
 	{
@@ -389,9 +391,10 @@ void AJS_TotoActor::MulticastShowToto_Implementation()
 			TotoTriger->ShowTotoWidget();
 		}
 	}
-	if (StartSound)
+	if (StartSound && TotStart)
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), StartSound);
+		UGameplayStatics::PlaySound2D(GetWorld(), TotStart);
 	}
 }
 
@@ -429,4 +432,9 @@ void AJS_TotoActor::LoseAnimationPlay(AHG_Player* player)
 			}
 		}
 	}
+}
+
+void AJS_TotoActor::MulticastPlayResultSound_Implementation()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(),TotResult);
 }

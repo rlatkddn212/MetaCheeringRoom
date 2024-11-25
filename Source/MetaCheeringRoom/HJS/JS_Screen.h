@@ -157,6 +157,6 @@ public:
 	int32 FailCount2 = 0;
 
 	void RequestSummaryVOD(int32 Time);
-
+	UPROPERTY(Replicated)
 	bool bVod;
 };

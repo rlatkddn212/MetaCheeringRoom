@@ -52,7 +52,7 @@ void AJS_Screen::BeginPlay()
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if(PC)
 	{
-		GetWorldTimerManager().SetTimer(PlayVedioHandle, this, &AJS_Screen::RepPlayVideo, 1.f, false);
+		GetWorldTimerManager().SetTimer(PlayVedioHandle, this, &AJS_Screen::RepPlayVideo, 2.f, false);
 		if (PC->HasAuthority())
 		{
 			SetOwner(PC);
@@ -75,9 +75,6 @@ void AJS_Screen::BeginPlay()
 			}
 			// 치지직 정보 가져오기
 			NetComp->GetInfoFromAIServer();
-			// 유튜브 정보 가져오기
-			// VOD 정보 가져오기
-			// 다 가져와서 어딘가에 리스트로 저장해야 함. 구조체를 하나 만들기
 		}
 	}
 	Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
@@ -198,6 +195,7 @@ void AJS_Screen::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	DOREPLIFETIME(AJS_Screen, RepVideoURL);
 	DOREPLIFETIME(AJS_Screen, RepVideoURL2);
 	DOREPLIFETIME(AJS_Screen, bUsingFirstPlayer);
+	DOREPLIFETIME(AJS_Screen, bVod);
 }
 
 
@@ -206,6 +204,41 @@ void AJS_Screen::RepPlayVideo()
 	PRINTLOG(TEXT("%s"), *RepVideoURL);
 	if (RepVideoURL != TEXT(""))
 	{
+		if (bVod)
+		{
+			// 만약 재생 중인 미디어 플레이어가 있다면 전부 멈추기
+			MediaPlayer->PlayOnOpen = true;
+			GetWorldTimerManager().ClearTimer(FailLoadVideo1Handle);
+			GetWorldTimerManager().ClearTimer(FailLoadVideo2Handle);
+			bVod = true;
+			// Media를 재생
+			// MediaSource의 URL 설정
+			MediaTexture->SetMediaPlayer(MediaPlayer);
+			if (MediaSource)
+			{
+				MediaSource->StreamUrl = RepVideoURL;
+				int32 Index;
+				if (RepVideoURL.FindLastChar('/', Index))
+				{
+					NetComp->CurrentVODFileName = RepVideoURL.RightChop(Index + 1);
+				}
+				// 미디어 재생 시작
+				if (MediaPlayer)
+				{
+					MediaPlayer->OpenSource(MediaSource);
+					bUsingFirstPlayer = true;
+
+					// 서버에 싱크 맞추기
+					AJS_PlayerController* PC = Cast<AJS_PlayerController>(GetWorld()->GetFirstPlayerController());
+					if (PC)
+					{
+						PC->ServerVODDataReq();
+					}
+
+				}
+			}
+			return;
+		}
 		NetComp->VideoURL = RepVideoURL;
 		AJS_PlayerController* PC = Cast<AJS_PlayerController>(GetWorld()->GetFirstPlayerController());
 		if (PC)
@@ -298,6 +331,7 @@ void AJS_Screen::PlayMedia(const FString& VideoURL)
 
 void AJS_Screen::PlayVOD(const FString& VideoURL)
 {
+	RepVideoURL = VideoURL;
 	MulticastPlayVOD(VideoURL);
 }
 
@@ -327,14 +361,6 @@ void AJS_Screen::MulticastPlayVOD_Implementation(const FString& VideoURL)
 			bUsingFirstPlayer = true;
 		}
 	}
-
-	TArray<AActor*> Actors;
-	UGameplayStatics::GetAllActorsWithTag(GetWorld(),TEXT("ControlLight"),Actors);
-	for (AActor* Actor : Actors)
-	{
-		Actor->SetActorHiddenInGame(true);
-	}
-
 }
 
 void AJS_Screen::PlayVideoRepURL(const FString& VideoURL)
