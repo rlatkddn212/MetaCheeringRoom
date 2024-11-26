@@ -18,6 +18,10 @@
 #include "CreatorObject/SW_CreatorObject.h"
 #include "Components/WidgetComponent.h"
 #include "UI/SW_UserNameWidget.h"
+#include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/OnlineSubsystem.h"
+#include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/Interfaces/OnlineIdentityInterface.h"
+#include "Online/CoreOnlineFwd.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASW_Creator::ASW_Creator()
@@ -83,6 +87,30 @@ void ASW_Creator::BeginPlay()
 		{
 			UserNameWidget->SetVisibility(ESlateVisibility::Visible);
 			UserNameWidget->SetUserName(FString("KSW"));
+		}
+	}
+
+	if (IsLocallyControlled())
+	{
+		IOnlineSubsystem* SubSystem = IOnlineSubsystem::Get(TEXT("Steam"));
+		if (SubSystem)
+		{
+			// Identity 인터페이스 가져오기
+			IOnlineIdentityPtr IdentityInterface = SubSystem->GetIdentityInterface();
+			if (IdentityInterface.IsValid())
+			{
+				UE_LOG(LogTemp, Log, TEXT("IdentityInterface: OK"));
+				// 로컬 플레이어의 유니크 넷 ID 가져오기
+				FUniqueNetIdPtr UserId = IdentityInterface->GetUniquePlayerId(0);
+				if (UserId.IsValid())
+				{
+					UE_LOG(LogTemp, Log, TEXT("UserId: OK"));
+					// 유니크 넷 ID를 문자열로 변환
+					FString Nickname = IdentityInterface->GetPlayerNickname(*UserId);
+					// SW_Creator를 가져옴
+					Server_SetPlayerName(Nickname);
+				}
+			}
 		}
 	}
 }
@@ -592,12 +620,14 @@ void ASW_Creator::Multicast_PlayMontage_Implementation(UAnimMontage* MontageToPl
 void ASW_Creator::Server_SetPlayerName_Implementation(const FString& newName)
 {
 	UserName = newName;
+	OnRep_UserName();
 }
 
 void ASW_Creator::OnRep_UserName()
 {
 	if (UserNameWidget)
 	{
+		UE_LOG(LogTemp, Log, TEXT("UserName: %s"), *UserName);
 		UserNameWidget->SetUserName(UserName);
 	}
 }
