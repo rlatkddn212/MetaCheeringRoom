@@ -450,13 +450,17 @@ void AHG_Player::TeleportToCreate()
 {
 	//(X=1040.000000,Y=1230.000000,Z=0.000000)
 	UGameplayStatics::PlaySound2D(GetWorld(), TeleportSound);
-	SetActorLocation(FVector(1040.0f, 1230.0f, 0.0f)); 
+	SetActorLocation(FVector(1040.0f, 1230.0f, 0.0f));
 	SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
 	Controller->SetControlRotation(GetActorRotation());
 }
 
 void AHG_Player::OnMyMove(const FInputActionValue& Value)
 {
+	if (bIsInEmotion) return;
+
+	if(bIsShaking) return;
+
 	if (bIsSitting || !bCanMove) return;
 
 	FVector2D v = Value.Get<FVector2D>();
@@ -480,7 +484,7 @@ void AHG_Player::OnMyLook(const FInputActionValue& Value)
 		return;
 	}
 
-	if (bIsShaking || (!bIsSitting && !bCanMove))
+	if (!bIsShaking && !bIsSitting && !bCanMove)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("22"));
 		return;

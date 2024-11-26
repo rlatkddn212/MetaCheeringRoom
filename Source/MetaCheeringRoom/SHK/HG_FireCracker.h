@@ -28,7 +28,6 @@ public:
 	void MulticastRPCUse(APawn* pawn);
 
 
-
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
-	class UParticleSystem* FireCrackerEffect;
+	class UNiagaraComponent* FireCrackerEffect;
 };

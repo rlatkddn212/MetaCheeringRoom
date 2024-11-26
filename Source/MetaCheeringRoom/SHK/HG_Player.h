@@ -459,7 +459,10 @@ public:
 	void CameraDelay();
 
 	bool bOnFullScreen = false;
+
 	bool bOnInventory = false;
 
 	bool bGetCoinSound = false;
+
+	bool bIsInEmotion = false;
 };

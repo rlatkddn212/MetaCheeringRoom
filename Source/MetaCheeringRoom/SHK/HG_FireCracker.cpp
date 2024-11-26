@@ -12,6 +12,8 @@ void AHG_FireCracker::BeginPlay()
 	Super::BeginPlay();
 	this->ItemData.ItemName = "FireCracker";
 	InitItemData();
+
+	SetLifeSpan(5.0f);
 }
 
 void AHG_FireCracker::Use()
@@ -27,9 +29,8 @@ void AHG_FireCracker::ServerRPCUse_Implementation()
 
 void AHG_FireCracker::MulticastRPCUse_Implementation(APawn* pawn)
 {
-	FVector SpawnLocation = pawn->GetActorLocation() + pawn->GetActorForwardVector() * 200.0f;
+	FVector SpawnLocation = pawn->GetActorLocation() + pawn->GetActorUpVector() * 200.0f;
 	FRotator SpawnRotation = pawn->GetActorRotation();
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireCrackerEffect, SpawnLocation, SpawnRotation, true);
 
 	Destroy();
 }

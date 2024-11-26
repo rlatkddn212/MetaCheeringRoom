@@ -79,7 +79,7 @@ void UHG_SlotWidget::OnButtonClicked()
 		OwningPlayer->PC->SetInputMode(FInputModeGameOnly());
 		if (SlotInfo.ItemInfo.ItemCategory != EItemCategory::Category_Emotion)
 		{
-			OwningPlayer->bCanMove = true;
+			OwningPlayer->bCanMove = false;
 		}
 		OwningPlayer->bOnInventory = false;
 		OwningPlayer->bToggle = !OwningPlayer->bToggle;
