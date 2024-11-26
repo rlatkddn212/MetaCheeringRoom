@@ -20,6 +20,18 @@ void UHG_HUD::SetPointText()
 	}
 }
 
+void UHG_HUD::SetAnimPointText(int32 Value)
+{
+	if (GetOwningPlayer())
+	{
+		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+		if (Player)
+		{
+			TB_Animation->SetText(FText::AsNumber(Value));
+		}
+	}
+}
+
 void UHG_HUD::UpdateHUD(int32 Value)
 {
 	SetPointText();

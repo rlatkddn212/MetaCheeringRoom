@@ -78,6 +78,8 @@ int32 UHG_PlayerGoodsComponent::GoldLerp(int32 p_TargetGold,float OneTick)
 {
 	GetWorld()->GetTimerManager().SetTimer(handle,this,&UHG_PlayerGoodsComponent::Add10Point, OneTick,true);
 
+	TargetGold = p_TargetGold;
+
 	return Gold;
 }
 
@@ -88,11 +90,18 @@ void UHG_PlayerGoodsComponent::Add10Point()
 		UGameplayStatics::PlaySound2D(GetWorld(), CompOwner->GetPointSound);
 	}
 
+	CompOwner->HUD->SetAnimPointText(Gold);
+
 	Gold+= 10;
 
 	CompOwner->HUD->SetPointText();
 
-	if (Gold <= TargetGold)
+	if (CompOwner->HUD->TBSlide)
+	{
+		CompOwner->HUD->PlayAnimation(CompOwner->HUD->TBSlide);
+	}
+
+	if (Gold >= TargetGold)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(handle);
 	}
