@@ -571,6 +571,11 @@ void ASW_CreatorObject::SetFileName(const FString& FileName)
 void ASW_CreatorObject::SetCreatorObjectName(const FString& Name)
 {
 	CreatorObjectName = FName(Name);
+
+	if (!Tags.Contains(CreatorObjectName))
+	{
+		Tags.Add(CreatorObjectName);
+	}
 }
 
 FString ASW_CreatorObject::GetCreatorObjectName() const

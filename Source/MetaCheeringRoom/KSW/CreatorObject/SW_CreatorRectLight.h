@@ -32,5 +32,6 @@ public:
 	float LightAttenuationRadius;
 	float LightSourceWidth;
 	float LightSourceHeight;
+	float AttenuationRadius;
 	bool CastShadow;
 };
