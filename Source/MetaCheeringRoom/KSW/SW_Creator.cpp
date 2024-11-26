@@ -631,6 +631,13 @@ void ASW_Creator::OnRep_UserName()
 	{
 		UE_LOG(LogTemp, Log, TEXT("UserName: %s"), *UserName);
 		UserNameWidget->SetUserName(UserName);
+
+		// ╥ндц PC
+		ASW_CreatorPlayerController* LocalPC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (LocalPC)
+		{
+			LocalPC->JoinUser(UserName);
+		}
 	}
 }
 
