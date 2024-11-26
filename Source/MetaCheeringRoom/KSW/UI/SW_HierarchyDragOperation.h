@@ -17,7 +17,7 @@ class METACHEERINGROOM_API USW_HierarchyDragOperation : public UDragDropOperatio
 public:
 	UPROPERTY(BlueprintReadWrite)
 	FString ItemName;
-
+	UPROPERTY()
 	class ASW_CreatorObject* CreatorObject;
 
 	// 드래그 시작한 위젯과 같은 위젯인지 확인

@@ -19,6 +19,7 @@
 #include "MetaCheeringRoom.h"
 #include "../SHK/HG_GameInstance.h"
 #include "JS_SessionGameInstanceSubSystem.h"
+#include "MediaPlayer.h"
 
 AJS_PlayerController::AJS_PlayerController()
 {
@@ -93,6 +94,23 @@ void AJS_PlayerController::ServerHandleVideoPlay_Implementation()
 		FString StreamID = ScreenActor->NetComp->StreamID;
 		int32 SegmentNumber = ScreenActor->NetComp->SegmentNumber - 1;
 		ClientHandleVideoPlay(URL, StreamID, SegmentNumber);
+	}
+}
+
+void AJS_PlayerController::ServerVODDataReq_Implementation()
+{
+	if (ScreenActor->MediaPlayer && ScreenActor->MediaPlayer->IsPlaying())
+	{
+		FTimespan Time = ScreenActor->MediaPlayer->GetTime();
+		ClientVodJump(Time);
+	}
+}
+
+void AJS_PlayerController::ClientVodJump_Implementation(FTimespan Time)
+{
+	if (MyScreenActor)
+	{
+		MyScreenActor->MediaPlayer->Seek(Time);
 	}
 }
 

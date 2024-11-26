@@ -29,6 +29,7 @@ public:
 	class UEditableText* ValueText;
 
 	int32 PropertyId;
+	UPROPERTY()
 	class UCreatorFloatProperty* FloatProperty;
 
 	void SetPropertyValue(int32 id, class UCreatorFloatProperty* Property);
@@ -39,5 +40,6 @@ public:
 	void SetInspectorWidget(class USW_CreatorInspectorWidget* InInspectorWidget) { InspectorWidget = InInspectorWidget; }
 
 	// 인스펙터 저장
+	UPROPERTY()
 	class USW_CreatorInspectorWidget* InspectorWidget;
 };

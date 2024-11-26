@@ -193,7 +193,7 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 			// 라인 트레이스 실행
 			bool bHit = GetWorld()->LineTraceSingleByObjectType(HitResult, TraceStart, TraceEnd, ObjectParams, Params);
 
-			if (bHit)
+			if (bHit && SelectedObject)
 			{
 				if (bHit && HitResult.Component.IsValid())
 				{
@@ -360,7 +360,7 @@ void ASW_CreatorPlayerController::UnSelectServerDeleteObject(class ASW_CreatorOb
 	{
 		//if (SelectedObject) SelectedObject->OnSelected(false);
 		Server_SetOwnerObject(SelectedObject, false);
-		SelectedObject = nullptr;
+		//SelectedObject = nullptr;
 		CreatorWidget->CreatorInspectorWidget->SetObject(nullptr);
 	}
 }
@@ -496,7 +496,10 @@ void ASW_CreatorPlayerController::DeleteSelectedObject()
 
 void ASW_CreatorPlayerController::ReloadHierarchy()
 {
-	CreatorWidget->CreatorHierarchyWidget->ReloadItem();
+	if (CreatorWidget && CreatorWidget->CreatorHierarchyWidget)
+	{
+		CreatorWidget->CreatorHierarchyWidget->ReloadItem();
+	}
 }
 
 void ASW_CreatorPlayerController::CopySelectedObject()
@@ -536,10 +539,10 @@ void ASW_CreatorPlayerController::Server_AddCreatingDummyObject_Implementation(c
 {
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 	ASW_CreatorObject* NewCreatingObject = system->CreateObject(&ObjectData);
-	system->AddObject(NewCreatingObject);
-	// 멀티
+
 	if (NewCreatingObject)
 	{
+		system->AddObject(NewCreatingObject);
 		NewCreatingObject->SetActorLocation(Pos);
 		// Timer
 		// PC를 가져옴
@@ -560,13 +563,13 @@ void ASW_CreatorPlayerController::Server_AddCreatingDummyObject_Implementation(c
 
 void ASW_CreatorPlayerController::Server_DeleteObject_Implementation(class ASW_CreatorObject* DeleteObject)
 {
-	if (DeleteObject)
+	if (DeleteObject == nullptr)
+		return;
+
+	ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+	if (Creator)
 	{
-		ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
-		if (Creator)
-		{
-			Creator->Multicast_DeleteObjectInfo(DeleteObject);
-		}
+		Creator->Multicast_DeleteObjectInfo(DeleteObject);
 	}
 
 	FTimerHandle TimerHandle;
@@ -591,8 +594,11 @@ void ASW_CreatorPlayerController::Server_DeleteObject_Implementation(class ASW_C
 
 void ASW_CreatorPlayerController::Server_DetachObject_Implementation(class ASW_CreatorObject* DetachObject)
 {
+	if (DetachObject == nullptr)
+		return;
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 	system->DetechObject(DetachObject);
+	system->AttachObject(nullptr, DetachObject);
 
 	ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
 	if (Creator)
@@ -603,6 +609,8 @@ void ASW_CreatorPlayerController::Server_DetachObject_Implementation(class ASW_C
 
 void ASW_CreatorPlayerController::Server_AttachObject_Implementation(class ASW_CreatorObject* ParentObject, class ASW_CreatorObject* AttachObject)
 {
+	if (ParentObject == nullptr || AttachObject == nullptr)
+		return;
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 	if (system->IsChildObject(AttachObject, ParentObject))
 	{
@@ -623,18 +631,22 @@ void ASW_CreatorPlayerController::Server_AttachObject_Implementation(class ASW_C
 
 void ASW_CreatorPlayerController::Server_CopyPasteObject_Implementation(class ASW_CreatorObject* CopyObject)
 {
+	if (CopyObject == nullptr)
+		return;
 	UCreatorMapSubsystem* system = GetGameInstance()->GetSubsystem<UCreatorMapSubsystem>();
 	ASW_CreatorObject* NewCopyObject = system->CopyObject(CopyObject);
-
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, NewCopyObject]()
-		{
-			// ASW_Creator를 가져옴
-			ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
-			if (Creator)
+	if (NewCopyObject)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, NewCopyObject]()
 			{
-				Creator->Multicast_CopyPasteObject(NewCopyObject);
-			}
-		}, 0.1f, false);
+				// ASW_Creator를 가져옴
+				ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+				if (Creator)
+				{
+					Creator->Multicast_CopyPasteObject(NewCopyObject);
+				}
+			}, 0.1f, false);
+	}
 }
 

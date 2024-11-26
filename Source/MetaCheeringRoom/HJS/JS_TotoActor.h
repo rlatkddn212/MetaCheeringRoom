@@ -115,6 +115,9 @@ public:
 
 	void LoseAnimationPlay(AHG_Player* player);
 
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastPlayResultSound();
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AJS_AtkActor> AtkActorFactory;
 	UPROPERTY()
@@ -127,6 +130,12 @@ public:
 	class USoundBase* TadaSound;
 	UPROPERTY(EditAnywhere)
 	class USoundBase* StartSound;
+	UPROPERTY(EditAnywhere)
+	class USoundBase* TotStart;
+	UPROPERTY(EditAnywhere)
+	class USoundBase* TotEnd;
+	UPROPERTY(EditAnywhere)
+	class USoundBase* TotResult;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> FanfareFactory;

@@ -53,7 +53,7 @@ public:
 	void HandleFinish(const FString& FilePath, AActor* ImportedActor);
 
 	class URLFProgress* GetProgressTracker() const { return ProgressTracker; }
-
+	UPROPERTY()
 	class URLFProgress* ProgressTracker;
 
 	UPROPERTY(EditAnywhere, Category = "FBX")
