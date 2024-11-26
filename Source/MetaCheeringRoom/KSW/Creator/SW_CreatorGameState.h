@@ -14,4 +14,7 @@ class METACHEERINGROOM_API ASW_CreatorGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 	
+	public:
+
+	virtual void BeginPlay() override;
 };

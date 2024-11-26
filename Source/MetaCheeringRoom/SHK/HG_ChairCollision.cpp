@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/ArrowComponent.h"
 #include "HG_Player.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AHG_ChairCollision::AHG_ChairCollision()
@@ -26,11 +27,26 @@ void AHG_ChairCollision::BeginPlay()
 	SphereComp->OnComponentEndOverlap.AddDynamic(this,&AHG_ChairCollision::OnMyEndOverlap);
 }
 
+void AHG_ChairCollision::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AHG_ChairCollision,IsSeatTaken);
+}
+
 // Called every frame
 void AHG_ChairCollision::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (OverlapedPlayer)
+	{
+		if((OverlapedPlayer->GetActorLocation() - this->GetActorLocation()).Length() > 300.0f)
+		{
+			if(OverlapedPlayer->DetectChair == this) OverlapedPlayer->DetectChair = nullptr;
+			OverlapedPlayer = nullptr;
+		}
+	}
 }
 
 void AHG_ChairCollision::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -45,7 +61,7 @@ void AHG_ChairCollision::OnMyEndOverlap(UPrimitiveComponent* OverlappedComponent
 {
 	if (auto* Player = Cast<AHG_Player>(OtherActor))
 	{
-		//Player->DetectChair = nullptr;
+		OverlapedPlayer = Player;
 	}
 }
 

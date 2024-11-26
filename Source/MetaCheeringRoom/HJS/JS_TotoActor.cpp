@@ -281,6 +281,7 @@ void AJS_TotoActor::ServerSetTimerLimit()
 		FString timeLimitText = FString::Printf(TEXT("제출이 마감되었습니다."));
 		MulticastSetTimeUI(timeLimitText, TotoLimitTIme);
 		MulticastAlarmToto(TEXT("승부예측이 마감되었습니다!"));
+		MulticastPlayEndSound();
 	}
 	else
 	{
@@ -349,7 +350,6 @@ void AJS_TotoActor::MulticastSetTimeUI_Implementation(const FString& TimeText, c
 			TotoMakeWidget->SetWidgetSwitcher(1);
 			TotoMakeWidget->bOpen = true;
 		}
-		UGameplayStatics::PlaySound2D(GetWorld(),TotEnd);
 	}
 	else
 	{
@@ -437,4 +437,9 @@ void AJS_TotoActor::LoseAnimationPlay(AHG_Player* player)
 void AJS_TotoActor::MulticastPlayResultSound_Implementation()
 {
 	UGameplayStatics::PlaySound2D(GetWorld(),TotResult);
+}
+
+void AJS_TotoActor::MulticastPlayEndSound_Implementation()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), TotEnd);
 }

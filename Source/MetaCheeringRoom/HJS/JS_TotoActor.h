@@ -118,6 +118,9 @@ public:
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastPlayResultSound();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayEndSound();
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AJS_AtkActor> AtkActorFactory;
 	UPROPERTY()

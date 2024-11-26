@@ -21,9 +21,6 @@ public:
 	class UAnimMontage* TwerkMontage;
 
 	UFUNCTION()
-	void PlayTwerkEmotionMontage();
-
-	UFUNCTION()
 	void AnimNotify_TwerkEnd();
 	
 	UFUNCTION()
@@ -62,4 +59,6 @@ public:
 
 	UFUNCTION()
 	void PlaySelectedMontage(UAnimMontage* p_Montage);
+
+	void EndAnimSetting();
 };

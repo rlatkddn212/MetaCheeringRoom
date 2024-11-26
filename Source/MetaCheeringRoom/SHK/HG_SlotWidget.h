@@ -55,4 +55,6 @@ public:
 	FButtonStyle NormalStyle;
 
 	int32 MyIndex;
+
+	bool bIsEquiped = false;
 };

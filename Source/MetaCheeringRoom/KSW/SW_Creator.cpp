@@ -16,6 +16,8 @@
 #include "CreatorMapSubsystem.h"
 #include "CreatorStorageSubsystem.h"
 #include "CreatorObject/SW_CreatorObject.h"
+#include "Components/WidgetComponent.h"
+#include "UI/SW_UserNameWidget.h"
 
 // Sets default values
 ASW_Creator::ASW_Creator()
@@ -44,6 +46,9 @@ ASW_Creator::ASW_Creator()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(RootSceneComponent);
 
+	UserNameWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("UserNameWidgetComponent"));
+	UserNameWidgetComponent->SetupAttachment(RootSceneComponent);
+
 	bReplicates = true; // Pawn이 네트워크에서 복제되도록 설정
 	SetReplicateMovement(true);
 }
@@ -60,11 +65,25 @@ void ASW_Creator::BeginPlay()
 		CameraSpeedWidget->AddToViewport();
 	}
 
+	UserNameWidget = Cast<USW_UserNameWidget>(UserNameWidgetComponent->GetUserWidgetObject());
+	UserNameWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	if (IsLocallyControlled())
 	{
 		// 매쉬를 숨긴다.
 		CameraMeshComponent->SetVisibility(false);
 		HandMeshComponent->SetVisibility(false);
+		if (UserNameWidget)
+		{
+			UserNameWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+	else
+	{
+		if (UserNameWidget)
+		{
+			UserNameWidget->SetVisibility(ESlateVisibility::Visible);
+			UserNameWidget->SetUserName(FString("KSW"));
+		}
 	}
 }
 
@@ -433,12 +452,12 @@ void ASW_Creator::OnMyAction1(const FInputActionValue& Value)
 
 void ASW_Creator::OnMyAction2(const FInputActionValue& Value)
 {
-	Server_PlayMontage(ThumbMontage);
+	Server_PlayMontage(HandShakeMontage);
 }
 
 void ASW_Creator::OnMyAction3(const FInputActionValue& Value)
 {
-	Server_PlayMontage(ThumbMontage);
+	Server_PlayMontage(HandOkMontage);
 }
 
 void ASW_Creator::SetMouseState(ECreatorMouseState NewState)
@@ -520,6 +539,7 @@ void ASW_Creator::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ASW_Creator, CurrentHandRotation);
 	DOREPLIFETIME(ASW_Creator, bGrap);
 	DOREPLIFETIME(ASW_Creator, bRot);
+	DOREPLIFETIME(ASW_Creator, UserName);
 }
 
 void ASW_Creator::GrapAnim(bool isGrap)
@@ -566,6 +586,19 @@ void ASW_Creator::Multicast_PlayMontage_Implementation(UAnimMontage* MontageToPl
 	if (HandMeshComponent && MontageToPlay)
 	{
 		HandMeshComponent->GetAnimInstance()->Montage_Play(MontageToPlay);
+	}
+}
+
+void ASW_Creator::Server_SetPlayerName_Implementation(const FString& newName)
+{
+	UserName = newName;
+}
+
+void ASW_Creator::OnRep_UserName()
+{
+	if (UserNameWidget)
+	{
+		UserNameWidget->SetUserName(UserName);
 	}
 }
 

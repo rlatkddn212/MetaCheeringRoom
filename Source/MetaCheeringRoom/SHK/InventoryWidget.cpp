@@ -277,7 +277,6 @@ void UInventoryWidget::UseItem()
 					// GameInstance의 EquipSlotIndexList에 내가 선택한 슬롯의 아이템의 인덱스가 포함되어 있는지 확인 ==> 장착한 아이템인지 확인
 					if (GI->EquipSlotIndexList.Contains(SelectedSlot->MyIndex))
 					{
-
 						// EquipList에서 선택한 슬롯을 제거
 						EquipList.Remove(SelectedSlot);
 
@@ -286,19 +285,25 @@ void UInventoryWidget::UseItem()
 
 						// 플레이어 아이템 장착 해제
 						OwningPlayer->UnequipItemToSocket(SelectedSlot->SlotInfo.ItemInfo.ItemName);
+
+						SelectedSlot->bIsEquiped = false;
 					}
 					else
 					{
 						// 장착하지 않았다면 
+						if (SelectedSlot->bIsEquiped == false)
+						{
+							// EquipList에서 선택한 슬롯을 추가
+							EquipList.Add(SelectedSlot);
 
-						// EquipList에서 선택한 슬롯을 추가
-						EquipList.Add(SelectedSlot);
+							SelectedSlot->bIsEquiped = true;
 
-						// GameInstance의 EquipSlotIndexList에서 현재 슬롯의 인덱스 추가
-						GI->EquipSlotIndexList.Add(GetSlotIndexInWB(SelectedSlot));
+							// GameInstance의 EquipSlotIndexList에서 현재 슬롯의 인덱스 추가
+							GI->EquipSlotIndexList.Add(GetSlotIndexInWB(SelectedSlot));
 
-						// 플레이어 아이템 장착
-						OwningPlayer->EquipItemToSocket(SelectedSlot->SlotInfo.ItemInfo);
+							// 플레이어 아이템 장착
+							OwningPlayer->EquipItemToSocket(SelectedSlot->SlotInfo.ItemInfo);
+						}
 					}
 				}
 				else if(SelectedCategory == WB_SlotList_Emotion)

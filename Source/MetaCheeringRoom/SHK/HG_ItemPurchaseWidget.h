@@ -43,6 +43,7 @@ public:
 	AHG_Player* Owner;
 
 	FItemData LookingItemData;
-
+	
+	UPROPERTY()
 	UHG_GameInstance* GI;
 };

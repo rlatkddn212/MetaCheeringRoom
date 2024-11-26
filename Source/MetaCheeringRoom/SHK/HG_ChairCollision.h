@@ -20,6 +20,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -31,4 +32,11 @@ public:
 	
 	UFUNCTION()
 	void OnMyEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY(EditDefaultsOnly,Replicated)
+	bool IsSeatTaken = false;
+
+	UPROPERTY()
+	class AHG_Player* OverlapedPlayer;
+
 };
