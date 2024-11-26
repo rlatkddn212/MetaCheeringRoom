@@ -15,7 +15,6 @@ class METACHEERINGROOM_API UHG_HUD : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	virtual void NativeConstruct() override;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UTextBlock* TB_Point;

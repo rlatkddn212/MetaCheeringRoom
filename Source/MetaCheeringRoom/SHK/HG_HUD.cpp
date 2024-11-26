@@ -8,13 +8,6 @@
 #include "Components/WidgetSwitcher.h"
 #include "Components/Button.h"
 
-void UHG_HUD::NativeConstruct()
-{
-	Super::NativeConstruct();
-
-}
-
-
 void UHG_HUD::SetPointText()
 {
 	if (GetOwningPlayer())
