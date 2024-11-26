@@ -320,7 +320,18 @@ void AJS_Screen::RequestSummaryVOD(int32 Time)
 	FString StartTime = FString::Printf(TEXT("%02d:%02d:%02d"), Hour, Minute, Second);
 	// 해서 AI Server에 요청 보내기
 	// 여기서 해야할 건, Time을 땡기고 숫자를 문자열로 바꿔서 NetComp의 함수를 호출
-	NetComp->SendSummaryRequestVOD(StartTime, EndTime);
+	//NetComp->SendSummaryRequestVOD(StartTime, EndTime);
+
+	FTimerHandle ResultHandle;
+	GetWorldTimerManager().SetTimer(ResultHandle,[this](){
+		ShowSummaryResult();
+	},3.f,false);
+
+}
+
+void AJS_Screen::ShowSummaryResult()
+{
+	NetComp->ShowResult();
 }
 
 void AJS_Screen::PlayMedia(const FString& VideoURL)

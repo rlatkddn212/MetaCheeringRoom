@@ -103,4 +103,6 @@ public:
 
 	FSummaryResultSignature OnSummarySignatureCompleteDelegate;
 
+	void ShowResult();
+
 };
