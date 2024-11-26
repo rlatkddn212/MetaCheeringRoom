@@ -55,8 +55,10 @@ int32 UHG_PlayerGoodsComponent::AddGold(int32 Value)
 	SetGold(FMath::Clamp(Gold + Value, 0, MAX_GOLD));
 	CompOwner->GI->CurrentGold = Gold;
 	CompOwner->HUD->SetPointText();
+	if(CompOwner->HUD->GetCoin)
+	CompOwner->HUD->PlayAnimation(CompOwner->HUD->GetCoin);
 
-	if (CompOwner->bOnFullScreen == false)
+	if (CompOwner->bOnFullScreen == false && CompOwner->bGetCoinSound)
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), CompOwner->GetPointSound);
 	}
