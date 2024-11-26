@@ -31,6 +31,7 @@
 #include "HG_KomanoDummy.h"
 #include "HG_ChairCollision.h"
 #include "Components/ArrowComponent.h"
+#include "HG_FullScreenWidget.h"
 
 AHG_Player::AHG_Player()
 {
@@ -294,6 +295,13 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	input->BindAction(IA_Sit, ETriggerEvent::Completed, this, &AHG_Player::Sit);
 
 	input->BindAction(IA_CheerSurfing, ETriggerEvent::Started, this, &AHG_Player::CheerSurfing);
+
+	input->BindAction(IA_MuteCoinSound, ETriggerEvent::Started, this, &AHG_Player::MuteCoinSound);
+}
+
+void AHG_Player::MuteCoinSound()
+{
+	bGetCoinSound = !bGetCoinSound;
 }
 
 void AHG_Player::CheerSurfing()
@@ -406,23 +414,36 @@ void AHG_Player::ConversionFullScreen()
 {
 	if (nullptr == FullScreenWidget)
 	{
-		FullScreenWidget = CreateWidget<UUserWidget>(GetWorld(), FullScreenClass);
+		FullScreenWidget = CreateWidget<UHG_FullScreenWidget>(GetWorld(), FullScreenClass);
 	}
 	if (FullScreenWidget)
 	{
 		if (!bToggle)
 		{
 			FullScreenWidget->AddToViewport();
+
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
+			FullScreenWidget->PlayAnimation(FullScreenWidget->Appear);
+
 			bCanMove = false;
 			bToggle = !bToggle;
 			bOnFullScreen = true;
 		}
 		else
 		{
-			FullScreenWidget->RemoveFromParent();
+			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
+			FullScreenWidget->PlayAnimation(FullScreenWidget->Disappear);
 			bToggle = !bToggle;
 			bCanMove = true;
 			bOnFullScreen = false;
+
+			FLatentActionInfo LatentInfo;
+			LatentInfo.Linkage = 0;
+			LatentInfo.UUID = GetUniqueID();
+			LatentInfo.ExecutionFunction = FName("RemoveInventory");
+			LatentInfo.CallbackTarget = this;
+
+			UKismetSystemLibrary::Delay(GetWorld(), 0.5f, LatentInfo);
 		}
 	}
 
@@ -459,7 +480,7 @@ void AHG_Player::OnMyMove(const FInputActionValue& Value)
 {
 	if (bIsInEmotion) return;
 
-	if(bIsShaking) return;
+	if (bIsShaking) return;
 
 	if (bIsSitting || !bCanMove) return;
 
@@ -673,6 +694,14 @@ void AHG_Player::CameraDelay()
 	if (My_CheeringStick)
 	{
 		My_CheeringStick->ApplyChange(FLinearColor::Black, false, 1.0f);
+	}
+}
+
+void AHG_Player::RemoveFullScreen()
+{
+	if (FullScreenWidget)
+	{
+		FullScreenWidget->RemoveFromParent();
 	}
 }
 

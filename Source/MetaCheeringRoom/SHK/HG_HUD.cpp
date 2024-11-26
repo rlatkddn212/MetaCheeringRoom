@@ -12,10 +12,6 @@ void UHG_HUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (!(Btn_SoundOff->OnClicked.IsBound()))
-	{
-		Btn_SoundOff->OnClicked.AddDynamic(this, &UHG_HUD::SoundOff);
-	}
 }
 
 
@@ -85,11 +81,4 @@ void UHG_HUD::StopInventoryAnimation()
 	}
 }
 
-void UHG_HUD::SoundOff()
-{
-	if (GetOwningPlayer())
-	{
-		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
-		Player->bGetCoinSound = !Player->bGetCoinSound;
-	}
-}
+

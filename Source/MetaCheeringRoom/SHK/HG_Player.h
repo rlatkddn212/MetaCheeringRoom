@@ -82,7 +82,13 @@ public:
 	class UInputAction* IA_Sit;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* IA_CheerSurfing;
+	class UInputAction* IA_CheerSurfing;	
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_MuteCoinSound;
+
+	UFUNCTION()
+	void MuteCoinSound();
 
 	UFUNCTION()
 	void CheerSurfing();
@@ -109,10 +115,10 @@ public:
 	void ConversionFullScreen();
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UUserWidget> FullScreenClass;
+	TSubclassOf<class UHG_FullScreenWidget> FullScreenClass;
 
 	UPROPERTY()
-	UUserWidget* FullScreenWidget;
+	UHG_FullScreenWidget* FullScreenWidget;
 
 	UFUNCTION()
 	void TeleportToStore();
@@ -462,7 +468,9 @@ public:
 
 	bool bOnInventory = false;
 
-	bool bGetCoinSound = false;
+	bool bGetCoinSound = true;
 
 	bool bIsInEmotion = false;
+
+	void RemoveFullScreen();
 };
