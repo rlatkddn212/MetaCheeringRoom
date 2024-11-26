@@ -86,6 +86,8 @@ public:
 	void CopySelectedObject();
 	void PasteSelectedObject();
 
+	void JoinUser(const FString& UserName);
+
 	ASW_CreatorObject* GetSelectedObject();
 	UPROPERTY()
 	class ASW_CreatorObject* CopiedObject;
