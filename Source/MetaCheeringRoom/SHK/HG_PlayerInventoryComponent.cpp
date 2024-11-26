@@ -20,7 +20,7 @@ UHG_PlayerInventoryComponent::UHG_PlayerInventoryComponent()
 		ItemDataTable = DataTableObj.Object;
 	}
 
-	InventorySize = 30;
+	InventorySize = 50;
 }
 
 // Called when the game starts
@@ -42,8 +42,7 @@ void UHG_PlayerInventoryComponent::TickComponent(float DeltaTime, ELevelTick Tic
 
 void UHG_PlayerInventoryComponent::AddtoInventory(FItemData Item, int32 Quantity)
 {
-	InitItemData(Item);
-
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *Item.ItemName);
 	if (Inventory.Num() <= InventorySize)
 	{
 
@@ -116,6 +115,19 @@ void UHG_PlayerInventoryComponent::InitItemData(FItemData& ItemData)
 				ItemData.Sound = Row->Sound;
 				break;
 			}
+		}
+	}
+}
+
+void UHG_PlayerInventoryComponent::GetAllItem()
+{
+	TArray<FItemData*> AllRows;
+	if (CompOwner->GI)
+	{
+		CompOwner->GI->ItemDataTable->GetAllRows(TEXT(""), AllRows);
+		for (auto Row : AllRows)
+		{
+			AddtoInventory(*Row, 1);
 		}
 	}
 }

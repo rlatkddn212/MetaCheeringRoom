@@ -54,4 +54,6 @@ public:
 	class AHG_Player* CompOwner;
 
 	void InitItemData(FItemData& ItemData);
+
+	void GetAllItem();
 };
