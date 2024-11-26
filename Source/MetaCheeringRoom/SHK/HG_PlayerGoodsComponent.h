@@ -28,9 +28,12 @@ public:
 	int32 GetGold() const;
 	int32 AddGold(int32 Value);
 	int32 SubGold(int32 Value);
-
+	int32 GoldLerp(int32 p_TargetGold, float OneTick);
+	void Add10Point();
 private:
 	int32 Gold;
+	FTimerHandle handle;
+	int32 TargetGold = 0;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
