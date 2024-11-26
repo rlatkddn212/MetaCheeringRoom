@@ -181,14 +181,7 @@ void AHG_Player::BeginPlay()
 		ServerRPC_ApplyCustom(CurCloth, CurPrinting, CurClothHem, CurEyes, CurHair, CurHairPin);
 	}
 
-	InventoryComp->AddtoInventory(FItemData(TEXT("CheeringStick")), 1);
-	InventoryComp->AddtoInventory(FItemData(TEXT("마라탕후루")), 1);
-	InventoryComp->AddtoInventory(FItemData(TEXT("Teemo")), 1);
-	InventoryComp->AddtoInventory(FItemData(TEXT("TeemoThumb")), 1);
-	InventoryComp->AddtoInventory(FItemData(TEXT("날라차기")), 1);
-	InventoryComp->AddtoInventory(FItemData(TEXT("SadBee")), 1);
-	InventoryComp->AddtoInventory(FItemData(TEXT("T1Logo")), 1);
-	InventoryComp->AddtoInventory(FItemData(TEXT("SiuSound")), 1);
+	InventoryComp->GetAllItem();
 }
 
 void AHG_Player::Tick(float DeltaTime)
