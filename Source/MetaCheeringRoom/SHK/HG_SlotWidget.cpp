@@ -42,6 +42,7 @@ void UHG_SlotWidget::SetItemName()
 
 void UHG_SlotWidget::OnButtonClicked()
 {
+
 	Owner->SelectedSlot = this;
 	Owner->UseItem();
 
@@ -65,9 +66,12 @@ void UHG_SlotWidget::OnButtonClicked()
 
 	Button_InventorySlot->SetStyle(Pressed);
 
-	Owner->RemoveFromParent();
 
-	
+
+
+
+
+	Owner->RemoveFromParent();
 
 	if (auto OwningPlayer = Cast<AHG_Player>(Owner->GetOwningPlayer()->GetPawn()))
 	{

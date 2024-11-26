@@ -762,7 +762,6 @@ void AHG_Player::EquipItem(AHG_EquipItem* ItemValue)
 		GI->EquipItemInfoList.Add(ItemValue->GetItemData());
 	}
 
-	ItemValue->SetActorHiddenInGame(false);
 	auto* mesh = ItemValue->GetComponentByClass<UStaticMeshComponent>();
 	check(mesh);
 	if (mesh)
@@ -817,6 +816,7 @@ void AHG_Player::UnequipItem(const FString& NameValue)
 			ItemsToRemove.Add(item);
 		}
 	}
+
 	for (auto* item : ItemsToRemove)
 	{
 		if (item != nullptr && item->GetItemName() == NameValue)
