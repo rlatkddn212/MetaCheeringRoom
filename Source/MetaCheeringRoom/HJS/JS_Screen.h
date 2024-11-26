@@ -159,4 +159,6 @@ public:
 	void RequestSummaryVOD(int32 Time);
 	UPROPERTY(Replicated)
 	bool bVod;
+
+	void ShowSummaryResult();
 };

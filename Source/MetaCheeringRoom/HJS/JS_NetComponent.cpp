@@ -494,3 +494,11 @@ void UJS_NetComponent::SendSummaryRequestVOD(FString StartTime, FString EndTime)
 	// 요청 전송
 	HttpRequest->ProcessRequest();
 }
+
+void UJS_NetComponent::ShowResult()
+{
+	FString result = TEXT("T1 팀이 리그 오브 레전드에서 다섯 번째 우승을 차지하며 그들의 불멸성을 입증했습니다. 페이커를 중심으로 한 T1은 어려운 상황에서도 물러서지 않고 계속해서 새로운 기록을 세우고 있습니다. 이 팀의 지속적인 성공은 역사적으로도 유례가 없는 일입니다.");
+	// 브로드캐스트 하기
+	OnSummarySignatureCompleteDelegate.Broadcast(result);
+}
+	
