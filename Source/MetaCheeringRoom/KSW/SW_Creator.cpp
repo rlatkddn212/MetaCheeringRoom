@@ -231,6 +231,8 @@ void ASW_Creator::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	input->BindAction(IA_Action1, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyAction1);
 	input->BindAction(IA_Action2, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyAction2);
 	input->BindAction(IA_Action3, ETriggerEvent::Triggered, this, &ASW_Creator::OnMyAction3);
+
+	input->BindAction(IA_P, ETriggerEvent::Started, this, &ASW_Creator::OnMyP);
 }
 
 void ASW_Creator::OnMyMove(const FInputActionValue& Value)
@@ -334,6 +336,15 @@ void ASW_Creator::OnMyR(const FInputActionValue& Value)
 		if (PC)
 			PC->SetToolState(ECreatorToolState::Scale);
 	}
+}
+
+void ASW_Creator::OnMyP(const FInputActionValue& Value)
+{
+	if (PC)
+	{
+		PC->ShowSampleMap();
+	}
+
 }
 
 void ASW_Creator::OnMyRClick(const FInputActionValue& Value)

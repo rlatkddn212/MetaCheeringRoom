@@ -46,5 +46,11 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	class USW_CreatorUserJoinWidget* UserJoinWidget;
+	
+	UPROPERTY( meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* SampleMapAnim;
+	UPROPERTY( meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* SampleMapCloseAnim;
 
+	void SetSampleMapAnim(bool bOpen);
 };

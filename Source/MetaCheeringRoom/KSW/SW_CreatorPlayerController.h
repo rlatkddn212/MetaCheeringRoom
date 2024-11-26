@@ -88,6 +88,9 @@ public:
 
 	void JoinUser(const FString& UserName);
 
+	bool IsSampleMap = false;
+	void ShowSampleMap();
+
 	ASW_CreatorObject* GetSelectedObject();
 	UPROPERTY()
 	class ASW_CreatorObject* CopiedObject;

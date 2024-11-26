@@ -25,13 +25,23 @@ void USW_CreatorWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent,
 
 bool USW_CreatorWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	 
-
 	return true;
 }
 
 bool USW_CreatorWidget::IsDragOverUI()
 {
 	return IsOverUI;
+}
+
+void USW_CreatorWidget::SetSampleMapAnim(bool bOpen)
+{
+	if (bOpen)
+	{
+		PlayAnimation(SampleMapAnim);
+	}
+	else
+	{
+		PlayAnimation(SampleMapCloseAnim);
+	}
 }
 

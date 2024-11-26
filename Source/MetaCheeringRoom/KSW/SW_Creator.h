@@ -95,6 +95,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Action3;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_P;
+
 	UFUNCTION()
 	void OnMyMove(const FInputActionValue& Value);
 	UFUNCTION()
@@ -108,6 +111,9 @@ public:
 	void OnMyE(const FInputActionValue& Value);
 	UFUNCTION()
 	void OnMyR(const FInputActionValue& Value);
+	UFUNCTION()
+	void OnMyP(const FInputActionValue& Value);
+
 	UFUNCTION()
 	void OnMyRClick(const FInputActionValue& Value);
 	UFUNCTION()

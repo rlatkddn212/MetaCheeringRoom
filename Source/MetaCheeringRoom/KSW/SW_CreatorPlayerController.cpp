@@ -525,6 +525,15 @@ void ASW_CreatorPlayerController::JoinUser(const FString& UserName)
 	}
 }
 
+void ASW_CreatorPlayerController::ShowSampleMap()
+{
+	if (CreatorWidget)
+	{
+		IsSampleMap = !IsSampleMap;
+		CreatorWidget->SetSampleMapAnim(IsSampleMap);
+	}
+}
+
 ASW_CreatorObject* ASW_CreatorPlayerController::GetSelectedObject()
 {
 	return SelectedObject;
