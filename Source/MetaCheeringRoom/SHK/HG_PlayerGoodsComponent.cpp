@@ -62,7 +62,7 @@ int32 UHG_PlayerGoodsComponent::AddGold(int32 Value)
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), CompOwner->GetPointSound);
 	}
-
+	
 	return Gold;
 }
 
@@ -72,5 +72,29 @@ int32 UHG_PlayerGoodsComponent::SubGold(int32 Value)
 	CompOwner->GI->CurrentGold = Gold;
 	CompOwner->HUD->SetPointText();
 	return Gold;
+}
+
+int32 UHG_PlayerGoodsComponent::GoldLerp(int32 p_TargetGold,float OneTick)
+{
+	GetWorld()->GetTimerManager().SetTimer(handle,this,&UHG_PlayerGoodsComponent::Add10Point, OneTick,true);
+
+	return Gold;
+}
+
+void UHG_PlayerGoodsComponent::Add10Point()
+{
+	if (CompOwner->bOnFullScreen == false)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), CompOwner->GetPointSound);
+	}
+
+	Gold+= 10;
+
+	CompOwner->HUD->SetPointText();
+
+	if (Gold <= TargetGold)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(handle);
+	}
 }
 
