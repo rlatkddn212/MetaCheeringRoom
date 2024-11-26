@@ -90,6 +90,8 @@ void ASW_Creator::BeginPlay()
 		}
 	}
 
+	OnRep_UserName();
+
 	if (IsLocallyControlled())
 	{
 		IOnlineSubsystem* SubSystem = IOnlineSubsystem::Get(TEXT("Steam"));
