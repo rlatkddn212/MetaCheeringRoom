@@ -52,4 +52,15 @@ public:
 	USoundBase* DrumHitSound;
 	UPROPERTY(EditAnywhere)
 	USoundBase* FeverSound;
+	UPROPERTY(meta=(BindWidget))
+	class UImage* IMG_FeverTime;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gradient")
+    float ColorChangeSpeed2 = 0.5f;
+	void TextGradientColor(float InDeltaTime);
+	float TimeElapsed2 = 0.f;
+	FLinearColor CurrenTextColor;
+
+	UPROPERTY(meta=(BindWidgetAnim),Transient)
+	class UWidgetAnimation* Fever;
+	
 };
