@@ -33,6 +33,7 @@ public:
 
 	void InitItemData();
 
+	UPROPERTY()
 	class UHG_GameInstance* GI;
 
 	void SetItemData(FItemData ItemValue);

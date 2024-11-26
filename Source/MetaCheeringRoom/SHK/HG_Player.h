@@ -80,7 +80,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Sit;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_CheerSurfing;
 
@@ -102,7 +102,7 @@ public:
 	UFUNCTION()
 	void StopHand();
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server, Reliable)
 	void ServerRPC_Shake(bool Value);
 
 	UFUNCTION()
@@ -110,7 +110,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> FullScreenClass;
-	
+
 	UPROPERTY()
 	UUserWidget* FullScreenWidget;
 
@@ -186,6 +186,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Equip)
 	class USceneComponent* UpperComp;
 
+	UPROPERTY()
 	class UHG_GameInstance* GI;
 
 	void EquipItem(AHG_EquipItem* ItemValue);
@@ -297,7 +298,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UHG_HUD* HUD;
-	
+
 	UPROPERTY()
 	class AHG_EquipItem* EItem;
 
@@ -435,11 +436,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Replicated)
 	bool bIsShaking = false;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Replicated)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Replicated)
 	bool bIsSitting = false;
 
-	UFUNCTION(Server,Reliable)
-	void ServerRPC_SetSitState();	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetSitState();
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -447,18 +448,21 @@ public:
 
 	bool bSitToggle = false;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Replicated)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Replicated)
 	bool bIsCheerSurfing = false;
 
-	UFUNCTION(Server,Reliable)
-	void ServerRPC_SetCheerSurfingState();	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetCheerSurfingState();
 
 	void SetCheerSurfingState();
 
 	void CameraDelay();
 
 	bool bOnFullScreen = false;
+
 	bool bOnInventory = false;
 
 	bool bGetCoinSound = false;
+
+	bool bIsInEmotion = false;
 };

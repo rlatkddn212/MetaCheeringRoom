@@ -4,6 +4,7 @@
 #include "SHK/HG_PlayerAnimInstance.h"
 #include "HG_Player.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 void UHG_PlayerAnimInstance::NativeInitializeAnimation()
 {
@@ -11,183 +12,65 @@ void UHG_PlayerAnimInstance::NativeInitializeAnimation()
 
 	Owner = Cast<AHG_Player>(GetOwningActor());
 }
-void UHG_PlayerAnimInstance::PlayTwerkEmotionMontage()
-{
-	if (Owner && TwerkMontage)
-	{
-		Montage_Play(TwerkMontage);
 
-		Owner->bCanMove = false;
-		Owner->CameraComp->FieldOfView = 120.0f;
-	}
-}
 void UHG_PlayerAnimInstance::AnimNotify_TwerkEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_HDEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_PrayEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_MLTEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_CheeringEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_CartWheelEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_ClappingEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_DefeatEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_FlyKickEnd()
 {
-	if (Owner)
-	{
-		Owner->SetActorLocation(Owner->GetMesh()->GetRelativeLocation());
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_WavingEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_PushUpEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 void UHG_PlayerAnimInstance::AnimNotify_KTTGEnd()
 {
-	if (Owner)
-	{
-		Owner->bCanMove = true;
-		Owner->CameraComp->FieldOfView = 90.0f;
-		auto* pc = Cast<APlayerController>(Owner->Controller);
-		if (pc)
-		{
-			pc->bShowMouseCursor = false;
-		}
-	}
+	EndAnimSetting();
 }
 
 
@@ -198,6 +81,22 @@ void UHG_PlayerAnimInstance::PlaySelectedMontage(UAnimMontage* p_Montage)
 		Montage_Play(p_Montage);
 
 		Owner->bCanMove = false;
+		Owner->bIsInEmotion = true;
 		Owner->CameraComp->FieldOfView = 120.0f;
+	}
+}
+
+void UHG_PlayerAnimInstance::EndAnimSetting()
+{
+	if (Owner)
+	{
+		Owner->bCanMove = true;
+		Owner->bIsInEmotion = false;
+		Owner->CameraComp->FieldOfView = 90.0f;
+		auto* pc = Cast<APlayerController>(Owner->Controller);
+		if (pc)
+		{
+			pc->bShowMouseCursor = false;
+		}
 	}
 }
