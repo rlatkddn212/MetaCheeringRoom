@@ -166,6 +166,7 @@ public:
 	FString MapName;
 	int32 UniqueCreatorItemId;
 
+	UPROPERTY()
 	ACreatorObjectRootActor* RootActor;
 
 	void SetRootActor(ACreatorObjectRootActor* InRootActor);

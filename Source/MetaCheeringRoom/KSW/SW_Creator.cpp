@@ -621,8 +621,11 @@ void ASW_Creator::Multicast_PlayMontage_Implementation(UAnimMontage* MontageToPl
 
 void ASW_Creator::Server_SetPlayerName_Implementation(const FString& newName)
 {
-	UserName = newName;
-	OnRep_UserName();
+	if (newName.Len() > 0)
+	{
+		UserName = newName;
+		OnRep_UserName();
+	}
 }
 
 void ASW_Creator::OnRep_UserName()
