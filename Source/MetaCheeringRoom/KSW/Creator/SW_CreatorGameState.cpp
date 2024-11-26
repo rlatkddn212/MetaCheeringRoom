@@ -6,3 +6,8 @@
 #include "../CreatorMapSubsystem.h"
 #include "../CreatorObject/SW_CreatorObject.h"
 #include "../CreatorStorageSubsystem.h"
+
+void ASW_CreatorGameState::BeginPlay()
+{
+    
+}

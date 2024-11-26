@@ -24,6 +24,11 @@
 #include "SW_Creator.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/OnlineSubsystem.h"
+#include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/Interfaces/OnlineIdentityInterface.h"
+#include "Online/CoreOnlineFwd.h"
+#include "Kismet/GameplayStatics.h"
+
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
 {
@@ -51,6 +56,30 @@ void ASW_CreatorPlayerController::BeginPlay()
 			{
 				SetToolState(NewState);
 			});
+
+		IOnlineSubsystem* SubSystem = IOnlineSubsystem::Get(TEXT("Steam"));
+		if (SubSystem)
+		{
+			// Identity 인터페이스 가져오기
+			IOnlineIdentityPtr IdentityInterface = SubSystem->GetIdentityInterface();
+			if (IdentityInterface.IsValid())
+			{
+				// 로컬 플레이어의 유니크 넷 ID 가져오기
+				FUniqueNetIdPtr UserId = IdentityInterface->GetUniquePlayerId(0);
+				if (UserId.IsValid())
+				{
+					// 유니크 넷 ID를 문자열로 변환
+					FString Nickname = IdentityInterface->GetPlayerNickname(*UserId);
+
+					// SW_Creator를 가져옴
+					ASW_Creator* Creator = Cast<ASW_Creator>(GetPawn());
+					if (Creator)
+					{
+						Creator->Server_SetPlayerName(Nickname);
+					}
+				}
+			}
+		}
 
 		// 타이머
 		

@@ -274,7 +274,27 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayMontage(class UAnimMontage* MontageToPlay, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
-
+	
 	UPROPERTY(EditAnywhere)
 	class UAnimMontage* ThumbMontage;
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* HandShakeMontage;
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* HandOkMontage;
+
+	UPROPERTY(EditAnywhere)
+	class USW_UserNameWidget* UserNameWidget;
+
+	UPROPERTY(ReplicatedUsing = OnRep_UserName)
+	FString UserName;
+	
+	UFUNCTION(Server, Reliable)
+	void Server_SetPlayerName(const FString& newName);
+
+	UFUNCTION()
+	void OnRep_UserName();
+
+	UPROPERTY(EditAnywhere, Category = "UserName")
+	class UWidgetComponent* UserNameWidgetComponent;
+	
 };
