@@ -67,7 +67,7 @@ void AHG_KomanoDummy::CheerSurfing()
 	ChangeCheeringStickColor();
 
 	FTimerHandle handle;
-	GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_KomanoDummy::ReturnOriginCondition, 0.5f, false);
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_KomanoDummy::ReturnOriginCondition, 1.5f, false);
 }
 
 
