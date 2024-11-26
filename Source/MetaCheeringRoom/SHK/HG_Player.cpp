@@ -433,17 +433,18 @@ void AHG_Player::ConversionFullScreen()
 		{
 			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
 			FullScreenWidget->PlayAnimation(FullScreenWidget->Disappear);
-			bToggle = !bToggle;
-			bCanMove = true;
-			bOnFullScreen = false;
 
 			FLatentActionInfo LatentInfo;
 			LatentInfo.Linkage = 0;
 			LatentInfo.UUID = GetUniqueID();
-			LatentInfo.ExecutionFunction = FName("RemoveInventory");
+			LatentInfo.ExecutionFunction = FName("RemoveFullScreen");
 			LatentInfo.CallbackTarget = this;
 
 			UKismetSystemLibrary::Delay(GetWorld(), 0.5f, LatentInfo);
+
+			bToggle = !bToggle;
+			bCanMove = true;
+			bOnFullScreen = false;
 		}
 	}
 
@@ -603,7 +604,10 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 
 void AHG_Player::RemoveInventory()
 {
-	InventoryWidget->RemoveFromParent();
+	if (InventoryWidget)
+	{
+		InventoryWidget->RemoveFromParent();
+	}
 }
 
 void AHG_Player::StartFeverTime()
