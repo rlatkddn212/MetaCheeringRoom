@@ -621,8 +621,11 @@ void ASW_Creator::Multicast_PlayMontage_Implementation(UAnimMontage* MontageToPl
 
 void ASW_Creator::Server_SetPlayerName_Implementation(const FString& newName)
 {
-	UserName = newName;
-	OnRep_UserName();
+	if (newName.Len() > 0)
+	{
+		UserName = newName;
+		OnRep_UserName();
+	}
 }
 
 void ASW_Creator::OnRep_UserName()
@@ -631,6 +634,13 @@ void ASW_Creator::OnRep_UserName()
 	{
 		UE_LOG(LogTemp, Log, TEXT("UserName: %s"), *UserName);
 		UserNameWidget->SetUserName(UserName);
+
+		// ╥ндц PC
+		ASW_CreatorPlayerController* LocalPC = Cast<ASW_CreatorPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (LocalPC)
+		{
+			LocalPC->JoinUser(UserName);
+		}
 	}
 }
 

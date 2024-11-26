@@ -24,6 +24,7 @@
 #include "SW_Creator.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "UI/SW_CreatorUserJoinWidget.h"
 
 
 ASW_CreatorPlayerController::ASW_CreatorPlayerController()
@@ -513,6 +514,14 @@ void ASW_CreatorPlayerController::PasteSelectedObject()
 	if (CopiedObject)
 	{
 		Server_CopyPasteObject(CopiedObject);
+	}
+}
+
+void ASW_CreatorPlayerController::JoinUser(const FString& UserName)
+{
+	if (CreatorWidget && CreatorWidget->UserJoinWidget)
+	{
+		CreatorWidget->UserJoinWidget->SetJoinUser(UserName);
 	}
 }
 

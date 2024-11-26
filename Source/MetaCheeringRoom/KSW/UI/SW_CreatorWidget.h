@@ -44,4 +44,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	class USW_CreatorModelToolbarWidget* ModelToolbarWidget;
 
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class USW_CreatorUserJoinWidget* UserJoinWidget;
+
 };
