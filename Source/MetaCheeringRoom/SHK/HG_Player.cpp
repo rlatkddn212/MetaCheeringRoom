@@ -102,8 +102,6 @@ void AHG_Player::BeginPlay()
 		PC->SetInputMode(FInputModeGameOnly());
 	}
 
-
-
 	TargetValue1 = SpringArmComp->TargetArmLength;
 
 	// 커스텀 - 옷
@@ -450,6 +448,8 @@ void AHG_Player::TeleportToStore()
 	SetActorLocation(FVector(-867.240674f, 927.178242f, 0.707882f));
 	SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
 	Controller->SetControlRotation(GetActorRotation());
+
+	HUD->PlayAnimation(HUD->Input1);
 }
 
 void AHG_Player::TeleportToJoin()
@@ -459,6 +459,8 @@ void AHG_Player::TeleportToJoin()
 	SetActorLocation(FVector(-677.120918f, 2559.526662f, -18.354637f));
 	SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
 	Controller->SetControlRotation(GetActorRotation());
+
+	HUD->PlayAnimation(HUD->Input2);
 }
 
 void AHG_Player::TeleportToCreate()
@@ -468,6 +470,8 @@ void AHG_Player::TeleportToCreate()
 	SetActorLocation(FVector(1040.0f, 1230.0f, 0.0f));
 	SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
 	Controller->SetControlRotation(GetActorRotation());
+
+	HUD->PlayAnimation(HUD->Input3);
 }
 
 void AHG_Player::OnMyMove(const FInputActionValue& Value)
@@ -566,6 +570,7 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 			InventoryWidget->PlayAppearAnimation(true);
 			HUD->PlayAppearAnimation(false);
 			HUD->StopInventoryAnimation();
+			HUD->PlayAnimation(HUD->InputInven);
 			InventoryWidget->InitInventoryUI();
 			bOnInventory = true;
 
@@ -721,11 +726,7 @@ void AHG_Player::ServerRPC_SetCheerSurfingState_Implementation()
 
 void AHG_Player::Emotion()
 {
-	auto* Dummy = UGameplayStatics::GetActorOfClass(GetWorld(), KomanoDummyClass);
-	if (auto* K_Dummy = Cast<AHG_KomanoDummy>(Dummy))
-	{
-		K_Dummy->CheerSurfing();
-	}
+	GoodsComp->GoldLerp(4500,0.1f);
 
 	if (bEquipItem)
 	{
@@ -735,6 +736,7 @@ void AHG_Player::Emotion()
 
 			RCSWidget->AddToViewport();
 
+			HUD->PlayAnimation(HUD->InputCS);
 
 			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound2);
 			RCSWidget->PlayAppearAnimation(true);
@@ -950,6 +952,7 @@ void AHG_Player::PopUpHUD()
 				HUD->AddToViewport();
 				HUD->UpdateHUD(0);
 				HUD->SetPointText();
+				HUD->SetAnimPointText(GoodsComp->GetGold());
 			}
 		}
 	}
@@ -1011,6 +1014,8 @@ void AHG_Player::PopUpCustomUI()
 			CustomUI->AddToViewport();
 
 			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound2);
+
+			HUD->PlayAnimation(HUD->InputCustom);
 
 			CustomUI->PlayAppearAnimation(true);
 			CustomUI->SetOwningPlayer(PC);
