@@ -175,7 +175,7 @@ void UJS_CreateRoomWidget::OnClickedCreateLevel()
 	system->SetMapName(NewLevelName);
 
 	int32 PlayerCount = 30;
-	si->CreateSession(LevelName.ToString(), PlayerCount, "Creator");
+	si->CreateSession(NewLevelName, PlayerCount, "Creator");
 	//UGameplayStatics::OpenLevel(GetWorld(), LevelName, true);
 }
 
@@ -211,6 +211,6 @@ void UJS_CreateRoomWidget::OnClickedModify()
 	system->SetupJson(JsonStr);
 
 	int32 PlayerCount = 30;
-	si->CreateSession(LevelName.ToString(), PlayerCount, "Creator");
+	si->CreateSession(meta[SelectIndex]->CreatorMapName, PlayerCount, "Creator");
 	//UGameplayStatics::OpenLevel(GetWorld(), LevelName, true);
 }
