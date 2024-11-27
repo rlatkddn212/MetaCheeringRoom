@@ -53,4 +53,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bChat = false;
 
+	void OnAutoChat();
+	TArray<FString> IDList;
+	TArray<FString> CommentList;
+	void InitDummychat();
+
+	UFUNCTION()
+	void DummyChat();
 };

@@ -9,6 +9,8 @@
 #include "Components/TextBlock.h"
 #include "GameFramework/Character.h"
 #include "JS_CoinActor.h"
+#include "../SHK/HG_Player.h"
+#include "../SHK/HG_PlayerGoodsComponent.h"
 
 void UJS_FeverWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -29,7 +31,6 @@ void UJS_FeverWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 			SetVisibility(ESlateVisibility::Hidden);
 			CurrentTime = 0.f;
 		}
-		RandomCoinSpawn();
 	}
 }
 
@@ -81,6 +82,15 @@ void UJS_FeverWidget::FeverStart()
 		CurrentTime = 2.f;
 		UGameplayStatics::PlaySound2D(GetWorld(), DrumHitSound);
 		UGameplayStatics::PlaySound2D(GetWorld(), FeverSound);
+		AHG_Player* Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+		if (Player)
+		{
+			UHG_PlayerGoodsComponent* Goods = Player->GoodsComp;
+			if (Goods)
+			{
+				Goods->GoldLerp(Goods->GetGold()+1000, 0.1f);
+			}
+		}
 	}
 }
 
@@ -105,6 +115,7 @@ void UJS_FeverWidget::RandomCoinSpawn()
 	if (Player)
 	{
 		FVector Loc = Player->GetActorLocation();
+		Loc.Z -= 100.f;
 		float Min = 300.f;
 		float Max = 500.f;
 		// 무작위 반지름 값
