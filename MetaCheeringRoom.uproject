@@ -55,6 +55,10 @@
 			"Name": "BlueprintColorPicker",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/9d311efe64b14bea9a9170c2067f0e2a"
+		},
+		{
+			"Name": "MovieRenderPipeline",
+			"Enabled": true
 		}
 	]
 }
