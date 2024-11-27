@@ -288,6 +288,14 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	input->BindAction(IA_CheerSurfing, ETriggerEvent::Started, this, &AHG_Player::CheerSurfing);
 
 	input->BindAction(IA_MuteCoinSound, ETriggerEvent::Started, this, &AHG_Player::MuteCoinSound);
+
+	input->BindAction(IA_ShowMouse, ETriggerEvent::Started, this, &AHG_Player::ShowMouse);
+}
+
+void AHG_Player::ShowMouse()
+{
+	MouseToggle = !MouseToggle;
+	PC->SetShowMouseCursor(MouseToggle);
 }
 
 void AHG_Player::MuteCoinSound()
@@ -413,6 +421,8 @@ void AHG_Player::ConversionFullScreen()
 		{
 			FullScreenWidget->AddToViewport();
 
+			HUD->PlayAnimation(HUD->InputG);
+
 			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
 			FullScreenWidget->PlayAnimation(FullScreenWidget->Appear);
 
@@ -497,15 +507,16 @@ void AHG_Player::OnMyJump(const FInputActionValue& Value)
 
 void AHG_Player::OnMyLook(const FInputActionValue& Value)
 {
+	if (MouseToggle) return;
+
+
 	if (bOnFullScreen || bOnInventory)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("11"));
 		return;
 	}
 
 	if (!bIsShaking && !bIsSitting && !bCanMove)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("22"));
 		return;
 	}
 
@@ -549,7 +560,7 @@ void AHG_Player::DetectObject()
 	}
 }
 
-void AHG_Player::PopUpInventory(const FInputActionValue& Value)
+void AHG_Player::PopUpInventory()
 {
 	if (InventoryWidget == nullptr)
 	{
@@ -568,10 +579,12 @@ void AHG_Player::PopUpInventory(const FInputActionValue& Value)
 			UGameplayStatics::PlaySound2D(GetWorld(), UIPopUpSound);
 
 			InventoryWidget->PlayAppearAnimation(true);
+			InventoryWidget->InitInventoryUI();
+
 			HUD->PlayAppearAnimation(false);
 			HUD->StopInventoryAnimation();
 			HUD->PlayAnimation(HUD->InputInven);
-			InventoryWidget->InitInventoryUI();
+
 			bOnInventory = true;
 
 			PC->SetShowMouseCursor(true);
@@ -726,7 +739,7 @@ void AHG_Player::ServerRPC_SetCheerSurfingState_Implementation()
 
 void AHG_Player::Emotion()
 {
-	GoodsComp->GoldLerp(4500,0.1f);
+	GoodsComp->GoldLerp(4500, 0.1f);
 
 	if (bEquipItem)
 	{
