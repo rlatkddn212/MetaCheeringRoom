@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../KSW/CreatorObject/SW_CreatorStaticObject.h"
 #include "HG_TeemoDummy.generated.h"
 
 UCLASS()
-class METACHEERINGROOM_API AHG_TeemoDummy : public AActor
+class METACHEERINGROOM_API AHG_TeemoDummy : public ASW_CreatorStaticObject
 {
 	GENERATED_BODY()
 
@@ -16,7 +17,7 @@ public:
 	AHG_TeemoDummy();
 
 protected:
-	// Called when the game starts or when spawned
+	// Called when the game starts or when spawneSd
 	virtual void BeginPlay() override;
 
 public:
