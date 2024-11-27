@@ -15,6 +15,7 @@ class METACHEERINGROOM_API UHG_HUD : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UTextBlock* TB_Point;
@@ -53,20 +54,97 @@ public:
 	class UWidgetAnimation* Input2;
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	class UWidgetAnimation* Input3;	
-	
+	class UWidgetAnimation* Input3;
+
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	class UWidgetAnimation* InputInven;	
-	
+	class UWidgetAnimation* InputInven;
+
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	class UWidgetAnimation* InputCustom;	
-	
+	class UWidgetAnimation* InputCustom;
+
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	class UWidgetAnimation* InputCS;	
-	
+	class UWidgetAnimation* InputCS;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* InputG;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* InputL;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* InputV;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* InputT;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* InputEnter;
+
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	class UWidgetAnimation* TBSlide;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UWidgetSwitcher* WS_Border;
+
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	class UButton* Btn_Custom_L;
+
+	UFUNCTION()
+	void CustomButton();
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_CheerStick_L;
+	UFUNCTION()
+	void RCSButton();
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_Inventory_L;
+
+	UFUNCTION()
+	void InvenButton();
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_Teleport1;
+
+	UFUNCTION()
+	void Tele1Button();
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_Teleport2;
+
+	UFUNCTION()
+	void Tele2Button();
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_Teleport3;
+
+	UFUNCTION()
+	void Tele3Button();
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_Custom_R;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_CheerStick_R;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_Inventory_R;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_Video;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_Predict;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_FullScreen;
+
+	void FullScreenButton();
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_MicToggle;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UButton* Btn_Chat;
 };

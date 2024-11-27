@@ -85,7 +85,13 @@ public:
 	class UInputAction* IA_CheerSurfing;	
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* IA_MuteCoinSound;
+	class UInputAction* IA_MuteCoinSound;	
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_ShowMouse;
+
+	UFUNCTION()
+	void ShowMouse();
 
 	UFUNCTION()
 	void MuteCoinSound();
@@ -141,7 +147,7 @@ public:
 	UFUNCTION()
 	void DetectObject();
 	UFUNCTION()
-	void PopUpInventory(const FInputActionValue& Value);
+	void PopUpInventory();
 	UFUNCTION()
 	void Emotion();
 
@@ -150,6 +156,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UHG_PlayerGoodsComponent* GoodsComp;
 
+	bool MouseToggle = false;
 	bool bToggle = false;
 	bool bToggle2 = false;
 	bool bStoreWidget = false;
