@@ -113,5 +113,5 @@ public:
 	class UWidgetAnimation* Disappear;
 
 	void PlayAppearAnimation(bool Play_Forward);
-	int32 memory = 0;
+	int32 memory = 1;
 };
