@@ -578,6 +578,11 @@ void ASW_CreatorObject::SetCreatorObjectName(const FString& Name)
 	}
 }
 
+void ASW_CreatorObject::CopyCreatorObject(ASW_CreatorObject* SourceObject)
+{
+	SetActorTransform(SourceObject->GetActorTransform());
+}
+
 FString ASW_CreatorObject::GetCreatorObjectName() const
 {
 	return CreatorObjectName.ToString();

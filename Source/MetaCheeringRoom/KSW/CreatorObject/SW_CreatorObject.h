@@ -159,6 +159,9 @@ public:
 	virtual void SetFileName(const FString& FileName);
 
 	void SetCreatorObjectName(const FString& Name);
+
+	virtual void CopyCreatorObject(ASW_CreatorObject* CopyObject);
+
 	FString GetCreatorObjectName() const;
 
 	bool IsSelectedObject;

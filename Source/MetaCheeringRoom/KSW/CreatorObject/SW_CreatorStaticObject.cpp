@@ -64,6 +64,20 @@ void ASW_CreatorStaticObject::OnSelected(bool isSelected)
 	}
 }
 
+void ASW_CreatorStaticObject::CopyCreatorObject(ASW_CreatorObject* CopyObject)
+{
+	Super::CopyCreatorObject(CopyObject);
+
+	ASW_CreatorStaticObject* CopyStaticObject = Cast<ASW_CreatorStaticObject>(CopyObject);
+	if (CopyStaticObject)
+	{
+		Server_SetMeshColor(CopyStaticObject->MeshColor);
+		Server_SetMetallic(CopyStaticObject->Metallic);
+		Server_SetRoughness(CopyStaticObject->Roughness);
+		Server_SetEmissiveColor(CopyStaticObject->EmissiveColor);
+	}
+}
+
 void ASW_CreatorStaticObject::OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty)
 {
 	Super::OnChangeProperty(id, CreatorProperty);

@@ -29,6 +29,31 @@ void ASW_CreatorPointLight::BeginPlay()
 	}
 }
 
+void ASW_CreatorPointLight::CopyCreatorObject(ASW_CreatorObject* CopyObject)
+{
+	Super::CopyCreatorObject(CopyObject);
+
+	ASW_CreatorPointLight* CopyPointLight = Cast<ASW_CreatorPointLight>(CopyObject);
+	if (CopyPointLight)
+	{
+		LightColor = CopyPointLight->LightColor;
+		LightComp->SetLightColor(LightColor);
+
+		LightIntensity = CopyPointLight->LightIntensity;
+		LightComp->SetIntensity(LightIntensity);
+
+		LightAttenuationRadius = CopyPointLight->LightAttenuationRadius;
+		LightComp->SetAttenuationRadius(LightAttenuationRadius);
+
+		LightSourceRadius = CopyPointLight->LightSourceRadius;
+		LightComp->SetSourceRadius(LightSourceRadius);
+
+		CastShadow = CopyPointLight->CastShadow;
+		LightComp->SetCastShadows(CastShadow);
+	}
+
+}
+
 void ASW_CreatorPointLight::OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty)
 {
 	Super::OnChangeProperty(id, CreatorProperty);

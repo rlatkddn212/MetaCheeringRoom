@@ -19,6 +19,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void CopyCreatorObject(ASW_CreatorObject* CopyObject) override;
+
 	virtual void OnChangeProperty(int32 id, UCreatorPropertyBase* CreatorProperty);
 	virtual TMap<int32, UCreatorPropertyBase*> GetPropertyMap() override;
 

@@ -314,7 +314,7 @@ ASW_CreatorObject* UCreatorMapSubsystem::CopyObjectRecursive(ASW_CreatorObject* 
     CreatorObject->CreatorObjectId = CreatorObjectId;
     CreatorObject->CreatorObjectType = CreatorObjectType;
 
-    CreatorObject->SetActorTransform(SourceObject->GetActorTransform());
+    CreatorObject->CopyCreatorObject(SourceObject);
 
     TArray<AActor*> ChildActors;
     SourceObject->GetAttachedActors(ChildActors);
