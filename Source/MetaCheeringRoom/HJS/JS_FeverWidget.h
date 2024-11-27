@@ -62,5 +62,10 @@ public:
 
 	UPROPERTY(meta=(BindWidgetAnim),Transient)
 	class UWidgetAnimation* Fever;
+
+	void RandomCoinSpawn();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AJS_CoinActor> CoinFactory;
 	
 };
