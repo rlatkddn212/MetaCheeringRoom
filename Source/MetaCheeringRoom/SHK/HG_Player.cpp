@@ -329,8 +329,9 @@ void AHG_Player::Sit()
 			SetActorRotation(ChairDir.Rotation());
 			SpringArmComp->TargetArmLength = 0.0f;
 			SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
-			CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
+			CameraComp->SetRelativeLocation(FVector(60.0f, 0.0f, 0.0f));
 			Controller->SetControlRotation(GetActorRotation());
+			GetMesh()->SetHiddenInGame(true);
 		}
 	}
 	else
@@ -338,6 +339,7 @@ void AHG_Player::Sit()
 		SpringArmComp->TargetArmLength = 300.0f;
 		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
 		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+		GetMesh()->SetHiddenInGame(false);
 	}
 	ServerRPC_SetSitState();
 }
@@ -697,7 +699,8 @@ void AHG_Player::CameraDelay()
 	SetActorRotation(ChairDir.Rotation());
 	SpringArmComp->TargetArmLength = 0.0f;
 	SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
-	CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
+	CameraComp->SetRelativeLocation(FVector(60.0f, 0.0f, 0.0f));
+	GetMesh()->SetHiddenInGame(true);
 
 	if (My_CheeringStick)
 	{
@@ -715,8 +718,12 @@ void AHG_Player::RemoveFullScreen()
 
 void AHG_Player::ServerRPC_SetCheerSurfingState_Implementation()
 {
-
 	bIsCheerSurfing = true;
+
+	if (IsLocallyControlled())
+	{
+		GetMesh()->SetHiddenInGame(false);
+	}
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), CSClass, CheerSticks);
 
@@ -727,7 +734,6 @@ void AHG_Player::ServerRPC_SetCheerSurfingState_Implementation()
 
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &AHG_Player::SetCheerSurfingState, 1.0f, false);
-
 }
 
 void AHG_Player::Emotion()
@@ -1246,6 +1252,7 @@ void AHG_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	DOREPLIFETIME(AHG_Player, bEquipItem);
 	DOREPLIFETIME(AHG_Player, bIsSitting);
 	DOREPLIFETIME(AHG_Player, bIsShaking);
+	DOREPLIFETIME(AHG_Player, bIsCheerSurfing);
 	DOREPLIFETIME(AHG_Player, CurCloth);
 	DOREPLIFETIME(AHG_Player, CurClothHem);
 	DOREPLIFETIME(AHG_Player, CurEyes);
