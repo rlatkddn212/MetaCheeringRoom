@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "MetaCheeringRoom.h"
 #include "../SHK/HG_KomanoDummy.h"
+#include "Kismet/GameplayStatics.h"
 // Sets default values
 AJS_StadiumWave::AJS_StadiumWave()
 {
@@ -48,6 +49,7 @@ void AJS_StadiumWave::MulticastTurnStart_Implementation()
     bTurn = true;
     CurrentRotation = 270.f;
     BoxComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    UGameplayStatics::PlaySound2D(GetWorld(), WaveSound);
 }
 
 void AJS_StadiumWave::OnTurn(float DeltaTime)

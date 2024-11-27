@@ -34,4 +34,7 @@ public:
 
 	bool bWayPoint = false;
 
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* CoinFX;
+
 };

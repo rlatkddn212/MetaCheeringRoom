@@ -6,6 +6,7 @@
 #include "../SHK/HG_Player.h"
 #include "MetaCheeringRoom.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h"
 // Sets default values
 AJS_CoinActor::AJS_CoinActor()
 {
@@ -61,7 +62,9 @@ void AJS_CoinActor::ComponentBeginOverlap(UPrimitiveComponent* OverlappedCompone
 	if (OtherActor->IsA<AHG_Player>())
 	{
 		// 나이아가라 이펙트를 터뜨리기(플레이어 머리 위 위치에)
-
+		FVector Point = Player->GetMesh()->GetSocketLocation(TEXT("Head"));
+		Point.Z += 30.f;
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),CoinFX, Point, FRotator::ZeroRotator);
 		// 디스트로이 하기
 		Destroy();
 	}

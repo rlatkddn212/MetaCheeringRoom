@@ -39,3 +39,11 @@ void AJS_LoadActor::MulticastAddChat_Implementation(const FString& id, const FTe
 		ChatWidget->AddChat(id, text, bAuto);
 	}
 }
+
+void AJS_LoadActor::MulticastAutoChatOpen_Implementation()
+{
+	if (ChatWidget)
+	{
+		ChatWidget->OnAutoChat();
+	}
+}

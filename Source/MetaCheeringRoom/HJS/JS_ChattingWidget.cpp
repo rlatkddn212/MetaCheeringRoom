@@ -16,9 +16,8 @@ void UJS_ChattingWidget::NativeConstruct()
 	ED_Chatting->OnTextChanged.AddDynamic(this,&UJS_ChattingWidget::OnChatChange);
 	ED_Chatting->OnTextCommitted.AddDynamic(this, &UJS_ChattingWidget::OnCommitText);
 	Btn_ChatCancel->OnClicked.AddDynamic(this,&UJS_ChattingWidget::OnClickedChatCancel);
-	//GetWorld()->GetTimerManager().SetTimer(ChatTimer,[this](){
-	//	AddChat(TEXT("랜덤 색깔"), TEXT("텍스트 테스트 123"), true);
-	//}, 0.1f, true);
+	InitDummychat();
+
 }
 
 void UJS_ChattingWidget::OnChatChange(const FText& text)
@@ -91,4 +90,45 @@ void UJS_ChattingWidget::OnClickedChatCancel()
 		PC->SetShowMouseCursor(false);
 		PC->SetInputMode(FInputModeGameOnly());
 	}
+}
+
+void UJS_ChattingWidget::OnAutoChat()
+{
+	GetWorld()->GetTimerManager().SetTimer(ChatTimer,this, &UJS_ChattingWidget::DummyChat, 0.1f, false);
+}
+
+void UJS_ChattingWidget::InitDummychat()
+{
+	IDList.Add(TEXT("asdfqwe2"));
+	IDList.Add(TEXT("상혁바라기"));
+	IDList.Add(TEXT("상혁나의빛"));
+	IDList.Add(TEXT("DAESANGHUK"));
+	IDList.Add(TEXT("BLGOUT"));
+	IDList.Add(TEXT("WORLDS"));
+	IDList.Add(TEXT("캐리"));
+
+	CommentList.Add_GetRef(TEXT("대~~~상~~~혁~~~~"));
+	CommentList.Add_GetRef(TEXT("신은존재하며티원에산다"));
+	CommentList.Add_GetRef(TEXT("대상혁 나의 빛."));
+	CommentList.Add_GetRef(TEXT("대상혁 나."));
+	CommentList.Add_GetRef(TEXT("월즈 연속 우승 드가자~~~"));
+	CommentList.Add_GetRef(TEXT("이게 티원이지"));
+	CommentList.Add_GetRef(TEXT("서커스단 출격  ㅋㅋ"));
+	CommentList.Add_GetRef(TEXT("GG~~~~"));
+	CommentList.Add_GetRef(TEXT("이건 게임 갔네"));
+	CommentList.Add_GetRef(TEXT("대~~~상~~~혁~~~~"));
+	CommentList.Add_GetRef(TEXT("신은존재하며티원에산다"));
+	CommentList.Add_GetRef(TEXT("대상혁 나의 빛."));
+	CommentList.Add_GetRef(TEXT("대상혁 나."));
+};
+
+void UJS_ChattingWidget::DummyChat()
+{
+	int32 RandomIndex = FMath::RandRange(0, IDList.Num() - 1);
+	FString ChrrentID = IDList[RandomIndex];
+	RandomIndex = FMath::RandRange(0, CommentList.Num() - 1);
+	FString CurrentComment = CommentList[RandomIndex];
+
+	AddChat(ChrrentID,FText::FromString(CurrentComment),true);
+	GetWorld()->GetTimerManager().SetTimer(ChatTimer, this, &UJS_ChattingWidget::DummyChat, 0.1f, false);
 }

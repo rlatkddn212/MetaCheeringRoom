@@ -302,6 +302,10 @@ void AJS_PlayerController::ServerAddChat_Implementation(const FString& id, const
 	}
 	if (LoadActor)
 	{
+		if (LoadActor->GetOwner() == this)
+		{
+			LoadActor->MulticastAutoChatOpen();
+		}
 		LoadActor->MulticastAddChat(id,text,bAuto);
 	}
 }

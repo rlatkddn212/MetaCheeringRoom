@@ -30,4 +30,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAddChat(const FString& id, const FText& text, bool bAuto);
 
+	UFUNCTION(NetMulticast,Reliable,BlueprintCallable)
+	void MulticastAutoChatOpen();
+
 };
