@@ -189,7 +189,7 @@ public:
 	float LastInputTime = 0.0f;
 	float InputDelay = 0.2f;
 
-	float CameraSpeed = 500.0f;
+	float CameraSpeed = 1000.0f;
 	UFUNCTION(Server, Unreliable)
 	void Server_Movement(const FVector& NewLocation);
 	UFUNCTION(Server, Unreliable)

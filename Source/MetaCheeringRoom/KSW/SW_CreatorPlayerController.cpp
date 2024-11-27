@@ -95,7 +95,7 @@ void ASW_CreatorPlayerController::OnMouseOver()
 
 		{
 			FVector TraceStart = WorldLocation;
-			FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0f);  // 트레이스 거리 설정
+			FVector TraceEnd = WorldLocation + (WorldDirection * 50000.0f);  // 트레이스 거리 설정
 
 			FHitResult HitResult;
 			FCollisionQueryParams Params;
@@ -183,7 +183,7 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 		
 		{
 			FVector TraceStart = WorldLocation;
-			FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0f);  // 트레이스 거리 설정
+			FVector TraceEnd = WorldLocation + (WorldDirection * 50000.0f);  // 트레이스 거리 설정
 
 			FHitResult HitResult;
 			FCollisionQueryParams Params;
@@ -262,7 +262,7 @@ bool ASW_CreatorPlayerController::OnLeftClick()
 
 		{
 			FVector TraceStart = WorldLocation;
-			FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0f);  // 트레이스 거리 설정
+			FVector TraceEnd = WorldLocation + (WorldDirection * 50000.0f);  // 트레이스 거리 설정
 
 			FHitResult HitResult;
 			FCollisionQueryParams Params;
