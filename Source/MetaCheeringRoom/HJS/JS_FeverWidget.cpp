@@ -7,6 +7,8 @@
 #include "Styling/SlateColor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
+#include "GameFramework/Character.h"
+#include "JS_CoinActor.h"
 
 void UJS_FeverWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -27,6 +29,7 @@ void UJS_FeverWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 			SetVisibility(ESlateVisibility::Hidden);
 			CurrentTime = 0.f;
 		}
+		RandomCoinSpawn();
 	}
 }
 
@@ -63,6 +66,7 @@ void UJS_FeverWidget::UpdateGradientColor(float InDeltaTime)
 		{
 			IMG_Fever->SetColorAndOpacity(CurrentColor);
 		}
+		RandomCoinSpawn();
 	}
 }
 
@@ -92,4 +96,30 @@ void UJS_FeverWidget::TextGradientColor(float InDeltaTime)
 	{
 		IMG_FeverTime->SetColorAndOpacity(CurrenTextColor);
 	}
+}
+
+void UJS_FeverWidget::RandomCoinSpawn()
+{
+	ACharacter* Player = GetWorld()->GetFirstPlayerController()->GetCharacter();
+
+	if (Player)
+	{
+		FVector Loc = Player->GetActorLocation();
+		float Min = 300.f;
+		float Max = 500.f;
+		// 무작위 반지름 값
+		float RandomRadius = FMath::RandRange(Min, Max);
+
+		// 구의 무작위 방향
+		FVector RandomDirection = FMath::VRand();
+
+		// 위쪽 반구로 제한
+		RandomDirection.Z = FMath::Abs(RandomDirection.Z); // Z 값을 양수로 제한
+
+		// 랜덤 방향에 반지름을 곱해 위치 계산
+		FVector RandomPoint = Loc + RandomDirection * RandomRadius;
+		FRotator SpawnRotation = FRotator::ZeroRotator;
+		GetWorld()->SpawnActor<AJS_CoinActor>(CoinFactory, RandomPoint, SpawnRotation);
+	}
+
 }
