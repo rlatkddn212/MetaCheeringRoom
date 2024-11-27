@@ -8,6 +8,22 @@
 #include "Components/WidgetSwitcher.h"
 #include "Components/Button.h"
 
+void UHG_HUD::NativeConstruct()
+{
+	Btn_Custom_L->OnClicked.AddDynamic(this, &UHG_HUD::CustomButton);
+	Btn_Custom_R->OnClicked.AddDynamic(this, &UHG_HUD::CustomButton);
+
+	Btn_CheerStick_L->OnClicked.AddDynamic(this, &UHG_HUD::RCSButton);
+	Btn_CheerStick_R->OnClicked.AddDynamic(this, &UHG_HUD::RCSButton);
+
+	Btn_Inventory_L->OnClicked.AddDynamic(this, &UHG_HUD::InvenButton);
+	Btn_Inventory_R->OnClicked.AddDynamic(this, &UHG_HUD::InvenButton);
+
+	Btn_Teleport1->OnClicked.AddDynamic(this, &UHG_HUD::Tele1Button);
+	Btn_Teleport2->OnClicked.AddDynamic(this, &UHG_HUD::Tele2Button);
+	Btn_Teleport3->OnClicked.AddDynamic(this, &UHG_HUD::Tele3Button);
+}
+
 void UHG_HUD::SetPointText()
 {
 	if (GetOwningPlayer())
@@ -83,6 +99,78 @@ void UHG_HUD::StopInventoryAnimation()
 	if (IsAnimationPlaying(NewItem))
 	{
 		StopAnimation(NewItem);
+	}
+}
+
+void UHG_HUD::CustomButton()
+{
+	if (GetOwningPlayer())
+	{
+		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+		if (Player)
+		{
+			Player->PopUpCustomUI();
+		}
+	}
+}
+
+void UHG_HUD::RCSButton()
+{
+	if (GetOwningPlayer())
+	{
+		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+		if (Player)
+		{
+			Player->Emotion();
+		}
+	}
+}
+
+void UHG_HUD::InvenButton()
+{
+	if (GetOwningPlayer())
+	{
+		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+		if (Player)
+		{
+			Player->PopUpInventory();
+		}
+	}
+}
+
+void UHG_HUD::Tele1Button()
+{
+	if (GetOwningPlayer())
+	{
+		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+		if (Player)
+		{
+			Player->TeleportToStore();
+		}
+	}
+}
+
+void UHG_HUD::Tele2Button()
+{
+	if (GetOwningPlayer())
+	{
+		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+		if (Player)
+		{
+			Player->TeleportToJoin();
+		}
+	}
+}
+
+void UHG_HUD::Tele3Button()
+{
+	if (GetOwningPlayer())
+	{
+		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+		if (Player)
+		{
+			Player->TeleportToCreate();
+		}
 	}
 }
 
