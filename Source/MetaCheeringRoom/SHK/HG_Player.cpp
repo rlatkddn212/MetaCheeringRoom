@@ -354,11 +354,6 @@ void AHG_Player::ServerRPC_SetSitState_Implementation()
 				SetActorLocation(ChairLoc);
 				FVector ChairDir = DetectChair->GetActorRightVector();
 				SetActorRotation(ChairDir.Rotation());
-				SpringArmComp->TargetArmLength = 0.0f;
-				SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
-				CameraComp->SetRelativeLocation(FVector(40.0f, 0.0f, 0.0f));
-				CameraComp->SetRelativeRotation(ChairDir.Rotation());
-				Controller->SetControlRotation(GetActorRotation());
 				bIsSitting = true;
 				DetectChair->IsSeatTaken = true;
 			}
@@ -371,9 +366,6 @@ void AHG_Player::ServerRPC_SetSitState_Implementation()
 			DetectChair->IsSeatTaken = false;
 		}
 		bIsSitting = false;
-		SpringArmComp->TargetArmLength = 300.0f;
-		SpringArmComp->SetRelativeLocation(FVector(-12.0f, 0.0f, -64.0f));
-		CameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	}
 	if (IsLocallyControlled())
 	{
