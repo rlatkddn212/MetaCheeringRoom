@@ -22,6 +22,12 @@ void UHG_HUD::NativeConstruct()
 	Btn_Teleport1->OnClicked.AddDynamic(this, &UHG_HUD::Tele1Button);
 	Btn_Teleport2->OnClicked.AddDynamic(this, &UHG_HUD::Tele2Button);
 	Btn_Teleport3->OnClicked.AddDynamic(this, &UHG_HUD::Tele3Button);
+
+	Btn_Video->OnClicked.AddDynamic(this, &UHG_HUD::Tele3Button);
+	Btn_Predict->OnClicked.AddDynamic(this, &UHG_HUD::Tele3Button);
+	Btn_FullScreen->OnClicked.AddDynamic(this, &UHG_HUD::Tele3Button);
+	Btn_MicToggle->OnClicked.AddDynamic(this, &UHG_HUD::Tele3Button);
+	Btn_Chat->OnClicked.AddDynamic(this, &UHG_HUD::Tele3Button);
 }
 
 void UHG_HUD::SetPointText()
@@ -170,6 +176,18 @@ void UHG_HUD::Tele3Button()
 		if (Player)
 		{
 			Player->TeleportToCreate();
+		}
+	}
+}
+
+void UHG_HUD::FullScreenButton()
+{
+	if (GetOwningPlayer())
+	{
+		auto* Player = Cast<AHG_Player>(GetOwningPlayer()->GetPawn());
+		if (Player)
+		{
+			Player->ConversionFullScreen();
 		}
 	}
 }

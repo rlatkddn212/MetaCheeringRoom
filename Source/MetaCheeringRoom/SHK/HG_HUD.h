@@ -140,6 +140,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UButton* Btn_FullScreen;
 
+	void FullScreenButton();
+
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UButton* Btn_MicToggle;
 
