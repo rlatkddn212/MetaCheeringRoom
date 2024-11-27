@@ -294,8 +294,9 @@ void AHG_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AHG_Player::ShowMouse()
 {
+	MouseToggle = PC->bShowMouseCursor;
+	PC->SetShowMouseCursor(!MouseToggle);
 	MouseToggle = !MouseToggle;
-	PC->SetShowMouseCursor(MouseToggle);
 }
 
 void AHG_Player::MuteCoinSound()
