@@ -5,6 +5,8 @@
 #include "../KSW/CreatorStorageSubsystem.h"
 #include "../KSW/CreatorStorageSubsystem.h"
 #include "../KSW/CreatorMapSubsystem.h"
+#include "Kismet/GameplayStatics.h"
+#include "JS_Screen.h"
 
 // Sets default values
 AJS_CustomLoad::AJS_CustomLoad()
@@ -34,6 +36,11 @@ void AJS_CustomLoad::BeginPlay()
 		system->LoadMap();
 		SetOwner(PC);
 	}
+
+	GetWorldTimerManager().SetTimer(A, this, &AJS_CustomLoad::AA, 20.f, false);
+	GetWorldTimerManager().SetTimer(B, this, &AJS_CustomLoad::BB, 30.f, false);
+	GetWorldTimerManager().SetTimer(C, this, &AJS_CustomLoad::CC, 65.f, false);
+
 }
 
 // Called every frame
@@ -41,5 +48,26 @@ void AJS_CustomLoad::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AJS_CustomLoad::AA()
+{
+	// 불끄기
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(),TEXT("EmissiveControlLight"),Actors);
+	for (AActor* Act : Actors)
+	{
+		Act->SetActorHiddenInGame(true);
+	}
+}
+
+void AJS_CustomLoad::BB()
+{
+	AJS_Screen* Screen = Cast<AJS_Screen>(UGameplayStatics::GetActorOfClass(GetWorld(), AJS_Screen::StaticClass()));
+
+	if (Screen)
+	{
+		Screen->PlayVOD(TEXT("http://221.163.19.142:13333/vod/시연.mp4"));
+	}
 }
 
