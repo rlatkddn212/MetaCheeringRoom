@@ -134,10 +134,10 @@ void UInventoryWidget::SetOwner(APawn* Player)
 // Active 카테고리 버튼이 클릭 됐을 때 실행되는 함수
 void UInventoryWidget::SelectCategory_Active()
 {
-	SelectedCategory = WB_SlotList_Active;
-	WS_Category->SetActiveWidgetIndex(0);
+	SelectedCategory = WB_SlotList_Costume;
+	WS_Category->SetActiveWidgetIndex(1);
 
-	memory = 0;
+	memory = 1;
 
 	CheckButtonClick(Btn_ActiveCategory);
 }
