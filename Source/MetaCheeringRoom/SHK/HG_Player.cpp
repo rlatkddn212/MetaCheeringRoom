@@ -684,6 +684,12 @@ void AHG_Player::BlingBling()
 void AHG_Player::SetCheerSurfingState()
 {
 	bIsCheerSurfing = false;
+
+	if (IsLocallyControlled())
+	{
+		GetMesh()->SetHiddenInGame(false);
+	}
+
 	if (DetectChair)
 	{
 		FTimerHandle handle;
@@ -719,11 +725,6 @@ void AHG_Player::RemoveFullScreen()
 void AHG_Player::ServerRPC_SetCheerSurfingState_Implementation()
 {
 	bIsCheerSurfing = true;
-
-	if (IsLocallyControlled())
-	{
-		GetMesh()->SetHiddenInGame(false);
-	}
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), CSClass, CheerSticks);
 
