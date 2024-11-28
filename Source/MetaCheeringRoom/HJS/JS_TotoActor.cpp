@@ -239,7 +239,7 @@ void AJS_TotoActor::MulticastAdjustPoint_Implementation(class AHG_Player* player
 {
 	if (player->IsLocallyControlled())
 	{
-		player->GoodsComp->AddGold((int32)bettingpoint*odd);
+		player->GoodsComp->GoldLerp(player->GoodsComp->GetGold()+(int32)bettingpoint*odd,0.05);
 	}
 	AdjustWin(player);
 }

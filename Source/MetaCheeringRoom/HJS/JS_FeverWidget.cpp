@@ -90,7 +90,6 @@ void UJS_FeverWidget::UpdateGradientColor(float InDeltaTime)
 			IMG_Fever->SetColorAndOpacity(CurrentColor);
 		}
 		RandomCoinSpawn();
-		RandomCoinSpawn();
 	}
 }
 
