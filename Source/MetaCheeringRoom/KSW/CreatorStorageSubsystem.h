@@ -106,6 +106,7 @@ public:
 
 	FString LoadCreatorMap(FString FilePath);
 	bool SaveCreatorMap(FString JsonStr, FString MapName);
+	bool CaptureThumbnailToFile(const FString& FilePath);
 
 	void LoadMetaData();
 	void SaveMetaData();
