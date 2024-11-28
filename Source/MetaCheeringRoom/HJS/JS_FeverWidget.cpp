@@ -11,7 +11,7 @@
 #include "JS_CoinActor.h"
 #include "../SHK/HG_Player.h"
 #include "../SHK/HG_PlayerGoodsComponent.h"
-
+#include "MetaCheeringRoom.h"
 void UJS_FeverWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry,InDeltaTime);
@@ -22,13 +22,35 @@ void UJS_FeverWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	if(bFeverStart || bFeverTime)
 	{ 
 		CurrentTime += InDeltaTime;
+		// 남은 시간 감소
+		if (bFeverStart)
+		{
+			RemainingTime -= InDeltaTime;
+			if (RemainingTime <= 0.f)
+			{
+				RemainingTime = 0.f;
+			}
+
+			// 초와 밀리초 계산
+			int32 Seconds = FMath::FloorToInt(RemainingTime);
+			int32 Milliseconds = FMath::FloorToInt((RemainingTime - Seconds) * 100);
+
+			// 시간 텍스트 업데이트
+			FString FormattedTime = FString::Printf(TEXT("%02d:%02d"), Seconds, Milliseconds);
+
+			if (TEXT_Time)
+			{
+				TEXT_Time->SetText(FText::FromString(FormattedTime));
+			}
+		}
+
 		if (CurrentTime >= FeverEndTime)
 		{
-			PB_FeverBar->SetVisibility(ESlateVisibility::Visible);
 			UGameplayStatics::PlaySound2D(GetWorld(),DrumHitSound);
 			bFeverTime = false;
 			bFeverStart = false;
 			SetVisibility(ESlateVisibility::Hidden);
+			PB_FeverBar->SetVisibility(ESlateVisibility::Visible);
 			CurrentTime = 0.f;
 		}
 	}
@@ -68,6 +90,7 @@ void UJS_FeverWidget::UpdateGradientColor(float InDeltaTime)
 			IMG_Fever->SetColorAndOpacity(CurrentColor);
 		}
 		RandomCoinSpawn();
+		RandomCoinSpawn();
 	}
 }
 
@@ -79,6 +102,12 @@ void UJS_FeverWidget::FeverStart()
 		IMG_Fever->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		bFeverTime = true;
 		bFeverStart = false;
+		// 남은 시간 초기화
+		// 시간 텍스트 초기화
+		if (TEXT_Time)
+		{
+			TEXT_Time->SetText(FText::FromString(TEXT("00:05")));
+		}
 		CurrentTime = 2.f;
 		UGameplayStatics::PlaySound2D(GetWorld(), DrumHitSound);
 		UGameplayStatics::PlaySound2D(GetWorld(), FeverSound);
@@ -105,6 +134,10 @@ void UJS_FeverWidget::TextGradientColor(float InDeltaTime)
 	if (IMG_FeverTime)
 	{
 		IMG_FeverTime->SetColorAndOpacity(CurrenTextColor);
+		if (bFeverTime)
+		{
+			TEXT_Time->SetColorAndOpacity(CurrenTextColor);
+		}
 	}
 }
 

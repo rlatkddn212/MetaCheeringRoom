@@ -258,7 +258,7 @@ void UJS_NetComponent::GetInfoFromAIServer()
 		});
 
 	// 요청 전송
-	HttpRequest->ProcessRequest();
+	//HttpRequest->ProcessRequest();
 
 	// 요청 전송
 	HttpRequest->ProcessRequest();

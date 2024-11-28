@@ -60,6 +60,8 @@ void AJS_FeverActor::MulticastFeverTimeStart_Implementation()
 		FeverWidget->SetPercent(0.1f);
 		FeverWidget->IMG_Fever->SetVisibility(ESlateVisibility::Hidden);
 		FeverWidget->PlayAnimation(FeverWidget->Fever);
+		FeverWidget->PlayAnimation(FeverWidget->TimeAnim);
+		FeverWidget->RemainingTime = 7.0f;
 		if (FeverWidget->DrumRollSound)
 		{
 			UGameplayStatics::PlaySound2D(GetWorld(),FeverWidget->DrumRollSound);

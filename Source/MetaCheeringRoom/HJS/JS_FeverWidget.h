@@ -24,6 +24,8 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* TEXT_Fever;
 	UPROPERTY(meta=(BindWidget))
+	class UTextBlock* TEXT_Time;
+	UPROPERTY(meta=(BindWidget))
 	class UProgressBar* PB_FeverBar;
 	UFUNCTION(BlueprintCallable)
 	void SetPercent(float value);
@@ -40,7 +42,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool bFeverStart = false;
 	bool bFeverTime = false;
-	float FeverEndTime = 5.f;
+	float FeverEndTime = 7.f;
 	float CurrentTime = 0.f;
 	void UpdateGradientColor(float InDeltaTime);
 
@@ -62,10 +64,14 @@ public:
 
 	UPROPERTY(meta=(BindWidgetAnim),Transient)
 	class UWidgetAnimation* Fever;
+	UPROPERTY(meta=(BindWidgetAnim),Transient)
+	class UWidgetAnimation* TimeAnim;
 
 	void RandomCoinSpawn();
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AJS_CoinActor> CoinFactory;
 	
+	float RemainingTime = 0.f;
+
 };
