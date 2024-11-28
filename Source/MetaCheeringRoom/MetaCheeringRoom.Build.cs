@@ -11,7 +11,7 @@ public class MetaCheeringRoom : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore",
 			"EnhancedInput", "UMG", "Json", "JsonUtilities", "HTTP", "MediaAssets", "OnlineSubsystem", 
 			"OnlineSubsystemSteam", "OnlineSubsystemUtils", "RenderCore", "RHI","MeshDescription", 
-			"StaticMeshDescription", "GeometryCore", "DesktopPlatform", "ProceduralMeshComponent", "RuntimeLoadFbx", "Niagara","NiagaraCore" });
+			"StaticMeshDescription", "GeometryCore", "ProceduralMeshComponent", "RuntimeLoadFbx", "Niagara","NiagaraCore" });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore"});
 
