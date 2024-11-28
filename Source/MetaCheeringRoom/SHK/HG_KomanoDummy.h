@@ -37,11 +37,11 @@ public:
 	void Multicast_SetStateShake(bool Value);
 
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Replicated)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool bSit = true;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Replicated)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool bShake = false;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Replicated)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool bIdle = false;
 
 	UFUNCTION(BlueprintImplementableEvent)
