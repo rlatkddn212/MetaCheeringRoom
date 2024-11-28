@@ -66,5 +66,13 @@ void AJS_FeverActor::MulticastFeverTimeStart_Implementation()
 		{
 			UGameplayStatics::PlaySound2D(GetWorld(),FeverWidget->DrumRollSound);
 		}
+		AHG_Player* Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+
+		if (Player)
+		{
+			Player->StartFeverTime();
+		}
+
+			
 	}
 }

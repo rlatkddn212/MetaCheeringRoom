@@ -52,6 +52,12 @@ void UJS_FeverWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 			SetVisibility(ESlateVisibility::Hidden);
 			PB_FeverBar->SetVisibility(ESlateVisibility::Visible);
 			CurrentTime = 0.f;
+			AHG_Player* Player = Cast<AHG_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+
+			if (Player)
+			{
+				Player->EndFeverTime();
+			}
 		}
 	}
 }
