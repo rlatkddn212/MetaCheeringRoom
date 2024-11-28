@@ -41,14 +41,14 @@ void AJS_StadiumWave::Tick(float DeltaTime)
 
 void AJS_StadiumWave::TurnStart()
 {
+    bTurn = true;
+    CurrentRotation = 270.f;
+    BoxComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     MulticastTurnStart();
 }
 
 void AJS_StadiumWave::MulticastTurnStart_Implementation()
 {
-    bTurn = true;
-    CurrentRotation = 270.f;
-    BoxComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     UGameplayStatics::PlaySound2D(GetWorld(), WaveSound);
 }
 
