@@ -30,9 +30,9 @@ void AHG_KomanoDummy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AHG_KomanoDummy, bShake);
-	DOREPLIFETIME(AHG_KomanoDummy, bSit);
-	DOREPLIFETIME(AHG_KomanoDummy, bIdle);
+// 	DOREPLIFETIME(AHG_KomanoDummy, bShake);
+// 	DOREPLIFETIME(AHG_KomanoDummy, bSit);
+// 	DOREPLIFETIME(AHG_KomanoDummy, bIdle);
 }
 
 void AHG_KomanoDummy::Multicast_SetStateSit_Implementation(bool Value)
