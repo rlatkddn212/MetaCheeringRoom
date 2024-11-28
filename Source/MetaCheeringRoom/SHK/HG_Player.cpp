@@ -739,8 +739,6 @@ void AHG_Player::ServerRPC_SetCheerSurfingState_Implementation()
 
 void AHG_Player::Emotion()
 {
-	GoodsComp->GoldLerp(4500, 0.1f);
-
 	if (bEquipItem)
 	{
 		auto* RCSWidget = CreateWidget<UHG_RemoteCS>(GetWorld(), RCSClass);
