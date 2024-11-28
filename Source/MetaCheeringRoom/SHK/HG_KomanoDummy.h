@@ -22,11 +22,8 @@ protected:
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UFUNCTION(Server,Reliable)
 	void ServerRPC_SetStateSit(bool Value);	
-	UFUNCTION(Server,Reliable)
 	void ServerRPC_SetStateIdle(bool Value);
-	UFUNCTION(Server, Reliable)
 	void ServerRPC_SetStateShake(bool Value);
 
 	UFUNCTION(NetMulticast,Reliable)
