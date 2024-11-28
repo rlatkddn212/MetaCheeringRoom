@@ -304,7 +304,7 @@ ASW_CreatorObject* UCreatorMapSubsystem::CopyObjectRecursive(ASW_CreatorObject* 
     }
 
     // CreatorObject¸¦ »ý¼º
-    ASW_CreatorObject* CreatorObject = CreateObject(CreatorObjectsStruct[CreatorObjectId]);
+    ASW_CreatorObject* CreatorObject = CreateObject(SourceObject->CreatingObjectData);
     if (CreatorObject == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to create object."));
@@ -315,6 +315,7 @@ ASW_CreatorObject* UCreatorMapSubsystem::CopyObjectRecursive(ASW_CreatorObject* 
     CreatorObject->CreatorObjectType = CreatorObjectType;
 
     CreatorObject->CopyCreatorObject(SourceObject);
+    CreatorObject->SetFileName(CreatorObject->CreatingObjectData->ItemName);
 
     TArray<AActor*> ChildActors;
     SourceObject->GetAttachedActors(ChildActors);
