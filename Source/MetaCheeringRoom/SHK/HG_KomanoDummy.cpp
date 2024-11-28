@@ -52,17 +52,17 @@ void AHG_KomanoDummy::Multicast_SetStateShake_Implementation(bool Value)
 
 void AHG_KomanoDummy::ReturnOriginCondition()
 {
-	ServerRPC_SetStateSit(true);
-	ServerRPC_SetStateIdle(false);
-	ServerRPC_SetStateShake(false);
+	Multicast_SetStateSit(true);
+	Multicast_SetStateIdle(false);
+	Multicast_SetStateShake(false);
 	ChangeCSOrigin();
 }
 
 void AHG_KomanoDummy::CheerSurfing()
 {
-	ServerRPC_SetStateSit(false);
-	ServerRPC_SetStateIdle(true);
-	ServerRPC_SetStateShake(true);
+	Multicast_SetStateSit(false);
+	Multicast_SetStateIdle(true);
+	Multicast_SetStateShake(true);
 
 	ChangeCheeringStickColor();
 
