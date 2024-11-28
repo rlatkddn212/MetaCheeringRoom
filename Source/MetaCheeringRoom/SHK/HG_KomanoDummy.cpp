@@ -14,12 +14,12 @@ AHG_KomanoDummy::AHG_KomanoDummy()
 
 	Mesh->SetGenerateOverlapEvents(true);
 	
-	bReplicates = true;
-	SetReplicateMovement(true);
-	SetReplicates(true);
+// 	bReplicates = true;
+// 	SetReplicateMovement(true);
+// 	SetReplicates(true);
 }
 
-// Called when the game starts or when spawned
+// Called when the game starts or when spawned	
 void AHG_KomanoDummy::BeginPlay()
 {
 	Super::BeginPlay();
