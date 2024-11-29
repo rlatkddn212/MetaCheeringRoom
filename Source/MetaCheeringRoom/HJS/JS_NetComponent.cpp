@@ -236,7 +236,7 @@ void UJS_NetComponent::GetInfoFromAIServer()
 		});
 
 	// 요청 전송
-	//HttpRequest->ProcessRequest();
+	HttpRequest->ProcessRequest();
 
 	HttpRequest = FHttpModule::Get().CreateRequest();
 	HttpRequest->SetURL(ServerURL + TEXT("/youtube_live_streams"));
@@ -258,7 +258,7 @@ void UJS_NetComponent::GetInfoFromAIServer()
 		});
 
 	// 요청 전송
-	//HttpRequest->ProcessRequest();
+	HttpRequest->ProcessRequest();
 
 	// 요청 전송
 	HttpRequest->ProcessRequest();
